@@ -193,4 +193,14 @@
     </dependency>
   </dependencies>
 
+  <scm>
+    <url>scm:git:https://github.com/MyCoRe-Org/MyVidCoRe.git</url>
+    <tag>master</tag>
+    <connection>scm:git:https://github.com/MyCoRe-Org/MyVidCoRe.git</connection>
+    <developerConnection>scm:git:https://github.com/MyCoRe-Org/MyVidCoRe.git</developerConnection>
+  </scm>
+  <organization>
+    <name>MyCoRe</name>
+    <url>http://www.mycore.de</url>
+  </organization>
 </project>
