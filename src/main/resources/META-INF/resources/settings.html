@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="MyVidCoRe">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+<meta name="description" content="MyVidCoRe - Video Converter WebService">
+<meta name="author" content="René Adler">
+<link rel="icon" href="/web/assets/images/favicon.ico">
+
+<title>MyVidCoRe - Video Converter WebService</title>
+
+<!-- Custom styles for this template -->
+<link href="/web/assets/css/bootstrap-slider.min.css" rel="stylesheet">
+<link href="/web/assets/css/layout.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/web"><span class="glyphicon glyphicon-film" aria-hidden="true"></span> MyVidCoRe</a>
+      </div>
+      <div id="navbar" class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+          <li class="nav-item"><a class="nav-link" href="/web"><span class="glyphicon
+              glyphicon-dashboard" aria-hidden="true"></span> {{
+              'nav.dashboard' | translate }}</a></li>
+          <li class="nav-item active"><a class="nav-link" href="/web/settings.html"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> {{
+              'nav.settings' | translate }}<span class="sr-only">(current)</span></a></li>
+        </ul>
+        <div class="nav navbar-nav navbar-right">
+          <span id="directoryWatcherStatus" ng-controller="directoryWatcherStatus" class="label {{status.active ? 'label-success' : 'label-danger'}}">Watcher</span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+
+    <div id="settings" class="content-container" ng-controller="settings">
+      <div id="status-message" class="alert alert-{{status.style}} alert-dismissible" role="alert" ng-if="status.style">
+        <button type="button" class="close" data-dismiss="alert" aria-label="{{ 'btn.close' | translate }}">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        {{ status.msg }}
+      </div>
+
+      <form novalidate>
+        <fieldset ng-if="formats">
+          <legend>{{ 'settings.converter.title' | translate }}</legend>
+          <div class="form-group">
+            <label for="format">{{ 'settings.format' | translate }}</label> <select id="format" class="form-control" ng-model="settings.format">
+              <option ng-repeat="(name, format) in formats" value="{{name}}">{{format.description}}</option>
+            </select>
+          </div>
+          <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#video" aria-controls="video" data-toggle="tab">Video</a></li>
+            <li role="presentation"><a href="#audio" aria-controls="audio" data-toggle="tab">Audio</a></li>
+          </ul>
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade in active" id="video">
+              <div class="form-group">
+                <select id="vcodec" class="form-control" ng-model="settings.video.codec">
+                  <option ng-repeat="codec in filterCodecs(settings.format, 'video')" value="{{codec.name}}">{{codec.description}}</option>
+                </select>
+              </div>
+              <div class="row">
+                <div class="col-sm-4">
+                  <div class="form-group">
+                    <label for="framerate">{{ 'settings.framerate' | translate }}</label> <select id="framerate" class="form-control" ng-model="settings.video.framerate">
+                      <option value="auto">{{ 'settings.framerate.auto' | translate }}</option>
+                      <option value="5">5</option>
+                      <option value="10">10</option>
+                      <option value="12">12</option>
+                      <option value="15">15</option>
+                      <option value="23.976">23.976 (NTSC Film)</option>
+                      <option value="24">24</option>
+                      <option value="25">25 (PAL Film/Video)</option>
+                      <option value="29.97">29.97 (NTSC Video)</option>
+                      <option value="30">30</option>
+                      <option value="50">50</option>
+                      <option value="59.94">59.94</option>
+                      <option value="60">60</option>
+                    </select>
+                  </div>
+                  <div class="radio">
+                    <label> <input type="radio" id="frTypeVFR" value="VFR" checked ng-model="settings.video.framerateType"> {{
+                      'settings.framerate.type.vfr' | translate }}
+                    </label>
+                  </div>
+                  <div class="radio">
+                    <label> <input type="radio" id="frTypeCFR" value="CFR" ng-model="settings.video.framerateType"> {{ 'settings.framerate.type.cfr' |
+                      translate }}
+                    </label>
+                  </div>
+                </div>
+                <div class="col-sm-2 quality-label">
+                  <label>{{ 'settings.quality' | translate }}</label>
+                </div>
+                <div class="col-sm-6">
+                  <div class="radio">
+                    <label> <input type="radio" id="qTypeCRF" value="CRF" checked ng-model="settings.video.quality.type"> {{ 'settings.quality.type.CRF' |
+                      translate }} <input id="quality" class="form-control" data-slider-id='qualitySlider' type="text" data-slider-min="0" data-slider-max="51"
+                      data-slider-step="0.25" data-slider-value="23" data-slider-precision="2" data-slider-reversed="true" ng-model="settings.video.quality.rateFactor"
+                      ng-disabled="settings.video.quality.type != 'CRF'" slider
+                    />
+                    </label>
+                  </div>
+                  <div class="radio">
+                    <label> <input type="radio" id="qTypeABR" value="ABR" ng-model="settings.video.quality.type"> {{ 'settings.quality.type.ABR' |
+                      translate }} <input type="text" class="form-control text-right" value="250000" ng-model="settings.video.quality.bitrate"
+                      ng-disabled="settings.video.quality.type != 'ABR'"
+                    />
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="form-group col-sm-6">
+                  <label for="profile">{{ 'settings.profile' | translate }}</label> <select id="profile" class="form-control" ng-model="settings.video.profile">
+                    <option value="high">high</option>
+                    <option value="main">main</option>
+                    <option value="baseline">baseline</option>
+                  </select>
+                </div>
+                <div class="form-group col-sm-6">
+                  <label for="level">{{ 'settings.level' | translate }}</label> <select id="level" class="form-control" ng-model="settings.video.level">
+                    <option value="3.0">3.0</option>
+                    <option value="3.1">3.1</option>
+                    <option value="4.0">4.0</option>
+                    <option value="4.1">4.1</option>
+                    <option value="4.2">4.2</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="audio">
+              <div class="form-group">
+                <label for="acodec">{{ 'settings.codec' | translate }}</label> <select id="vcodec" class="form-control" ng-model="settings.audio.codec">
+                  <option ng-repeat="codec in filterCodecs(settings.format, 'audio') track by $id(codec)" value="{{codec.name}}">{{codec.description}}
+                </select>
+              </div>
+              <!--              <div class="form-group"> -->
+              <!--                <label for="mixdown">{{ 'settings.audio.mixdown' | translate }}</label> <select id="mixdown" class="form-control" ng-model="settings.audio.mixdown"> -->
+              <!--                  <option value="mono">{{ 'settings.audio.mixdown.mono' | translate }}</option> -->
+              <!--                  <option value="mono-l">{{ 'settings.audio.mixdown.mono-l' | translate }}</option> -->
+              <!--                  <option value="mono-r">{{ 'settings.audio.mixdown.mono-r' | translate }}</option> -->
+              <!--                  <option value="stereo">{{ 'settings.audio.mixdown.stereo' | translate }}</option> -->
+              <!--                </select> -->
+              <!--              </div> -->
+              <div class="form-group">
+                <label for="samplerate">{{ 'settings.audio.samplerate' | translate }}</label> <select id="samplerate" class="form-control"
+                  ng-model="settings.audio.samplerate"
+                >
+                  <option value="auto">{{ 'settings.auto' | translate }}</option>
+                  <option value="8000">8</option>
+                  <option value="11025">11.025</option>
+                  <option value="12000">12</option>
+                  <option value="16000">16</option>
+                  <option value="22050">22.05</option>
+                  <option value="24000">24</option>
+                  <option value="32000">32</option>
+                  <option value="44100">44.1</option>
+                  <option value="48000">48</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="bitrate">{{ 'settings.audio.bitrate' | translate }}</label> <select id="bitrate" class="form-control" ng-model="settings.audio.bitrate"
+                  convert-to-number
+                >
+                  <option value="64">64</option>
+                  <option value="80">80</option>
+                  <option value="96">96</option>
+                  <option value="112">112</option>
+                  <option value="128">128</option>
+                  <option value="160">160</option>
+                  <option value="192">192</option>
+                  <option value="224">224</option>
+                  <option value="256">256</option>
+                  <option value="320">320</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="pull-right clear-fix">
+            <button type="submit" class="btn btn-default btn-primary" ng-click="save(settings)">{{ 'btn.save' | translate }}</button>
+          </div>
+        </fieldset>
+      </form>
+      <br>
+      <pre>{{settings | json}}</pre>
+    </div>
+
+  </div>
+  <!-- /.container -->
+
+
+  <!-- Bootstrap core JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script type="text/javascript" src="/web/assets/js/jquery.min.js"></script>
+  <script type="text/javascript" src="/web/assets/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="/web/assets/js/bootstrap-slider.min.js"></script>
+  <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+  <script type="text/javascript" src="/web/assets/js/ie10-viewport-bug-workaround.js"></script>
+
+  <script type="text/javascript" src="/web/assets/js/angular.min.js"></script>
+  <script type="text/javascript" src="/web/assets/js/angular-sanitize.min.js"></script>
+  <script type="text/javascript" src="/web/assets/js/angular-translate.min.js"></script>
+  <script type="text/javascript" src="/web/assets/js/angular-translate-loader-static-files.min.js"></script>
+
+  <script type="text/javascript" src="/web/assets/js/main.js"></script>
+</body>
+</html>
+
+</body>
+</html>

@@ -1,0 +1,64 @@
+body {
+  padding-top: 50px;
+}
+
+.content-container {
+  padding: 40px 0;
+}
+
+#converter {
+  .panel-body {
+    padding: 0 15px;
+    .no-jobs {
+      padding: 15px;
+    }
+
+    .converter {
+      &:last-child {
+        border-bottom: none;
+      }
+
+      border-bottom: 1px solid @panel-default-border;
+      padding: 5px 0 0;
+    }
+  }
+}
+
+#settings {
+  .nav-tabs > li.active {
+    > a , > a:hover , > a:focus {
+      background-color: @panel-default-heading-bg;
+    }
+  }
+
+  .tab-content > .tab-pane {
+    background-color: @panel-default-heading-bg;
+    border-color: @panel-default-border;
+    border-image: none;
+    border-style: none solid solid;
+    border-width: 0 1px 1px;
+    padding: 15px;
+    margin-bottom: 10px;
+    .border-bottom-radius (2px);
+  }
+
+  .quality-label {
+    @media (min-width: @screen-md-min) {
+      text-align: right;
+    }
+  }
+
+  #qualitySlider {
+    display: block;
+    .slider-handle {
+      background-color: @brand-primary;
+      background-image: linear-gradient(to bottom, lighten(@brand-primary, 30%) 0px, darken(@brand-primary, 10%) 100%);
+      background-repeat: repeat-x;
+    }
+
+    .slider-selection {
+      background-image: linear-gradient(to bottom, #e0e0e0 0px, #f5f5f5 100%);
+    }
+  }
+}
+
