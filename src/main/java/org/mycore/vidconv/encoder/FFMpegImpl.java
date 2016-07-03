@@ -25,15 +25,21 @@ package org.mycore.vidconv.encoder;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.mycore.vidconv.entity.CodecWrapper;
 import org.mycore.vidconv.entity.CodecsWrapper;
+import org.mycore.vidconv.entity.EncoderWrapper;
+import org.mycore.vidconv.entity.EncodersWrapper;
 import org.mycore.vidconv.entity.FormatWrapper;
 import org.mycore.vidconv.entity.FormatsWrapper;
+import org.mycore.vidconv.entity.ParameterWrapper;
 import org.mycore.vidconv.entity.SettingsWrapper;
 import org.mycore.vidconv.entity.SettingsWrapper.Audio;
 import org.mycore.vidconv.entity.SettingsWrapper.Video;
@@ -108,13 +114,11 @@ public class FFMpegImpl {
                 if (desc != null) {
                     final Matcher em = PATTERN_ENCODER_LIB.matcher(desc);
                     while (em.find()) {
-                        codec.setEncoderLib(
-                                Arrays.stream(em.group(1).trim().split("\\s")).collect(Collectors.toList()));
+                        codec.setEncoderLib(splitString(em.group(1)).collect(Collectors.toList()));
                     }
                     final Matcher dm = PATTERN_DECODER_LIB.matcher(desc);
                     while (dm.find()) {
-                        codec.setDecoderLib(
-                                Arrays.stream(dm.group(1).trim().split("\\s")).collect(Collectors.toList()));
+                        codec.setDecoderLib(splitString(dm.group(1)).collect(Collectors.toList()));
                     }
                     desc = desc.replaceAll(PATTERN_DECODER_LIB.pattern(), "");
                     desc = desc.replaceAll(PATTERN_ENCODER_LIB.pattern(), "");
@@ -168,6 +172,114 @@ public class FFMpegImpl {
         return supportedFormats;
     }
 
+    private static final Pattern PATTERN_ENCODER = Pattern
+            .compile(
+                    "\\n*Encoder\\s([^\\s]+)\\s\\[(?:[^\\]]+)\\]:\\n([\\S\\s]+)\\1\\s.*AVOptions:([\\S\\s]+?(?=\\n\\n))",
+                    Pattern.CASE_INSENSITIVE);
+
+    private static final Pattern PATTERN_PIX_FMT = Pattern.compile("pixel formats:(.*)");
+
+    private static final Pattern PATTERN_SMP_RATES = Pattern.compile("sample rates:(.*)");
+
+    private static final Pattern PATTERN_SMP_FROMATS = Pattern.compile("sample formats:(.*)");
+
+    private static final Pattern PATTERN_CH_LAYOUTS = Pattern.compile("channel layouts:(.*)");
+
+    private static final Pattern PATTERN_PARAMS = Pattern.compile("\\s*-([^\\s]+)\\s+<([^>]+)>\\s+(?:[^\\s]+)\\s(.*)");
+
+    private static Map<String, EncodersWrapper> supportedEncoders = new HashMap<>();
+
+    /**
+     * Returns informations for given encoder.
+     * 
+     * @param name the encoder name
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public static EncodersWrapper encoder(final String name) throws IOException, InterruptedException {
+        if (supportedEncoders.containsKey(name)) {
+            return supportedEncoders.get(name);
+        }
+
+        final Process p = Runtime.getRuntime().exec(new String[] { "ffmpeg", "-h", "encoder=" + name });
+
+        StreamConsumer outputConsumer = new StreamConsumer(p.getInputStream());
+        StreamConsumer errorConsumer = new StreamConsumer(p.getErrorStream());
+
+        new Thread(outputConsumer).start();
+        new Thread(errorConsumer).start();
+
+        p.waitFor();
+
+        final String outputStream = outputConsumer.getStreamOutput();
+        if (outputStream != null) {
+            final List<EncoderWrapper> encoders = new ArrayList<>();
+            final Matcher m = PATTERN_ENCODER.matcher(outputStream);
+
+            while (m.find()) {
+                final EncoderWrapper encoder = new EncoderWrapper();
+
+                encoder.setName(m.group(1));
+
+                //                for (int i = 1; i <= m.groupCount(); i++) {
+                //                    System.out.println(i + ": " + m.group(i));
+                //                }
+
+                encoder.setPixelFormats(
+                        Stream.of(m.group(2)).map(s -> PATTERN_PIX_FMT.matcher(s)).filter(ma -> ma.find())
+                                .flatMap(ma -> splitString(ma.group(1)))
+                                .collect(Collectors.toList()));
+
+                encoder.setSampleFormats(
+                        Stream.of(m.group(2)).map(s -> PATTERN_SMP_FROMATS.matcher(s)).filter(ma -> ma.find())
+                                .flatMap(ma -> splitString(ma.group(1)))
+                                .collect(Collectors.toList()));
+
+                encoder.setSampleRates(
+                        Stream.of(m.group(2)).map(s -> PATTERN_SMP_RATES.matcher(s)).filter(ma -> ma.find())
+                                .flatMap(ma -> splitString(ma.group(1))).map(s -> new Integer(s))
+                                .collect(Collectors.toList()));
+
+                encoder.setChannelLayouts(
+                        Stream.of(m.group(2)).map(s -> PATTERN_CH_LAYOUTS.matcher(s)).filter(ma -> ma.find())
+                                .flatMap(ma -> splitString(ma.group(1)))
+                                .collect(Collectors.toList()));
+
+                final List<ParameterWrapper> parameters = new ArrayList<>();
+                final Matcher pm = PATTERN_PARAMS.matcher(m.group(3));
+                while (pm.find()) {
+                    final ParameterWrapper param = new ParameterWrapper();
+                    param.setName(pm.group(1));
+                    param.setType(pm.group(2));
+                    param.setDescription(pm.group(3));
+
+                    parameters.add(param);
+                }
+                encoder.setParameters(parameters);
+
+//                System.out.println(encoder);
+                encoders.add(encoder);
+            }
+
+            supportedEncoders.put(name, new EncodersWrapper().setEncoders(encoders));
+            return supportedEncoders.get(name);
+        }
+
+        return null;
+    }
+
+    private static Stream<String> splitString(final String str) {
+        return Arrays.stream(str.split("\\s")).filter(s -> !s.isEmpty());
+    }
+
+    /**
+     * Build the command line for given {@link SettingsWrapper}.
+     *  
+     * @param settings the settings
+     * @return the command
+     * @throws IOException
+     * @throws InterruptedException
+     */
     public static String command(final SettingsWrapper settings) throws IOException, InterruptedException {
         final StringBuffer cmd = new StringBuffer();
 

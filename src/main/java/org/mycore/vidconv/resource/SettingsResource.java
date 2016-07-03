@@ -141,4 +141,18 @@ public class SettingsResource {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(so).build();
         }
     }
+
+    @GET
+    @Path("encoder/{name}")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    public Response getEncoder(@PathParam("name") String name) {
+        try {
+            return Response.ok().status(Response.Status.OK).entity(FFMpegImpl.encoder(name))
+                    .build();
+        } catch (IOException | InterruptedException e) {
+            LOGGER.error(e.getMessage(), e);
+            final StreamingOutput so = (OutputStream os) -> e.printStackTrace(new PrintStream(os));
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(so).build();
+        }
+    }
 }
