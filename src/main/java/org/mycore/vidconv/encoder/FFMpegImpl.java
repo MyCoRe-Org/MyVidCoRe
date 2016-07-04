@@ -172,10 +172,10 @@ public class FFMpegImpl {
         return supportedFormats;
     }
 
+    private static final Pattern PATTERN_ENCODER_SPLIT = Pattern.compile("\\n\\n");
+
     private static final Pattern PATTERN_ENCODER = Pattern
-            .compile(
-                    "\\n*Encoder\\s([^\\s]+)\\s\\[(?:[^\\]]+)\\]:\\n([\\S\\s]+)\\1\\s.*AVOptions:([\\S\\s]+?(?=\\n\\n))",
-                    Pattern.CASE_INSENSITIVE);
+            .compile("^Encoder\\s([^\\s]+)\\s\\[(?:[^\\]]+)\\]:\\n([\\S\\s]+)$");
 
     private static final Pattern PATTERN_PIX_FMT = Pattern.compile("pixel formats:(.*)");
 
@@ -213,53 +213,54 @@ public class FFMpegImpl {
 
         final String outputStream = outputConsumer.getStreamOutput();
         if (outputStream != null) {
-            final List<EncoderWrapper> encoders = new ArrayList<>();
-            final Matcher m = PATTERN_ENCODER.matcher(outputStream);
+            final List<EncoderWrapper> encoders = PATTERN_ENCODER_SPLIT.splitAsStream(outputStream)
+                    .filter(os -> !os.isEmpty())
+                    .map(os -> {
+                        final Matcher m = PATTERN_ENCODER.matcher(os);
+                        while (m.find()) {
+                            final EncoderWrapper encoder = new EncoderWrapper();
 
-            while (m.find()) {
-                final EncoderWrapper encoder = new EncoderWrapper();
+                            encoder.setName(m.group(1));
 
-                encoder.setName(m.group(1));
+                            encoder.setPixelFormats(
+                                    Stream.of(m.group(2)).map(s -> PATTERN_PIX_FMT.matcher(s)).filter(ma -> ma.find())
+                                            .flatMap(ma -> splitString(ma.group(1)))
+                                            .collect(Collectors.toList()));
 
-                //                for (int i = 1; i <= m.groupCount(); i++) {
-                //                    System.out.println(i + ": " + m.group(i));
-                //                }
+                            encoder.setSampleFormats(
+                                    Stream.of(m.group(2)).map(s -> PATTERN_SMP_FROMATS.matcher(s))
+                                            .filter(ma -> ma.find())
+                                            .flatMap(ma -> splitString(ma.group(1)))
+                                            .collect(Collectors.toList()));
 
-                encoder.setPixelFormats(
-                        Stream.of(m.group(2)).map(s -> PATTERN_PIX_FMT.matcher(s)).filter(ma -> ma.find())
-                                .flatMap(ma -> splitString(ma.group(1)))
-                                .collect(Collectors.toList()));
+                            encoder.setSampleRates(
+                                    Stream.of(m.group(2)).map(s -> PATTERN_SMP_RATES.matcher(s)).filter(ma -> ma.find())
+                                            .flatMap(ma -> splitString(ma.group(1))).map(s -> new Integer(s))
+                                            .collect(Collectors.toList()));
 
-                encoder.setSampleFormats(
-                        Stream.of(m.group(2)).map(s -> PATTERN_SMP_FROMATS.matcher(s)).filter(ma -> ma.find())
-                                .flatMap(ma -> splitString(ma.group(1)))
-                                .collect(Collectors.toList()));
+                            encoder.setChannelLayouts(
+                                    Stream.of(m.group(2)).map(s -> PATTERN_CH_LAYOUTS.matcher(s))
+                                            .filter(ma -> ma.find())
+                                            .flatMap(ma -> splitString(ma.group(1)))
+                                            .collect(Collectors.toList()));
 
-                encoder.setSampleRates(
-                        Stream.of(m.group(2)).map(s -> PATTERN_SMP_RATES.matcher(s)).filter(ma -> ma.find())
-                                .flatMap(ma -> splitString(ma.group(1))).map(s -> new Integer(s))
-                                .collect(Collectors.toList()));
+                            final List<ParameterWrapper> parameters = new ArrayList<>();
+                            final Matcher pm = PATTERN_PARAMS.matcher(m.group(2));
+                            while (pm.find()) {
+                                final ParameterWrapper param = new ParameterWrapper();
+                                param.setName(pm.group(1));
+                                param.setType(pm.group(2));
+                                param.setDescription(pm.group(3));
 
-                encoder.setChannelLayouts(
-                        Stream.of(m.group(2)).map(s -> PATTERN_CH_LAYOUTS.matcher(s)).filter(ma -> ma.find())
-                                .flatMap(ma -> splitString(ma.group(1)))
-                                .collect(Collectors.toList()));
+                                parameters.add(param);
+                            }
+                            encoder.setParameters(parameters);
 
-                final List<ParameterWrapper> parameters = new ArrayList<>();
-                final Matcher pm = PATTERN_PARAMS.matcher(m.group(3));
-                while (pm.find()) {
-                    final ParameterWrapper param = new ParameterWrapper();
-                    param.setName(pm.group(1));
-                    param.setType(pm.group(2));
-                    param.setDescription(pm.group(3));
+                            return encoder;
+                        }
 
-                    parameters.add(param);
-                }
-                encoder.setParameters(parameters);
-
-//                System.out.println(encoder);
-                encoders.add(encoder);
-            }
+                        return null;
+                    }).filter(e -> e != null).collect(Collectors.toList());
 
             supportedEncoders.put(name, new EncodersWrapper().setEncoders(encoders));
             return supportedEncoders.get(name);
