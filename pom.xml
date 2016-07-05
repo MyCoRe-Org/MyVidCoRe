@@ -13,6 +13,26 @@
     <template.assetsdir>${project.build.directory}/classes/META-INF/resources/assets</template.assetsdir>
   </properties>
 
+  <scm>
+    <url>scm:git:https://github.com/MyCoRe-Org/MyVidCoRe.git</url>
+    <tag>master</tag>
+    <connection>scm:git:https://github.com/MyCoRe-Org/MyVidCoRe.git</connection>
+    <developerConnection>scm:git:https://github.com/MyCoRe-Org/MyVidCoRe.git</developerConnection>
+  </scm>
+  <organization>
+    <name>MyCoRe</name>
+    <url>http://www.mycore.de</url>
+  </organization>
+  <inceptionYear>2016</inceptionYear>
+
+  <licenses>
+    <license>
+      <name>GNU General Public License, version 3</name>
+      <distribution>repo</distribution>
+      <url>http://www.gnu.org/licenses/gpl-3.0.txt</url>
+    </license>
+  </licenses>
+
   <build>
     <plugins>
       <plugin>
@@ -155,6 +175,26 @@
           <downloadJavadocs>true</downloadJavadocs>
         </configuration>
       </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>1.9</version>
+        <configuration>
+          <verbose>false</verbose>
+          <licenseName>gpl_v3</licenseName>
+          <licenceFile>${basedir}/LICENSE</licenceFile>
+        </configuration>
+        <executions>
+          <execution>
+            <id>download-licenses</id>
+            <goals>
+              <goal>update-project-license</goal>
+            </goals>
+            <phase>process-sources</phase>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
@@ -193,14 +233,4 @@
     </dependency>
   </dependencies>
 
-  <scm>
-    <url>scm:git:https://github.com/MyCoRe-Org/MyVidCoRe.git</url>
-    <tag>master</tag>
-    <connection>scm:git:https://github.com/MyCoRe-Org/MyVidCoRe.git</connection>
-    <developerConnection>scm:git:https://github.com/MyCoRe-Org/MyVidCoRe.git</developerConnection>
-  </scm>
-  <organization>
-    <name>MyCoRe</name>
-    <url>http://www.mycore.de</url>
-  </organization>
 </project>
