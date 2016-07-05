@@ -175,7 +175,7 @@ app.controller("converterStatus", function($scope, $http, $interval, $timeout) {
 
 // provides some helper for converter format settings
 app.service("formatService", function($http, $q, asyncQueue) {
-	function buildURLs(formats) {
+	function buildFormatURLs(formats) {
 		var urls = [];
 		angular.forEach(formats, function(options, format) {
 			urls.push("/settings/formats/name/" + format);
@@ -185,6 +185,26 @@ app.service("formatService", function($http, $q, asyncQueue) {
 					if ($.inArray(url, urls) == -1)
 						urls.push(url);
 				});
+			});
+		});
+		return urls;
+	}
+
+	function buildEncoderURLs(codecs) {
+		var urls = [];
+		angular.forEach(codecs, function(cs, type) {
+			angular.forEach(cs, function(c) {
+				if (c.encoders !== undefined && c.encoders.length != 0) {
+					angular.forEach(c.encoders.encoder, function(e) {
+						var url = "/settings/encoder/" + e;
+						if ($.inArray(url, urls) == -1)
+							urls.push(url);
+					});
+				} else {
+					var url = "/settings/encoder/" + c.name;
+					if ($.inArray(url, urls) == -1)
+						urls.push(url);
+				}
 			});
 		});
 		return urls;
@@ -204,12 +224,15 @@ app.service("formatService", function($http, $q, asyncQueue) {
 	this.getSupportedFormats = function(formats) {
 		var deferred = $q.defer();
 
-		asyncQueue.load(buildURLs(formats)).then(function(results) {
+		asyncQueue.load(buildFormatURLs(formats)).then(function(results) {
 			var fs = [];
 			var cc = {
 				audio : [],
 				video : []
 			};
+			var ec = [];
+
+			// load formats and codecs
 			angular.forEach(results, function(result) {
 				var json = result.data;
 				if (json.formats !== undefined && json.formats.length != 0) {
@@ -220,33 +243,56 @@ app.service("formatService", function($http, $q, asyncQueue) {
 				}
 			});
 
-			angular.forEach(formats, function(options, format) {
-				var f = getByProperty(fs, "name", format);
-				if (f != null) {
-					formats[format]["description"] = f.description;
-					angular.forEach(options, function(codecs, type) {
-						if (Array.isArray(formats[format][type])) {
-							var re = [];
-							angular.forEach(codecs, function(codec, index) {
-								var c = getByProperty(cc[type], "name", codec);
-								if (c != null) {
-									formats[format][type][index] = c;
-								} else {
-									re.push(index);
-								}
-							});
+			// load encoder infos for codecs
+			asyncQueue.load(buildEncoderURLs(cc)).then(function(results) {
+				angular.forEach(results, function(result) {
+					var json = result.data;
+					ec = ec.concat(json.encoders);
+				});
 
-							for (var i = 0; i < re.length; i++) {
-								formats[format][type].splice(re[i], 1);
-							}
+				angular.forEach(cc, function(codecs, type) {
+					angular.forEach(codecs, function(codec) {
+						if (codec.encoders !== undefined) {
+							var encoders = {};
+							angular.forEach(codec.encoders.encoder, function(e) {
+								encoders[e] = getByProperty(ec, "name", e);
+							});
+							codec.encoders = encoders;
+						} else {
+							codec.encoders = {};
+							codec.encoders[codec.name] = getByProperty(ec, "name", codec.name);
 						}
 					});
-				} else {
-					delete formats[format];
-				}
+				});
+
+				angular.forEach(formats, function(options, format) {
+					var f = getByProperty(fs, "name", format);
+					if (f != null) {
+						formats[format]["description"] = f.description;
+						angular.forEach(options, function(codecs, type) {
+							if (Array.isArray(formats[format][type])) {
+								var re = [];
+								angular.forEach(codecs, function(codec, index) {
+									var c = angular.copy(getByProperty(cc[type], "name", codec));
+									if (c != null) {
+										formats[format][type][index] = c;
+									} else {
+										re.push(index);
+									}
+								});
+
+								for (var i = 0; i < re.length; i++) {
+									formats[format][type].splice(re[i], 1);
+								}
+							}
+						});
+					} else {
+						delete formats[format];
+					}
+				});
 			});
 		});
-
+		console.log(formats);
 		deferred.resolve(formats);
 
 		return deferred.promise;
@@ -277,7 +323,7 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 	$scope.settings = {
 		"format" : "mp4",
 		"video" : {
-			"codec" : "h264",
+			"codec" : "libx264",
 			"framerate" : "auto",
 			"framerateType" : "VFR",
 			"profile" : "main",
@@ -289,7 +335,7 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 			}
 		},
 		"audio" : {
-			"codec" : "aac",
+			"codec" : "libfaac",
 			"mixdown" : "stereo",
 			"samplerate" : "auto",
 			"bitrate" : 160
@@ -329,6 +375,10 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 
 	$scope.filterCodecs = function(format, type) {
 		return $scope.formats[format][type];
+	}
+
+	$scope.getLength = function(obj) {
+		return Object.keys(obj).length;
 	}
 
 	$scope.showStatusMessage = function(type, msg) {

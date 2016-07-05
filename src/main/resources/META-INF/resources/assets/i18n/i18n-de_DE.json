@@ -8,12 +8,11 @@
     "converter.noJobs" : "Keine Konverter-Aufträge vorhanden.",
     
     "settings.auto" : "automatisch",
+    "settings.library": "Bibliothek",
     "settings.converter.title" : "Konverter Einstellungen",
     "settings.saved.success" : "Einstellungen wurden erfolgreich gespeichert!",
     "settings.saved.error" : "Fehler beim speichern der Einstellungen!",
     "settings.format" : "Ausgabe Format",
-    "settings.format.mp4" : "MP4 Datei",
-    "settings.format.mkv" : "MKV Datei",
     "settings.codec" : "Codec",
     "settings.framerate" : "Wiederholungsrate (FPS)",
     "settings.framerate.auto" : "wie Quelle",

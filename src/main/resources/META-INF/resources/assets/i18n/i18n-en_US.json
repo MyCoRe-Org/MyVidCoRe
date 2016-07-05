@@ -8,12 +8,11 @@
     "converter.noJobs" : "No Jobs running.",
     
     "settings.auto" : "Auto",
+    "settings.library": "Library",
     "settings.converter.title" : "Converter Settings",
     "settings.saved.success" : "Settings successfull saved!",
     "settings.saved.error" : "Error on saving settings!",
     "settings.format" : "Output Format",
-    "settings.format.mp4" : "MP4 File",
-    "settings.format.mkv" : "MKV File",
     "settings.codec" : "Codec",
     "settings.framerate" : "Framerate (FPS)",
     "settings.framerate.auto" : "same as Source",
