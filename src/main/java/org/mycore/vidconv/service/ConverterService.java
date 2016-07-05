@@ -133,16 +133,17 @@ public class ConverterService extends Widget implements Listener {
         if (settings != null) {
             final String id = Long.toHexString(new Random().nextLong());
             final String command = FFMpegImpl.command(settings);
-            final String fileName = inputPath.getFileName().toString();
-            final Path outputPath = Paths.get(outputDir, id,
-                    fileName.substring(0, fileName.lastIndexOf('.')) + "." + settings.getFormat());
+            if (!Files.isDirectory(inputPath)) {
+                final String fileName = inputPath.getFileName().toString();
+                final Path outputPath = Paths.get(outputDir, id, FFMpegImpl.filename(settings, fileName));
 
-            if (!Files.exists(outputPath.getParent()))
-                Files.createDirectories(outputPath.getParent());
+                if (!Files.exists(outputPath.getParent()))
+                    Files.createDirectories(outputPath.getParent());
 
-            final ConverterJob converter = new ConverterJob(command, inputPath, outputPath);
-            converts.put(id, converter);
-            converterThreadPool.submit(converter);
+                final ConverterJob converter = new ConverterJob(command, inputPath, outputPath);
+                converts.put(id, converter);
+                converterThreadPool.submit(converter);
+            }
         }
     }
 

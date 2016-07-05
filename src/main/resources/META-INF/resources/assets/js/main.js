@@ -338,7 +338,6 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 		"format" : "mp4",
 		"video" : {
 			"codec" : "libx264",
-			"framerate" : "auto",
 			"framerateType" : "VFR",
 			"profile" : "main",
 			"level" : "4.0",
@@ -350,10 +349,9 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 			}
 		},
 		"audio" : {
-			"codec" : "libfaac",
-			"mixdown" : "stereo",
+			"codec" : "libfdk_aac",
 			"samplerate" : "auto",
-			"bitrate" : 160
+			"bitrate" : "auto"
 		}
 	};
 
@@ -382,6 +380,7 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 	}
 
 	$scope.save = function(settings) {
+		console.log(settings);
 		$http.post("/settings", settings).then(function(response) {
 			$scope.showStatusMessage("success", $translate.instant("settings.saved.success"));
 		}, function(error) {
@@ -413,10 +412,12 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 		return Object.keys(obj).length;
 	}
 
-	$scope.changeCodec = function() {
-		$scope.selectedCodec = {
-			"audio" : $scope.filterEncoder($scope.settings.audio.codec),
-			"video" : $scope.filterEncoder($scope.settings.video.codec),
+	$scope.changeCodec = function(type) {
+		var codec = $scope.settings[type].codec;
+
+		$scope.selectedCodec[type] = $scope.filterEncoder(codec);
+		$scope.settings[type] = {
+			"codec" : codec
 		};
 	}
 

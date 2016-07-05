@@ -322,57 +322,6 @@ public class FFMpegImpl {
         return null;
     }
 
-    /**
-     * Build the command line for given {@link SettingsWrapper}.
-     *  
-     * @param settings the settings
-     * @return the command
-     * @throws IOException
-     * @throws InterruptedException
-     */
-    public static String command(final SettingsWrapper settings) throws IOException, InterruptedException {
-        final StringBuffer cmd = new StringBuffer();
-
-        cmd.append("ffmpeg -i {0} -stats -threads 1 -y");
-
-        Video video = settings.getVideo();
-
-        cmd.append(" -codec:v " + video.getCodec());
-        if (video.getProfile() != null)
-            cmd.append(" -profile:v " + video.getProfile());
-        if (video.getLevel() != null)
-            cmd.append(" -level " + video.getLevel());
-        cmd.append(" -pix_fmt " + (video.getPixelFormat() != null && !video.getPixelFormat().isEmpty()
-                ? video.getPixelFormat() : "yuv420p"));
-
-        if (video.getFramerate() != null) {
-            if (video.getFramerateType() != null) {
-                cmd.append(" -vsync " + (video.getFramerateType().equals("CFR") ? "1"
-                        : video.getFramerateType().equals("VFR") ? "2" : "0"));
-            }
-            cmd.append(" -r " + video.getFramerate());
-        }
-
-        if (video.getQuality().getType() != null && video.getQuality().getType().equals("CRF")) {
-            cmd.append(" -crf " + video.getQuality().getRateFactor());
-        } else if (video.getQuality().getType() != null && video.getQuality().getType().equals("ABR")) {
-            cmd.append(" -b:v " + video.getQuality().getBitrate() + "k");
-        }
-
-        Audio audio = settings.getAudio();
-
-        cmd.append(" -codec:a " + audio.getCodec());
-        cmd.append(" -b:a " + audio.getBitrate() + "k");
-
-        if (audio.getSamplerate() != null)
-            cmd.append(" -ar " + audio.getSamplerate());
-
-        cmd.append(" {1}");
-
-        System.out.println(cmd.toString());
-        return cmd.toString();
-    }
-
     private static final Pattern PATTERN_DURATION = Pattern.compile("Duration: (.*), start:");
 
     private static final Pattern PATTERN_CURRENT = Pattern.compile(".*time=([0-9:\\.]+) bitrate.*$");
@@ -407,6 +356,69 @@ public class FFMpegImpl {
         }
 
         return millis;
+    }
+
+    /**
+     * Build the command line for given {@link SettingsWrapper}.
+     *  
+     * @param settings the settings
+     * @return the command
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public static String command(final SettingsWrapper settings) throws IOException, InterruptedException {
+        final StringBuffer cmd = new StringBuffer();
+
+        cmd.append("ffmpeg -i {0} -stats -threads 1 -y");
+
+        Video video = settings.getVideo();
+
+        cmd.append(" -codec:v " + video.getCodec());
+        if (video.getProfile() != null)
+            cmd.append(" -profile:v " + video.getProfile());
+        if (video.getLevel() != null)
+            cmd.append(" -level " + video.getLevel());
+        cmd.append(" -pix_fmt " + (video.getPixelFormat() != null && !video.getPixelFormat().isEmpty()
+                ? video.getPixelFormat() : "yuv420p"));
+
+        if (video.getFramerate() != null) {
+            if (video.getFramerateType() != null) {
+                cmd.append(" -vsync " + (video.getFramerateType().equals("CFR") ? "1"
+                        : video.getFramerateType().equals("VFR") ? "2" : "0"));
+            }
+            cmd.append(" -r " + video.getFramerate());
+        }
+
+        if (video.getQuality().getType() != null && video.getQuality().getType().equals("CRF")) {
+            cmd.append(" -crf " + video.getQuality().getRateFactor());
+        } else if (video.getQuality().getType() != null && video.getQuality().getType().equals("CQ")) {
+            cmd.append(" -qscale:v " + video.getQuality().getScale());
+        } else if (video.getQuality().getType() != null && video.getQuality().getType().equals("ABR")) {
+            cmd.append(" -b:v " + video.getQuality().getBitrate() + "k");
+        }
+
+        Audio audio = settings.getAudio();
+
+        cmd.append(" -codec:a " + audio.getCodec());
+
+        if (audio.getBitrate() != null)
+            cmd.append(" -b:a " + audio.getBitrate() + "k");
+        if (audio.getSamplerate() != null)
+            cmd.append(" -ar " + audio.getSamplerate());
+
+        cmd.append(" {1}");
+
+        System.out.println(cmd.toString());
+        return cmd.toString();
+    }
+
+    public static String filename(final SettingsWrapper settings, final String fileName) {
+        try {
+            final String extension = muxer(settings.getFormat()).getExtension();
+            return fileName.substring(0, fileName.lastIndexOf('.')) + "." + extension;
+        } catch (IOException | InterruptedException e) {
+            return null;
+        }
     }
 
     private static Stream<String> splitString(final String str) {

@@ -209,6 +209,8 @@ public class SettingsWrapper {
 
             private Float rateFactor;
 
+            private Integer scale;
+
             private Integer bitrate;
 
             public Quality() {
@@ -222,24 +224,10 @@ public class SettingsWrapper {
             }
 
             /**
-             * @return the bitrate
-             */
-            public Integer getBitrate() {
-                return bitrate;
-            }
-
-            /**
              * @param type the type to set
              */
             public void setType(String type) {
                 this.type = type;
-            }
-
-            /**
-             * @param bitrate the bitrate to set
-             */
-            public void setBitrate(Integer bitrate) {
-                this.bitrate = bitrate;
             }
 
             /**
@@ -254,6 +242,34 @@ public class SettingsWrapper {
              */
             public void setRateFactor(Float rateFactor) {
                 this.rateFactor = rateFactor;
+            }
+
+            /**
+             * @return the scale
+             */
+            public Integer getScale() {
+                return scale;
+            }
+
+            /**
+             * @param scale the scale to set
+             */
+            public void setScale(Integer scale) {
+                this.scale = scale;
+            }
+
+            /**
+             * @return the bitrate
+             */
+            public Integer getBitrate() {
+                return bitrate;
+            }
+
+            /**
+             * @param bitrate the bitrate to set
+             */
+            public void setBitrate(Integer bitrate) {
+                this.bitrate = bitrate;
             }
 
         }

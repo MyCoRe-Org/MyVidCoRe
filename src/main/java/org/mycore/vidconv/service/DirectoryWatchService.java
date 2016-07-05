@@ -126,7 +126,7 @@ public class DirectoryWatchService extends Widget {
                                     try {
                                         walk(child, keys, ws);
                                     } catch (IOException e) {
-                                        LOGGER.error(e);
+                                        LOGGER.error(e.getMessage(), e);
                                     }
                                 }
                             }
