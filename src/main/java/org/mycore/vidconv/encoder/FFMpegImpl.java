@@ -39,6 +39,7 @@ import org.mycore.vidconv.entity.EncoderWrapper;
 import org.mycore.vidconv.entity.EncodersWrapper;
 import org.mycore.vidconv.entity.FormatWrapper;
 import org.mycore.vidconv.entity.FormatsWrapper;
+import org.mycore.vidconv.entity.MuxerWrapper;
 import org.mycore.vidconv.entity.ParameterWrapper;
 import org.mycore.vidconv.entity.SettingsWrapper;
 import org.mycore.vidconv.entity.SettingsWrapper.Audio;
@@ -50,6 +51,8 @@ import org.mycore.vidconv.util.StreamConsumer;
  *
  */
 public class FFMpegImpl {
+
+    private static final Pattern PATTERN_ENTRY_SPLIT = Pattern.compile("\\n\\n");
 
     private static final Pattern PATTERN_LIB = Pattern.compile("--enable-([^\\s]+)");
 
@@ -172,8 +175,6 @@ public class FFMpegImpl {
         return supportedFormats;
     }
 
-    private static final Pattern PATTERN_ENCODER_SPLIT = Pattern.compile("\\n\\n");
-
     private static final Pattern PATTERN_ENCODER = Pattern
             .compile("^Encoder\\s([^\\s]+)\\s\\[(?:[^\\]]+)\\]:\\n([\\S\\s]+)$");
 
@@ -213,7 +214,7 @@ public class FFMpegImpl {
 
         final String outputStream = outputConsumer.getStreamOutput();
         if (outputStream != null) {
-            final List<EncoderWrapper> encoders = PATTERN_ENCODER_SPLIT.splitAsStream(outputStream)
+            final List<EncoderWrapper> encoders = PATTERN_ENTRY_SPLIT.splitAsStream(outputStream)
                     .filter(os -> !os.isEmpty())
                     .map(os -> {
                         final Matcher m = PATTERN_ENCODER.matcher(os);
@@ -269,8 +270,56 @@ public class FFMpegImpl {
         return null;
     }
 
-    private static Stream<String> splitString(final String str) {
-        return Arrays.stream(str.split("\\s")).filter(s -> !s.isEmpty());
+    private static final Pattern PATTERN_MUXER = Pattern
+            .compile("^Muxer\\s([^\\s]+)\\s\\[(?:[^\\]]+)\\]:\\n([\\S\\s]+)$");
+
+    private static final Pattern PATTERN_EXTENSION = Pattern.compile("Common extensions:(.*)\\.");
+
+    private static final Pattern PATTERN_MIME_TYPE = Pattern.compile("Mime type:(.*)\\.");
+
+    private static final Pattern PATTERN_AUDIO_CODEC = Pattern.compile("audio codec:(.*)\\.");
+
+    private static final Pattern PATTERN_VIDEO_CODEC = Pattern.compile("video codec:(.*)\\.");
+
+    private static final Pattern PATTERN_SUBTITLE_CODEC = Pattern.compile("video codec:(.*)\\.");
+
+    private static Map<String, MuxerWrapper> supportedMuxers = new HashMap<>();
+
+    public static MuxerWrapper muxer(final String name) throws IOException, InterruptedException {
+        if (supportedMuxers.containsKey(name)) {
+            return supportedMuxers.get(name);
+        }
+
+        final Process p = Runtime.getRuntime().exec(new String[] { "ffmpeg", "-h", "muxer=" + name });
+
+        StreamConsumer outputConsumer = new StreamConsumer(p.getInputStream());
+        StreamConsumer errorConsumer = new StreamConsumer(p.getErrorStream());
+
+        new Thread(outputConsumer).start();
+        new Thread(errorConsumer).start();
+
+        p.waitFor();
+
+        final String outputStream = outputConsumer.getStreamOutput();
+        if (outputStream != null) {
+            final Matcher m = PATTERN_MUXER.matcher(outputStream);
+            while (m.find()) {
+                final MuxerWrapper muxer = new MuxerWrapper();
+
+                muxer.setName(m.group(1));
+
+                muxer.setExtension(getPatternGroup(PATTERN_EXTENSION, m.group(2), 1));
+                muxer.setMimeType(getPatternGroup(PATTERN_MIME_TYPE, m.group(2), 1));
+                muxer.setAudioCodec(getPatternGroup(PATTERN_AUDIO_CODEC, m.group(2), 1));
+                muxer.setVideoCodec(getPatternGroup(PATTERN_VIDEO_CODEC, m.group(2), 1));
+                muxer.setSubtitleCodec(getPatternGroup(PATTERN_SUBTITLE_CODEC, m.group(2), 1));
+
+                supportedMuxers.put(name, muxer);
+                return supportedMuxers.get(name);
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -354,5 +403,18 @@ public class FFMpegImpl {
         millis += Integer.parseInt(tp[3]);
 
         return millis;
+    }
+
+    private static Stream<String> splitString(final String str) {
+        return Arrays.stream(str.split("\\s")).filter(s -> !s.isEmpty());
+    }
+
+    private static String getPatternGroup(final Pattern pattern, final String str, int group) {
+        final Matcher m = pattern.matcher(str);
+        if (m.find()) {
+            return m.group(group).trim();
+        }
+
+        return null;
     }
 }
