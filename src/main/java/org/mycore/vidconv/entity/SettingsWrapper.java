@@ -98,6 +98,8 @@ public class SettingsWrapper {
 
         private String level;
 
+        private String pixelFormat;
+
         private Quality quality;
 
         public Video() {
@@ -178,6 +180,20 @@ public class SettingsWrapper {
          */
         public void setLevel(String level) {
             this.level = level;
+        }
+
+        /**
+         * @return the pixelFormat
+         */
+        public String getPixelFormat() {
+            return pixelFormat;
+        }
+
+        /**
+         * @param pixelFormat the pixelFormat to set
+         */
+        public void setPixelFormat(String pixelFormat) {
+            this.pixelFormat = pixelFormat;
         }
 
         /**

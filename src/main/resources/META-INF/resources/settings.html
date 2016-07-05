@@ -181,7 +181,7 @@
               <!--              </div> -->
               <div class="form-group" ng-show="(selectedCodec.audio = selectedCodec.audio || filterEncoder(settings.audio.codec)).sampleRates.length > 0">
                 <label for="samplerate">{{'settings.audio.samplerate' | translate}}</label> <select id="samplerate" class="form-control"
-                  ng-model="settings.audio.samplerate"
+                  ng-model="settings.audio.samplerate" convert-to-number
                 >
                   <option value="auto">{{'settings.auto' | translate}}</option>
                   <option ng-repeat="sr in selectedCodec.audio.sampleRates" value="{{sr}}">{{sr}}</option>

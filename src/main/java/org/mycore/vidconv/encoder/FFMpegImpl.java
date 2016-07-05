@@ -288,12 +288,13 @@ public class FFMpegImpl {
 
         Video video = settings.getVideo();
 
-        System.out.println(codecs().getByName(video.getCodec()).get(0));
-
-        cmd.append(" -codec:v lib" + video.getCodec());
-        cmd.append(" -profile:v " + video.getProfile());
-        cmd.append(" -level " + video.getLevel());
-        cmd.append(" -pix_fmt yuv420p");
+        cmd.append(" -codec:v " + video.getCodec());
+        if (video.getProfile() != null)
+            cmd.append(" -profile:v " + video.getProfile());
+        if (video.getLevel() != null)
+            cmd.append(" -level " + video.getLevel());
+        cmd.append(" -pix_fmt " + (video.getPixelFormat() != null && !video.getPixelFormat().isEmpty()
+                ? video.getPixelFormat() : "yuv420p"));
 
         if (video.getFramerate() != null) {
             if (video.getFramerateType() != null) {
@@ -311,21 +312,7 @@ public class FFMpegImpl {
 
         Audio audio = settings.getAudio();
 
-        switch (audio.getCodec()) {
-        case "aac":
-            cmd.append(" -codec:a libfdk_aac");
-            break;
-        case "he-aac":
-            cmd.append(" -codec:a libfdk_aac -profile:a aac_he");
-            break;
-        case "mp3":
-            cmd.append(" -codec:a libmp3lame");
-            break;
-        case "vorbis":
-            cmd.append(" -codec:a libvorbis");
-            break;
-        }
-
+        cmd.append(" -codec:a " + audio.getCodec());
         cmd.append(" -b:a " + audio.getBitrate() + "k");
 
         if (audio.getSamplerate() != null)
