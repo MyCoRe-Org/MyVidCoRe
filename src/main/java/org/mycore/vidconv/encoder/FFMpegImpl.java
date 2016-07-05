@@ -395,12 +395,16 @@ public class FFMpegImpl {
 
     private static long parseMillis(final String time) {
         long millis = 0;
-        String[] tp = time.split("[:\\.]");
+        if (time != null && !time.isEmpty()) {
+            final String[] tp = time.split("[:\\.]");
 
-        millis += Integer.parseInt(tp[0]) * 3600000;
-        millis += Integer.parseInt(tp[1]) * 60000;
-        millis += Integer.parseInt(tp[2]) * 1000;
-        millis += Integer.parseInt(tp[3]);
+            if (tp.length == 4) {
+                millis += Integer.parseInt(tp[0]) * 3600000;
+                millis += Integer.parseInt(tp[1]) * 60000;
+                millis += Integer.parseInt(tp[2]) * 1000;
+                millis += Integer.parseInt(tp[3]);
+            }
+        }
 
         return millis;
     }
