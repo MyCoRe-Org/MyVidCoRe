@@ -53,7 +53,7 @@
       </div>
 
       <form novalidate>
-        <fieldset ng-if="formats">
+        <fieldset ng-if="getLength(formats) > 0">
           <legend>{{'settings.converter.title' | translate}}</legend>
           <div class="form-group">
             <label for="format">{{'settings.format' | translate}}</label> <select id="format" class="form-control" ng-model="settings.format">
@@ -67,13 +67,23 @@
           <div class="tab-content">
             <div role="tabpanel" class="tab-pane fade in active" id="video">
               <div class="form-group">
-                <select id="vcodec" class="form-control" ng-model="settings.video.codec">
+                <select id="vcodec" class="form-control" ng-model="settings.video.codec" ng-change="changeCodec()">
                   <optgroup ng-if="codec.encoders && getLength(codec.encoders) > 1" ng-repeat="codec in filterCodecs(settings.format, 'video')"
                     label="{{codec.description}}"
                   >
                     <option ng-repeat="encoder in codec.encoders" value="{{encoder.name}}">{{encoder.name}}</option>
                   </optgroup>
-                  <option ng-if="!codec.encoders || getLength(codec.encoders) == 1" ng-repeat="codec in filterCodecs(settings.format, 'video')" value="{{codec.name}}">{{codec.description}}</option>
+                  <option ng-if="codec.encoders && getLength(codec.encoders) == 1" ng-repeat="codec in filterCodecs(settings.format, 'video')"
+                    value="{{codec.encoders[0].name}}"
+                  >{{codec.description}}</option>
+                </select>
+              </div>
+              <div class="form-group" ng-show="(selectedCodec.video = selectedCodec.video || filterEncoder(settings.video.codec)).pixelFormats.length > 0">
+                <label for="pixelFormat">{{'settings.colorSpace' | translate}}</label> <select id="pixelFormat" class="form-control"
+                  ng-model="settings.video.pixelFormat"
+                >
+                  <option value="">{{'settings.auto' | translate}}</option>
+                  <option ng-repeat="pf in selectedCodec.video.pixelFormats" value="{{pf}}">{{pf}}</option>
                 </select>
               </div>
               <div class="row">
@@ -127,7 +137,7 @@
                   </div>
                 </div>
               </div>
-              <div class="row">
+              <div class="row" ng-show="encoderHasParameter(selectedCodec.video, 'profile') && encoderHasParameter(selectedCodec.video, 'level')">
                 <div class="form-group col-sm-6">
                   <label for="profile">{{'settings.profile' | translate}}</label> <select id="profile" class="form-control" ng-model="settings.video.profile">
                     <option value="high">high</option>
@@ -148,13 +158,17 @@
             </div>
             <div role="tabpanel" class="tab-pane fade" id="audio">
               <div class="form-group">
-                <label for="acodec">{{'settings.codec' | translate}}</label> <select id="vcodec" class="form-control" ng-model="settings.audio.codec">
+                <label for="acodec">{{'settings.codec' | translate}}</label> <select id="acodec" class="form-control" ng-model="settings.audio.codec"
+                  ng-change="changeCodec()"
+                >
                   <optgroup ng-if="codec.encoders && getLength(codec.encoders) > 1" ng-repeat="codec in filterCodecs(settings.format, 'audio')"
                     label="{{codec.description}}"
                   >
                     <option ng-repeat="encoder in codec.encoders" value="{{encoder.name}}">{{encoder.name}}</option>
                   </optgroup>
-                  <option ng-if="!codec.encoders || getLength(codec.encoders) == 1" ng-repeat="codec in filterCodecs(settings.format, 'audio')" value="{{codec.name}}">{{codec.description}}</option>
+                  <option ng-if="codec.encoders && getLength(codec.encoders) == 1" ng-repeat="codec in filterCodecs(settings.format, 'audio')"
+                    value="{{codec.encoders[0].name}}"
+                  >{{codec.description}}</option>
                 </select>
               </div>
               <!--              <div class="form-group"> -->
@@ -165,20 +179,12 @@
               <!--                  <option value="stereo">{{'settings.audio.mixdown.stereo' | translate}}</option> -->
               <!--                </select> -->
               <!--              </div> -->
-              <div class="form-group">
+              <div class="form-group" ng-show="(selectedCodec.audio = selectedCodec.audio || filterEncoder(settings.audio.codec)).sampleRates.length > 0">
                 <label for="samplerate">{{'settings.audio.samplerate' | translate}}</label> <select id="samplerate" class="form-control"
                   ng-model="settings.audio.samplerate"
                 >
                   <option value="auto">{{'settings.auto' | translate}}</option>
-                  <option value="8000">8</option>
-                  <option value="11025">11.025</option>
-                  <option value="12000">12</option>
-                  <option value="16000">16</option>
-                  <option value="22050">22.05</option>
-                  <option value="24000">24</option>
-                  <option value="32000">32</option>
-                  <option value="44100">44.1</option>
-                  <option value="48000">48</option>
+                  <option ng-repeat="sr in selectedCodec.audio.sampleRates" value="{{sr}}">{{sr}}</option>
                 </select>
               </div>
               <div class="form-group">

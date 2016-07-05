@@ -175,6 +175,8 @@ app.controller("converterStatus", function($scope, $http, $interval, $timeout) {
 
 // provides some helper for converter format settings
 app.service("formatService", function($http, $q, asyncQueue) {
+	this.supportedEncoders = {};
+
 	function buildFormatURLs(formats) {
 		var urls = [];
 		angular.forEach(formats, function(options, format) {
@@ -221,7 +223,16 @@ app.service("formatService", function($http, $q, asyncQueue) {
 		return null;
 	}
 
+	this.getByProperty = function(array, prop, value) {
+		return getByProperty(array, prop, value);
+	}
+
+	this.getSupportedEncoders = function() {
+		return this.supportedEncoders;
+	}
+
 	this.getSupportedFormats = function(formats) {
+		var that = this;
 		var deferred = $q.defer();
 
 		asyncQueue.load(buildFormatURLs(formats)).then(function(results) {
@@ -250,17 +261,20 @@ app.service("formatService", function($http, $q, asyncQueue) {
 					ec = ec.concat(json.encoders);
 				});
 
+				// cache it
+				that.supportedEncoders = ec;
+
 				angular.forEach(cc, function(codecs, type) {
 					angular.forEach(codecs, function(codec) {
 						if (codec.encoders !== undefined) {
-							var encoders = {};
+							var encoders = [];
 							angular.forEach(codec.encoders.encoder, function(e) {
-								encoders[e] = getByProperty(ec, "name", e);
+								encoders.push(getByProperty(ec, "name", e));
 							});
 							codec.encoders = encoders;
 						} else {
-							codec.encoders = {};
-							codec.encoders[codec.name] = getByProperty(ec, "name", codec.name);
+							codec.encoders = [];
+							codec.encoders.push(getByProperty(ec, "name", codec.name));
 						}
 					});
 				});
@@ -328,6 +342,7 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 			"framerateType" : "VFR",
 			"profile" : "main",
 			"level" : "4.0",
+			"pixelFormat" : "yuv420p",
 			"quality" : {
 				"type" : "CRF",
 				"rateFactor" : 23,
@@ -343,6 +358,7 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 	};
 
 	$scope.formats = {};
+	$scope.selectedCodec = {};
 
 	$scope.supportedFormats = function() {
 		var formats = {};
@@ -357,8 +373,9 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 
 	$scope.load = function() {
 		$http.get("/settings").then(function(response) {
-			if (response.status = 200)
+			if (response.status = 200) {
 				angular.merge($scope.settings, response.data);
+			}
 		}, function(error) {
 			$log.error("failure loading settings", error);
 		});
@@ -377,8 +394,30 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 		return $scope.formats[format][type];
 	}
 
+	$scope.filterEncoder = function(name) {
+		var encoders = formatService.getSupportedEncoders();
+		return encoders !== undefined && encoders.length != 0 && formatService.getByProperty(encoders, "name", name);
+	}
+
+	$scope.encoderHasParameter = function(obj, param) {
+		var encoder = typeof obj == "String" ? $scope.filterEncoder(obj) : obj;
+		if (encoder === undefined || encoder == null || encoder.length == 0)
+			return false;
+		if (encoder.parameters === undefined || encoder.parameters.length == 0)
+			return false;
+		var p = formatService.getByProperty(encoder.parameters, "name", param);
+		return p !== undefined && p != null;
+	}
+
 	$scope.getLength = function(obj) {
 		return Object.keys(obj).length;
+	}
+
+	$scope.changeCodec = function() {
+		$scope.selectedCodec = {
+			"audio" : $scope.filterEncoder($scope.settings.audio.codec),
+			"video" : $scope.filterEncoder($scope.settings.video.codec),
+		};
 	}
 
 	$scope.showStatusMessage = function(type, msg) {
@@ -417,6 +456,6 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 	}
 
 	// init
-	$scope.supportedFormats();
 	$scope.load();
+	$scope.supportedFormats();
 });

@@ -20,6 +20,7 @@
     "settings.framerate.type.cfr" : "Konstante Wiederholrate",
     "settings.profile" : "Profil",
     "settings.level" : "Level",
+    "settings.colorSpace": "Farbraum",
     "settings.quality": "Qualität",
     "settings.quality.type.CRF" : "Konstant",
     "settings.quality.type.ABR" : "Durchsch. Bitrate (kbps)",

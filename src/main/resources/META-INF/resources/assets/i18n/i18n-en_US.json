@@ -20,6 +20,7 @@
     "settings.framerate.type.cfr" : "Constante Framerate",
     "settings.profile" : "Profile",
     "settings.level" : "Level",
+    "settings.colorSpace": "Color Space",
     "settings.quality": "Quality",
     "settings.quality.type.constant" : "Constant",
     "settings.quality.type.averange" : "Averange Bitrate (kbps)",
