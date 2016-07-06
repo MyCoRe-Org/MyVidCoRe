@@ -31,24 +31,38 @@ app.directive("convertToNumber", function() {
 	};
 });
 
-app.directive("slider", function() {
+app.directive("slider", function($parse) {
 	return {
 		require : 'ngModel',
 		link : function(scope, element, attrs, ngModel) {
-			var data = $(element).data();
-			var options = {};
+			var slider;
+			if (attrs.slider.length == 0) {
+				var options = {};
+				var data = $(element).data();
 
-			angular.forEach(data, function(value, key) {
-				if (key.indexOf("slider") == 0) {
-					var k = key.replace("slider", "");
-					k = k.substring(0, 1).toLowerCase() + k.substring(1);
-					options[k] = value;
-				}
-			});
+				angular.forEach(data, function(value, key) {
+					if (key.indexOf("slider") == 0) {
+						var k = key.replace("slider", "");
+						k = k.substring(0, 1).toLowerCase() + k.substring(1);
+						options[k] = value;
+					}
+				});
 
-			$(element).slider(options).on("slide", function() {
-				ngModel = $(this).val();
-			});
+				slider = $(element).slider(options);
+			} else {
+				scope.$watch(function(scope) {
+					var options = scope.$eval(attrs.slider);
+					if (options != false && options.length > 2) {
+						slider = $(element).slider(JSON.parse(options));
+					}
+				});
+			}
+
+			if (slider !== undefined) {
+				slider.on("slide", function() {
+					ngModel = $(this).val();
+				});
+			}
 		}
 	};
 });
@@ -406,6 +420,51 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 			return false;
 		var p = formatService.getByProperty(encoder.parameters, "name", param);
 		return p !== undefined && p != null;
+	}
+
+	$scope.qualityData = function(obj, param) {
+		var encoder = typeof obj == "String" ? $scope.filterEncoder(obj) : obj;
+		if (encoder === undefined || encoder == null || encoder.length == 0)
+			return false;
+
+		var data = {};
+		if (param == "qscale") {
+			data = {
+				id : "qualitySlider",
+				min : 0,
+				max : 31,
+				step : 1,
+				value : 14,
+				reversed : true
+			};
+		} else if (encoder.name == "libx264") {
+			data = {
+				id : "qualitySlider",
+				min : 0,
+				max : 51,
+				step : 0.25,
+				precision : 2,
+				value : 23,
+				reversed : true
+			};
+		} else {
+			if (encoder.parameters === undefined || encoder.parameters.length == 0)
+				return false;
+			var p = formatService.getByProperty(encoder.parameters, "name", param);
+			if (p !== undefined && p != null) {
+				data = {
+					id : "qualitySlider",
+					min : p.type == "float" ? parseFloat(p.fromValue) : parseInt(p.fromValue),
+					max : p.type == "float" ? parseFloat(p.toValue) : parseInt(p.toValue),
+					step : p.type == "float" ? 0.25 : 1,
+					precision : p.type == "float" ? 2 : 0,
+					value : Math.floor((p.toValue - p.fromValue) / 2),
+					reversed : true
+				};
+			}
+		}
+
+		return JSON.stringify(data);
 	}
 
 	$scope.getLength = function(obj) {

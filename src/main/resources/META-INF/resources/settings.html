@@ -122,17 +122,15 @@
                 <div class="col-sm-6">
                   <div class="radio" ng-hide="!(encoderHasParameter(selectedCodec.video, 'crf'))">
                     <label> <input type="radio" id="qTypeCRF" value="CRF" checked ng-model="settings.video.quality.type"> {{'settings.quality.type.CRF' |
-                      translate}} <input id="quality" class="form-control" data-slider-id='qualitySlider' type="text" data-slider-min="0" data-slider-max="51"
-                      data-slider-step="0.25" data-slider-value="23" data-slider-precision="2" data-slider-reversed="true" ng-model="settings.video.quality.rateFactor"
-                      ng-disabled="settings.video.quality.type != 'CRF'" slider
+                      translate}} <input id="quality" class="form-control" type="text" ng-model="settings.video.quality.rateFactor"
+                      ng-disabled="settings.video.quality.type != 'CRF'" slider="qualityData(selectedCodec.video, 'crf')"
                     />
                     </label>
                   </div>
                   <div class="radio" ng-hide="(encoderHasParameter(selectedCodec.video, 'crf'))">
                     <label> <input type="radio" id="qTypeCQ" value="CQ" checked ng-model="settings.video.quality.type"> {{'settings.quality.type.CRF' |
-                      translate}} <input id="quality" class="form-control" data-slider-id='qualitySlider' type="text" data-slider-min="0" data-slider-max="31"
-                      data-slider-step="1" data-slider-value="14" data-slider-precision="2" data-slider-reversed="true"
-                      ng-model="settings.video.quality.scale" ng-disabled="settings.video.quality.type != 'CQ'" slider
+                      translate}} <input id="quality" class="form-control" type="text" ng-model="settings.video.quality.scale"
+                      ng-disabled="settings.video.quality.type != 'CQ'" slider="qualityData(selectedCodec.video, 'qscale')"
                     />
                     </label>
                   </div>
