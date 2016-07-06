@@ -54,7 +54,7 @@ public class StreamConsumer implements Runnable {
                 sb.append(new String(buf, 0, read));
             }
         } catch (IOException e) {
-            LOGGER.error(e);
+            LOGGER.error(e.getMessage(), e);
         }
     }
 

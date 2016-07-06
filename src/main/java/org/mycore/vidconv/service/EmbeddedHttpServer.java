@@ -107,7 +107,7 @@ public class EmbeddedHttpServer extends Widget {
         try {
             hostName = InetAddress.getLocalHost().getCanonicalHostName();
         } catch (UnknownHostException e) {
-            LOGGER.error(e);
+            LOGGER.error(e.getMessage(), e);
         }
 
         return hostName;
