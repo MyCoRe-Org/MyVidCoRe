@@ -1,4 +1,4 @@
-# MyVidCoRe - My Video Converter
+# MyVidCoRe - My Video Converter [![Build Status](https://travis-ci.org/MyCoRe-Org/MyVidCoRe.svg?branch=master)](https://travis-ci.org/MyCoRe-Org/MyVidCoRe)
 
 ## Getting Started
 
