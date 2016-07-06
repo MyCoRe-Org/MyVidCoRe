@@ -10,6 +10,8 @@ Build Project with this command:
 
 You also need to install FFMpeg and FFProbe, please visit the [FFMpeg download page](https://ffmpeg.org/download.html).
 
+## Overview
+
 **Running Server**
 
 Run Server with (Maven):
@@ -18,11 +20,14 @@ Run Server with (Maven):
 
 or:
 
+    # run with default settings
     $ java -jar target/myvidcore-*-jar-with-dependencies.jar
+    # run with custom settings
+    $ java -jar target/myvidcore-*-jar-with-dependencies.jar --watchDir convert/input --outputDir convert/output
 
 Now you should be able to access the WEB-Interface on [http://localhost:8085/web](http://localhost:8085/web).
-
-## Overview
+ 
+**Access Server**
 
 REST-API:
 
@@ -33,11 +38,12 @@ WEB-Interface:
 
     http://localhost:8085/web
 
+## Commandline Options
+
 For a help and/or overview about default settings run:
 
     $ java -jar target/myvidcore-*-jar-with-dependencies.jar -h
-
-## Options
+    
 * **-h, --help**
 
   Print help message
