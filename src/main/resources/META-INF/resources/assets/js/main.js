@@ -320,7 +320,7 @@ app.service("formatService", function($http, $q, asyncQueue) {
 				});
 			});
 		});
-		console.log(formats);
+
 		deferred.resolve(formats);
 
 		return deferred.promise;
@@ -390,20 +390,19 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 	$scope.load = function() {
 		$http.get("/settings").then(function(response) {
 			if (response.status = 200) {
-				angular.merge($scope.settings, response.data);
+				$scope.settings = response.data;
 			}
 		}, function(error) {
 			$log.error("failure loading settings", error);
 		});
 	}
 
-	$scope.save = function(settings) {
-		$http.post("/settings", settings).then(function(response) {
+	$scope.save = function() {
+		$http.post("/settings", $scope.settings).then(function(response) {
 			$scope.showStatusMessage("success", $translate.instant("settings.saved.success"));
 		}, function(error) {
 			$scope.showStatusMessage("error", $translate.instant("settings.saved.error"));
 		});
-
 	}
 
 	$scope.filterCodecs = function(format, type) {

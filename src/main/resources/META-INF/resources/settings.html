@@ -120,14 +120,14 @@
                   <label>{{'settings.quality' | translate}}</label>
                 </div>
                 <div class="col-sm-6">
-                  <div class="radio" ng-hide="!(encoderHasParameter(selectedCodec.video, 'crf'))">
+                  <div class="radio" ng-if="(encoderHasParameter(selectedCodec.video, 'crf'))">
                     <label> <input type="radio" id="qTypeCRF" value="CRF" checked ng-model="settings.video.quality.type"> {{'settings.quality.type.CRF' |
                       translate}} <input id="quality" class="form-control" type="text" ng-model="settings.video.quality.rateFactor"
                       ng-disabled="settings.video.quality.type != 'CRF'" slider="qualityData(selectedCodec.video, 'crf')"
                     />
                     </label>
                   </div>
-                  <div class="radio" ng-hide="(encoderHasParameter(selectedCodec.video, 'crf'))">
+                  <div class="radio" ng-if="!(encoderHasParameter(selectedCodec.video, 'crf'))">
                     <label> <input type="radio" id="qTypeCQ" value="CQ" checked ng-model="settings.video.quality.type"> {{'settings.quality.type.CRF' |
                       translate}} <input id="quality" class="form-control" type="text" ng-model="settings.video.quality.scale"
                       ng-disabled="settings.video.quality.type != 'CQ'" slider="qualityData(selectedCodec.video, 'qscale')"
@@ -213,7 +213,7 @@
             </div>
           </div>
           <div class="pull-right clear-fix">
-            <button type="submit" class="btn btn-default btn-primary" ng-click="save(settings)">{{ 'btn.save' | translate}}</button>
+            <button type="submit" class="btn btn-default btn-primary" ng-click="save()">{{ 'btn.save' | translate}}</button>
           </div>
         </fieldset>
       </form>
