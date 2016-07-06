@@ -181,9 +181,8 @@
         <artifactId>license-maven-plugin</artifactId>
         <version>1.9</version>
         <configuration>
-          <verbose>false</verbose>
+          <verbose>true</verbose>
           <licenseName>gpl_v3</licenseName>
-          <licenceFile>${basedir}/LICENSE</licenceFile>
         </configuration>
         <executions>
           <execution>
