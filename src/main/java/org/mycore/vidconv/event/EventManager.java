@@ -72,9 +72,9 @@ public class EventManager {
         listeners.values().forEach(d -> {
             try {
                 d.handleEvent(event);
-            } catch (Exception e) {
-                LogManager.getRootLogger().error(e);
-                throw new RuntimeException(e);
+            } catch (Exception ex) {
+                LogManager.getLogger(d.getClass()).error(ex.getMessage(), ex);
+                throw new RuntimeException(ex);
             }
         });
     }
@@ -84,6 +84,7 @@ public class EventManager {
             try {
                 e.getValue().handleEvent(event);
             } catch (Exception ex) {
+                LogManager.getLogger(e.getValue().getClass()).error(ex.getMessage(), ex);
                 throw new RuntimeException(ex);
             }
         });
