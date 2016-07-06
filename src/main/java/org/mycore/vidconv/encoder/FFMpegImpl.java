@@ -412,12 +412,15 @@ public class FFMpegImpl {
             cmd.append(" -r " + video.getFramerate());
         }
 
-        if (video.getQuality().getType() != null && video.getQuality().getType().equals("CRF")) {
-            cmd.append(" -crf " + video.getQuality().getRateFactor());
-        } else if (video.getQuality().getType() != null && video.getQuality().getType().equals("CQ")) {
-            cmd.append(" -qscale:v " + video.getQuality().getScale());
-        } else if (video.getQuality().getType() != null && video.getQuality().getType().equals("ABR")) {
-            cmd.append(" -b:v " + video.getQuality().getBitrate() + "k");
+        Video.Quality quality = video.getQuality();
+        if (quality != null && quality.getType() != null) {
+            if (quality.getType().equals("CRF") && quality.getRateFactor() != null) {
+                cmd.append(" -crf " + quality.getRateFactor());
+            } else if (quality.getType().equals("CQ") && quality.getScale() != null) {
+                cmd.append(" -qscale:v " + quality.getScale());
+            } else if (quality.getType().equals("ABR") && quality.getBitrate() != null) {
+                cmd.append(" -b:v " + quality.getBitrate() + "k");
+            }
         }
 
         Audio audio = settings.getAudio();
