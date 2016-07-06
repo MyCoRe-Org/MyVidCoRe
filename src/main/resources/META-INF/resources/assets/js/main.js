@@ -22,10 +22,11 @@ app.directive("convertToNumber", function() {
 		require : 'ngModel',
 		link : function(scope, element, attrs, ngModel) {
 			ngModel.$parsers.push(function(val) {
+				console.log(val);
 				return parseInt(val, 10);
 			});
 			ngModel.$formatters.push(function(val) {
-				return '' + val;
+				return val === undefined || val.length == 0 ? null : '' + val;
 			});
 		}
 	};

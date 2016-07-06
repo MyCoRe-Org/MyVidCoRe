@@ -189,7 +189,7 @@
                 <label for="samplerate">{{'settings.audio.samplerate' | translate}}</label> <select id="samplerate" class="form-control"
                   ng-model="settings.audio.samplerate" convert-to-number
                 >
-                  <option value="auto">{{'settings.auto' | translate}}</option>
+                  <option value="">{{'settings.auto' | translate}}</option>
                   <option ng-repeat="sr in selectedCodec.audio.sampleRates" value="{{sr}}">{{sr}}</option>
                 </select>
               </div>
@@ -197,7 +197,7 @@
                 <label for="bitrate">{{'settings.audio.bitrate' | translate}}</label> <select id="bitrate" class="form-control" ng-model="settings.audio.bitrate"
                   convert-to-number
                 >
-                  <option value="auto">{{'settings.auto' | translate}}</option>
+                  <option value="">{{'settings.auto' | translate}}</option>
                   <option value="64">64</option>
                   <option value="80">80</option>
                   <option value="96">96</option>
