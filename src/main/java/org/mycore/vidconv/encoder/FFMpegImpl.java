@@ -64,6 +64,13 @@ public class FFMpegImpl {
 
     private static CodecsWrapper supportedCodecs;
 
+    /**
+     * Returns all supported codecs.
+     * 
+     * @return the supported codecs
+     * @throws IOException
+     * @throws InterruptedException
+     */
     public static CodecsWrapper codecs() throws IOException, InterruptedException {
         if (supportedCodecs != null) {
             return supportedCodecs;
@@ -130,6 +137,13 @@ public class FFMpegImpl {
 
     private static FormatsWrapper supportedFormats;
 
+    /**
+     * Returns all supported formats.
+     * 
+     * @return the supported formats
+     * @throws IOException
+     * @throws InterruptedException
+     */
     public static FormatsWrapper formats() throws IOException, InterruptedException {
         if (supportedFormats != null) {
             return supportedFormats;
@@ -329,6 +343,12 @@ public class FFMpegImpl {
 
     private static final Pattern PATTERN_CURRENT = Pattern.compile(".*time=([0-9:\\.]+) bitrate.*$");
 
+    /**
+     * Returns the current progress value in percent.
+     * 
+     * @param stream the stream
+     * @return the progress value
+     */
     public static Integer progress(final String stream) {
         if (stream != null) {
             final Matcher dm = PATTERN_DURATION.matcher(stream);
