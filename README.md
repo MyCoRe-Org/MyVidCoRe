@@ -1,5 +1,7 @@
 # MyVidCoRe - My Video Converter [![Build Status](https://travis-ci.org/MyCoRe-Org/MyVidCoRe.svg?branch=master)](https://travis-ci.org/MyCoRe-Org/MyVidCoRe)
 
+Converts Videos from hotfolder to output directory with given settings. 
+
 ## Getting Started
 
 This Project requires at least Java 8 and Maven 3 to build.
