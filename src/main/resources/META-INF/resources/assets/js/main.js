@@ -398,7 +398,6 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 	}
 
 	$scope.save = function(settings) {
-		console.log(settings);
 		$http.post("/settings", settings).then(function(response) {
 			$scope.showStatusMessage("success", $translate.instant("settings.saved.success"));
 		}, function(error) {
