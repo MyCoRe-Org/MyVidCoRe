@@ -54,8 +54,6 @@ public class FFMpegImpl {
 
     private static final Pattern PATTERN_ENTRY_SPLIT = Pattern.compile("\\n\\n");
 
-    private static final Pattern PATTERN_LIB = Pattern.compile("--enable-([^\\s]+)");
-
     private static final Pattern PATTERN_CODECS = Pattern
             .compile("\\s(D|\\.|\\s)(E|\\.|\\s)(V|A|S|\\s)(I|\\.|\\s)(L|\\.|\\s)(S|\\.|\\s)\\s([^=\\s\\t]+)([^\\n]+)");
 
@@ -78,15 +76,6 @@ public class FFMpegImpl {
         new Thread(errorConsumer).start();
 
         p.waitFor();
-
-        final List<String> libs = new ArrayList<>();
-        final String errorStream = errorConsumer.getStreamOutput();
-        if (errorStream != null) {
-            final Matcher m = PATTERN_LIB.matcher(errorStream);
-            while (m.find()) {
-                libs.add(m.group(1));
-            }
-        }
 
         final List<CodecWrapper> codecs = new ArrayList<>();
         final String outputStream = outputConsumer.getStreamOutput();
