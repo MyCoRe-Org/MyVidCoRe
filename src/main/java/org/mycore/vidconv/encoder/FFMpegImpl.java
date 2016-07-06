@@ -434,7 +434,6 @@ public class FFMpegImpl {
 
         cmd.append(" {1}");
 
-        System.out.println(cmd.toString());
         return cmd.toString();
     }
 
