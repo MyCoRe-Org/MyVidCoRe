@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -177,6 +178,12 @@ public class FFMpegImpl {
 
     private static final Pattern PATTERN_PARAMS = Pattern.compile("\\s*-([^\\s]+)\\s+<([^>]+)>\\s+(?:[^\\s]+)\\s(.*)");
 
+    private static final Pattern PATTERN_PARAM_FROM_TO = Pattern
+            .compile("\\(from\\s([^\\s]+)\\sto\\s([^\\s]+)\\)");
+
+    private static final Pattern PATTERN_PARAM_DEFAULT = Pattern
+            .compile("\\(default\\s([^\\)]+)\\)");
+
     private static Map<String, EncodersWrapper> supportedEncoders = new HashMap<>();
 
     /**
@@ -241,6 +248,13 @@ public class FFMpegImpl {
                                 param.setName(pm.group(1));
                                 param.setType(pm.group(2));
                                 param.setDescription(pm.group(3));
+
+                                Optional.ofNullable(getPatternGroup(PATTERN_PARAM_FROM_TO, pm.group(3), 1))
+                                        .ifPresent(v -> param.setFromValue(v));
+                                Optional.ofNullable(getPatternGroup(PATTERN_PARAM_FROM_TO, pm.group(3), 2))
+                                        .ifPresent(v -> param.setToValue(v));
+                                Optional.ofNullable(getPatternGroup(PATTERN_PARAM_DEFAULT, pm.group(3), 1))
+                                        .ifPresent(v -> param.setDefaultValue(v));
 
                                 parameters.add(param);
                             }

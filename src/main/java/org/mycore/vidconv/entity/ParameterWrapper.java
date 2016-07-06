@@ -34,6 +34,12 @@ public class ParameterWrapper {
 
     private String description;
 
+    private String fromValue;
+
+    private String toValue;
+
+    private String defaultValue;
+
     /**
      * 
      */
@@ -83,6 +89,67 @@ public class ParameterWrapper {
         this.description = description;
     }
 
+    /**
+     * @return the fromValue
+     */
+    public String getFromValue() {
+        return fromValue;
+    }
+
+    /**
+     * @param fromValue the fromValue to set
+     */
+    public void setFromValue(String fromValue) {
+        this.fromValue = parseValueConstant(fromValue);
+    }
+
+    /**
+     * @return the toValue
+     */
+    public String getToValue() {
+        return toValue;
+    }
+
+    /**
+     * @param toValue the toValue to set
+     */
+    public void setToValue(String toValue) {
+        this.toValue = parseValueConstant(toValue);
+    }
+
+    /**
+     * @return the defaultValue
+     */
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    /**
+     * @param defaultValue the defaultValue to set
+     */
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = parseValueConstant(defaultValue);
+    }
+
+    private String parseValueConstant(String value) {
+        switch (value) {
+        case "I64_MIN":
+        case "INT_MIN":
+            return new Integer(Integer.MIN_VALUE).toString();
+        case "I64_MAX":
+        case "INT_MAX":
+            return new Integer(Integer.MAX_VALUE).toString();
+        case "FLT_MIN":
+            return new Float(Float.MIN_VALUE).toString();
+        case "-FLT_MAX":
+            return new Float(Float.MAX_VALUE * -1).toString();
+        case "FLT_MAX":
+            return new Float(Float.MAX_VALUE).toString();
+        }
+
+        return value;
+    }
+
     /* (non-Javadoc)
      * @see java.lang.Object#toString()
      */
@@ -103,6 +170,21 @@ public class ParameterWrapper {
         if (description != null) {
             builder.append("description=");
             builder.append(description);
+            builder.append(", ");
+        }
+        if (fromValue != null) {
+            builder.append("fromValue=");
+            builder.append(fromValue);
+            builder.append(", ");
+        }
+        if (toValue != null) {
+            builder.append("toValue=");
+            builder.append(toValue);
+            builder.append(", ");
+        }
+        if (defaultValue != null) {
+            builder.append("defaultValue=");
+            builder.append(defaultValue);
         }
         builder.append("]");
         return builder.toString();
