@@ -344,6 +344,10 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 		"matroska" : {
 			"audio" : [ "aac", "mp3", "vorbis", "opus", "flac" ],
 			"video" : [ "h264", "h265", "mpeg4", "msmpeg4v2", "mpeg2video", "vp8", "vp9", "theora" ]
+		},
+		"webm" : {
+			"audio" : [ "vorbis", "opus" ],
+			"video" : [ "vp8", "vp9" ]
 		}
 	};
 
