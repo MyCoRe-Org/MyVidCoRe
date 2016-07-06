@@ -10,7 +10,7 @@ Build Project with this command:
 
 You also need to install FFMpeg and FFProbe, please visit the [FFMpeg download page](https://ffmpeg.org/download.html).
 
-** Running Server
+**Running Server**
 
 Run Server with (Maven):
 
