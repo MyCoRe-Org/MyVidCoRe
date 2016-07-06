@@ -46,7 +46,7 @@ For a help and/or overview about default settings run:
 
   Set host to listen on
 
-* **-p, --port**
+* **-p, --port**<br />
   *Default:* `8085`
   
   Set port to listen on
