@@ -207,7 +207,7 @@ public class SettingsWrapper {
         public static class Quality {
             private String type;
 
-            private Float rateFactor;
+            private String rateFactor;
 
             private Integer scale;
 
@@ -233,14 +233,14 @@ public class SettingsWrapper {
             /**
              * @return the rateFactor
              */
-            public Float getRateFactor() {
+            public String getRateFactor() {
                 return rateFactor;
             }
 
             /**
              * @param rateFactor the rateFactor to set
              */
-            public void setRateFactor(Float rateFactor) {
+            public void setRateFactor(String rateFactor) {
                 this.rateFactor = rateFactor;
             }
 
