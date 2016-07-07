@@ -381,6 +381,7 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 			"profile" : "main",
 			"level" : "4.0",
 			"pixelFormat" : "yuv420p",
+			"profile" : "default",
 			"quality" : {
 				"type" : "CRF",
 				"rateFactor" : 23,

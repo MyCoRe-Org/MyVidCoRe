@@ -8,7 +8,7 @@
     "converter.noJobs" : "No Jobs running.",
     
     "settings.auto" : "Auto",
-    "settings.library": "Library",
+    "settings.preset" : "Preset",
     "settings.converter.title" : "Converter Settings",
     "settings.saved.success" : "Settings successfull saved!",
     "settings.saved.error" : "Error on saving settings!",

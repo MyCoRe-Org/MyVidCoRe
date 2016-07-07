@@ -78,12 +78,18 @@
                   >{{codec.description}}</option>
                 </select>
               </div>
+              <div class="form-group" ng-if="(preset = encoderParameter(selectedCodec.video, 'preset')).values">
+                <label for="preset">{{'settings.preset' | translate}}</label> <select id="preset" class="form-control" ng-model="settings.video.preset"
+                  ng-init="settings.video.preset = settings.video.preset || preset.defaultValue"
+                  ng-options="value.name as value.name + (value.description !== undefined ? ' (' + value.description + ')' : '') for value in preset.values"
+                <option value="">{{'settings.auto' | translate}}</option>
+                </select>
+              </div>
               <div class="form-group" ng-if="(selectedCodec.video = selectedCodec.video || filterEncoder(settings.video.codec)).pixelFormats.length > 0">
                 <label for="pixelFormat">{{'settings.colorSpace' | translate}}</label> <select id="pixelFormat" class="form-control"
-                  ng-model="settings.video.pixelFormat"
+                  ng-model="settings.video.pixelFormat" ng-options="pf as pf for pf in selectedCodec.video.pixelFormats"
                 >
                   <option value="">{{'settings.auto' | translate}}</option>
-                  <option ng-repeat="pf in selectedCodec.video.pixelFormats" value="{{pf}}">{{pf}}</option>
                 </select>
               </div>
               <div class="row">
@@ -143,17 +149,21 @@
                   </div>
                 </div>
               </div>
-              <div class="row"
-                ng-if="((profile = encoderParameter(selectedCodec.video, 'profile') ) && (level = encoderParameter(selectedCodec.video, 'level')))"
-              >
+              <div class="row" ng-if="((profile = encoderParameter(selectedCodec.video, 'profile') ) && (level = encoderParameter(selectedCodec.video, 'level')))">
                 <div class="form-group col-sm-6">
-                  <label for="profile">{{'settings.profile' | translate}}</label> <select id="profile" class="form-control" ng-model="settings.video.profile">
-                    <option ng-repeat="value in profile.values || defaultProfiles" value="{{value.name}}">{{value.name}}</option>
+                  <label for="profile">{{'settings.profile' | translate}}</label> <select id="profile" class="form-control" ng-model="settings.video.profile"
+                    ng-init="settings.video.profile = settings.video.profile || profile.defaultValue"
+                    ng-options="value.name as value.name for value in profile.values || defaultProfiles"
+                  >
+                    <option value="">{{'settings.auto' | translate}}</option>
                   </select>
                 </div>
                 <div class="form-group col-sm-6">
-                  <label for="level">{{'settings.level' | translate}}</label> <select id="level" class="form-control" ng-model="settings.video.level">
-                    <option ng-repeat="value in level.values || defaultLevels" value="{{value.name}}">{{value.name}}</option>
+                  <label for="level">{{'settings.level' | translate}}</label> <select id="level" class="form-control" ng-model="settings.video.level"
+                    ng-init="settings.video.level = settings.video.level || level.defaultValue"
+                    ng-options="value.name as value.name for value in (level.values || defaultLevels)"
+                  >
+                    <option value="">{{'settings.auto' | translate}}</option>
                   </select>
                 </div>
               </div>
@@ -183,10 +193,9 @@
               <!--              </div> -->
               <div class="form-group" ng-if="(selectedCodec.audio = selectedCodec.audio || filterEncoder(settings.audio.codec)).sampleRates.length > 0">
                 <label for="samplerate">{{'settings.audio.samplerate' | translate}}</label> <select id="samplerate" class="form-control"
-                  ng-model="settings.audio.samplerate" convert-to-number
+                  ng-model="settings.audio.samplerate" convert-to-number ng-options="sr as sr for sr in selectedCodec.audio.sampleRates"
                 >
                   <option value="">{{'settings.auto' | translate}}</option>
-                  <option ng-repeat="sr in selectedCodec.audio.sampleRates" value="{{sr}}">{{sr}}</option>
                 </select>
               </div>
               <div class="form-group">

@@ -8,7 +8,7 @@
     "converter.noJobs" : "Keine Konverter-Aufträge vorhanden.",
     
     "settings.auto" : "automatisch",
-    "settings.library": "Bibliothek",
+    "settings.preset" : "Vorlage",
     "settings.converter.title" : "Konverter Einstellungen",
     "settings.saved.success" : "Einstellungen wurden erfolgreich gespeichert!",
     "settings.saved.error" : "Fehler beim speichern der Einstellungen!",
