@@ -22,6 +22,8 @@
  */
 package org.mycore.vidconv.entity;
 
+import java.util.List;
+
 /**
  * @author Ren\u00E9 Adler (eagle)
  *
@@ -39,6 +41,8 @@ public class ParameterWrapper {
     private String toValue;
 
     private String defaultValue;
+
+    private List<ParameterValue> values;
 
     /**
      * 
@@ -131,6 +135,20 @@ public class ParameterWrapper {
         this.defaultValue = parseValueConstant(defaultValue);
     }
 
+    /**
+     * @return the values
+     */
+    public List<ParameterValue> getValues() {
+        return values;
+    }
+
+    /**
+     * @param values the values to set
+     */
+    public void setValues(List<ParameterValue> values) {
+        this.values = values;
+    }
+
     private String parseValueConstant(String value) {
         switch (value) {
         case "I64_MIN":
@@ -150,11 +168,67 @@ public class ParameterWrapper {
         return value;
     }
 
+    public static class ParameterValue {
+        private String name;
+
+        private String description;
+
+        /**
+         * @return the name
+         */
+        public String getName() {
+            return name;
+        }
+
+        /**
+         * @param name the name to set
+         */
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        /**
+         * @return the description
+         */
+        public String getDescription() {
+            return description;
+        }
+
+        /**
+         * @param description the description to set
+         */
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        /* (non-Javadoc)
+         * @see java.lang.Object#toString()
+         */
+        @Override
+        public String toString() {
+            StringBuilder builder = new StringBuilder();
+            builder.append("ParameterValue [");
+            if (name != null) {
+                builder.append("name=");
+                builder.append(name);
+                builder.append(", ");
+            }
+            if (description != null) {
+                builder.append("description=");
+                builder.append(description);
+            }
+            builder.append("]");
+            return builder.toString();
+        }
+
+    }
+
     /* (non-Javadoc)
      * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
+        final int maxLen = 10;
         StringBuilder builder = new StringBuilder();
         builder.append("ParameterWrapper [");
         if (name != null) {
@@ -185,6 +259,11 @@ public class ParameterWrapper {
         if (defaultValue != null) {
             builder.append("defaultValue=");
             builder.append(defaultValue);
+            builder.append(", ");
+        }
+        if (values != null) {
+            builder.append("values=");
+            builder.append(values.subList(0, Math.min(values.size(), maxLen)));
         }
         builder.append("]");
         return builder.toString();
