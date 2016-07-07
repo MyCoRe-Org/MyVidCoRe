@@ -42,6 +42,7 @@ import org.mycore.vidconv.entity.FormatWrapper;
 import org.mycore.vidconv.entity.FormatsWrapper;
 import org.mycore.vidconv.entity.MuxerWrapper;
 import org.mycore.vidconv.entity.ParameterWrapper;
+import org.mycore.vidconv.entity.ParameterWrapper.ParameterValue;
 import org.mycore.vidconv.entity.SettingsWrapper;
 import org.mycore.vidconv.entity.SettingsWrapper.Audio;
 import org.mycore.vidconv.entity.SettingsWrapper.Video;
@@ -190,7 +191,10 @@ public class FFMpegImpl {
 
     private static final Pattern PATTERN_CH_LAYOUTS = Pattern.compile("channel layouts:(.*)");
 
-    private static final Pattern PATTERN_PARAMS = Pattern.compile("\\s*-([^\\s]+)\\s+<([^>]+)>\\s+(?:[^\\s]+)\\s(.*)");
+    private static final Pattern PATTERN_PARAMS = Pattern
+            .compile("\\s+-([^\\s]+)\\s+<([^>]+)>\\s+(?:[^\\s]+)\\s([^\\n]+)([\\S\\s]+?(?=\\s+-))?");
+
+    private static final Pattern PATTERN_PARAM_VALUES = Pattern.compile("\\s+([^\\s]+)\\s+(?:[^\\s]+)([^\\n]*)");
 
     private static final Pattern PATTERN_PARAM_FROM_TO = Pattern
             .compile("\\(from\\s([^\\s]+)\\sto\\s([^\\s]+)\\)");
@@ -258,6 +262,9 @@ public class FFMpegImpl {
                             final List<ParameterWrapper> parameters = new ArrayList<>();
                             final Matcher pm = PATTERN_PARAMS.matcher(m.group(2));
                             while (pm.find()) {
+                                //                                for (int i = 0; i <= pm.groupCount(); i++) {
+                                //                                    System.out.println(i + ": " + pm.group(i));
+                                //                                }
                                 final ParameterWrapper param = new ParameterWrapper();
                                 param.setName(pm.group(1));
                                 param.setType(pm.group(2));
@@ -269,6 +276,25 @@ public class FFMpegImpl {
                                         .ifPresent(v -> param.setToValue(v));
                                 Optional.ofNullable(getPatternGroup(PATTERN_PARAM_DEFAULT, pm.group(3), 1))
                                         .ifPresent(v -> param.setDefaultValue(v));
+
+                                Optional.ofNullable(pm.group(4)).ifPresent(vs -> {
+                                    if (!vs.isEmpty()) {
+                                        final List<ParameterValue> values = new ArrayList<>();
+                                        final Matcher pv = PATTERN_PARAM_VALUES.matcher(vs);
+                                        while (pv.find()) {
+                                            final ParameterValue value = new ParameterValue();
+                                            value.setName(pv.group(1));
+                                            Optional.ofNullable(pv.group(2)).ifPresent(v -> {
+                                                v = v.trim();
+                                                if (!v.isEmpty())
+                                                    value.setDescription(v);
+                                            });
+                                            values.add(value);
+                                        }
+                                        if (!values.isEmpty())
+                                            param.setValues(values);
+                                    }
+                                });
 
                                 parameters.add(param);
                             }
