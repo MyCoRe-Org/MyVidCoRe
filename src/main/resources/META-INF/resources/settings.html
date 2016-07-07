@@ -143,21 +143,17 @@
                   </div>
                 </div>
               </div>
-              <div class="row" ng-hide="!(encoderHasParameter(selectedCodec.video, 'profile') && encoderHasParameter(selectedCodec.video, 'level'))">
+              <div class="row"
+                ng-if="((profile = encoderParameter(selectedCodec.video, 'profile') ) && (level = encoderParameter(selectedCodec.video, 'level')))"
+              >
                 <div class="form-group col-sm-6">
                   <label for="profile">{{'settings.profile' | translate}}</label> <select id="profile" class="form-control" ng-model="settings.video.profile">
-                    <option value="high">high</option>
-                    <option value="main">main</option>
-                    <option value="baseline">baseline</option>
+                    <option ng-repeat="value in profile.values || defaultProfiles" value="{{value.name}}">{{value.name}}</option>
                   </select>
                 </div>
                 <div class="form-group col-sm-6">
                   <label for="level">{{'settings.level' | translate}}</label> <select id="level" class="form-control" ng-model="settings.video.level">
-                    <option value="3.0">3.0</option>
-                    <option value="3.1">3.1</option>
-                    <option value="4.0">4.0</option>
-                    <option value="4.1">4.1</option>
-                    <option value="4.2">4.2</option>
+                    <option ng-repeat="value in level.values || defaultLevels" value="{{value.name}}">{{value.name}}</option>
                   </select>
                 </div>
               </div>

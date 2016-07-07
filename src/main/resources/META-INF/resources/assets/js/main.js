@@ -352,6 +352,26 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 		}
 	};
 
+	$scope.defaultProfiles = [ {
+		"name" : "baseline"
+	}, {
+		"name" : "main"
+	}, {
+		"name" : "high"
+	} ];
+
+	$scope.defaultLevels = [ {
+		"name" : "3.0"
+	}, {
+		"name" : "3.1"
+	}, {
+		"name" : "4.0"
+	}, {
+		"name" : "4.1"
+	}, {
+		"name" : "4.2"
+	} ];
+
 	// default settings
 	$scope.settings = {
 		"format" : "mp4",
@@ -415,14 +435,14 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 		return encoders !== undefined && encoders.length != 0 && formatService.getByProperty(encoders, "name", name);
 	}
 
-	$scope.encoderHasParameter = function(obj, param) {
+	$scope.encoderParameter = function(obj, param) {
 		var encoder = typeof obj == "String" ? $scope.filterEncoder(obj) : obj;
 		if (encoder === undefined || encoder == null || encoder.length == 0)
 			return false;
 		if (encoder.parameters === undefined || encoder.parameters.length == 0)
 			return false;
-		var p = formatService.getByProperty(encoder.parameters, "name", param);
-		return p !== undefined && p != null;
+
+		return formatService.getByProperty(encoder.parameters, "name", param);
 	}
 
 	$scope.qualityData = function(obj, param) {
