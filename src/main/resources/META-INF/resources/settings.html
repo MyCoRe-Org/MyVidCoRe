@@ -102,8 +102,9 @@
                     </select>
                   </div>
                   <div class="radio">
-                    <label> <input type="radio" id="frTypeVFR" value="VFR" checked ng-model="settings.video.framerateType"> {{
-                      'settings.framerate.type.vfr' | translate}}
+                    <label> <input type="radio" id="frTypeVFR" value="VFR" ng-model="settings.video.framerateType"
+                      ng-checked="settings.video.framerateType === undefined || settings.video.framerateType == 'VFR'"
+                    > {{ 'settings.framerate.type.vfr' | translate}}
                     </label>
                   </div>
                   <div class="radio">
