@@ -9,6 +9,7 @@
     
     "settings.auto" : "Auto",
     "settings.preset" : "Preset",
+    "settings.preset" : "Tune",
     "settings.converter.title" : "Converter Settings",
     "settings.saved.success" : "Settings successfull saved!",
     "settings.saved.error" : "Error on saving settings!",
