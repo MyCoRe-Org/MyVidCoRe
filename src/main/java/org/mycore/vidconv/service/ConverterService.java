@@ -22,6 +22,7 @@
  */
 package org.mycore.vidconv.service;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -37,10 +38,13 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.persistence.jaxb.MarshallerProperties;
 import org.mycore.vidconv.config.Settings;
 import org.mycore.vidconv.encoder.FFMpegImpl;
 import org.mycore.vidconv.entity.ConverterWrapper;
@@ -144,7 +148,7 @@ public class ConverterService extends Widget implements Listener {
                         Files.createDirectories(outputPath.getParent());
 
                     final String command = FFMpegImpl.command(settings);
-                    final ConverterJob converter = new ConverterJob(command, inputPath, outputPath);
+                    final ConverterJob converter = new ConverterJob(id, command, inputPath, outputPath);
                     converts.put(id, converter);
                     converterThreadPool.submit(converter);
                 } else {
@@ -155,6 +159,8 @@ public class ConverterService extends Widget implements Listener {
     }
 
     public static class ConverterJob implements Runnable {
+
+        private final String id;
 
         private final Path inputPath;
 
@@ -174,7 +180,8 @@ public class ConverterService extends Widget implements Listener {
 
         private StreamConsumer errorConsumer;
 
-        public ConverterJob(final String command, final Path inputPath, final Path outputPath) {
+        public ConverterJob(final String id, final String command, final Path inputPath, final Path outputPath) {
+            this.id = id;
             this.command = command;
             this.inputPath = inputPath;
             this.outputPath = outputPath;
@@ -205,10 +212,15 @@ public class ConverterService extends Widget implements Listener {
                 running = false;
                 done = true;
                 endTime = Instant.now();
+                save();
                 LOGGER.info("Converting of " + inputPath.toString() + " done.");
-            } catch (IOException | InterruptedException e) {
+            } catch (IOException | InterruptedException | JAXBException e) {
                 LOGGER.error(e.getMessage(), e);
             }
+        }
+
+        public String getId() {
+            return id;
         }
 
         public String getCommand() {
@@ -242,6 +254,17 @@ public class ConverterService extends Widget implements Listener {
 
         public String errorStream() {
             return errorConsumer != null ? errorConsumer.getStreamOutput() : null;
+        }
+
+        private void save() throws JAXBException {
+            final JAXBContext jc = JAXBContext.newInstance(ConverterWrapper.class);
+            final Marshaller marshaller = jc.createMarshaller();
+            marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, "application/json");
+            marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+            final File file = outputPath.getParent().resolve(".converted").toFile();
+            marshaller.marshal(new ConverterWrapper(id, this), file);
         }
     }
 }
