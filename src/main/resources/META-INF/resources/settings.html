@@ -119,14 +119,14 @@
                   <div class="radio" ng-if="(encoderParameter(selectedCodec.video, 'crf'))">
                     <label> <input type="radio" id="qTypeCRF" value="CRF" checked ng-model="settings.video.quality.type"> {{'settings.quality.type.CRF' |
                       translate}} <input id="quality" class="form-control" type="text" ng-model="settings.video.quality.rateFactor"
-                      ng-disabled="settings.video.quality.type != 'CRF'" slider="qualityData(selectedCodec.video, 'crf')"
+                      ng-disabled="settings.video.quality.type != 'CRF'" slider="qualityData(selectedCodec.video, 'crf', settings.video.quality.rateFactor)"
                     />
                     </label>
                   </div>
                   <div class="radio" ng-if="!(encoderParameter(selectedCodec.video, 'crf'))">
                     <label> <input type="radio" id="qTypeCQ" value="CQ" checked ng-model="settings.video.quality.type"> {{'settings.quality.type.CRF' |
                       translate}} <input id="quality" class="form-control" type="text" ng-model="settings.video.quality.scale"
-                      ng-disabled="settings.video.quality.type != 'CQ'" slider="qualityData(selectedCodec.video, 'qscale')"
+                      ng-disabled="settings.video.quality.type != 'CQ'" slider="qualityData(selectedCodec.video, 'qscale', settings.video.quality.scale)"
                     />
                     </label>
                   </div>

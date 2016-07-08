@@ -448,7 +448,7 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 		return formatService.getByProperty(encoder.parameters, "name", param);
 	}
 
-	$scope.qualityData = function(obj, param) {
+	$scope.qualityData = function(obj, param, value) {
 		var encoder = typeof obj == "String" ? $scope.filterEncoder(obj) : obj;
 		if (encoder === undefined || encoder == null || encoder.length == 0)
 			return false;
@@ -460,7 +460,7 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 				min : 0,
 				max : 31,
 				step : 1,
-				value : 14,
+				value : value !== undefined && value != null ? parsetInt(value) : 14,
 				reversed : true
 			};
 		} else if (encoder.name == "libx264") {
@@ -470,7 +470,7 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 				max : 51,
 				step : 0.25,
 				precision : 2,
-				value : 23,
+				value : value !== undefined && value != null ? parseInt(value) : 23,
 				reversed : true
 			};
 		} else {
@@ -484,7 +484,8 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 					max : p.type == "float" ? parseFloat(p.toValue) : parseInt(p.toValue),
 					step : p.type == "float" ? 0.25 : 1,
 					precision : p.type == "float" ? 2 : 0,
-					value : Math.floor((p.toValue - p.fromValue) / 2),
+					value : value !== undefined && value != null ? p.type == "float" ? parseFloat(value) : parseInt(value) : Math
+							.floor((p.toValue - p.fromValue) / 2),
 					reversed : true
 				};
 			}
