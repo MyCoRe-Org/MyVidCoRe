@@ -58,7 +58,7 @@ public class StreamConsumer implements Runnable {
         }
     }
 
-    public String getStreamOutput() {
+    public synchronized String getStreamOutput() {
         return sb.toString();
     }
 
