@@ -34,6 +34,8 @@ public class EncoderWrapper {
 
     private List<String> pixelFormats;
 
+    private List<String> frameRates;
+
     private List<Integer> sampleRates;
 
     private List<String> sampleFormats;
@@ -89,6 +91,20 @@ public class EncoderWrapper {
      */
     public void setSampleRates(List<Integer> sampleRates) {
         this.sampleRates = sampleRates.isEmpty() ? null : sampleRates;
+    }
+
+    /**
+     * @return the frameRates
+     */
+    public List<String> getFrameRates() {
+        return frameRates;
+    }
+
+    /**
+     * @param frameRates the frameRates to set
+     */
+    public void setFrameRates(List<String> frameRates) {
+        this.frameRates = frameRates.isEmpty() ? null : frameRates;
     }
 
     /**

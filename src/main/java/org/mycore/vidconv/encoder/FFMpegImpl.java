@@ -185,6 +185,8 @@ public class FFMpegImpl {
 
     private static final Pattern PATTERN_PIX_FMT = Pattern.compile("pixel formats:(.*)");
 
+    private static final Pattern PATTERN_FRM_RATES = Pattern.compile("framerates:(.*)");
+
     private static final Pattern PATTERN_SMP_RATES = Pattern.compile("sample rates:(.*)");
 
     private static final Pattern PATTERN_SMP_FROMATS = Pattern.compile("sample formats:(.*)");
@@ -242,6 +244,12 @@ public class FFMpegImpl {
                                             .flatMap(ma -> splitString(ma.group(1)))
                                             .collect(Collectors.toList()));
 
+                            encoder.setFrameRates(
+                                    Stream.of(m.group(2)).map(s -> PATTERN_FRM_RATES.matcher(s))
+                                            .filter(ma -> ma.find())
+                                            .flatMap(ma -> splitString(ma.group(1)))
+                                            .collect(Collectors.toList()));
+
                             encoder.setSampleFormats(
                                     Stream.of(m.group(2)).map(s -> PATTERN_SMP_FROMATS.matcher(s))
                                             .filter(ma -> ma.find())
@@ -262,9 +270,6 @@ public class FFMpegImpl {
                             final List<ParameterWrapper> parameters = new ArrayList<>();
                             final Matcher pm = PATTERN_PARAMS.matcher(m.group(2));
                             while (pm.find()) {
-                                //                                for (int i = 0; i <= pm.groupCount(); i++) {
-                                //                                    System.out.println(i + ": " + pm.group(i));
-                                //                                }
                                 final ParameterWrapper param = new ParameterWrapper();
                                 param.setName(pm.group(1));
                                 param.setType(pm.group(2));

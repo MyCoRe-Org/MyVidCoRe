@@ -95,20 +95,10 @@
               <div class="row">
                 <div class="col-sm-4">
                   <div class="form-group">
-                    <label for="framerate">{{'settings.framerate' | translate}}</label> <select id="framerate" class="form-control" ng-model="settings.video.framerate">
+                    <label for="framerate">{{'settings.framerate' | translate}}</label> <select id="framerate" class="form-control" ng-model="settings.video.framerate"
+                      ng-options="fr for fr in selectedCodec.video.frameRates || defaultFrameRates"
+                    >
                       <option value="">{{'settings.framerate.auto' | translate}}</option>
-                      <option value="5">5</option>
-                      <option value="10">10</option>
-                      <option value="12">12</option>
-                      <option value="15">15</option>
-                      <option value="23.976">23.976 (NTSC Film)</option>
-                      <option value="24">24</option>
-                      <option value="25">25 (PAL Film/Video)</option>
-                      <option value="29.97">29.97 (NTSC Video)</option>
-                      <option value="30">30</option>
-                      <option value="50">50</option>
-                      <option value="59.94">59.94</option>
-                      <option value="60">60</option>
                     </select>
                   </div>
                   <div class="radio">
