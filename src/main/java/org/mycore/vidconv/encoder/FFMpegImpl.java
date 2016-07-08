@@ -422,6 +422,34 @@ public class FFMpegImpl {
     }
 
     /**
+     * Checks if encoding supported for given input file.
+     *  
+     * @param inputFile the input file
+     * @return <code>true</code> if supported or <code>false</code> if not
+     * @throws IOException
+     * @throws InterruptedException
+     * @throws JAXBException
+     */
+    public static boolean isEncodingSupported(final Path inputFile)
+            throws IOException, InterruptedException, JAXBException {
+        final ProbeWrapper probe = probe(inputFile);
+
+        if (probe.getFormat() != null && probe.getStreams() != null) {
+            return probe.getStreams().stream().filter(
+                    s -> s.getCodecType().equalsIgnoreCase("audio") || s.getCodecType().equalsIgnoreCase("video"))
+                    .map(s -> {
+                        try {
+                            return !codecs().getByName(s.getCodecName()).isEmpty();
+                        } catch (Exception ex) {
+                            return false;
+                        }
+                    }).filter(rt -> !rt).count() == 0;
+        }
+
+        return false;
+    }
+
+    /**
      * Build the command line for given {@link SettingsWrapper}.
      *  
      * @param settings the settings

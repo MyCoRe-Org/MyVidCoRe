@@ -37,6 +37,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.xml.bind.JAXBException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.vidconv.config.Settings;
@@ -127,22 +129,25 @@ public class ConverterService extends Widget implements Listener {
         }
     }
 
-    private void addConverter(final Path inputPath) throws IOException, InterruptedException, ExecutionException {
+    private void addConverter(final Path inputPath)
+            throws IOException, InterruptedException, ExecutionException, JAXBException {
         final SettingsWrapper settings = CONFIG.getSettings();
 
         if (settings != null) {
             final String id = Long.toHexString(new Random().nextLong());
             final String command = FFMpegImpl.command(settings);
             if (!Files.isDirectory(inputPath)) {
-                final String fileName = inputPath.getFileName().toString();
-                final Path outputPath = Paths.get(outputDir, id, FFMpegImpl.filename(settings, fileName));
+                if (FFMpegImpl.isEncodingSupported(inputPath)) {
+                    final String fileName = inputPath.getFileName().toString();
+                    final Path outputPath = Paths.get(outputDir, id, FFMpegImpl.filename(settings, fileName));
 
-                if (!Files.exists(outputPath.getParent()))
-                    Files.createDirectories(outputPath.getParent());
+                    if (!Files.exists(outputPath.getParent()))
+                        Files.createDirectories(outputPath.getParent());
 
-                final ConverterJob converter = new ConverterJob(command, inputPath, outputPath);
-                converts.put(id, converter);
-                converterThreadPool.submit(converter);
+                    final ConverterJob converter = new ConverterJob(command, inputPath, outputPath);
+                    converts.put(id, converter);
+                    converterThreadPool.submit(converter);
+                }
             }
         }
     }
