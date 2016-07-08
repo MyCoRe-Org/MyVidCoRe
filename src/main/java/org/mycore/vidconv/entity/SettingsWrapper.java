@@ -90,9 +90,13 @@ public class SettingsWrapper {
     public static class Video {
         private String codec;
 
-        private Float framerate;
+        private String framerate;
 
         private String framerateType;
+
+        private String preset;
+
+        private String tune;
 
         private String profile;
 
@@ -113,10 +117,24 @@ public class SettingsWrapper {
         }
 
         /**
+         * @param codec the codec to set
+         */
+        public void setCodec(String codec) {
+            this.codec = codec;
+        }
+
+        /**
          * @return the framerate
          */
-        public Float getFramerate() {
+        public String getFramerate() {
             return framerate;
+        }
+
+        /**
+         * @param framerate the framerate to set
+         */
+        public void setFramerate(String framerate) {
+            this.framerate = framerate;
         }
 
         /**
@@ -127,41 +145,6 @@ public class SettingsWrapper {
         }
 
         /**
-         * @return the profile
-         */
-        public String getProfile() {
-            return profile;
-        }
-
-        /**
-         * @return the level
-         */
-        public String getLevel() {
-            return level;
-        }
-
-        /**
-         * @return the quality
-         */
-        public Quality getQuality() {
-            return quality;
-        }
-
-        /**
-         * @param codec the codec to set
-         */
-        public void setCodec(String codec) {
-            this.codec = codec;
-        }
-
-        /**
-         * @param framerate the framerate to set
-         */
-        public void setFramerate(Float framerate) {
-            this.framerate = framerate;
-        }
-
-        /**
          * @param framerateType the framerateType to set
          */
         public void setFramerateType(String framerateType) {
@@ -169,10 +152,52 @@ public class SettingsWrapper {
         }
 
         /**
+         * @return the preset
+         */
+        public String getPreset() {
+            return preset;
+        }
+
+        /**
+         * @param preset the preset to set
+         */
+        public void setPreset(String preset) {
+            this.preset = preset;
+        }
+
+        /**
+         * @return the tune
+         */
+        public String getTune() {
+            return tune;
+        }
+
+        /**
+         * @param tune the tune to set
+         */
+        public void setTune(String tune) {
+            this.tune = tune;
+        }
+
+        /**
+         * @return the profile
+         */
+        public String getProfile() {
+            return profile;
+        }
+
+        /**
          * @param profile the profile to set
          */
         public void setProfile(String profile) {
             this.profile = profile;
+        }
+
+        /**
+         * @return the level
+         */
+        public String getLevel() {
+            return level;
         }
 
         /**
@@ -194,6 +219,13 @@ public class SettingsWrapper {
          */
         public void setPixelFormat(String pixelFormat) {
             this.pixelFormat = pixelFormat;
+        }
+
+        /**
+         * @return the quality
+         */
+        public Quality getQuality() {
+            return quality;
         }
 
         /**

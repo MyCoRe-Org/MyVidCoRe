@@ -437,40 +437,40 @@ public class FFMpegImpl {
         Video video = settings.getVideo();
 
         cmd.append(" -codec:v " + video.getCodec());
-        if (video.getProfile() != null)
-            cmd.append(" -profile:v " + video.getProfile());
-        if (video.getLevel() != null)
-            cmd.append(" -level " + video.getLevel());
-        cmd.append(" -pix_fmt " + (video.getPixelFormat() != null && !video.getPixelFormat().isEmpty()
-                ? video.getPixelFormat() : "yuv420p"));
 
-        if (video.getFramerate() != null) {
-            if (video.getFramerateType() != null) {
-                cmd.append(" -vsync " + (video.getFramerateType().equals("CFR") ? "1"
-                        : video.getFramerateType().equals("VFR") ? "2" : "0"));
-            }
-            cmd.append(" -r " + video.getFramerate());
-        }
+        Optional.ofNullable(video.getPreset()).ifPresent(v -> cmd.append(" -preset " + v));
+        Optional.ofNullable(video.getTune()).ifPresent(v -> cmd.append(" -tune " + v));
+        Optional.ofNullable(video.getProfile()).ifPresent(v -> cmd.append(" -profile:v " + v));
+        Optional.ofNullable(video.getLevel()).ifPresent(v -> cmd.append(" -level " + v));
+        Optional.ofNullable(video.getPixelFormat())
+                .ifPresent(v -> cmd.append(" -pix_fmt " + (!v.isEmpty() ? v : "yuv420p")));
 
-        Video.Quality quality = video.getQuality();
-        if (quality != null && quality.getType() != null) {
-            if (quality.getType().equals("CRF") && quality.getRateFactor() != null) {
-                cmd.append(" -crf " + quality.getRateFactor());
-            } else if (quality.getType().equals("CQ") && quality.getScale() != null) {
-                cmd.append(" -qscale:v " + quality.getScale());
-            } else if (quality.getType().equals("ABR") && quality.getBitrate() != null) {
-                cmd.append(" -b:v " + quality.getBitrate() + "k");
+        Optional.ofNullable(video.getFramerate()).ifPresent(v -> {
+            cmd.append(" -r " + v);
+            Optional.ofNullable(video.getFramerateType()).ifPresent(t -> cmd.append(" -vsync " + (t.equals("CFR") ? "1"
+                    : t.equals("VFR") ? "2" : "0")));
+        });
+
+        Optional.ofNullable(video.getQuality()).ifPresent(quality -> {
+            switch (quality.getType()) {
+            case "CRF":
+                Optional.ofNullable(quality.getRateFactor()).ifPresent(v -> cmd.append(" -crf " + v));
+                break;
+            case "CQ":
+                Optional.ofNullable(quality.getScale()).ifPresent(v -> cmd.append(" -qscale:v " + v));
+                break;
+            case "ABR":
+                Optional.ofNullable(quality.getBitrate()).ifPresent(v -> cmd.append(" -b:v " + v));
+                break;
             }
-        }
+        });
 
         Audio audio = settings.getAudio();
 
         cmd.append(" -codec:a " + audio.getCodec());
 
-        if (audio.getBitrate() != null)
-            cmd.append(" -b:a " + audio.getBitrate() + "k");
-        if (audio.getSamplerate() != null)
-            cmd.append(" -ar " + audio.getSamplerate());
+        Optional.ofNullable(audio.getBitrate()).ifPresent(v -> cmd.append(" -b:a " + v));
+        Optional.ofNullable(audio.getSamplerate()).ifPresent(v -> cmd.append(" -ar " + v));
 
         cmd.append(" {1}");
 

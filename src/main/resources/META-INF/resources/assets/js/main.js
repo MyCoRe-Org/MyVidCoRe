@@ -352,6 +352,48 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 		}
 	};
 
+	$scope.defaultPresets = {
+		"libx264" : [ {
+			"name" : "ultrafast"
+		}, {
+			"name" : "superfast"
+		}, {
+			"name" : "veryfast"
+		}, {
+			"name" : "faster"
+		}, {
+			"name" : "fast"
+		}, {
+			"name" : "medium"
+		}, {
+			"name" : "slow"
+		}, {
+			"name" : "slower"
+		}, {
+			"name" : "veryslow"
+		}, {
+			"name" : "placebo"
+		} ]
+	};
+
+	$scope.defaultTunes = {
+		"libx264" : [ {
+			"name" : "film"
+		}, {
+			"name" : "animation"
+		}, {
+			"name" : "grain"
+		}, {
+			"name" : "stillimage"
+		}, {
+			"name" : "psnr"
+		}, {
+			"name" : "ssim"
+		}, {
+			"name" : "zerolatency"
+		} ]
+	};
+
 	$scope.defaultFrameRates = [ "5", "10", "12", "15", "23.976", "24", "25", "29.97", "30", "50", "59.94", "60" ];
 
 	$scope.defaultProfiles = [ {

@@ -79,11 +79,12 @@
                   >{{codec.description}}</option>
                 </select>
               </div>
-              <div class="form-group" ng-if="(preset = encoderParameter(selectedCodec.video, 'preset')).values">
+              <div class="form-group" ng-if="(preset = encoderParameter(selectedCodec.video, 'preset')).values || defaultPresets[settings.video.codec]">
                 <label for="preset">{{'settings.preset' | translate}}</label> <select id="preset" class="form-control" ng-model="settings.video.preset"
                   ng-init="settings.video.preset = settings.video.preset || preset.defaultValue"
-                  ng-options="value.name as value.name + (value.description !== undefined ? ' (' + value.description + ')' : '') for value in preset.values"
-                <option value="">{{'settings.auto' | translate}}</option>
+                  ng-options="value.name as value.name + (value.description !== undefined ? ' (' + value.description + ')' : '') for value in preset.values || defaultPresets[settings.video.codec]"
+                >
+                  <option value="">{{'settings.auto' | translate}}</option>
                 </select>
               </div>
               <div class="form-group" ng-if="(selectedCodec.video = selectedCodec.video || filterEncoder(settings.video.codec)).pixelFormats.length > 0">
@@ -140,6 +141,14 @@
                     </label>
                   </div>
                 </div>
+              </div>
+              <div class="form-group" ng-if="(tune = encoderParameter(selectedCodec.video, 'tune')).values || defaultTunes[settings.video.codec]">
+                <label for="tune">{{'settings.tune' | translate}}</label> <select id="tune" class="form-control" ng-model="settings.video.tune"
+                  ng-init="settings.video.tune = settings.video.tune || tune.defaultValue"
+                  ng-options="value.name as value.name + (value.description !== undefined ? ' (' + value.description + ')' : '') for value in tune.values || defaultTunes[settings.video.codec]"
+                >
+                  <option value="">{{'settings.auto' | translate}}</option>
+                </select>
               </div>
               <div class="row" ng-if="((profile = encoderParameter(selectedCodec.video, 'profile') ) && (level = encoderParameter(selectedCodec.video, 'level')))">
                 <div class="form-group col-sm-6">
