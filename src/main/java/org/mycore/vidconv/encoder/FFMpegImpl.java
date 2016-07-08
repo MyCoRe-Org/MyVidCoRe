@@ -23,6 +23,8 @@
 package org.mycore.vidconv.encoder;
 
 import java.io.IOException;
+import java.io.StringReader;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,6 +36,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.stream.StreamSource;
 
 import org.mycore.vidconv.entity.CodecWrapper;
 import org.mycore.vidconv.entity.CodecsWrapper;
@@ -47,6 +54,7 @@ import org.mycore.vidconv.entity.ParameterWrapper.ParameterValue;
 import org.mycore.vidconv.entity.SettingsWrapper;
 import org.mycore.vidconv.entity.SettingsWrapper.Audio;
 import org.mycore.vidconv.entity.SettingsWrapper.Video;
+import org.mycore.vidconv.entity.probe.ProbeWrapper;
 import org.mycore.vidconv.util.StreamConsumer;
 
 /**
@@ -469,6 +477,13 @@ public class FFMpegImpl {
         return cmd.toString();
     }
 
+    /**
+     * Builds filename for set format.
+     * 
+     * @param settings the settings
+     * @param fileName the input file name
+     * @return
+     */
     public static String filename(final SettingsWrapper settings, final String fileName) {
         try {
             final String extension = muxer(settings.getFormat()).getExtension();
@@ -476,6 +491,40 @@ public class FFMpegImpl {
         } catch (IOException | InterruptedException e) {
             return null;
         }
+    }
+
+    /**
+     * Returns file informations.
+     * 
+     * @param inputFile the input file
+     * @return the informations as {@link ProbeWrapper}
+     * @throws IOException
+     * @throws InterruptedException
+     * @throws JAXBException
+     */
+    public static ProbeWrapper probe(final Path inputFile) throws IOException, InterruptedException, JAXBException {
+        final Process p = Runtime.getRuntime().exec(
+                new String[] { "ffprobe", "-v", "quiet", "-print_format", "xml", "-show_format", "-show_streams",
+                        inputFile.toFile().getAbsolutePath() });
+
+        StreamConsumer outputConsumer = new StreamConsumer(p.getInputStream());
+        StreamConsumer errorConsumer = new StreamConsumer(p.getErrorStream());
+
+        new Thread(outputConsumer).start();
+        new Thread(errorConsumer).start();
+
+        p.waitFor();
+
+        final String outputStream = outputConsumer.getStreamOutput();
+        if (outputStream != null) {
+            final JAXBContext jc = JAXBContext.newInstance(ProbeWrapper.class);
+            final Unmarshaller unmarshaller = jc.createUnmarshaller();
+
+            return unmarshaller.unmarshal(new StreamSource(new StringReader(outputStream)), ProbeWrapper.class)
+                    .getValue();
+        }
+
+        return null;
     }
 
     private static Stream<String> splitString(final String str) {
