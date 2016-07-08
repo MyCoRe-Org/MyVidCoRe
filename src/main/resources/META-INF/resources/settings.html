@@ -56,8 +56,9 @@
         <fieldset ng-if="getLength(formats) > 0">
           <legend>{{'settings.converter.title' | translate}}</legend>
           <div class="form-group">
-            <label for="format">{{'settings.format' | translate}}</label> <select id="format" class="form-control" ng-model="settings.format">
-              <option ng-repeat="(name, format) in formats" value="{{name}}">{{format.description}}</option>
+            <label for="format">{{'settings.format' | translate}}</label> <select id="format" class="form-control" ng-model="settings.format"
+              ng-options="name as format.description for (name, format) in formats"
+            >
             </select>
           </div>
           <ul class="nav nav-tabs" role="tablist">
