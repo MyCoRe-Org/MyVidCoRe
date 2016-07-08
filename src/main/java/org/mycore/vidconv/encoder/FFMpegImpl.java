@@ -27,11 +27,10 @@ import java.io.StringReader;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -213,7 +212,7 @@ public class FFMpegImpl {
     private static final Pattern PATTERN_PARAM_DEFAULT = Pattern
             .compile("\\(default\\s([^\\)]+)\\)");
 
-    private static Map<String, EncodersWrapper> supportedEncoders = Collections.synchronizedMap(new HashMap<>());
+    private static Map<String, EncodersWrapper> supportedEncoders = new ConcurrentHashMap<>();
 
     /**
      * Returns informations for given encoder.
@@ -340,7 +339,7 @@ public class FFMpegImpl {
 
     private static final Pattern PATTERN_SUBTITLE_CODEC = Pattern.compile("video codec:(.*)\\.");
 
-    private static Map<String, MuxerWrapper> supportedMuxers = Collections.synchronizedMap(new HashMap<>());
+    private static Map<String, MuxerWrapper> supportedMuxers = new ConcurrentHashMap<>();
 
     public static MuxerWrapper muxer(final String name) throws IOException, InterruptedException {
         if (supportedMuxers.containsKey(name)) {
