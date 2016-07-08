@@ -134,19 +134,21 @@ public class ConverterService extends Widget implements Listener {
         final SettingsWrapper settings = CONFIG.getSettings();
 
         if (settings != null) {
-            final String id = Long.toHexString(new Random().nextLong());
-            final String command = FFMpegImpl.command(settings);
             if (!Files.isDirectory(inputPath)) {
                 if (FFMpegImpl.isEncodingSupported(inputPath)) {
+                    final String id = Long.toHexString(new Random().nextLong());
                     final String fileName = inputPath.getFileName().toString();
                     final Path outputPath = Paths.get(outputDir, id, FFMpegImpl.filename(settings, fileName));
 
                     if (!Files.exists(outputPath.getParent()))
                         Files.createDirectories(outputPath.getParent());
 
+                    final String command = FFMpegImpl.command(settings);
                     final ConverterJob converter = new ConverterJob(command, inputPath, outputPath);
                     converts.put(id, converter);
                     converterThreadPool.submit(converter);
+                } else {
+                    LOGGER.warn("encoding of file \"" + inputPath.toFile().getAbsolutePath() + "\" isn't supported.");
                 }
             }
         }
