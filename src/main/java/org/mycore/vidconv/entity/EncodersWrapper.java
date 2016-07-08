@@ -22,6 +22,7 @@
  */
 package org.mycore.vidconv.entity;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -50,7 +51,7 @@ public class EncodersWrapper {
      * @param encoders the encoders to set
      */
     public EncodersWrapper setEncoders(List<EncoderWrapper> encoders) {
-        this.encoders = encoders;
+        this.encoders = Collections.synchronizedList(encoders);
         return this;
     }
 
