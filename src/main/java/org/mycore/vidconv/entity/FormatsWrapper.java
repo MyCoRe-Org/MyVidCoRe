@@ -22,6 +22,7 @@
  */
 package org.mycore.vidconv.entity;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -69,7 +70,7 @@ public class FormatsWrapper {
      * @param formats the formats to set
      */
     public FormatsWrapper setFormats(List<FormatWrapper> formats) {
-        this.formats = formats;
+        this.formats = Collections.synchronizedList(formats);
         return this;
     }
 

@@ -22,6 +22,7 @@
  */
 package org.mycore.vidconv.entity;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -79,7 +80,7 @@ public class CodecsWrapper {
      * @param codecs the codecs to set
      */
     public CodecsWrapper setCodecs(List<CodecWrapper> codecs) {
-        this.codecs = codecs;
+        this.codecs = Collections.synchronizedList(codecs);
         return this;
     }
 

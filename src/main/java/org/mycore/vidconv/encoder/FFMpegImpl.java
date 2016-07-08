@@ -25,6 +25,7 @@ package org.mycore.vidconv.encoder;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -204,7 +205,7 @@ public class FFMpegImpl {
     private static final Pattern PATTERN_PARAM_DEFAULT = Pattern
             .compile("\\(default\\s([^\\)]+)\\)");
 
-    private static Map<String, EncodersWrapper> supportedEncoders = new HashMap<>();
+    private static Map<String, EncodersWrapper> supportedEncoders = Collections.synchronizedMap(new HashMap<>());
 
     /**
      * Returns informations for given encoder.
@@ -331,7 +332,7 @@ public class FFMpegImpl {
 
     private static final Pattern PATTERN_SUBTITLE_CODEC = Pattern.compile("video codec:(.*)\\.");
 
-    private static Map<String, MuxerWrapper> supportedMuxers = new HashMap<>();
+    private static Map<String, MuxerWrapper> supportedMuxers = Collections.synchronizedMap(new HashMap<>());
 
     public static MuxerWrapper muxer(final String name) throws IOException, InterruptedException {
         if (supportedMuxers.containsKey(name)) {
