@@ -4,8 +4,11 @@
     "btn.close": "Close",
     "nav.dashboard" : "Dashboard",
     "nav.settings" : "Settings",
+    
     "converter.headline" : "Converter Jobs",
     "converter.noJobs" : "No Jobs running.",
+    "converter.done.headline" : "Done Jobs",
+    "converter.noDoneJobs" : "No done jobs found.",
     
     "settings.auto" : "Auto",
     "settings.preset" : "Preset",

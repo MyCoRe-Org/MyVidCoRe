@@ -55,6 +55,8 @@ public class ConverterWrapper {
 
     private Instant endTime;
 
+    private Integer exitValue;
+
     private Progress progress;
 
     private String outputStream;
@@ -68,12 +70,13 @@ public class ConverterWrapper {
         this();
 
         this.id = id;
-        this.command = converter.getCommand();
-        this.fileName = converter.getFileName();
+        this.command = converter.command();
+        this.fileName = converter.fileName();
         this.running = converter.isRunning();
         this.done = converter.isDone();
-        this.startTime = converter.getStartTime();
-        this.endTime = converter.getEndTime();
+        this.startTime = converter.startTime();
+        this.endTime = converter.endTime();
+        this.exitValue = converter.exitValue();
         this.outputStream = converter.outputStream();
         this.errorStream = converter.errorStream();
     }
@@ -113,6 +116,21 @@ public class ConverterWrapper {
         return endTime != null ? endTime.toString() : null;
     }
 
+    /**
+     * @return the exitValue
+     */
+    @XmlAttribute(name = "exitValue")
+    public Integer getExitValue() {
+        return exitValue;
+    }
+
+    /**
+     * @param exitValue the exitValue to set
+     */
+    public void setExitValue(Integer exitValue) {
+        this.exitValue = exitValue;
+    }
+
     @XmlElement(name = "progress")
     Progress getProgress() {
         if (progress == null) {
@@ -140,6 +158,7 @@ public class ConverterWrapper {
         copy.done = this.done;
         copy.startTime = this.startTime;
         copy.endTime = this.endTime;
+        copy.exitValue = this.exitValue;
         copy.progress = this.getProgress();
 
         return copy;

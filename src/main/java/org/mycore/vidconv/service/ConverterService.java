@@ -175,6 +175,8 @@ public class ConverterService extends Widget implements Listener {
 
         private Instant endTime;
 
+        private Integer exitValue;
+
         private StreamConsumer outputConsumer;
 
         private StreamConsumer errorConsumer;
@@ -211,6 +213,8 @@ public class ConverterService extends Widget implements Listener {
                 new Thread(errorConsumer).start();
 
                 p.waitFor();
+                
+                exitValue = p.exitValue();
                 running = false;
                 done = true;
                 endTime = Instant.now();
@@ -223,16 +227,16 @@ public class ConverterService extends Widget implements Listener {
             }
         }
 
-        public String getId() {
+        public String id() {
             return id;
         }
 
-        public String getCommand() {
+        public String command() {
             return MessageFormat.format(command,
                     inputPath.toFile().getAbsolutePath(), outputPath.toFile().getAbsolutePath());
         }
 
-        public String getFileName() {
+        public String fileName() {
             return outputPath.getFileName().toString();
         }
 
@@ -244,12 +248,16 @@ public class ConverterService extends Widget implements Listener {
             return done;
         }
 
-        public Instant getStartTime() {
+        public Instant startTime() {
             return startTime;
         }
 
-        public Instant getEndTime() {
+        public Instant endTime() {
             return endTime;
+        }
+
+        public Integer exitValue() {
+            return exitValue;
         }
 
         public String outputStream() {

@@ -43,9 +43,9 @@
 
   <div class="container">
 
-    <div class="content-container">
+    <div class="content-container" ng-controller="converterStatus">
 
-      <div id="converter" class="panel panel-default" ng-controller="converterStatus">
+      <div id="converter-jobs" class="panel panel-default">
         <div class="panel-heading">{{ 'converter.headline' | translate }}</div>
         <div class="panel-body">
           <div class="row no-jobs" ng-show="(converters | filter:filterDone).length === 0">
@@ -71,6 +71,27 @@
           </div>
         </div>
       </div>
+
+      <div id="converter-done" class="panel panel-default">
+        <div class="panel-heading">{{ 'converter.done.headline' | translate }}</div>
+        <div class="panel-body">
+          <div class="row" ng-show="(converters | filter:filterNotDone).length === 0">
+            <div class="col-sm-12 text-center">
+              <strong>{{ 'converter.noDoneJobs' | translate }}</strong>
+            </div>
+          </div>
+          <div class="row" id="converter-{{converter.id}}" ng-animate="'animate'"
+            ng-repeat="converter in converters | filter:filterNotDone | orderBy:orderByEndTime:true track by converter.id"
+          >
+            <div class="col-sm-10">
+              <span class="glyphicon aria-hidden="true" ng-class="converter.exitValue == 0 ? 'glyphicon-ok text-success' : 'glyphicon-remove text-danger'"></span>
+              <strong>{{converter.file}}</strong>
+            </div>
+            <div class="col-sm-2 text-right">{{converter.progress.elapsed}}</div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
   </div>

@@ -151,6 +151,10 @@ app.controller("converterStatus", function($scope, $http, $interval, $timeout) {
 		return converter.running ? true : converter.done && diff < removeTimeout ? true : false;
 	}
 
+	$scope.filterNotDone = function(converter) {
+		return !$scope.filterDone(converter);
+	}
+
 	$scope.$on("$destroy", function() {
 		if (refresh) {
 			$interval.cancel(refresh);

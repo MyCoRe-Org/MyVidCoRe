@@ -4,8 +4,11 @@
     "btn.close" : "Schliessen",
     "nav.dashboard" : "Übersicht",
     "nav.settings" : "Einstellungen",
+    
     "converter.headline" : "Konverter Aufträge",
     "converter.noJobs" : "Keine Konverter-Aufträge vorhanden.",
+    "converter.done.headline" : "Fetiggestellte Aufträge",
+    "converter.noDoneJobs" : "Keine fertiggestellte Aufträge vorhanden.",
     
     "settings.auto" : "automatisch",
     "settings.preset" : "Vorlage",
