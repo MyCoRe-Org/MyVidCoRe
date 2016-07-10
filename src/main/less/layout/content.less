@@ -11,15 +11,26 @@ body {
     padding: 0 15px;
     .no-jobs {
       padding: 15px;
+      opacity: 1;
+      height: 100%;
+      transition: all linear 0.5s;
+      &.ng-hide {
+        opacity: 0;
+        height: 0;
+      }
+
+      &.ng-show {
+        opacity: 1;
+        height: 100%;
+      }
     }
 
     .converter {
+      border-bottom: 1px solid @panel-default-border;
+      padding: 5px 0 0;
       &:last-child {
         border-bottom: none;
       }
-
-      border-bottom: 1px solid @panel-default-border;
-      padding: 5px 0 0;
     }
   }
 }

@@ -2,7 +2,7 @@
 "use strict";
 
 var appName = "MyVidCoRe";
-var app = angular.module(appName, [ "ngSanitize", "pascalprecht.translate" ]);
+var app = angular.module(appName, [ "ngAnimate", "ngSanitize", "pascalprecht.translate" ]);
 
 app.run(function($animate) {
 	$animate.enabled(true);
@@ -137,42 +137,18 @@ app.controller("converterStatus", function($scope, $http, $interval, $timeout) {
 		}).then(function(response) {
 			if (response.status = 200) {
 				var converters = [];
-				for (var i = 0; i < response.data.converter.length; i++) {
-					var converter = response.data.converter[i];
-					if (!converter.done) {
-						converters.push(converter);
-						continue;
-					}
-					var diff = new Date() - new Date(converter.endTime);
-					if (diff < removeTimeout || $scope.getConverterById(converter.id) !== undefined) {
-						converters.push(converter);
-					}
-				}
-
-				angular.merge($scope.converters, converters);
-
-				angular.forEach($scope.converters, function(converter, index) {
-					if (converter.done) {
-						var $elm = $("#converter-" + converter.id);
-						$timeout(function() {
-							$elm.animate({
-								opacity : 0,
-								height : 0
-							}, "slow", function() {
-								var id = $elm.attr("id").replace("converter-", "");
-								for (var i = 0; i < $scope.converters.length; i++) {
-									if ($scope.converters[i].id == id) {
-										$scope.converters.splice(i, 1);
-										break;
-									}
-								}
-								$elm.remove();
-							});
-						}, removeTimeout);
-					}
-				});
+				angular.merge($scope.converters, response.data.converter);
 			}
 		});
+	}
+
+	$scope.orderByPercent = function(converter) {
+		return converter.progress.percent;
+	}
+
+	$scope.filterDone = function(converter) {
+		var diff = new Date() - new Date(converter.endTime);
+		return converter.running ? true : converter.done && diff < removeTimeout ? true : false;
 	}
 
 	$scope.$on("$destroy", function() {
