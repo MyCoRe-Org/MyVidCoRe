@@ -22,7 +22,6 @@
  */
 package org.mycore.vidconv.service;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -193,6 +192,9 @@ public class ConverterService extends Widget implements Listener {
         public void run() {
             try {
                 LOGGER.info("Start converting of " + inputPath.toString() + " to " + outputPath.toString() + "...");
+
+                save();
+
                 done = false;
                 running = true;
                 startTime = Instant.now();
@@ -212,7 +214,9 @@ public class ConverterService extends Widget implements Listener {
                 running = false;
                 done = true;
                 endTime = Instant.now();
+
                 save();
+
                 LOGGER.info("Converting of " + inputPath.toString() + " done.");
             } catch (IOException | InterruptedException | JAXBException e) {
                 LOGGER.error(e.getMessage(), e);
@@ -263,8 +267,7 @@ public class ConverterService extends Widget implements Listener {
             marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
-            final File file = outputPath.getParent().resolve(".converted").toFile();
-            marshaller.marshal(new ConverterWrapper(id, this), file);
+            marshaller.marshal(new ConverterWrapper(id, this), outputPath.getParent().resolve(".convert").toFile());
         }
     }
 }
