@@ -28,9 +28,8 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
 
-import javax.activation.MimetypesFileTypeMap;
-
 import org.mycore.vidconv.util.Hash;
+import org.mycore.vidconv.util.MimeType;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
@@ -55,7 +54,7 @@ public class ResourceWrapper implements Serializable {
     public ResourceWrapper(final String fileName, final String mimeType, final InputStream is) {
         try {
             this.fileName = fileName;
-            this.mimeType = mimeType != null ? mimeType : detectMimeType(fileName);
+            this.mimeType = mimeType != null ? mimeType : MimeType.detect(fileName);
             this.content = toByteArray(is);
             this.etag = Hash.getMD5String(new String(this.content));
         } catch (IOException | NoSuchAlgorithmException e) {
@@ -89,12 +88,6 @@ public class ResourceWrapper implements Serializable {
      */
     public byte[] getContent() {
         return content;
-    }
-
-    static String detectMimeType(final String fileName) throws IOException {
-        // Missing mime type should be add to META-INF/mime.types
-        MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
-        return mimeTypesMap.getContentType(fileName);
     }
 
     static byte[] toByteArray(InputStream input) throws IOException {
