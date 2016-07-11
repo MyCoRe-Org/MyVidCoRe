@@ -48,12 +48,12 @@
       <div id="converter-jobs" class="panel panel-default">
         <div class="panel-heading">{{ 'converter.headline' | translate }}</div>
         <div class="panel-body">
-          <div class="row no-jobs" ng-animate="'animate'" ng-if="(converters | filter:filterDone).length === 0">
+          <div class="row no-jobs" ng-if="(converters | filter:filterDone).length === 0">
             <div class="col-sm-12 text-center">
               <strong>{{ 'converter.noJobs' | translate }}</strong>
             </div>
           </div>
-          <div class="row converter" id="converter-{{converter.id}}" ng-animate="'animate'"
+          <div class="row converter" id="converter-{{converter.id}}"
             ng-repeat="converter in converters | filter:filterDone | orderBy:orderByPercent:true track by converter.id"
           >
             <div class="col-sm-12">
@@ -75,14 +75,12 @@
       <div id="converter-done" class="panel panel-default">
         <div class="panel-heading">{{ 'converter.done.headline' | translate }}</div>
         <div class="panel-body">
-          <div class="row" ng-animate="'animate'" ng-if="(converters | filter:filterNotDone).length === 0">
+          <div class="row" ng-if="(converters | filter:filterNotDone).length === 0">
             <div class="col-sm-12 text-center">
               <strong>{{ 'converter.noDoneJobs' | translate }}</strong>
             </div>
           </div>
-          <div class="row" id="converter-{{converter.id}}" ng-animate="'animate'"
-            ng-repeat="converter in converters | filter:filterNotDone | orderBy:orderByEndTime track by converter.id"
-          >
+          <div class="row" id="converter-{{converter.id}}" ng-repeat="converter in converters | filter:filterNotDone | orderBy:orderByEndTime track by converter.id">
             <div class="col-xs-9">
               <span class="glyphicon" aria-hidden=" true" ng-class="converter.exitValue == 0 ? 'glyphicon-ok text-success' : 'glyphicon-remove text-danger'"></span> <strong>{{converter.file}}</strong>
             </div>
