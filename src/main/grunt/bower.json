@@ -24,6 +24,7 @@
     "seiyria-bootstrap-slider": "~7.1.1",
     "font-awesome": "~4.6.3",
     "html5shiv": "^3.7.3",
-    "respond": "^1.4.2"
+    "respond": "^1.4.2",
+    "video.js": "^5.10.7"
   }
 }

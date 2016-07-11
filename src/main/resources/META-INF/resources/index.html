@@ -12,6 +12,7 @@
 <title>MyVidCoRe - Video Converter WebService</title>
 
 <!-- Custom styles for this template -->
+<link href="/web/assets/css/video-js.min.css" rel="stylesheet">
 <link href="/web/assets/css/layout.css" rel="stylesheet">
 
 </head>
@@ -80,25 +81,41 @@
               <strong>{{ 'converter.noDoneJobs' | translate }}</strong>
             </div>
           </div>
-          <div class="row converter" id="converter-{{converter.id}}" ng-repeat="converter in converters | filter:filterNotDone | orderBy:orderByEndTime track by converter.id">
+          <div class="row converter" id="converter-{{converter.id}}"
+            ng-repeat="converter in converters | filter:filterNotDone | orderBy:orderByEndTime track by converter.id"
+          >
             <div class="col-xs-8 col-sm-7">
               <span class="glyphicon" aria-hidden="true" ng-class="converter.exitValue == 0 ? 'glyphicon-ok text-success' : 'glyphicon-remove text-danger'"></span> <strong>{{converter.file}}</strong>
             </div>
             <div class="col-sm-3 hidden-xs text-right">{{converter.progress.elapsed}}</div>
             <div class="col-xs-4 col-sm-2">
               <div class="btn-group pull-right" role="group">
-                <button class="btn btn-xs btn-default" data-toggle="collapse" data-target="#collapse-{{converter.id}}" aria-expanded="false"
-                  aria-controls="collapse-{{converter.id}}" ng-click="loadDetailData(converter.id)"
+                <button class="btn btn-xs btn-default" data-toggle="collapse" data-target="#details-{{converter.id}}" aria-expanded="false"
+                  aria-controls="details-{{converter.id}}" ng-click="loadDetailData(converter.id)"
                 >
                   <span class="glyphicon glyphicon-console" aria-hidden="true"></span>
                 </button>
-                <button class="btn btn-xs btn-default" disabled="disabled">
-                  <span class="glyphicon glyphicon-save" aria-hidden="true"></span>
+                <button class="btn btn-xs btn-default hidden-xs" data-toggle="collapse" data-target="#preview-{{converter.id}}" aria-expanded="false"
+                  aria-controls="preview-{{converter.id}}" ng-disabled="!(converter.file.endsWith('.mp4') || converter.file.endsWith('.webm'))"
+                >
+                  <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
                 </button>
+                <a class="btn btn-xs btn-default" href="/widget/converter/{{converter.id}}/download"><span class="glyphicon glyphicon-save" aria-hidden="true"></span>
+                </a>
               </div>
             </div>
-            <div class="col-md-12 collapse" id="collapse-{{converter.id}}">
-              <pre class="pre-scrollable">{{converter.errorStream}}</pre>
+            <div class="col-md-12 collapse" id="details-{{converter.id}}">
+              <pre class="pre-scrollable">{{formatStream(converter.errorStream)}}</pre>
+            </div>
+            <div class="col-md-12 hidden-xs collapse" id="preview-{{converter.id}}" ng-if="converter.file.endsWith('.mp4') || converter.file.endsWith('.webm')">
+              <video id="video-{{converter.id}}" class="video-preview" controls preload="none">
+                <source ng-src="{{'/widget/converter/' + converter.id + '/download'}}">
+                <p class="vjs-no-js">
+                  To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/"
+                    target="_blank"
+                  >supports HTML5 video</a>
+                </p>
+              </video>
             </div>
           </div>
         </div>
@@ -122,6 +139,7 @@
     <script type="text/javascript" src="/web/assets/js/angular-sanitize.min.js"></script>
     <script type="text/javascript" src="/web/assets/js/angular-translate.min.js"></script>
     <script type="text/javascript" src="/web/assets/js/angular-translate-loader-static-files.min.js"></script>
+    <script type="text/javascript" src="/web/assets/js/video.min.js"></script>
 
     <script type="text/javascript" src="/web/assets/js/main.js"></script>
 </body>
