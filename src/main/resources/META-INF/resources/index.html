@@ -82,7 +82,7 @@
             </div>
           </div>
           <div class="row converter" id="converter-{{converter.id}}"
-            ng-repeat="converter in converters | filter:filterNotDone | orderBy:orderByEndTime track by converter.id"
+            ng-repeat="converter in converters | filter:filterNotDone | orderBy:orderByEndTime:true track by converter.id"
           >
             <div class="col-xs-8 col-sm-7">
               <span class="glyphicon" aria-hidden="true" ng-class="converter.exitValue == 0 ? 'glyphicon-ok text-success' : 'glyphicon-remove text-danger'"></span> <strong>{{converter.file}}</strong>
