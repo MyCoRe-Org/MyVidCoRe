@@ -22,6 +22,7 @@
  */
 package org.mycore.vidconv.widget;
 
+import java.nio.file.Path;
 import java.util.List;
 
 /**
@@ -102,5 +103,25 @@ public class Widget {
      */
     public void stop(List<String> params) throws Exception {
         throw new UnsupportedOperationException("Stop is not implemented");
+    }
+
+    /**
+     * Returns a path for download.
+     * 
+     * @return the file to download
+     * @throws Exception
+     */
+    public Path download() throws Exception {
+        throw new UnsupportedOperationException("Download is not implemented");
+    }
+
+    /**
+     * Returns a path for download.
+     * 
+     * @return the file to download
+     * @throws Exception
+     */
+    public Path download(List<String> params) throws Exception {
+        throw new UnsupportedOperationException("Download is not implemented");
     }
 }

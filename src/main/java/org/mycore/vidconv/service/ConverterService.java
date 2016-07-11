@@ -121,6 +121,23 @@ public class ConverterService extends Widget implements Listener {
     }
 
     /* (non-Javadoc)
+     * @see org.mycore.vidconv.widget.Widget#download(java.util.List)
+     */
+    @Override
+    public Path download(List<String> params) throws Exception {
+        if (!params.isEmpty()) {
+            final String converterId = params.get(0);
+            final ConverterJob converter = converts.get(converterId);
+
+            if (converter != null) {
+                return converter.outputPath;
+            }
+        }
+
+        return null;
+    }
+
+    /* (non-Javadoc)
      * @see org.mycore.vidconv.event.Listener#handleEvent(org.mycore.vidconv.event.Event)
      */
     @Override
@@ -213,7 +230,7 @@ public class ConverterService extends Widget implements Listener {
                 new Thread(errorConsumer).start();
 
                 p.waitFor();
-                
+
                 exitValue = p.exitValue();
                 running = false;
                 done = true;

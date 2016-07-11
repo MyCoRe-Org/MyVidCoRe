@@ -22,6 +22,9 @@
  */
 package org.mycore.vidconv.resource;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -31,8 +34,10 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -55,7 +60,7 @@ public class WidgetResource {
     @GET()
     @Path("{widget:.+}/{action:(status|start|stop)}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Response getWidgetStatus(@PathParam("widget") String widgetOptions, @PathParam("action") String action) {
+    public Response widgetActions(@PathParam("widget") String widgetOptions, @PathParam("action") String action) {
         try {
             final StringTokenizer tok = new StringTokenizer(widgetOptions, "/");
 
@@ -98,4 +103,55 @@ public class WidgetResource {
         }
     }
 
+    @GET
+    @Path("{widget:.+}/{action:(download)}")
+    public Response widgetDownload(@PathParam("widget") String widgetOptions, @PathParam("action") String action) {
+        try {
+            final StringTokenizer tok = new StringTokenizer(widgetOptions, "/");
+
+            final String widgetName = tok.nextToken();
+            final List<String> widgetParams = new ArrayList<>();
+
+            while (tok.hasMoreTokens()) {
+                widgetParams.add(tok.nextToken());
+            }
+
+            final Widget widget = WIDGET_MANAGER.get(widgetName);
+
+            if (widget != null) {
+                final java.nio.file.Path path = widgetParams.isEmpty() ? widget.download()
+                        : widget.download(widgetParams);
+
+                if (path != null) {
+                    StreamingOutput fileStream = new StreamingOutput() {
+                        @Override
+                        public void write(OutputStream output) throws IOException, WebApplicationException {
+                            try {
+                                byte[] data = Files.readAllBytes(path);
+                                output.write(data);
+                                output.flush();
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    };
+
+                    return Response
+                            .ok(fileStream, MediaType.APPLICATION_OCTET_STREAM)
+                            .header("content-disposition", "attachment; filename = " + path.getFileName().toString())
+                            .build();
+                } else {
+                    LOGGER.error("download path was empty.");
+                    return Response.status(Response.Status.NOT_FOUND).build();
+                }
+            } else {
+                LOGGER.error("widget \"" + widgetOptions + "\" not found.");
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            final ExceptionWrapper error = new ExceptionWrapper(e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build();
+        }
+    }
 }
