@@ -80,35 +80,49 @@
               <strong>{{ 'converter.noDoneJobs' | translate }}</strong>
             </div>
           </div>
-          <div class="row" id="converter-{{converter.id}}" ng-repeat="converter in converters | filter:filterNotDone | orderBy:orderByEndTime track by converter.id">
-            <div class="col-xs-9">
-              <span class="glyphicon" aria-hidden=" true" ng-class="converter.exitValue == 0 ? 'glyphicon-ok text-success' : 'glyphicon-remove text-danger'"></span> <strong>{{converter.file}}</strong>
+          <div class="row converter" id="converter-{{converter.id}}" ng-repeat="converter in converters | filter:filterNotDone | orderBy:orderByEndTime track by converter.id">
+            <div class="col-xs-8 col-sm-7">
+              <span class="glyphicon" aria-hidden="true" ng-class="converter.exitValue == 0 ? 'glyphicon-ok text-success' : 'glyphicon-remove text-danger'"></span> <strong>{{converter.file}}</strong>
             </div>
-            <div class="col-xs-3 text-right">{{converter.progress.elapsed}}</div>
+            <div class="col-sm-3 hidden-xs text-right">{{converter.progress.elapsed}}</div>
+            <div class="col-xs-4 col-sm-2">
+              <div class="btn-group pull-right" role="group">
+                <button class="btn btn-xs btn-default" data-toggle="collapse" data-target="#collapse-{{converter.id}}" aria-expanded="false"
+                  aria-controls="collapse-{{converter.id}}" ng-click="loadDetailData(converter.id)"
+                >
+                  <span class="glyphicon glyphicon-console" aria-hidden="true"></span>
+                </button>
+                <button class="btn btn-xs btn-default" disabled="disabled">
+                  <span class="glyphicon glyphicon-save" aria-hidden="true"></span>
+                </button>
+              </div>
+            </div>
+            <div class="col-md-12 collapse" id="collapse-{{converter.id}}">
+              <pre class="pre-scrollable">{{converter.errorStream}}</pre>
+            </div>
           </div>
         </div>
+
       </div>
 
     </div>
-
-  </div>
-  <!-- /.container -->
+    <!-- /.container -->
 
 
-  <!-- Bootstrap core JavaScript
+    <!-- Bootstrap core JavaScript
     ================================================== -->
-  <!-- Placed at the end of the document so the pages load faster -->
-  <script type="text/javascript" src="/web/assets/js/jquery.min.js"></script>
-  <script type="text/javascript" src="/web/assets/js/bootstrap.min.js"></script>
-  <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-  <script type="text/javascript" src="/web/assets/js/ie10-viewport-bug-workaround.js"></script>
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/javascript" src="/web/assets/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/web/assets/js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script type="text/javascript" src="/web/assets/js/ie10-viewport-bug-workaround.js"></script>
 
-  <script type="text/javascript" src="/web/assets/js/angular.min.js"></script>
-  <script type="text/javascript" src="/web/assets/js/angular-animate.min.js"></script>
-  <script type="text/javascript" src="/web/assets/js/angular-sanitize.min.js"></script>
-  <script type="text/javascript" src="/web/assets/js/angular-translate.min.js"></script>
-  <script type="text/javascript" src="/web/assets/js/angular-translate-loader-static-files.min.js"></script>
+    <script type="text/javascript" src="/web/assets/js/angular.min.js"></script>
+    <script type="text/javascript" src="/web/assets/js/angular-animate.min.js"></script>
+    <script type="text/javascript" src="/web/assets/js/angular-sanitize.min.js"></script>
+    <script type="text/javascript" src="/web/assets/js/angular-translate.min.js"></script>
+    <script type="text/javascript" src="/web/assets/js/angular-translate-loader-static-files.min.js"></script>
 
-  <script type="text/javascript" src="/web/assets/js/main.js"></script>
+    <script type="text/javascript" src="/web/assets/js/main.js"></script>
 </body>
 </html>

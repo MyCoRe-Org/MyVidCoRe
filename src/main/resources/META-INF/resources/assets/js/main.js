@@ -136,10 +136,23 @@ app.controller("converterStatus", function($scope, $http, $interval, $timeout) {
 			url : "/widget/converter/status"
 		}).then(function(response) {
 			if (response.status = 200) {
-				var converters = [];
 				angular.merge($scope.converters, response.data.converter);
 			}
 		});
+	}
+
+	$scope.loadDetailData = function(id) {
+		var converter = $scope.getConverterById(id);
+		if (converter.outputStream === undefined && converter.errorStream === undefined) {
+			$http({
+				method : "GET",
+				url : "/widget/converter/" + id + "/status"
+			}).then(function(response) {
+				if (response.status = 200) {
+					angular.merge(converter, response.data);
+				}
+			});
+		}
 	}
 
 	$scope.orderByPercent = function(converter) {
