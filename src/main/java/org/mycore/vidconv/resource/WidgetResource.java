@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Date;
@@ -205,7 +206,7 @@ public class WidgetResource {
             return Response
                     .ok(streamer, mimeType)
                     .header("content-disposition",
-                            "attachment; filename = " + asset.getFileName().toString())
+                            "attachment; filename = \"" + asset.getFileName().toString() + "\"")
                     .build();
         }
 
