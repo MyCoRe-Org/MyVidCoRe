@@ -146,6 +146,10 @@ app.controller("converterStatus", function($scope, $http, $interval, $timeout) {
 		return converter.progress.percent;
 	}
 
+	$scope.orderByEndTime = function(converter) {
+		return converter.endTime;
+	}
+
 	$scope.filterDone = function(converter) {
 		var diff = new Date() - new Date(converter.endTime);
 		return converter.running ? true : converter.done && diff < removeTimeout ? true : false;
