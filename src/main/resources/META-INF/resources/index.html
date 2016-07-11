@@ -109,7 +109,7 @@
             </div>
             <div class="col-md-12 hidden-xs collapse" id="preview-{{converter.id}}" ng-if="converter.file.endsWith('.mp4') || converter.file.endsWith('.webm')">
               <video id="video-{{converter.id}}" class="video-preview" controls preload="none">
-                <source ng-src="{{'/widget/converter/' + converter.id + '/stream'}}">
+                <source ng-src="{{'/widget/converter/' + converter.id + '/download'}}">
                 <p class="vjs-no-js">
                   To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/"
                     target="_blank"
