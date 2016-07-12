@@ -44,11 +44,12 @@ public class RangeStreamingOutput implements StreamingOutput {
     @Override
     public void write(OutputStream outputStream) throws IOException, WebApplicationException {
         try {
-            while( length != 0) {
+            while (length != 0) {
                 int read = raf.read(buf, 0, buf.length > length ? length : buf.length);
                 outputStream.write(buf, 0, read);
                 length -= read;
             }
+        } catch (IOException e) {
         } finally {
             raf.close();
         }
