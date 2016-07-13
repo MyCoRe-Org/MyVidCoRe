@@ -4,7 +4,7 @@ jdk:
 deploy:
   provider: releases
   api_key: ${GH_TOKEN}
-  file: "target/myvidcore-0.0.1-SNAPSHOT-jar-with-dependencies.jar"
+  file: "target/myvidcore.jar"
   skip_cleanup: true
   on:
     tags: true
