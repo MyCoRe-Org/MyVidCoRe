@@ -23,9 +23,9 @@ Run Server with (Maven):
 or:
 
     # run with default settings
-    $ java -jar target/myvidcore-*-jar-with-dependencies.jar
+    $ java -jar target/myvidcore.jar
     # run with custom settings
-    $ java -jar target/myvidcore-*-jar-with-dependencies.jar --watchDir convert/input --outputDir convert/output
+    $ java -jar target/myvidcore.jar --watchDir convert/input --outputDir convert/output
 
 Now you should be able to access the WEB-Interface on [http://localhost:8085/web](http://localhost:8085/web).
  
@@ -44,7 +44,7 @@ WEB-Interface:
 
 For a help and/or overview about default settings run:
 
-    $ java -jar target/myvidcore-*-jar-with-dependencies.jar -h
+    $ java -jar target/myvidcore.jar -h
     
 * **-h, --help**
 
