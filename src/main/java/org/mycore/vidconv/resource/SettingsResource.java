@@ -25,14 +25,12 @@ package org.mycore.vidconv.resource;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.Optional;
 
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -43,9 +41,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.vidconv.config.Settings;
 import org.mycore.vidconv.encoder.FFMpegImpl;
-import org.mycore.vidconv.entity.CodecWrapper.Type;
-import org.mycore.vidconv.entity.CodecsWrapper;
-import org.mycore.vidconv.entity.FormatsWrapper;
 import org.mycore.vidconv.entity.SettingsWrapper;
 
 /**
@@ -76,80 +71,6 @@ public class SettingsResource {
             return Response.ok().status(Response.Status.OK).entity(settings)
                     .build();
         } catch (JAXBException | IOException | InterruptedException e) {
-            LOGGER.error(e.getMessage(), e);
-            final StreamingOutput so = (OutputStream os) -> e.printStackTrace(new PrintStream(os));
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(so).build();
-        }
-    }
-
-    @GET
-    @Path("codecs{filter:(/[^/]+?)?}{value:(/([^/]+)?)?}")
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Response getCodecs(@PathParam("filter") String filter, @PathParam("value") String value) {
-        try {
-            CodecsWrapper codecs = FFMpegImpl.codecs();
-
-            filter = Optional.ofNullable(filter.replaceAll("/", "")).orElse("");
-            value = Optional.ofNullable(value.replaceAll("/", "")).orElse("");
-
-            if (!filter.isEmpty() && !value.isEmpty()) {
-                if ("type".equals(filter)) {
-                    codecs = CodecsWrapper.getByType(codecs, Type.valueOf(value));
-                } else if ("name".equals(filter)) {
-                    codecs = CodecsWrapper.getByName(codecs, value);
-                } else if ("description".equals(filter)) {
-                    codecs = CodecsWrapper.getByDescription(codecs, value);
-                } else if ("encoder".equals(filter)) {
-                    codecs = CodecsWrapper.getByEncoder(codecs, value);
-                } else if ("decoder".equals(filter)) {
-                    codecs = CodecsWrapper.getByDecoder(codecs, value);
-                }
-            }
-
-            return Response.ok().status(Response.Status.OK).entity(codecs)
-                    .build();
-        } catch (IOException | InterruptedException e) {
-            LOGGER.error(e.getMessage(), e);
-            final StreamingOutput so = (OutputStream os) -> e.printStackTrace(new PrintStream(os));
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(so).build();
-        }
-    }
-
-    @GET
-    @Path("formats{filter:(/[^/]+?)?}{value:(/([^/]+)?)?}")
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Response getFormats(@PathParam("filter") String filter, @PathParam("value") String value) {
-        try {
-            FormatsWrapper formats = FFMpegImpl.formats();
-
-            filter = Optional.ofNullable(filter.replaceAll("/", "")).orElse("");
-            value = Optional.ofNullable(value.replaceAll("/", "")).orElse("");
-
-            if (!filter.isEmpty() && !value.isEmpty()) {
-                if ("name".equals(filter)) {
-                    formats = FormatsWrapper.getByName(formats, value);
-                } else if ("description".equals(filter)) {
-                    formats = FormatsWrapper.getByDescription(formats, value);
-                }
-            }
-
-            return Response.ok().status(Response.Status.OK).entity(formats)
-                    .build();
-        } catch (IOException | InterruptedException e) {
-            LOGGER.error(e.getMessage(), e);
-            final StreamingOutput so = (OutputStream os) -> e.printStackTrace(new PrintStream(os));
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(so).build();
-        }
-    }
-
-    @GET
-    @Path("encoder/{name}")
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Response getEncoder(@PathParam("name") String name) {
-        try {
-            return Response.ok().status(Response.Status.OK).entity(FFMpegImpl.encoder(name))
-                    .build();
-        } catch (IOException | InterruptedException e) {
             LOGGER.error(e.getMessage(), e);
             final StreamingOutput so = (OutputStream os) -> e.printStackTrace(new PrintStream(os));
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(so).build();

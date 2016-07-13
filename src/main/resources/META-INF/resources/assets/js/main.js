@@ -197,10 +197,10 @@ app.service("formatService", function($http, $q, asyncQueue) {
 	function buildFormatURLs(formats) {
 		var urls = [];
 		angular.forEach(formats, function(options, format) {
-			urls.push("/settings/formats/name/" + format);
+			urls.push("/converter/formats/name/" + format);
 			angular.forEach(options, function(codecs, type) {
 				angular.forEach(codecs, function(codec) {
-					var url = "/settings/codecs/name/" + codec;
+					var url = "/converter/codecs/name/" + codec;
 					if ($.inArray(url, urls) == -1)
 						urls.push(url);
 				});
@@ -215,12 +215,12 @@ app.service("formatService", function($http, $q, asyncQueue) {
 			angular.forEach(cs, function(c) {
 				if (c.encoders !== undefined && c.encoders.length != 0) {
 					angular.forEach(c.encoders.encoder, function(e) {
-						var url = "/settings/encoder/" + e;
+						var url = "/converter/encoder/" + e;
 						if ($.inArray(url, urls) == -1)
 							urls.push(url);
 					});
 				} else {
-					var url = "/settings/encoder/" + c.name;
+					var url = "/converter/encoder/" + c.name;
 					if ($.inArray(url, urls) == -1)
 						urls.push(url);
 				}
