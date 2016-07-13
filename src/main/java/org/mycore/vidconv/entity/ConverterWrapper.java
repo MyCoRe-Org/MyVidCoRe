@@ -191,10 +191,12 @@ public class ConverterWrapper {
                 p.percent = FFMpegImpl.progress(wrapper.getErrorStream());
 
                 final Duration elapsed = Duration.between(wrapper.startTime, Instant.now());
-                long estimate = p.percent > 0 ? Long.divideUnsigned(elapsed.toNanos(), p.percent) * 100 : 0;
-
                 p.elapsed = formatDuration(elapsed);
-                p.estimate = formatDuration(estimate);
+
+                if (p.percent != null) {
+                    long estimate = p.percent > 0 ? Long.divideUnsigned(elapsed.toNanos(), p.percent) * 100 : 0;
+                    p.estimate = formatDuration(estimate);
+                }
             } else {
                 return null;
             }
