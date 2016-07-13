@@ -36,6 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -52,6 +53,7 @@ import org.mycore.vidconv.entity.SettingsWrapper;
 import org.mycore.vidconv.event.Event;
 import org.mycore.vidconv.event.EventManager;
 import org.mycore.vidconv.event.Listener;
+import org.mycore.vidconv.util.Executable;
 import org.mycore.vidconv.util.StreamConsumer;
 import org.mycore.vidconv.widget.Widget;
 
@@ -218,16 +220,15 @@ public class ConverterService extends Widget implements Listener {
                 running = true;
                 startTime = Instant.now();
 
-                final Process p = Runtime.getRuntime()
-                        .exec(Arrays.stream(command.split(" ")).map(s -> MessageFormat.format(s,
+                final Executable exec = new Executable(
+                        Arrays.stream(command.split(" ")).map(s -> MessageFormat.format(s,
                                 inputPath.toFile().getAbsolutePath(), outputPath.toFile().getAbsolutePath()))
-                                .toArray(String[]::new));
+                                .collect(Collectors.toList()));
 
-                outputConsumer = new StreamConsumer(p.getInputStream());
-                errorConsumer = new StreamConsumer(p.getErrorStream());
+                final Process p = exec.run();
 
-                new Thread(outputConsumer).start();
-                new Thread(errorConsumer).start();
+                outputConsumer = exec.outputConsumer();
+                errorConsumer = exec.errorConsumer();
 
                 p.waitFor();
 
