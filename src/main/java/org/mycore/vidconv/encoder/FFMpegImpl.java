@@ -416,7 +416,7 @@ public class FFMpegImpl {
             throws IOException, InterruptedException, JAXBException {
         final ProbeWrapper probe = probe(inputFile);
 
-        if (probe.getFormat() != null && probe.getStreams() != null) {
+        if (probe != null && probe.getFormat() != null && probe.getStreams() != null) {
             return probe.getStreams().stream().filter(
                     s -> s.getCodecType().equalsIgnoreCase("audio") || s.getCodecType().equalsIgnoreCase("video"))
                     .map(s -> {
