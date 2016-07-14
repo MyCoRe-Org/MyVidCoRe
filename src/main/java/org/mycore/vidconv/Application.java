@@ -101,6 +101,5 @@ public class Application implements Listener {
      */
     @Override
     public void handleEvent(Event event) throws Exception {
-        LOGGER.info(event);
     }
 }
