@@ -19,6 +19,7 @@
  */
 package org.mycore.vidconv.util;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -58,31 +59,31 @@ public class Executable {
         return command;
     }
 
-    public Process run() throws InterruptedException, ExecutionException {
-        Future<Process> future = EXECUTOR.submit(new Callable<Process>() {
-            public Process call() throws Exception {
-                final ProcessBuilder pb = new ProcessBuilder(command);
+    public Process run() throws InterruptedException, ExecutionException, IOException {
+        final ProcessBuilder pb = new ProcessBuilder(command);
 
-                process = pb.start();
+        process = pb.start();
 
-                outputConsumer = new StreamConsumer(process.getInputStream());
-                errorConsumer = new StreamConsumer(process.getErrorStream());
+        outputConsumer = new StreamConsumer(process.getInputStream());
+        errorConsumer = new StreamConsumer(process.getErrorStream());
 
-                new Thread(outputConsumer).start();
-                new Thread(errorConsumer).start();
+        new Thread(outputConsumer).start();
+        new Thread(errorConsumer).start();
 
-                return process;
+        return process;
+    }
+
+    public int runAndWait() throws InterruptedException, ExecutionException {
+        Future<Integer> future = EXECUTOR.submit(new Callable<Integer>() {
+            public Integer call() throws Exception {
+                process = run();
+                process.waitFor();
+
+                return process.exitValue();
             }
         });
 
         return future.get();
-    }
-
-    public int runAndWait() throws InterruptedException, ExecutionException {
-        process = run();
-        process.waitFor();
-
-        return process.exitValue();
     }
 
     public StreamConsumer outputConsumer() {
