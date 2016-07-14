@@ -19,10 +19,14 @@
  */
 package org.mycore.vidconv.util;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 /**
@@ -30,6 +34,8 @@ import java.util.stream.Collectors;
  *
  */
 public class Executable {
+
+    private final static ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
 
     private final List<String> command;
 
@@ -52,21 +58,27 @@ public class Executable {
         return command;
     }
 
-    public Process run() throws IOException, InterruptedException {
-        final ProcessBuilder pb = new ProcessBuilder(command);
+    public Process run() throws InterruptedException, ExecutionException {
+        Future<Process> future = EXECUTOR.submit(new Callable<Process>() {
+            public Process call() throws Exception {
+                final ProcessBuilder pb = new ProcessBuilder(command);
 
-        process = pb.start();
+                process = pb.start();
 
-        outputConsumer = new StreamConsumer(process.getInputStream());
-        errorConsumer = new StreamConsumer(process.getErrorStream());
+                outputConsumer = new StreamConsumer(process.getInputStream());
+                errorConsumer = new StreamConsumer(process.getErrorStream());
 
-        new Thread(outputConsumer).start();
-        new Thread(errorConsumer).start();
+                new Thread(outputConsumer).start();
+                new Thread(errorConsumer).start();
 
-        return process;
+                return process;
+            }
+        });
+
+        return future.get();
     }
 
-    public int runAndWait() throws IOException, InterruptedException {
+    public int runAndWait() throws InterruptedException, ExecutionException {
         process = run();
         process.waitFor();
 
@@ -96,5 +108,4 @@ public class Executable {
     public String toString() {
         return command.stream().collect(Collectors.joining(" "));
     }
-
 }

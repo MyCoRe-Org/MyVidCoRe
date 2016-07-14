@@ -19,10 +19,10 @@
  */
 package org.mycore.vidconv.resource;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
@@ -49,7 +49,7 @@ import org.mycore.vidconv.entity.FormatsWrapper;
 public class ConverterResource {
 
     private static final Logger LOGGER = LogManager.getLogger(ConverterResource.class);
-    
+
     @GET
     @Path("codecs{filter:(/[^/]+?)?}{value:(/([^/]+)?)?}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
@@ -76,7 +76,7 @@ public class ConverterResource {
 
             return Response.ok().status(Response.Status.OK).entity(codecs)
                     .build();
-        } catch (IOException | InterruptedException e) {
+        } catch (InterruptedException | ExecutionException e) {
             LOGGER.error(e.getMessage(), e);
             final StreamingOutput so = (OutputStream os) -> e.printStackTrace(new PrintStream(os));
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(so).build();
@@ -103,7 +103,7 @@ public class ConverterResource {
 
             return Response.ok().status(Response.Status.OK).entity(formats)
                     .build();
-        } catch (IOException | InterruptedException e) {
+        } catch (InterruptedException | ExecutionException e) {
             LOGGER.error(e.getMessage(), e);
             final StreamingOutput so = (OutputStream os) -> e.printStackTrace(new PrintStream(os));
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(so).build();
@@ -117,7 +117,7 @@ public class ConverterResource {
         try {
             return Response.ok().status(Response.Status.OK).entity(FFMpegImpl.encoder(name))
                     .build();
-        } catch (IOException | InterruptedException e) {
+        } catch (InterruptedException | NumberFormatException | ExecutionException e) {
             LOGGER.error(e.getMessage(), e);
             final StreamingOutput so = (OutputStream os) -> e.printStackTrace(new PrintStream(os));
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(so).build();

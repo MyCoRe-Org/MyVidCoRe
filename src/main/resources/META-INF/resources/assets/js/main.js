@@ -474,8 +474,8 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 		});
 	}
 
-	$scope.save = function() {
-		$http.post("/settings", $scope.settings).then(function(response) {
+	$scope.save = function(settings) {
+		$http.post("/settings", settings).then(function(response) {
 			$scope.showStatusMessage("success", $translate.instant("settings.saved.success"));
 		}, function(error) {
 			$scope.showStatusMessage("error", $translate.instant("settings.saved.error"));
@@ -483,7 +483,7 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 	}
 
 	$scope.filterCodecs = function(format, type) {
-		return $scope.formats[format][type];
+		return format !== undefined ? $scope.formats[format][type] : null;
 	}
 
 	$scope.filterEncoder = function(name) {
@@ -552,6 +552,9 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 	}
 
 	$scope.changeCodec = function(type) {
+		if ($scope.settings[type] === undefined)
+			return;
+
 		var codec = $scope.settings[type].codec;
 
 		$scope.selectedCodec[type] = $scope.filterEncoder(codec);

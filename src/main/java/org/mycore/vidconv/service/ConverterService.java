@@ -240,7 +240,7 @@ public class ConverterService extends Widget implements Listener {
                 save();
 
                 LOGGER.info("Converting of " + inputPath.toString() + " done.");
-            } catch (IOException | InterruptedException | JAXBException e) {
+            } catch (InterruptedException | JAXBException | ExecutionException e) {
                 LOGGER.error(e.getMessage(), e);
             }
         }

@@ -22,7 +22,6 @@
  */
 package org.mycore.vidconv.resource;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
@@ -40,7 +39,6 @@ import javax.xml.bind.JAXBException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.vidconv.config.Settings;
-import org.mycore.vidconv.encoder.FFMpegImpl;
 import org.mycore.vidconv.entity.SettingsWrapper;
 
 /**
@@ -67,10 +65,10 @@ public class SettingsResource {
     public Response postSettings(final SettingsWrapper settings) {
         try {
             SETTINGS.setSettings(settings);
-            LOGGER.info(FFMpegImpl.command(settings));
+
             return Response.ok().status(Response.Status.OK).entity(settings)
                     .build();
-        } catch (JAXBException | IOException | InterruptedException e) {
+        } catch (JAXBException e) {
             LOGGER.error(e.getMessage(), e);
             final StreamingOutput so = (OutputStream os) -> e.printStackTrace(new PrintStream(os));
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(so).build();

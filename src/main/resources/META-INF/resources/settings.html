@@ -54,7 +54,7 @@
 
       <span class="loading-indicator" ng-show="isLoading"><i></i> <i></i> <i></i></span>
 
-      <form novalidate ng-if="!isLoading">
+      <form novalidate ng-if="!isLoading && getLength(formats) > 0">
         <fieldset>
           <legend>{{'settings.converter.title' | translate}}</legend>
           <div class="form-group">
@@ -63,11 +63,11 @@
             >
             </select>
           </div>
-          <ul class="nav nav-tabs" role="tablist">
+          <ul class="nav nav-tabs" role="tablist" ng-hide="!settings.format">
             <li role="presentation" class="active"><a href="#video" aria-controls="video" data-toggle="tab">Video</a></li>
             <li role="presentation"><a href="#audio" aria-controls="audio" data-toggle="tab">Audio</a></li>
           </ul>
-          <div class="tab-content">
+          <div class="tab-content" ng-hide="!settings.format">
             <div role="tabpanel" class="tab-pane fade in active" id="video">
               <div class="form-group">
                 <select id="vcodec" class="form-control" ng-model="settings.video.codec" ng-change="changeCodec('video')">
@@ -221,7 +221,7 @@
             </div>
           </div>
           <div class="pull-right clear-fix">
-            <button type="submit" class="btn btn-default btn-primary" ng-click="save()">{{ 'btn.save' | translate}}</button>
+            <button type="submit" class="btn btn-default btn-primary" ng-click="save(settings)" ng-disabled="!settings.format">{{ 'btn.save' | translate}}</button>
           </div>
         </fieldset>
       </form>

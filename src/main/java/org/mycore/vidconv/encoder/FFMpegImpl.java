@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -79,8 +80,9 @@ public class FFMpegImpl {
      * @return the supported codecs
      * @throws IOException
      * @throws InterruptedException
+     * @throws ExecutionException 
      */
-    public static CodecsWrapper codecs() throws IOException, InterruptedException {
+    public static CodecsWrapper codecs() throws InterruptedException, ExecutionException {
         if (supportedCodecs != null) {
             return supportedCodecs;
         }
@@ -90,6 +92,7 @@ public class FFMpegImpl {
         if (exec.runAndWait() == 0) {
             final List<CodecWrapper> codecs = new ArrayList<>();
             final String outputStream = exec.output();
+
             if (outputStream != null) {
                 final Matcher m = PATTERN_CODECS.matcher(outputStream);
                 while (m.find()) {
@@ -149,8 +152,9 @@ public class FFMpegImpl {
      * @return the supported formats
      * @throws IOException
      * @throws InterruptedException
+     * @throws ExecutionException 
      */
-    public static FormatsWrapper formats() throws IOException, InterruptedException {
+    public static FormatsWrapper formats() throws InterruptedException, ExecutionException {
         if (supportedFormats != null) {
             return supportedFormats;
         }
@@ -160,6 +164,7 @@ public class FFMpegImpl {
         if (exec.runAndWait() == 0) {
             final List<FormatWrapper> formats = new ArrayList<>();
             final String outputStream = exec.output();
+
             if (outputStream != null) {
                 final Matcher m = PATTERN_FORMATS.matcher(outputStream);
                 while (m.find()) {
@@ -213,8 +218,11 @@ public class FFMpegImpl {
      * @param name the encoder name
      * @throws IOException
      * @throws InterruptedException
+     * @throws ExecutionException 
+     * @throws NumberFormatException 
      */
-    public static EncodersWrapper encoder(final String name) throws IOException, InterruptedException {
+    public static EncodersWrapper encoder(final String name)
+            throws InterruptedException, NumberFormatException, ExecutionException {
         if (supportedEncoders.containsKey(name)) {
             return supportedEncoders.get(name);
         }
@@ -223,6 +231,7 @@ public class FFMpegImpl {
 
         if (exec.runAndWait() == 0) {
             final String outputStream = exec.output();
+
             if (outputStream != null) {
                 final List<EncoderWrapper> encoders = PATTERN_ENTRY_SPLIT.splitAsStream(outputStream)
                         .filter(os -> !os.isEmpty())
@@ -330,7 +339,7 @@ public class FFMpegImpl {
 
     private static Map<String, MuxerWrapper> supportedMuxers = new ConcurrentHashMap<>();
 
-    public static MuxerWrapper muxer(final String name) throws IOException, InterruptedException {
+    public static MuxerWrapper muxer(final String name) throws InterruptedException, ExecutionException {
         if (supportedMuxers.containsKey(name)) {
             return supportedMuxers.get(name);
         }
@@ -339,6 +348,7 @@ public class FFMpegImpl {
 
         if (exec.runAndWait() == 0) {
             final String outputStream = exec.output();
+
             if (outputStream != null) {
                 final Matcher m = PATTERN_MUXER.matcher(outputStream);
                 while (m.find()) {
@@ -411,9 +421,10 @@ public class FFMpegImpl {
      * @throws IOException
      * @throws InterruptedException
      * @throws JAXBException
+     * @throws ExecutionException 
      */
     public static boolean isEncodingSupported(final Path inputFile)
-            throws IOException, InterruptedException, JAXBException {
+            throws InterruptedException, JAXBException, ExecutionException {
         final ProbeWrapper probe = probe(inputFile);
 
         if (probe != null && probe.getFormat() != null && probe.getStreams() != null) {
@@ -439,7 +450,7 @@ public class FFMpegImpl {
      * @throws IOException
      * @throws InterruptedException
      */
-    public static String command(final SettingsWrapper settings) throws IOException, InterruptedException {
+    public static String command(final SettingsWrapper settings) throws InterruptedException {
         final StringBuffer cmd = new StringBuffer();
 
         cmd.append("ffmpeg -i {0} -stats -threads 1 -y");
@@ -493,12 +504,13 @@ public class FFMpegImpl {
      * @param settings the settings
      * @param fileName the input file name
      * @return
+     * @throws ExecutionException 
      */
-    public static String filename(final SettingsWrapper settings, final String fileName) {
+    public static String filename(final SettingsWrapper settings, final String fileName) throws ExecutionException {
         try {
             final String extension = muxer(settings.getFormat()).getExtension();
             return fileName.substring(0, fileName.lastIndexOf('.')) + "." + extension;
-        } catch (IOException | InterruptedException e) {
+        } catch (InterruptedException e) {
             return null;
         }
     }
@@ -511,14 +523,17 @@ public class FFMpegImpl {
      * @throws IOException
      * @throws InterruptedException
      * @throws JAXBException
+     * @throws ExecutionException 
      */
-    public static ProbeWrapper probe(final Path inputFile) throws IOException, InterruptedException, JAXBException {
+    public static ProbeWrapper probe(final Path inputFile)
+            throws InterruptedException, JAXBException, ExecutionException {
         final Executable exec = new Executable("ffprobe", "-v", "quiet", "-print_format", "xml", "-show_format",
                 "-show_streams",
                 inputFile.toFile().getAbsolutePath());
 
         if (exec.runAndWait() == 0) {
             final String outputStream = exec.output();
+
             if (outputStream != null) {
                 final JAXBContext jc = JAXBContext.newInstance(ProbeWrapper.class);
                 final Unmarshaller unmarshaller = jc.createUnmarshaller();
