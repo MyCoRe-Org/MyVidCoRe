@@ -146,7 +146,7 @@ public class ConverterService extends Widget implements Listener {
     public void handleEvent(Event event) throws Exception {
         if (DirectoryWatchService.EVENT_ENTRY_CREATE.equals(event.getType())
                 && event.getSource().equals(DirectoryWatchService.class)) {
-            Path inputPath = event.getParameter("path", Path.class);
+            Path inputPath = event.getParameter("path");
             addConverter(inputPath);
         }
     }

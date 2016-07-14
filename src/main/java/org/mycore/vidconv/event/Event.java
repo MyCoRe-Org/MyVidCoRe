@@ -74,12 +74,9 @@ public class Event {
      * @param clazz the parameter type
      * @return
      */
-    public <T> T getParameter(final String name, Class<T> clazz) {
-        try {
-            return clazz.cast(this.params.get(name));
-        } catch (ClassCastException e) {
-            return null;
-        }
+    @SuppressWarnings("unchecked")
+    public <T> T getParameter(final String name) {
+        return (T) this.params.get(name);
     }
 
     /**
