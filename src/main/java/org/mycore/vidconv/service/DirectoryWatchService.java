@@ -37,9 +37,12 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
+import java.nio.file.WatchEvent.Kind;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,9 +78,13 @@ public class DirectoryWatchService extends Widget {
 
     private static final Logger LOGGER = LogManager.getLogger(DirectoryWatchService.class);
 
+    private static final long EVENT_DELAY = 30000;
+
     private static final EventManager EVENT_MANGER = EventManager.instance();
 
     private final Map<WatchKey, Path> keys = new ConcurrentHashMap<>();
+
+    private final Map<Path, InitialEvent> events = new ConcurrentHashMap<>();
 
     private ExecutorService service;
 
@@ -113,13 +120,13 @@ public class DirectoryWatchService extends Widget {
                             Path name = event.context();
                             Path child = path.resolve(name);
 
-                            LOGGER.info(String.format("%s: %s %s", kind.name(), path, child));
+                            LOGGER.debug(String.format("%s: %s %s", kind.name(), path, child));
 
-                            EVENT_MANGER.fireEvent(new Event(kind.name(), new HashMap<String, Object>() {
-                                {
-                                    put("path", child);
-                                }
-                            }, that.getClass()));
+                            if (!events.containsKey(child)) {
+                                events.put(child, new InitialEvent(kind, Instant.now()));
+                            } else {
+                                events.get(child).lastModified = Instant.now();
+                            }
 
                             if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
                                 if (Files.isDirectory(child, LinkOption.NOFOLLOW_LINKS)) {
@@ -131,14 +138,27 @@ public class DirectoryWatchService extends Widget {
                                 }
                             }
                         });
+
                         if (key.reset() == false) {
-                            LOGGER.info(String.format("%s is invalid", key));
+                            LOGGER.debug(String.format("%s is invalid", key));
                             keys.remove(key);
                             if (keys.isEmpty()) {
                                 break;
                             }
                         }
                     }
+
+                    // fire event after a given time without changes
+                    events.forEach((p, ie) -> {
+                        if (Duration.between(ie.lastModified, Instant.now()).toMillis() > EVENT_DELAY) {
+                            EVENT_MANGER.fireEvent(new Event(ie.kind.name(), new HashMap<String, Object>() {
+                                {
+                                    put("path", p);
+                                }
+                            }, that.getClass()));
+                            events.remove(p);
+                        }
+                    });
                 }
             }
         });
@@ -217,6 +237,16 @@ public class DirectoryWatchService extends Widget {
          */
         public void setPaths(List<String> paths) {
             this.paths = paths;
+        }
+    }
+
+    static class InitialEvent {
+        final Kind<Path> kind;
+        Instant lastModified;
+
+        InitialEvent(final Kind<Path> kind, final Instant lastModified) {
+            this.kind = kind;
+            this.lastModified = lastModified;
         }
     }
 }
