@@ -52,8 +52,10 @@
         {{ status.msg }}
       </div>
 
-      <form novalidate>
-        <fieldset ng-if="getLength(formats) > 0">
+      <span class="loading-indicator" ng-show="isLoading"><i></i> <i></i> <i></i></span>
+
+      <form novalidate ng-if="!isLoading">
+        <fieldset>
           <legend>{{'settings.converter.title' | translate}}</legend>
           <div class="form-group">
             <label for="format">{{'settings.format' | translate}}</label> <select id="format" class="form-control" ng-model="settings.format"
@@ -223,8 +225,7 @@
           </div>
         </fieldset>
       </form>
-      <br>
-      <pre>{{settings | json}}</pre>
+
     </div>
 
   </div>

@@ -99,6 +99,8 @@ app.controller("directoryWatcherStatus", function($scope, $http, $interval) {
 		}).then(function(response) {
 			if (response.status = 200)
 				angular.merge($scope.status, response.data);
+		}, function(error) {
+			$scope.status = {};
 		});
 	}
 
@@ -138,6 +140,8 @@ app.controller("converterStatus", function($scope, $http, $interval, $timeout) {
 			if (response.status = 200) {
 				angular.merge($scope.converters, response.data.converter);
 			}
+		}, function(error) {
+			$scope.converters = [];
 		});
 	}
 
@@ -156,7 +160,7 @@ app.controller("converterStatus", function($scope, $http, $interval, $timeout) {
 	}
 
 	$scope.orderByPercent = function(converter) {
-		return converter.progress.percent;
+		return converter.progress ? converter.progress.percent : -1;
 	}
 
 	$scope.orderByEndTime = function(converter) {
@@ -165,11 +169,12 @@ app.controller("converterStatus", function($scope, $http, $interval, $timeout) {
 
 	$scope.filterDone = function(converter) {
 		var diff = new Date() - new Date(converter.endTime);
-		return converter.running ? true : converter.done && diff < removeTimeout ? true : false;
+		return converter.running || !converter.running && !converter.done ? true : converter.done && diff < removeTimeout ? true : false;
 	}
 
 	$scope.filterNotDone = function(converter) {
-		return !$scope.filterDone(converter);
+		var diff = new Date() - new Date(converter.endTime);
+		return converter.done && diff > removeTimeout ? true : false;
 	}
 
 	$scope.formatStream = function(stream) {
@@ -322,9 +327,9 @@ app.service("formatService", function($http, $q, asyncQueue) {
 					}
 				});
 			});
-		});
 
-		deferred.resolve(formats);
+			deferred.resolve(formats);
+		});
 
 		return deferred.promise;
 	}
@@ -333,6 +338,7 @@ app.service("formatService", function($http, $q, asyncQueue) {
 app.controller("settings", function($scope, $http, $translate, $log, $timeout, formatService) {
 	var removeTimeout = 30000;
 	$scope.status = {};
+	$scope.isLoading = true;
 
 	// configured formats
 	$scope.converterFormats = {
@@ -445,11 +451,13 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 	$scope.selectedCodec = {};
 
 	$scope.supportedFormats = function() {
+		$scope.isLoading = true;
 		var formats = {};
 		angular.copy($scope.converterFormats, formats);
 
 		formatService.getSupportedFormats(formats).then(function(formats) {
 			$scope.formats = formats;
+			$scope.isLoading = false;
 		}, function(error) {
 			$log.error("failure loading formats", error);
 		});
