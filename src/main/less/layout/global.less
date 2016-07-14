@@ -1,8 +1,6 @@
 // GLOBAL STYLES
 //--------------------------------------------------
 
-@import url(fonts.css);
-
 // Bootstrap - Panel
 .panel-default {
   border: 1px solid @panel-default-border;
@@ -22,3 +20,160 @@
     border-top: 1px solid @panel-default-border;
   }
 }
+
+pre.console {
+  background-color: #222;
+  color: #f1f1f1;
+  font-family: 'Source Code Pro', @font-family-monospace;
+  font-size: 12px;
+}
+
+// Text Helper
+.padding-bottom {
+  padding-bottom: 10px;
+}
+
+// Animations
+@-webkit-keyframes bouncedelay {
+  0% {
+    transform: scale(0);
+  }
+
+  80%{
+    transform: scale(0);
+  }
+
+  100%{
+    transform: scale(0);
+  }
+
+  40% {
+    transform: scale(1);
+  }
+}
+
+@keyframes bouncedelay {
+  0% {
+    transform: scale(0);
+  }
+
+  80%{
+    transform: scale(0);
+  }
+
+  100%{
+    transform: scale(0);
+  }
+
+  40% {
+    transform: scale(1);
+  }
+}
+
+@-webkit-keyframes rotation {
+  0% {
+    transform: rotateZ(0deg);
+  }
+
+  45%{
+    transform: rotateZ(180deg);
+  }
+
+  55% {
+    transform: rotateZ(180deg);
+  }
+
+  100% {
+    transform: rotateZ(360deg);
+  }
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotateZ(0deg);
+  }
+
+  45%{
+    transform: rotateZ(180deg);
+  }
+
+  55% {
+    transform: rotateZ(180deg);
+  }
+
+  100% {
+    transform: rotateZ(360deg);
+  }
+}
+
+.loading-indicator , .loading-indicator-white {
+  display: inline-block;
+  vertical-align: middle;
+  & i {
+    -webkit-animation: bouncedelay 1.3s infinite linear;
+    animation: bouncedelay 1.3s infinite linear;
+    background-color: @text-color;
+    border-radius: 50%;
+    display: inline-block;
+    height: 8px;
+    line-height: 0;
+    position: relative;
+    -webkit-transform-origin: center center;
+    transform-origin: center center;
+    width: 8px;
+    .loading-indicator-white & {
+      background-color: @gray-lighter
+    }
+
+    &:nth-child(2) {
+      -moz-animation-delay: 0.3s;
+      -webkit-animation-delay: 0.3s;
+      animation-delay: 0.3s;
+    }
+
+    &:nth-child(3) {
+      -moz-animation-delay: 0.6s;
+      -webkit-animation-delay: 0.6s;
+      animation-delay: 0.6s;
+    }
+  }
+}
+
+.status-icon {
+  height: 14px;
+  line-height: 0;
+  margin-right: 0.5em;
+  width: 13px;
+  * {
+    stroke-width: 2px;
+  }
+
+  .is-rotating {
+    -webkit-animation: rotation 3s infinite ease;
+    animation: rotation 3s infinite ease;
+    height: 18px;
+    line-height: 1.1;
+    text-align: center;
+    -webkit-transform-origin: center center;
+    transform-origin: center center;
+    width: 17px;
+    will-change: transform;
+    .circle {
+      border: 1px solid @text-color;
+      border-radius: 50%;
+      display: inline-block;
+      height: 5px;
+      transform-origin: center center 0;
+      vertical-align: middle;
+      width: 5px;
+    }
+  }
+
+  &.queued {
+    height: 19px;
+    .circle {
+      border-color: @brand-primary;
+    }
+  }
+}
+

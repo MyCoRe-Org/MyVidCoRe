@@ -41,6 +41,9 @@ module.exports = function(grunt) {
 					fonts : [ {
 						family : 'Titillium Web',
 						styles : [ 200, 400, 600, 700, '200italic', '400italic', '600italic', '700italic' ]
+					}, {
+						family : 'Source Code Pro',
+						styles : [ 400, 300, 500 ]
 					} ]
 				}
 			}

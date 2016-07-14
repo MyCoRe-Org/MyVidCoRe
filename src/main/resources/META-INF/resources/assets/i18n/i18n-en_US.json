@@ -9,6 +9,7 @@
     "converter.noJobs" : "No Jobs running.",
     "converter.done.headline" : "Done Jobs",
     "converter.noDoneJobs" : "No done jobs found.",
+    "converter.queued" : "queued",
     
     "settings.auto" : "Auto",
     "settings.preset" : "Preset",

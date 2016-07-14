@@ -9,6 +9,7 @@
     "converter.noJobs" : "Keine Konverter-Aufträge vorhanden.",
     "converter.done.headline" : "Fetiggestellte Aufträge",
     "converter.noDoneJobs" : "Keine fertiggestellte Aufträge vorhanden.",
+    "converter.queued" : "eingereiht",
     
     "settings.auto" : "automatisch",
     "settings.preset" : "Vorlage",
