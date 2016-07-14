@@ -178,8 +178,9 @@ app.controller("converterStatus", function($scope, $http, $interval, $timeout) {
 	}
 
 	$scope.formatStream = function(stream) {
-		if (stream !== undefined)
+		if (stream !== undefined) {
 			return stream.replace(/\r/g, "\n");
+		}
 	}
 
 	$scope.$on("$destroy", function() {
