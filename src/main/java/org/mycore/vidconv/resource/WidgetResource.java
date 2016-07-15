@@ -30,7 +30,10 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
@@ -186,52 +189,55 @@ public class WidgetResource {
         }
     }
 
+    private static final Pattern RANGE_PATTERN = Pattern.compile("([^=]+)=(\\d+)(?:-(\\d+)?)");
+
     private Response buildStream(final java.nio.file.Path asset, final String range) throws Exception {
         final String mimeType = MimeType.detect(asset);
-        if (range == null) {
-            StreamingOutput streamer = new StreamingOutput() {
-                @Override
-                public void write(final OutputStream output) throws IOException, WebApplicationException {
+
+        return Stream.of(RANGE_PATTERN.matcher(Optional.ofNullable(range).orElse("")))
+                .filter(rm -> rm.find()).findFirst()
+                .map(rm -> {
                     try {
-                        byte[] data = Files.readAllBytes(asset);
-                        output.write(data);
-                        output.flush();
-                    } catch (Exception e) {
+                        final File assetFile = asset.toFile();
+                        final int from = new Integer(rm.group(2));
+                        final Optional<String> toVal = Optional.ofNullable(rm.group(3));
+                        final int to = toVal.isPresent() ? new Integer(toVal.get()) : (int) (assetFile.length() - 1);
+
+                        final String responseRange = String.format("bytes %d-%d/%d", from, to, assetFile.length());
+                        final RandomAccessFile raf = new RandomAccessFile(assetFile, "r");
+                        raf.seek(from);
+
+                        final int len = to - from + 1;
+                        final RangeStreamingOutput streamer = new RangeStreamingOutput(len, raf);
+
+                        return Response.ok(streamer, mimeType)
+                                .status(Response.Status.PARTIAL_CONTENT)
+                                .header("Accept-Ranges", "bytes")
+                                .header("Content-Range", responseRange)
+                                .header(HttpHeaders.CONTENT_LENGTH, streamer.getLenth())
+                                .header(HttpHeaders.LAST_MODIFIED, new Date(assetFile.lastModified())).build();
+                    } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                }
-            };
+                }).orElseGet(() -> {
+                    final StreamingOutput streamer = new StreamingOutput() {
+                        @Override
+                        public void write(final OutputStream output) throws IOException, WebApplicationException {
+                            try {
+                                byte[] data = Files.readAllBytes(asset);
+                                output.write(data);
+                                output.flush();
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    };
 
-            return Response
-                    .ok(streamer, mimeType)
-                    .header("content-disposition",
-                            "attachment; filename = \"" + asset.getFileName().toString() + "\"")
-                    .build();
-        }
-
-        final File assetFile = asset.toFile();
-        String[] ranges = range.split("=")[1].split("-");
-        final int from = Integer.parseInt(ranges[0]);
-
-        int to = (int) (assetFile.length() - 1);
-        if (ranges.length == 2) {
-            to = Integer.parseInt(ranges[1]);
-        }
-
-        final String responseRange = String.format("bytes %d-%d/%d", from, to, assetFile.length());
-        final RandomAccessFile raf = new RandomAccessFile(assetFile, "r");
-        raf.seek(from);
-
-        final int len = to - from + 1;
-        final RangeStreamingOutput streamer = new RangeStreamingOutput(len, raf);
-
-        Response.ResponseBuilder res = Response.ok(streamer, mimeType)
-                .status(Response.Status.PARTIAL_CONTENT)
-                .header("Accept-Ranges", "bytes")
-                .header("Content-Range", responseRange)
-                .header(HttpHeaders.CONTENT_LENGTH, streamer.getLenth())
-                .header(HttpHeaders.LAST_MODIFIED, new Date(assetFile.lastModified()));
-
-        return res.build();
+                    return Response
+                            .ok(streamer, mimeType)
+                            .header("content-disposition",
+                                    "attachment; filename = \"" + asset.getFileName().toString() + "\"")
+                            .build();
+                });
     }
 }
