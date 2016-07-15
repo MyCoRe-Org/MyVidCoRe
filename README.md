@@ -18,10 +18,6 @@ You also need to install FFMpeg and FFProbe, please visit the [FFMpeg download p
 
 Run Server with (Maven):
 
-    $ mvn exec:java
-
-or:
-
     # run with default settings
     $ java -jar target/myvidcore.jar
     # run with custom settings
