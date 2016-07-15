@@ -23,6 +23,7 @@
 package org.mycore.vidconv;
 
 import java.io.File;
+import java.nio.file.Paths;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -72,6 +73,12 @@ public class Application implements Listener {
             jcmd.usage();
         } else {
             try {
+                if (Paths.get(app.watchDir).equals(Paths.get(app.outputDir).getParent())
+                        || Paths.get(app.watchDir).equals(Paths.get(app.outputDir))) {
+                    throw new RuntimeException(
+                            "Watching directory isn't allowed to be the parent of output directory or the same.");
+                }
+
                 app.run();
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
