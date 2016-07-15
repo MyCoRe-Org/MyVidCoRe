@@ -173,7 +173,7 @@
             <argument>-ct</argument>
             <argument>2</argument>
             <argument>--watchDir</argument>
-            <argument>/tmp</argument>
+            <argument>/tmp/input</argument>
             <argument>--outputDir</argument>
             <argument>/tmp/converted</argument>
           </arguments>
