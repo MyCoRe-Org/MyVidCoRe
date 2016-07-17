@@ -14,6 +14,7 @@
     "settings.advancedOptions": "Erweiterte Optionen",
     "settings.auto" : "automatisch",
     "settings.preset" : "Vorlage",
+    "settings.scale" : "Skalierung",
     "settings.tune" : "Abstimmung",
     "settings.converter.title" : "Konverter Einstellungen",
     "settings.saved.success" : "Einstellungen wurden erfolgreich gespeichert!",

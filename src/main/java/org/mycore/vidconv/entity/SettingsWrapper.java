@@ -90,6 +90,8 @@ public class SettingsWrapper {
     public static class Video {
         private String codec;
 
+        private String scale;
+
         private String framerate;
 
         private String framerateType;
@@ -123,6 +125,20 @@ public class SettingsWrapper {
          */
         public void setCodec(String codec) {
             this.codec = codec;
+        }
+
+        /**
+         * @return the scale
+         */
+        public String getScale() {
+            return scale;
+        }
+
+        /**
+         * @param scale the scale to set
+         */
+        public void setScale(String scale) {
+            this.scale = scale;
         }
 
         /**

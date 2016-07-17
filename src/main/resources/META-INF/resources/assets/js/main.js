@@ -402,6 +402,23 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 		} ]
 	};
 
+	$scope.defaultScales = [ {
+		"name" : "1080p",
+		"value" : "-1:1080"
+	}, {
+		"name" : "720p",
+		"value" : "-1:720"
+	}, {
+		"name" : "540p",
+		"value" : "-1:540"
+	}, {
+		"name" : "480p",
+		"value" : "-1:480"
+	}, {
+		"name" : "360p",
+		"value" : "-1:300"
+	} ];
+
 	$scope.defaultFrameRates = [ "5", "10", "12", "15", "23.976", "24", "25", "29.97", "30", "50", "59.94", "60" ];
 
 	$scope.defaultProfiles = [ {

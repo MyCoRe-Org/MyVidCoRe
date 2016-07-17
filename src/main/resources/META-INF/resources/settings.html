@@ -104,6 +104,13 @@
                   <option value="">{{'settings.auto' | translate}}</option>
                 </select>
               </div>
+              <div class="form-group">
+                <label for="scale">{{'settings.scale' | translate}}</label> <select id="scale" class="form-control" ng-model="settings.video.scale"
+                  ng-options="scale.value as scale.name for scale in defaultScales"
+                >
+                  <option value="">{{'settings.auto' | translate}}</option>
+                </select>
+              </div>
               <div class="row">
                 <div class="col-sm-4">
                   <div class="form-group">

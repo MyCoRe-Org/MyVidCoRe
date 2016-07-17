@@ -14,6 +14,7 @@
     "settings.advancedOptions": "Advanced Options",
     "settings.auto" : "Auto",
     "settings.preset" : "Preset",
+    "settings.scale" : "Scale",
     "settings.tune" : "Tune",
     "settings.converter.title" : "Converter Settings",
     "settings.saved.success" : "Settings successfull saved!",

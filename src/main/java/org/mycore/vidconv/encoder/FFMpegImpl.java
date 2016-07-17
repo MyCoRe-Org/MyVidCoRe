@@ -469,6 +469,7 @@ public class FFMpegImpl {
         Optional.ofNullable(video.getLevel()).ifPresent(v -> cmd.append(" -level " + v));
         Optional.ofNullable(video.getPixelFormat())
                 .ifPresent(v -> cmd.append(" -pix_fmt " + (!v.isEmpty() ? v : "yuv420p")));
+        Optional.ofNullable(video.getScale()).ifPresent(v -> cmd.append(" -vf 'scale=" + v + "'"));
 
         Optional.ofNullable(video.getFramerate()).ifPresent(v -> {
             cmd.append(" -r " + v);
