@@ -74,7 +74,7 @@
                   <optgroup ng-if="codec.encoders && getLength(codec.encoders) > 1" ng-repeat="codec in filterCodecs(settings.format, 'video')"
                     label="{{codec.description}}"
                   >
-                    <option ng-repeat="encoder in codec.encoders" value="{{encoder.name}}">{{encoder.name}}</option>
+                    <option ng-repeat="encoder in codec.encoders" value="{{encoder.name}}">{{encoder.description}}</option>
                   </optgroup>
                   <option ng-if="codec.encoders && getLength(codec.encoders) == 1" ng-repeat="codec in filterCodecs(settings.format, 'video')"
                     value="{{codec.encoders[0].name}}"
@@ -192,7 +192,7 @@
                   <optgroup ng-if="codec.encoders && getLength(codec.encoders) > 1" ng-repeat="codec in filterCodecs(settings.format, 'audio')"
                     label="{{codec.description}}"
                   >
-                    <option ng-repeat="encoder in codec.encoders" value="{{encoder.name}}">{{encoder.name}}</option>
+                    <option ng-repeat="encoder in codec.encoders" value="{{encoder.name}}">{{encoder.description}}</option>
                   </optgroup>
                   <option ng-if="codec.encoders && getLength(codec.encoders) == 1" ng-repeat="codec in filterCodecs(settings.format, 'audio')"
                     value="{{codec.encoders[0].name}}"

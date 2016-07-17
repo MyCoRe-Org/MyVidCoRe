@@ -187,7 +187,7 @@ public class FFMpegImpl {
     }
 
     private static final Pattern PATTERN_ENCODER = Pattern
-            .compile("^Encoder\\s([^\\s]+)\\s\\[(?:[^\\]]+)\\]:\\n([\\S\\s]+)$");
+            .compile("^Encoder\\s([^\\s]+)\\s\\[([^\\]]+)\\]:\\n([\\S\\s]+)$");
 
     private static final Pattern PATTERN_PIX_FMT = Pattern.compile("pixel formats:(.*)");
 
@@ -241,39 +241,40 @@ public class FFMpegImpl {
                                 final EncoderWrapper encoder = new EncoderWrapper();
 
                                 encoder.setName(m.group(1));
+                                encoder.setDescription(m.group(2));
 
                                 encoder.setPixelFormats(
-                                        Stream.of(m.group(2)).map(s -> PATTERN_PIX_FMT.matcher(s))
+                                        Stream.of(m.group(3)).map(s -> PATTERN_PIX_FMT.matcher(s))
                                                 .filter(ma -> ma.find())
                                                 .flatMap(ma -> splitString(ma.group(1)))
                                                 .collect(Collectors.toList()));
 
                                 encoder.setFrameRates(
-                                        Stream.of(m.group(2)).map(s -> PATTERN_FRM_RATES.matcher(s))
+                                        Stream.of(m.group(3)).map(s -> PATTERN_FRM_RATES.matcher(s))
                                                 .filter(ma -> ma.find())
                                                 .flatMap(ma -> splitString(ma.group(1)))
                                                 .collect(Collectors.toList()));
 
                                 encoder.setSampleFormats(
-                                        Stream.of(m.group(2)).map(s -> PATTERN_SMP_FROMATS.matcher(s))
+                                        Stream.of(m.group(3)).map(s -> PATTERN_SMP_FROMATS.matcher(s))
                                                 .filter(ma -> ma.find())
                                                 .flatMap(ma -> splitString(ma.group(1)))
                                                 .collect(Collectors.toList()));
 
                                 encoder.setSampleRates(
-                                        Stream.of(m.group(2)).map(s -> PATTERN_SMP_RATES.matcher(s))
+                                        Stream.of(m.group(3)).map(s -> PATTERN_SMP_RATES.matcher(s))
                                                 .filter(ma -> ma.find())
                                                 .flatMap(ma -> splitString(ma.group(1))).map(s -> new Integer(s))
                                                 .collect(Collectors.toList()));
 
                                 encoder.setChannelLayouts(
-                                        Stream.of(m.group(2)).map(s -> PATTERN_CH_LAYOUTS.matcher(s))
+                                        Stream.of(m.group(3)).map(s -> PATTERN_CH_LAYOUTS.matcher(s))
                                                 .filter(ma -> ma.find())
                                                 .flatMap(ma -> splitString(ma.group(1)))
                                                 .collect(Collectors.toList()));
 
                                 final List<ParameterWrapper> parameters = new ArrayList<>();
-                                final Matcher pm = PATTERN_PARAMS.matcher(m.group(2));
+                                final Matcher pm = PATTERN_PARAMS.matcher(m.group(3));
                                 while (pm.find()) {
                                     final ParameterWrapper param = new ParameterWrapper();
                                     param.setName(pm.group(1));

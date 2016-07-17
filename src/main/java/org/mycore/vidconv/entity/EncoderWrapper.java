@@ -32,6 +32,8 @@ public class EncoderWrapper {
 
     private String name;
 
+    private String description;
+
     private List<String> pixelFormats;
 
     private List<String> frameRates;
@@ -63,6 +65,20 @@ public class EncoderWrapper {
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * @return the description
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * @param description the description to set
+     */
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     /**
