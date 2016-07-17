@@ -106,6 +106,8 @@ public class SettingsWrapper {
 
         private Quality quality;
 
+        private String advancedOptions;
+
         public Video() {
         }
 
@@ -233,6 +235,20 @@ public class SettingsWrapper {
          */
         public void setQuality(Quality quality) {
             this.quality = quality;
+        }
+
+        /**
+         * @return the advancedOptions
+         */
+        public String getAdvancedOptions() {
+            return advancedOptions;
+        }
+
+        /**
+         * @param advancedOptions the advancedOptions to set
+         */
+        public void setAdvancedOptions(String advancedOptions) {
+            this.advancedOptions = advancedOptions;
         }
 
         @XmlRootElement(name = "quality")

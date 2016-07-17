@@ -22,11 +22,10 @@ app.directive("convertToNumber", function() {
 		require : 'ngModel',
 		link : function(scope, element, attrs, ngModel) {
 			ngModel.$parsers.push(function(val) {
-				console.log(val);
 				return parseInt(val, 10);
 			});
 			ngModel.$formatters.push(function(val) {
-				return val === undefined || val.length == 0 ? null : '' + val;
+				return val === undefined || val.length == 0 ? null : val;
 			});
 		}
 	};
@@ -425,6 +424,8 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 		"name" : "4.2"
 	} ];
 
+	$scope.defaultBitrates = [ 64, 80, 96, 112, 128, 160, 192, 224, 256, 320 ];
+
 	// default settings
 	$scope.settings = {
 		"format" : "mp4",
@@ -443,8 +444,8 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 		},
 		"audio" : {
 			"codec" : "libfdk_aac",
-			"samplerate" : "auto",
-			"bitrate" : "auto"
+			"samplerate" : 44100,
+			"bitrate" : 128
 		}
 	};
 

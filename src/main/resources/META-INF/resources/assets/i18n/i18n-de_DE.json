@@ -11,6 +11,7 @@
     "converter.noDoneJobs" : "Keine fertiggestellte Aufträge vorhanden.",
     "converter.queued" : "eingereiht",
     
+    "settings.advancedOptions": "Erweiterte Optionen",
     "settings.auto" : "automatisch",
     "settings.preset" : "Vorlage",
     "settings.tune" : "Abstimmung",

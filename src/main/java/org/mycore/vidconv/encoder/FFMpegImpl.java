@@ -459,6 +459,10 @@ public class FFMpegImpl {
 
         cmd.append(" -codec:v " + video.getCodec());
 
+        Optional.ofNullable(video.getAdvancedOptions()).ifPresent(ao -> {
+            cmd.append(" " + ao);
+        });
+
         Optional.ofNullable(video.getPreset()).ifPresent(v -> cmd.append(" -preset " + v));
         Optional.ofNullable(video.getTune()).ifPresent(v -> cmd.append(" -tune " + v));
         Optional.ofNullable(video.getProfile()).ifPresent(v -> cmd.append(" -profile:v " + v));
@@ -481,7 +485,7 @@ public class FFMpegImpl {
                 Optional.ofNullable(quality.getScale()).ifPresent(v -> cmd.append(" -qscale:v " + v));
                 break;
             case "ABR":
-                Optional.ofNullable(quality.getBitrate()).ifPresent(v -> cmd.append(" -b:v " + v));
+                Optional.ofNullable(quality.getBitrate()).ifPresent(v -> cmd.append(" -b:v " + v + "k"));
                 break;
             }
         });
@@ -489,8 +493,9 @@ public class FFMpegImpl {
         Audio audio = settings.getAudio();
 
         cmd.append(" -codec:a " + audio.getCodec());
+        cmd.append(" -ac 2");
 
-        Optional.ofNullable(audio.getBitrate()).ifPresent(v -> cmd.append(" -b:a " + v));
+        Optional.ofNullable(audio.getBitrate()).ifPresent(v -> cmd.append(" -b:a " + v + "k"));
         Optional.ofNullable(audio.getSamplerate()).ifPresent(v -> cmd.append(" -ar " + v));
 
         cmd.append(" {1}");

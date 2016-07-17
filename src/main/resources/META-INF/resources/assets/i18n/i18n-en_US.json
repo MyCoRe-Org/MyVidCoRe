@@ -11,6 +11,7 @@
     "converter.noDoneJobs" : "No done jobs found.",
     "converter.queued" : "queued",
     
+    "settings.advancedOptions": "Advanced Options",
     "settings.auto" : "Auto",
     "settings.preset" : "Preset",
     "settings.tune" : "Tune",
