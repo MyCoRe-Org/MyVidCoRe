@@ -41,6 +41,8 @@ import org.mycore.vidconv.service.ConverterService.ConverterJob;
 @XmlRootElement
 public class ConverterWrapper {
 
+    private String parentId;
+
     private String id;
 
     private String command;
@@ -70,6 +72,7 @@ public class ConverterWrapper {
         this();
 
         this.id = id;
+        this.parentId = converter.parentId();
         this.command = converter.command();
         this.fileName = converter.fileName();
         this.running = converter.isRunning();
@@ -79,6 +82,11 @@ public class ConverterWrapper {
         this.exitValue = converter.exitValue();
         this.outputStream = converter.outputStream();
         this.errorStream = converter.errorStream();
+    }
+
+    @XmlAttribute(name = "parentId")
+    String getParentId() {
+        return parentId;
     }
 
     @XmlAttribute(name = "id")
@@ -152,6 +160,7 @@ public class ConverterWrapper {
     public ConverterWrapper getBasicCopy() {
         final ConverterWrapper copy = new ConverterWrapper();
 
+        copy.parentId = this.parentId;
         copy.id = this.id;
         copy.fileName = this.fileName;
         copy.running = this.running;

@@ -42,6 +42,11 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 
+import org.ehcache.Cache;
+import org.ehcache.CacheManager;
+import org.ehcache.config.builders.CacheConfigurationBuilder;
+import org.ehcache.config.builders.CacheManagerBuilder;
+import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.mycore.vidconv.entity.CodecWrapper;
 import org.mycore.vidconv.entity.CodecsWrapper;
 import org.mycore.vidconv.entity.EncoderWrapper;
@@ -53,6 +58,7 @@ import org.mycore.vidconv.entity.ParameterWrapper;
 import org.mycore.vidconv.entity.ParameterWrapper.ParameterValue;
 import org.mycore.vidconv.entity.SettingsWrapper;
 import org.mycore.vidconv.entity.SettingsWrapper.Audio;
+import org.mycore.vidconv.entity.SettingsWrapper.Output;
 import org.mycore.vidconv.entity.SettingsWrapper.Video;
 import org.mycore.vidconv.entity.probe.ProbeWrapper;
 import org.mycore.vidconv.util.Executable;
@@ -62,6 +68,12 @@ import org.mycore.vidconv.util.Executable;
  *
  */
 public class FFMpegImpl {
+    private static final CacheManager CACHE_MGR = CacheManagerBuilder.newCacheManagerBuilder()
+            .withCache("probe",
+                    CacheConfigurationBuilder.newCacheConfigurationBuilder(Path.class, ProbeWrapper.class,
+                            ResourcePoolsBuilder.heap(100))
+                            .build())
+            .build(true);
 
     private static final Pattern PATTERN_ENTRY_SPLIT = Pattern.compile("\\n\\n");
 
@@ -461,8 +473,8 @@ public class FFMpegImpl {
         if (probe != null && probe.getStreams() != null) {
             return probe.getStreams().stream().filter(s -> s.getCodecType().equalsIgnoreCase("video")).map(s -> {
                 try {
-                    return sc[0] != -1 && sc[0] < s.getWidth()
-                            && sc[1] != -1 && sc[1] < s.getHeight();
+                    return (sc[0] < 0 || sc[0] < s.getWidth())
+                            && (sc[1] < 0 || sc[1] < s.getHeight());
                 } catch (Exception ex) {
                     return true;
                 }
@@ -475,18 +487,18 @@ public class FFMpegImpl {
     /**
      * Build the command line for given {@link SettingsWrapper}.
      *  
-     * @param settings the settings
+     * @param output the settings
      * @return the command
      * @throws IOException
      * @throws InterruptedException
      */
-    public static String command(final SettingsWrapper settings, final boolean isUpscaling)
+    public static String command(final Output output)
             throws InterruptedException {
         final StringBuffer cmd = new StringBuffer();
 
         cmd.append("ffmpeg -i {0} -stats -threads 1 -y");
 
-        Video video = settings.getVideo();
+        Video video = output.getVideo();
 
         cmd.append(" -codec:v " + video.getCodec());
 
@@ -501,8 +513,7 @@ public class FFMpegImpl {
         Optional.ofNullable(video.getPixelFormat())
                 .ifPresent(v -> cmd.append(" -pix_fmt " + (!v.isEmpty() ? v : "yuv420p")));
 
-        if (Optional.ofNullable(settings.getVideo().getUpscale()).orElse(false) && isUpscaling)
-            Optional.ofNullable(video.getScale()).ifPresent(v -> cmd.append(" -vf 'scale=" + v + "'"));
+        Optional.ofNullable(video.getScale()).ifPresent(v -> cmd.append(" -vf 'scale=" + v + "'"));
 
         Optional.ofNullable(video.getFramerate()).ifPresent(v -> {
             cmd.append(" -r " + v);
@@ -524,7 +535,7 @@ public class FFMpegImpl {
             }
         });
 
-        Audio audio = settings.getAudio();
+        Audio audio = output.getAudio();
 
         cmd.append(" -codec:a " + audio.getCodec());
         cmd.append(" -ac 2");
@@ -538,17 +549,20 @@ public class FFMpegImpl {
     }
 
     /**
-     * Builds filename for set format.
+     * Builds filename for given format.
      * 
-     * @param settings the settings
+     * @param format the output format
      * @param fileName the input file name
+     * @param appendix the filename appendix
      * @return
      * @throws ExecutionException 
      */
-    public static String filename(final SettingsWrapper settings, final String fileName) throws ExecutionException {
+    public static String filename(final String format, final String fileName, final String appendix)
+            throws ExecutionException {
         try {
-            final String extension = muxer(settings.getFormat()).getExtension();
-            return fileName.substring(0, fileName.lastIndexOf('.')) + "." + extension;
+            final String extension = muxer(format).getExtension();
+            return fileName.substring(0, fileName.lastIndexOf('.'))
+                    + Optional.ofNullable(appendix).orElse("") + "." + extension;
         } catch (InterruptedException e) {
             return null;
         }
@@ -566,6 +580,13 @@ public class FFMpegImpl {
      */
     public static ProbeWrapper probe(final Path inputFile)
             throws InterruptedException, JAXBException, ExecutionException {
+        final Cache<Path, ProbeWrapper> cache = CACHE_MGR.getCache("probe", Path.class,
+                ProbeWrapper.class);
+
+        if (cache.containsKey(inputFile)) {
+            return cache.get(inputFile);
+        }
+
         final Executable exec = new Executable("ffprobe", "-v", "quiet", "-print_format", "xml", "-show_format",
                 "-show_streams",
                 inputFile.toFile().getAbsolutePath());
@@ -577,8 +598,12 @@ public class FFMpegImpl {
                 final JAXBContext jc = JAXBContext.newInstance(ProbeWrapper.class);
                 final Unmarshaller unmarshaller = jc.createUnmarshaller();
 
-                return unmarshaller.unmarshal(new StreamSource(new StringReader(outputStream)), ProbeWrapper.class)
+                final ProbeWrapper pw = unmarshaller
+                        .unmarshal(new StreamSource(new StringReader(outputStream)), ProbeWrapper.class)
                         .getValue();
+
+                cache.put(inputFile, pw);
+                return pw;
             }
         }
 

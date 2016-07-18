@@ -403,20 +403,26 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 	};
 
 	$scope.defaultScales = [ {
+		"name" : "2160p",
+		"value" : "-2:2160"
+	}, {
+		"name" : "1440p",
+		"value" : "-2:1440"
+	}, {
 		"name" : "1080p",
-		"value" : "-1:1080"
+		"value" : "-2:1080"
 	}, {
 		"name" : "720p",
-		"value" : "-1:720"
+		"value" : "-2:720"
 	}, {
 		"name" : "540p",
-		"value" : "-1:540"
+		"value" : "-2:540"
 	}, {
 		"name" : "480p",
-		"value" : "-1:480"
+		"value" : "-2:480"
 	}, {
 		"name" : "360p",
-		"value" : "-1:300"
+		"value" : "-2:360"
 	} ];
 
 	$scope.defaultFrameRates = [ "5", "10", "12", "15", "23.976", "24", "25", "29.97", "30", "50", "59.94", "60" ];
@@ -445,25 +451,26 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 
 	// default settings
 	$scope.settings = {
-		"format" : "mp4",
-		"video" : {
-			"codec" : "libx264",
-			"framerateType" : "VFR",
-			"profile" : "main",
-			"level" : "4.0",
-			"pixelFormat" : "yuv420p",
-			"profile" : "default",
-			"quality" : {
-				"type" : "CRF",
-				"rateFactor" : 23,
-				"bitrate" : 2500
+		"output" : [ {
+			"format" : "mp4",
+			"video" : {
+				"codec" : "libx264",
+				"framerateType" : "VFR",
+				"profile" : "main",
+				"level" : "4.0",
+				"pixelFormat" : "yuv420p",
+				"quality" : {
+					"type" : "CRF",
+					"rateFactor" : 23,
+					"bitrate" : 2500
+				}
+			},
+			"audio" : {
+				"codec" : "libfdk_aac",
+				"samplerate" : 44100,
+				"bitrate" : 128
 			}
-		},
-		"audio" : {
-			"codec" : "libfdk_aac",
-			"samplerate" : 44100,
-			"bitrate" : 128
-		}
+		} ]
 	};
 
 	$scope.formats = {};
@@ -485,7 +492,8 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 	$scope.load = function() {
 		$http.get("/settings").then(function(response) {
 			if (response.status = 200) {
-				$scope.settings = response.data;
+				if (response.data.output.length > 0)
+					$scope.settings = response.data;
 			}
 		}, function(error) {
 			$log.error("failure loading settings", error);
@@ -569,16 +577,24 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 		return Object.keys(obj).length;
 	}
 
-	$scope.changeCodec = function(type) {
-		if ($scope.settings[type] === undefined)
+	$scope.changeCodec = function(index, type) {
+		if ($scope.settings.output[index] === undefined || $scope.settings.output[index][type] === undefined)
 			return;
 
-		var codec = $scope.settings[type].codec;
+		var codec = $scope.settings.output[index][type].codec;
 
-		$scope.selectedCodec[type] = $scope.filterEncoder(codec);
-		$scope.settings[type] = {
+		$scope.selectedCodec[index][type] = $scope.filterEncoder(codec);
+		$scope.settings.output[index][type] = {
 			"codec" : codec
 		};
+	}
+
+	$scope.addOutput = function() {
+		$scope.settings.output.push({});
+	}
+
+	$scope.removeOutput = function(index) {
+		$scope.settings.output.splice(index, 1);
 	}
 
 	$scope.showStatusMessage = function(type, msg) {

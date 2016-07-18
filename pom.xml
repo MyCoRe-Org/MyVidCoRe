@@ -12,19 +12,19 @@
     <url>http://www.mycore.de</url>
   </organization>
   <inceptionYear>2016</inceptionYear>
-  
+
   <scm>
     <url>scm:git:https://github.com/MyCoRe-Org/MyVidCoRe.git</url>
     <tag>master</tag>
     <connection>scm:git:https://github.com/MyCoRe-Org/MyVidCoRe.git</connection>
     <developerConnection>scm:git:https://github.com/MyCoRe-Org/MyVidCoRe.git</developerConnection>
   </scm>
-  
+
   <issueManagement>
     <url>https://github.com/MyCoRe-Org/MyVidCoRe/issues</url>
     <system>GitHub Issues</system>
   </issueManagement>
-  
+
   <ciManagement>
     <system>Travis-CI</system>
     <url>https://travis-ci.org/MyCoRe-Org/MyVidCoRe</url>
@@ -37,7 +37,7 @@
       <url>http://www.gnu.org/licenses/gpl-3.0.txt</url>
     </license>
   </licenses>
-  
+
   <properties>
     <jersey.version>2.23.1</jersey.version>
     <grunt.projectBase>${project.build.directory}/grunt</grunt.projectBase>
@@ -45,7 +45,7 @@
     <encoding>UTF-8</encoding>
     <java.version>1.8</java.version>
   </properties>
-  
+
   <build>
     <plugins>
       <plugin>
@@ -223,6 +223,11 @@
       <artifactId>log4j-core</artifactId>
       <version>2.6.1</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j-impl</artifactId>
+      <version>2.6.2</version>
+    </dependency>
 
     <dependency>
       <groupId>org.glassfish.jersey.core</groupId>
@@ -244,6 +249,12 @@
       <groupId>com.beust</groupId>
       <artifactId>jcommander</artifactId>
       <version>1.48</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.ehcache</groupId>
+      <artifactId>ehcache</artifactId>
+      <version>3.1.0</version>
     </dependency>
   </dependencies>
 

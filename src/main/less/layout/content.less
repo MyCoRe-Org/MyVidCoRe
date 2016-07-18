@@ -42,21 +42,45 @@ body {
 }
 
 #settings {
-  .nav-tabs > li.active {
-    > a , > a:hover , > a:focus {
-      background-color: @panel-default-heading-bg;
+  .nav-tabs > li.remove-btn {
+    > a {
+      padding-right: 30px;
+    }
+
+    > .glyphicon-remove {
+      cursor: not-allowed;
+      padding: 10px;
+      position: absolute;
+      right: 0;
+      top: 4px;
     }
   }
 
-  .tab-content > .tab-pane {
-    background-color: @panel-default-heading-bg;
+  fieldset > .tab-content {
     border-color: @panel-default-border;
     border-image: none;
     border-style: none solid solid;
     border-width: 0 1px 1px;
-    padding: 15px;
-    margin-bottom: 10px;
-    .border-bottom-radius (2px);
+    padding: 5px 10px 0;
+    margin-bottom: 15px;
+    .tab-pane {
+      .nav-tabs > li.active {
+        > a , > a:hover , > a:focus {
+          background-color: @panel-default-heading-bg;
+        }
+      }
+
+      .tab-content > .tab-pane {
+        background-color: @panel-default-heading-bg;
+        border-color: @panel-default-border;
+        border-image: none;
+        border-style: none solid solid;
+        border-width: 0 1px 1px;
+        padding: 15px;
+        margin-bottom: 10px;
+        .border-bottom-radius (2px);
+      }
+    }
   }
 
   .quality-label {

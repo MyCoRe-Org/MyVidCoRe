@@ -31,6 +31,7 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -50,6 +51,7 @@ import org.mycore.vidconv.encoder.FFMpegImpl;
 import org.mycore.vidconv.entity.ConverterWrapper;
 import org.mycore.vidconv.entity.ConvertersWrapper;
 import org.mycore.vidconv.entity.SettingsWrapper;
+import org.mycore.vidconv.entity.SettingsWrapper.Output;
 import org.mycore.vidconv.event.Event;
 import org.mycore.vidconv.event.EventManager;
 import org.mycore.vidconv.event.Listener;
@@ -151,26 +153,51 @@ public class ConverterService extends Widget implements Listener {
         }
     }
 
-    private void addConverter(final Path inputPath)
-            throws IOException, InterruptedException, ExecutionException, JAXBException {
+    private void addConverter(final Path inputPath) throws InterruptedException, JAXBException, ExecutionException {
         final SettingsWrapper settings = CONFIG.getSettings();
 
-        if (settings != null) {
+        if (settings != null && !settings.getOutput().isEmpty()) {
             if (!Files.isDirectory(inputPath)) {
                 if (FFMpegImpl.isEncodingSupported(inputPath)) {
-                    final String id = Long.toHexString(new Random().nextLong());
+                    final String parentId = Long.toHexString(new Random().nextLong());
                     final String fileName = inputPath.getFileName().toString();
-                    final Path outputPath = Paths.get(outputDir, id, FFMpegImpl.filename(settings, fileName));
 
-                    if (!Files.exists(outputPath.getParent()))
-                        Files.createDirectories(outputPath.getParent());
+                    List<Output> outputs = settings.getOutput().stream()
+                            .sorted((o2, o1) -> o1.getFormat().equals(o2.getFormat())
+                                    ? o1.getVideo().getScale().compareTo(o2.getVideo().getScale())
+                                    : o1.getFormat().compareTo(o2.getFormat()))
+                            .filter(output -> {
+                                try {
+                                    return output.getVideo().getUpscale()
+                                            || !FFMpegImpl.isUpscaling(inputPath, output.getVideo().getScale());
+                                } catch (Exception e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }).collect(Collectors.toList());
 
-                    boolean isUpscaling = FFMpegImpl.isUpscaling(inputPath, settings.getVideo().getScale());
+                    outputs.forEach(output -> {
+                        try {
+                            final String id = outputs.size() == 1 ? parentId
+                                    : Long.toHexString(new Random().nextLong());
 
-                    final String command = FFMpegImpl.command(settings, isUpscaling);
-                    final ConverterJob converter = new ConverterJob(id, command, inputPath, outputPath);
-                    converts.put(id, converter);
-                    converterThreadPool.submit(converter);
+                            final String appendix = Optional.ofNullable(output.getFilenameAppendix()).orElse(id);
+                            final Path outputPath = Paths.get(outputDir, parentId,
+                                    FFMpegImpl.filename(output.getFormat(), fileName,
+                                            appendix));
+
+                            if (!Files.exists(outputPath.getParent()))
+                                Files.createDirectories(outputPath.getParent());
+
+                            final String command = FFMpegImpl.command(output);
+                            final ConverterJob converter = new ConverterJob(parentId, id, command, inputPath,
+                                    outputPath);
+
+                            converts.put(id, converter);
+                            converterThreadPool.submit(converter);
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
                 } else {
                     LOGGER.warn("encoding of file \"" + inputPath.toFile().getAbsolutePath() + "\" isn't supported.");
                 }
@@ -179,6 +206,8 @@ public class ConverterService extends Widget implements Listener {
     }
 
     public static class ConverterJob implements Runnable {
+
+        private final String parentId;
 
         private final String id;
 
@@ -202,7 +231,9 @@ public class ConverterService extends Widget implements Listener {
 
         private StreamConsumer errorConsumer;
 
-        public ConverterJob(final String id, final String command, final Path inputPath, final Path outputPath) {
+        public ConverterJob(final String parentId, final String id, final String command, final Path inputPath,
+                final Path outputPath) {
+            this.parentId = parentId;
             this.id = id;
             this.command = command;
             this.inputPath = inputPath;
@@ -245,6 +276,10 @@ public class ConverterService extends Widget implements Listener {
             } catch (InterruptedException | JAXBException | ExecutionException | IOException e) {
                 LOGGER.error(e.getMessage(), e);
             }
+        }
+
+        public String parentId() {
+            return parentId;
         }
 
         public String id() {
@@ -295,7 +330,8 @@ public class ConverterService extends Widget implements Listener {
             marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
-            marshaller.marshal(new ConverterWrapper(id, this), outputPath.getParent().resolve(".convert").toFile());
+            marshaller.marshal(new ConverterWrapper(id, this),
+                    outputPath.getParent().resolve(".convert").toFile());
         }
     }
 }

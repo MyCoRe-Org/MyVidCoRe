@@ -13,7 +13,9 @@
     
     "settings.advancedOptions": "Advanced Options",
     "settings.auto" : "Auto",
+    "settings.filenameAppendix" : "Filename appendix",
     "settings.preset" : "Preset",
+    "settings.output" : "Output",
     "settings.scale" : "Scale",
     "settings.tune" : "Tune",
     "settings.upscaleAllowed" : "allow upscale",

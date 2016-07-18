@@ -22,6 +22,10 @@
  */
 package org.mycore.vidconv.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -32,58 +36,96 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "settings")
 public class SettingsWrapper {
 
-    private String format;
-
-    private Video video;
-
-    private Audio audio;
+    private List<Output> output = new ArrayList<>();
 
     public SettingsWrapper() {
     }
 
     /**
-     * @return the format
+     * @return the output
      */
-    @XmlElement
-    public String getFormat() {
-        return format;
+    public List<Output> getOutput() {
+        return output;
     }
 
     /**
-     * @return the video
+     * @param output the output to set
      */
-    @XmlElement
-    public Video getVideo() {
-        return video;
+    public void setOutput(List<Output> output) {
+        this.output = output;
     }
 
-    /**
-     * @return the audio
-     */
-    @XmlElement
-    public Audio getAudio() {
-        return audio;
-    }
+    public static class Output {
 
-    /**
-     * @param format the format to set
-     */
-    public void setFormat(String format) {
-        this.format = format;
-    }
+        private String filenameAppendix;
 
-    /**
-     * @param video the video to set
-     */
-    public void setVideo(Video video) {
-        this.video = video;
-    }
+        private String format;
 
-    /**
-     * @param audio the audio to set
-     */
-    public void setAudio(Audio audio) {
-        this.audio = audio;
+        private Video video;
+
+        private Audio audio;
+
+        public Output() {
+        }
+
+        /**
+         * @return the filenameAppendix
+         */
+        public String getFilenameAppendix() {
+            return filenameAppendix;
+        }
+
+        /**
+         * @param filenameAppendix the filenameAppend to set
+         */
+        public void setFilenameAppendix(String filenameAppendix) {
+            this.filenameAppendix = filenameAppendix;
+        }
+
+        /**
+         * @return the format
+         */
+        @XmlElement
+        public String getFormat() {
+            return format;
+        }
+
+        /**
+         * @return the video
+         */
+        @XmlElement
+        public Video getVideo() {
+            return video;
+        }
+
+        /**
+         * @return the audio
+         */
+        @XmlElement
+        public Audio getAudio() {
+            return audio;
+        }
+
+        /**
+         * @param format the format to set
+         */
+        public void setFormat(String format) {
+            this.format = format;
+        }
+
+        /**
+         * @param video the video to set
+         */
+        public void setVideo(Video video) {
+            this.video = video;
+        }
+
+        /**
+         * @param audio the audio to set
+         */
+        public void setAudio(Audio audio) {
+            this.audio = audio;
+        }
     }
 
     @XmlRootElement(name = "video")
@@ -147,7 +189,7 @@ public class SettingsWrapper {
          * @return the upscale
          */
         public Boolean getUpscale() {
-            return upscale;
+            return Optional.ofNullable(upscale).orElse(false);
         }
 
         /**

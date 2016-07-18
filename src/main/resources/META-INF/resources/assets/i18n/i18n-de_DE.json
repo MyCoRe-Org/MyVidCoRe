@@ -13,7 +13,9 @@
     
     "settings.advancedOptions": "Erweiterte Optionen",
     "settings.auto" : "automatisch",
+    "settings.filenameAppendix" : "Dateinamen Anhang",
     "settings.preset" : "Vorlage",
+    "settings.output" : "Ausgabe",
     "settings.scale" : "Skalierung",
     "settings.tune" : "Abstimmung",
     "settings.upscaleAllowed" : "erlaube Hochskalieren",
