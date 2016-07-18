@@ -92,6 +92,8 @@ public class SettingsWrapper {
 
         private String scale;
 
+        private Boolean upscale;
+
         private String framerate;
 
         private String framerateType;
@@ -139,6 +141,20 @@ public class SettingsWrapper {
          */
         public void setScale(String scale) {
             this.scale = scale;
+        }
+
+        /**
+         * @return the upscale
+         */
+        public Boolean getUpscale() {
+            return upscale;
+        }
+
+        /**
+         * @param upscale the upscale to set
+         */
+        public void setUpscale(Boolean upscale) {
+            this.upscale = upscale;
         }
 
         /**

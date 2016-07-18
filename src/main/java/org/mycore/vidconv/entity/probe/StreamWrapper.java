@@ -52,7 +52,7 @@ public class StreamWrapper {
     private String level;
 
     @XmlAttribute(name = "height")
-    private String height;
+    private Integer height;
 
     @XmlAttribute(name = "start_pts")
     private String startPts;
@@ -82,7 +82,7 @@ public class StreamWrapper {
     private String codecLongName;
 
     @XmlAttribute(name = "width")
-    private String width;
+    private Integer width;
 
     @XmlAttribute(name = "time_base")
     private String timeBase;
@@ -216,14 +216,14 @@ public class StreamWrapper {
     /**
      * @return the height
      */
-    public String getHeight() {
+    public Integer getHeight() {
         return height;
     }
 
     /**
      * @param height the height to set
      */
-    public void setHeight(String height) {
+    public void setHeight(Integer height) {
         this.height = height;
     }
 
@@ -356,14 +356,14 @@ public class StreamWrapper {
     /**
      * @return the width
      */
-    public String getWidth() {
+    public Integer getWidth() {
         return width;
     }
 
     /**
      * @param width the width to set
      */
-    public void setWidth(String width) {
+    public void setWidth(Integer width) {
         this.width = width;
     }
 

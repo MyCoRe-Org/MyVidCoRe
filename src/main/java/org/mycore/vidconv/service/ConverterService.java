@@ -31,6 +31,7 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -165,7 +166,10 @@ public class ConverterService extends Widget implements Listener {
                     if (!Files.exists(outputPath.getParent()))
                         Files.createDirectories(outputPath.getParent());
 
-                    final String command = FFMpegImpl.command(settings);
+                    boolean upscale = Optional.ofNullable(settings.getVideo().getUpscale()).orElse(false)
+                            && FFMpegImpl.isUpscaling(inputPath, settings.getVideo().getScale());
+
+                    final String command = FFMpegImpl.command(settings, upscale);
                     final ConverterJob converter = new ConverterJob(id, command, inputPath, outputPath);
                     converts.put(id, converter);
                     converterThreadPool.submit(converter);

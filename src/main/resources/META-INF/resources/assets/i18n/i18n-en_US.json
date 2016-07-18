@@ -16,6 +16,7 @@
     "settings.preset" : "Preset",
     "settings.scale" : "Scale",
     "settings.tune" : "Tune",
+    "settings.upscaleAllowed" : "allow upscale",
     "settings.converter.title" : "Converter Settings",
     "settings.saved.success" : "Settings successfull saved!",
     "settings.saved.error" : "Error on saving settings!",

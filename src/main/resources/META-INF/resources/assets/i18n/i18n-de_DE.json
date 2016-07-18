@@ -16,6 +16,7 @@
     "settings.preset" : "Vorlage",
     "settings.scale" : "Skalierung",
     "settings.tune" : "Abstimmung",
+    "settings.upscaleAllowed" : "erlaube Hochskalieren",
     "settings.converter.title" : "Konverter Einstellungen",
     "settings.saved.success" : "Einstellungen wurden erfolgreich gespeichert!",
     "settings.saved.error" : "Fehler beim speichern der Einstellungen!",

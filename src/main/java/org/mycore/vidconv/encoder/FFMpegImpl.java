@@ -444,6 +444,35 @@ public class FFMpegImpl {
     }
 
     /**
+     * Checks if given scale factor against media files width and height if upscaling.
+     * 
+     * @param inputFile the input file
+     * @param scale the scale factor, in format <code>-1:720</code>
+     * @return <code>true</code> if media file less than scale factor or <code>false</code> if not
+     * @throws InterruptedException
+     * @throws JAXBException
+     * @throws ExecutionException
+     */
+    public static boolean isUpscaling(final Path inputFile, final String scale)
+            throws InterruptedException, JAXBException, ExecutionException {
+        final ProbeWrapper probe = probe(inputFile);
+        final Integer[] sc = Arrays.stream(scale.split(":")).map(Integer::new).toArray(Integer[]::new);
+
+        if (probe != null && probe.getStreams() != null) {
+            return probe.getStreams().stream().filter(s -> s.getCodecType().equalsIgnoreCase("video")).map(s -> {
+                try {
+                    return sc[0] != -1 && sc[0] < s.getWidth()
+                            && sc[1] != -1 && sc[1] < s.getHeight();
+                } catch (Exception ex) {
+                    return true;
+                }
+            }).filter(rt -> rt).count() == 0;
+        }
+
+        return true;
+    }
+
+    /**
      * Build the command line for given {@link SettingsWrapper}.
      *  
      * @param settings the settings
@@ -451,7 +480,8 @@ public class FFMpegImpl {
      * @throws IOException
      * @throws InterruptedException
      */
-    public static String command(final SettingsWrapper settings) throws InterruptedException {
+    public static String command(final SettingsWrapper settings, final boolean allowScale)
+            throws InterruptedException {
         final StringBuffer cmd = new StringBuffer();
 
         cmd.append("ffmpeg -i {0} -stats -threads 1 -y");
@@ -470,7 +500,9 @@ public class FFMpegImpl {
         Optional.ofNullable(video.getLevel()).ifPresent(v -> cmd.append(" -level " + v));
         Optional.ofNullable(video.getPixelFormat())
                 .ifPresent(v -> cmd.append(" -pix_fmt " + (!v.isEmpty() ? v : "yuv420p")));
-        Optional.ofNullable(video.getScale()).ifPresent(v -> cmd.append(" -vf 'scale=" + v + "'"));
+
+        if (allowScale)
+            Optional.ofNullable(video.getScale()).ifPresent(v -> cmd.append(" -vf 'scale=" + v + "'"));
 
         Optional.ofNullable(video.getFramerate()).ifPresent(v -> {
             cmd.append(" -r " + v);

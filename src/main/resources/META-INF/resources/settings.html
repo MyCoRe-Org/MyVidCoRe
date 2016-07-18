@@ -110,6 +110,10 @@
                 >
                   <option value="">{{'settings.auto' | translate}}</option>
                 </select>
+                <div class="checkbox">
+                  <label> <input type="checkbox" value="" ng-model="settings.video.upscale" ng-init="false"> {{'settings.upscaleAllowed' | translate}}
+                  </label>
+                </div>
               </div>
               <div class="row">
                 <div class="col-sm-4">
