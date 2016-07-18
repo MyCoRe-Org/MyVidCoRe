@@ -480,7 +480,7 @@ public class FFMpegImpl {
      * @throws IOException
      * @throws InterruptedException
      */
-    public static String command(final SettingsWrapper settings, final boolean allowScale)
+    public static String command(final SettingsWrapper settings, final boolean isUpscaling)
             throws InterruptedException {
         final StringBuffer cmd = new StringBuffer();
 
@@ -501,7 +501,7 @@ public class FFMpegImpl {
         Optional.ofNullable(video.getPixelFormat())
                 .ifPresent(v -> cmd.append(" -pix_fmt " + (!v.isEmpty() ? v : "yuv420p")));
 
-        if (allowScale)
+        if (Optional.ofNullable(settings.getVideo().getUpscale()).orElse(false) && isUpscaling)
             Optional.ofNullable(video.getScale()).ifPresent(v -> cmd.append(" -vf 'scale=" + v + "'"));
 
         Optional.ofNullable(video.getFramerate()).ifPresent(v -> {
