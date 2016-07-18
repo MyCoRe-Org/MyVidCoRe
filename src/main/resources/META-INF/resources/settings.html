@@ -70,7 +70,9 @@
           <div class="tab-content" ng-hide="!settings.format">
             <div role="tabpanel" class="tab-pane fade in active" id="video">
               <div class="form-group">
-                <select id="vcodec" class="form-control" ng-model="settings.video.codec" ng-change="changeCodec('video')">
+                <label for="acodec">{{'settings.codec' | translate}}</label> <select id="vcodec" class="form-control" ng-model="settings.video.codec"
+                  ng-change="changeCodec('video')"
+                >
                   <optgroup ng-if="codec.encoders && getLength(codec.encoders) > 1" ng-repeat="codec in filterCodecs(settings.format, 'video')"
                     label="{{codec.description}}"
                   >
