@@ -28,8 +28,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
@@ -37,6 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBContext;
@@ -73,7 +76,7 @@ public class ConverterService extends Widget implements Listener {
 
     private static final Settings CONFIG = Settings.instance();
 
-    private final Map<String, ConverterJob> converts = new ConcurrentHashMap<>();
+    private final Map<String, ConverterJob> converters = new ConcurrentHashMap<>();
 
     private final ExecutorService converterThreadPool;
 
@@ -106,19 +109,57 @@ public class ConverterService extends Widget implements Listener {
      */
     @Override
     public ConvertersWrapper status() {
-        return new ConvertersWrapper(this.converts);
+        return new ConvertersWrapper(this.converters);
     }
 
     /* (non-Javadoc)
      * @see org.mycore.vidconv.widget.Widget#status(java.util.List)
      */
     @Override
-    public ConverterWrapper status(List<String> params) {
-        final String converterId = params.get(0);
-        final ConverterJob converter = converts.get(converterId);
+    public Object status(List<String> params) {
+        if (params.size() == 1) {
+            final String converterId = params.get(0);
+            final ConverterJob converter = converters.get(converterId);
 
-        if (converter != null) {
-            return new ConverterWrapper(converterId, converter);
+            if (converter != null) {
+                return new ConverterWrapper(converterId, converter);
+            }
+        } else {
+            final Integer page = new Integer(params.get(0));
+            final Integer limit = new Integer(params.get(1));
+
+            int start = (page - 1) * limit;
+
+            final List<ConverterWrapper> filteredList = converters.entrySet().stream()
+                    .map(e -> new ConverterWrapper(e.getKey(), e.getValue())).filter(cw -> {
+                        boolean ret = true;
+                        final String filter = params.size() == 3 ? params.get(2).toLowerCase(Locale.ROOT) : null;
+                        if (filter != null) {
+                            ret = Pattern.compile(",").splitAsStream(filter).map(f -> {
+                                boolean fb = true;
+                                if (f.endsWith("isdone"))
+                                    fb = cw.isDone();
+                                if (f.endsWith("isrunning"))
+                                    fb = cw.isRunning();
+
+                                if (f.startsWith("!"))
+                                    fb = !fb;
+                                return fb;
+                            }).filter(b -> !b).count() != 0;
+                        }
+
+                        return ret;
+                    }).collect(Collectors.toCollection(ArrayList<ConverterWrapper>::new));
+
+            final ConvertersWrapper wrapper = new ConvertersWrapper(
+                    filteredList.stream().sorted().skip(start).limit(limit)
+                            .collect(Collectors.toCollection(ArrayList<ConverterWrapper>::new)));
+
+            wrapper.setTotal((int) filteredList.size());
+            wrapper.setStart(start);
+            wrapper.setLimit(limit);
+
+            return wrapper;
         }
 
         return null;
@@ -131,7 +172,7 @@ public class ConverterService extends Widget implements Listener {
     public Path download(List<String> params) throws Exception {
         if (!params.isEmpty()) {
             final String converterId = params.get(0);
-            final ConverterJob converter = converts.get(converterId);
+            final ConverterJob converter = converters.get(converterId);
 
             if (converter != null) {
                 return converter.outputPath;
@@ -192,7 +233,7 @@ public class ConverterService extends Widget implements Listener {
                             final ConverterJob converter = new ConverterJob(parentId, id, command, inputPath,
                                     outputPath);
 
-                            converts.put(id, converter);
+                            converters.put(id, converter);
                             converterThreadPool.submit(converter);
                         } catch (Exception e) {
                             throw new RuntimeException(e);
@@ -221,6 +262,8 @@ public class ConverterService extends Widget implements Listener {
 
         private boolean done;
 
+        private Instant addTime;
+
         private Instant startTime;
 
         private Instant endTime;
@@ -238,6 +281,7 @@ public class ConverterService extends Widget implements Listener {
             this.command = command;
             this.inputPath = inputPath;
             this.outputPath = outputPath;
+            this.addTime = Instant.now();
             this.done = false;
             this.running = false;
         }
@@ -301,6 +345,10 @@ public class ConverterService extends Widget implements Listener {
 
         public boolean isDone() {
             return done;
+        }
+
+        public Instant addTime() {
+            return addTime;
         }
 
         public Instant startTime() {

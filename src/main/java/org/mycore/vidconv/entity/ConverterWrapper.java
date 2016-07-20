@@ -39,7 +39,7 @@ import org.mycore.vidconv.service.ConverterService.ConverterJob;
  *
  */
 @XmlRootElement
-public class ConverterWrapper {
+public class ConverterWrapper implements Comparable<ConverterWrapper> {
 
     private String parentId;
 
@@ -52,6 +52,8 @@ public class ConverterWrapper {
     private boolean running;
 
     private boolean done;
+
+    private Instant addTime;
 
     private Instant startTime;
 
@@ -77,6 +79,7 @@ public class ConverterWrapper {
         this.fileName = converter.fileName();
         this.running = converter.isRunning();
         this.done = converter.isDone();
+        this.addTime = converter.addTime();
         this.startTime = converter.startTime();
         this.endTime = converter.endTime();
         this.exitValue = converter.exitValue();
@@ -85,62 +88,57 @@ public class ConverterWrapper {
     }
 
     @XmlAttribute(name = "parentId")
-    String getParentId() {
+    public String getParentId() {
         return parentId;
     }
 
     @XmlAttribute(name = "id")
-    String getId() {
+    public String getId() {
         return id;
     }
 
     @XmlElement(name = "command")
-    String getCommand() {
+    public String getCommand() {
         return command;
     }
 
     @XmlAttribute(name = "file")
-    String getFileName() {
+    public String getFileName() {
         return fileName;
     }
 
     @XmlAttribute(name = "running")
-    boolean isRunning() {
+    public boolean isRunning() {
         return running;
     }
 
     @XmlAttribute(name = "done")
-    boolean isDone() {
+    public boolean isDone() {
         return done;
     }
 
+    @XmlAttribute(name = "addTime")
+    public String getAddTime() {
+        return addTime != null ? addTime.toString() : null;
+    }
+
     @XmlAttribute(name = "startTime")
-    String getStartTime() {
+    public String getStartTime() {
         return startTime != null ? startTime.toString() : null;
     }
 
     @XmlAttribute(name = "endTime")
-    String getEndTime() {
+    public String getEndTime() {
         return endTime != null ? endTime.toString() : null;
     }
 
-    /**
-     * @return the exitValue
-     */
     @XmlAttribute(name = "exitValue")
     public Integer getExitValue() {
         return exitValue;
     }
 
-    /**
-     * @param exitValue the exitValue to set
-     */
-    public void setExitValue(Integer exitValue) {
-        this.exitValue = exitValue;
-    }
-
     @XmlElement(name = "progress")
-    Progress getProgress() {
+    public Progress getProgress() {
         if (progress == null) {
             progress = Progress.buildProgress(this);
         }
@@ -148,12 +146,12 @@ public class ConverterWrapper {
     }
 
     @XmlElement(name = "outputStream")
-    String getOutputStream() {
+    public String getOutputStream() {
         return outputStream;
     }
 
     @XmlElement(name = "errorStream")
-    String getErrorStream() {
+    public String getErrorStream() {
         return errorStream;
     }
 
@@ -165,6 +163,7 @@ public class ConverterWrapper {
         copy.fileName = this.fileName;
         copy.running = this.running;
         copy.done = this.done;
+        copy.addTime = this.addTime;
         copy.startTime = this.startTime;
         copy.endTime = this.endTime;
         copy.exitValue = this.exitValue;
@@ -173,8 +172,27 @@ public class ConverterWrapper {
         return copy;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
+    @Override
+    public int compareTo(ConverterWrapper cw) {
+        if (cw.isDone() && (!this.isDone() || this.isRunning()))
+            return -1;
+        if (this.isDone() && (!cw.isDone() || cw.isRunning()))
+            return 1;
+        if (this.isDone() && cw.isDone())
+            return cw.endTime.compareTo(this.endTime);
+
+        int ret = 0;
+        if (cw.getProgress() != null && this.getProgress() != null)
+            ret = cw.getProgress().compareTo(getProgress());
+
+        return ret != 0 ? ret : this.addTime.compareTo(cw.addTime);
+    }
+
     @XmlRootElement
-    private static class Progress {
+    static class Progress implements Comparable<Progress> {
         private static final DateTimeFormatter DURATION_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss");
 
         @XmlAttribute(name = "percent")
@@ -220,6 +238,14 @@ public class ConverterWrapper {
         static String formatDuration(final long dur) {
             LocalTime fTime = LocalTime.ofNanoOfDay(dur);
             return fTime.format(DURATION_FORMAT);
+        }
+
+        /* (non-Javadoc)
+         * @see java.lang.Comparable#compareTo(java.lang.Object)
+         */
+        @Override
+        public int compareTo(Progress p) {
+            return this.percent == null ? -1 : p.percent == null ? 1 : this.percent.compareTo(p.percent);
         }
     }
 }

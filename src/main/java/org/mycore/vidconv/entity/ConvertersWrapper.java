@@ -25,8 +25,10 @@ package org.mycore.vidconv.entity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -38,7 +40,13 @@ import org.mycore.vidconv.service.ConverterService.ConverterJob;
  */
 @XmlRootElement(name = "converters")
 public class ConvertersWrapper {
-    
+
+    private Integer total;
+
+    private Integer start;
+
+    private Integer limit;
+
     private List<ConverterWrapper> converters;
 
     ConvertersWrapper() {
@@ -49,14 +57,64 @@ public class ConvertersWrapper {
         this();
 
         this.converters = converters.entrySet().stream()
-                .map(e -> new ConverterWrapper(e.getKey(), e.getValue()))
+                .map(e -> new ConverterWrapper(e.getKey(), e.getValue())).sorted()
                 .collect(Collectors.toCollection(ArrayList<ConverterWrapper>::new));
     }
 
+    public ConvertersWrapper(final List<ConverterWrapper> converters) {
+        this();
+
+        this.converters = converters;
+    }
+
     @XmlElement(name = "converter")
-    List<ConverterWrapper> getConverters() {
+    public List<ConverterWrapper> getConverters() {
         return converters.stream().map(c -> c.getBasicCopy())
                 .collect(Collectors.toCollection(ArrayList<ConverterWrapper>::new));
     }
 
+    /**
+     * @return the total
+     */
+    @XmlAttribute(name = "total")
+    public Integer getTotal() {
+        return Optional.ofNullable(total).orElse(converters.size());
+    }
+
+    /**
+     * @param total the total to set
+     */
+    public void setTotal(Integer total) {
+        this.total = total;
+    }
+
+    /**
+     * @return the start
+     */
+    @XmlAttribute(name = "start")
+    public Integer getStart() {
+        return start;
+    }
+
+    /**
+     * @param start the start to set
+     */
+    public void setStart(Integer start) {
+        this.start = start;
+    }
+
+    /**
+     * @return the limit
+     */
+    @XmlAttribute(name = "limit")
+    public Integer getLimit() {
+        return limit;
+    }
+
+    /**
+     * @param limit the limit to set
+     */
+    public void setLimit(Integer limit) {
+        this.limit = limit;
+    }
 }
