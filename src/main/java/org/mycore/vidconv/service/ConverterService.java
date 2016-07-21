@@ -30,6 +30,7 @@ import java.text.MessageFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -53,6 +54,7 @@ import org.mycore.vidconv.config.Settings;
 import org.mycore.vidconv.encoder.FFMpegImpl;
 import org.mycore.vidconv.entity.ConverterWrapper;
 import org.mycore.vidconv.entity.ConvertersWrapper;
+import org.mycore.vidconv.entity.SMILWrapper;
 import org.mycore.vidconv.entity.SettingsWrapper;
 import org.mycore.vidconv.entity.SettingsWrapper.Output;
 import org.mycore.vidconv.event.Event;
@@ -192,6 +194,28 @@ public class ConverterService extends Widget implements Listener {
             Path inputPath = event.getParameter("path");
             addConverter(inputPath);
         }
+
+        if (ConverterJob.DONE.equals(event.getType())
+                && event.getSource().equals(ConverterJob.class)) {
+
+            final List<ConverterJob> jobs = converters.values().stream().filter(cj -> {
+                return cj.parentId().equals(event.getParameter("parentId"));
+            }).collect(Collectors.toList());
+
+            if (jobs.size() > 1 && jobs.stream().filter(cj -> !cj.isDone() || cj.isRunning()).count() == 0) {
+                final ConverterJob job = jobs.get(0);
+                final String fileName = job.inputPath.getFileName().toString();
+                final Path file = job.outputPath.getParent()
+                        .resolve(fileName.substring(0, fileName.lastIndexOf(".")) + ".smil");
+                SMILWrapper.saveTo(file, jobs.stream().map(cj -> {
+                    try {
+                        return FFMpegImpl.probe(cj.outputPath);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }).collect(Collectors.toList()));
+            }
+        }
     }
 
     private void addConverter(final Path inputPath) throws InterruptedException, JAXBException, ExecutionException {
@@ -248,6 +272,8 @@ public class ConverterService extends Widget implements Listener {
 
     public static class ConverterJob implements Runnable {
 
+        public static final String DONE = "done";
+
         private final String parentId;
 
         private final String id;
@@ -286,6 +312,7 @@ public class ConverterService extends Widget implements Listener {
             this.running = false;
         }
 
+        @SuppressWarnings("serial")
         @Override
         public void run() {
             try {
@@ -317,6 +344,13 @@ public class ConverterService extends Widget implements Listener {
                 save();
 
                 LOGGER.info("Converting of " + inputPath.toString() + " done.");
+
+                EventManager.instance().fireEvent(new Event(DONE, new HashMap<String, String>() {
+                    {
+                        put("parentId", parentId);
+                        put("id", id);
+                    }
+                }, this.getClass()));
             } catch (InterruptedException | JAXBException | ExecutionException | IOException e) {
                 LOGGER.error(e.getMessage(), e);
             }
