@@ -22,7 +22,6 @@ package org.mycore.vidconv.entity.probe;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -33,394 +32,119 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class StreamWrapper {
 
-    @XmlAttribute(name = "color_space")
-    private String colorSpace;
+    @XmlAttribute(name = "avg_frame_rate")
+    private String avgFrameRate;
 
-    @XmlAttribute(name = "pix_fmt")
-    private String pixelFormat;
+    @XmlAttribute(name = "bit_rate")
+    private Integer bitRate;
+
+    @XmlAttribute(name = "bits_per_raw_sample")
+    private Integer bitsPerRawSample;
+
+    @XmlAttribute(name = "bits_per_sample")
+    private Integer bitsPerSample;
+
+    @XmlAttribute(name = "channel_layout")
+    private String channelLayout;
+
+    @XmlAttribute(name = "channels")
+    private Integer channels;
 
     @XmlAttribute(name = "chroma_location")
     private String chromaLocation;
 
-    @XmlAttribute(name = "bits_per_raw_sample")
-    private String bitsPerRawSample;
-
-    @XmlAttribute(name = "codec_type")
-    private String codecType;
-
-    @XmlAttribute(name = "level")
-    private String level;
-
-    @XmlAttribute(name = "height")
-    private Integer height;
-
-    @XmlAttribute(name = "start_pts")
-    private String startPts;
-
-    @XmlAttribute(name = "color_transfer")
-    private String colorTransfer;
-
-    @XmlAttribute(name = "codec_time_base")
-    private String codecTimeBase;
-
-    @XmlAttribute(name = "color_range")
-    private String colorRange;
-
-    @XmlElement
-    private DispositionWrapper disposition;
-
-    @XmlAttribute(name = "profile")
-    private String profile;
-
-    @XmlAttribute(name = "color_primaries")
-    private String colorPrimaries;
-
-    @XmlAttribute(name = "index")
-    private String index;
-
     @XmlAttribute(name = "codec_long_name")
     private String codecLongName;
-
-    @XmlAttribute(name = "width")
-    private Integer width;
-
-    @XmlAttribute(name = "time_base")
-    private String timeBase;
-
-    @XmlAttribute(name = "coded_width")
-    private String codedWidth;
 
     @XmlAttribute(name = "codec_name")
     private String codecName;
 
-    @XmlAttribute(name = "sample_aspect_ratio")
-    private String sampleAspectRatio;
-
-    @XmlAttribute(name = "avg_frame_rate")
-    private String avgFrameRate;
-
-    @XmlAttribute(name = "is_avc")
-    private String isAVC;
-
     @XmlAttribute(name = "codec_tag")
     private String codecTag;
-
-    @XmlAttribute(name = "refs")
-    private String refs;
-
-    @XmlAttribute(name = "nal_length_size")
-    private String nalLengthSize;
-
-    @XmlAttribute(name = "start_time")
-    private String startTime;
-
-    @XmlAttribute(name = "display_aspect_ratio")
-    private String displayAspectRatio;
-
-    @XmlAttribute(name = "has_b_frames")
-    private String hasBFrames;
-
-    @XmlAttribute(name = "r_frame_rate")
-    private String rFrameRate;
 
     @XmlAttribute(name = "codec_tag_string")
     private String codecTagString;
 
+    @XmlAttribute(name = "codec_time_base")
+    private String codecTimeBase;
+
+    @XmlAttribute(name = "codec_type")
+    private String codecType;
+
     @XmlAttribute(name = "coded_height")
-    private String codedHeight;
+    private Integer codedHeight;
+
+    @XmlAttribute(name = "coded_width")
+    private Integer codedWidth;
+
+    @XmlAttribute(name = "display_aspect_ratio")
+    private String displayAspectRatio;
+
+    @XmlAttribute(name = "duration")
+    private String duration;
+
+    @XmlAttribute(name = "duration_ts")
+    private Integer durationTs;
+
+    @XmlAttribute(name = "has_b_frames")
+    private Integer hasBFrames;
+
+    @XmlAttribute(name = "height")
+    private Integer height;
+
+    @XmlAttribute(name = "index")
+    private Integer index;
+
+    @XmlAttribute(name = "is_avc")
+    private String isAvc;
+
+    @XmlAttribute(name = "level")
+    private Integer level;
+
+    @XmlAttribute(name = "nal_length_size")
+    private Integer nalLengthSize;
+
+    @XmlAttribute(name = "nb_frames")
+    private Integer nbFrames;
+
+    @XmlAttribute(name = "pix_fmt")
+    private String pixFmt;
+
+    @XmlAttribute(name = "profile")
+    private String profile;
+
+    @XmlAttribute(name = "r_frame_rate")
+    private String rFrameRate;
+
+    @XmlAttribute(name = "refs")
+    private Integer refs;
+
+    @XmlAttribute(name = "sample_aspect_ratio")
+    private String sampleAspectRatio;
+
+    @XmlAttribute(name = "sample_fmt")
+    private String sampleFmt;
+
+    @XmlAttribute(name = "sample_rate")
+    private Integer sampleRate;
+
+    @XmlAttribute(name = "start_pts")
+    private String startPts;
+
+    @XmlAttribute(name = "start_time")
+    private String startTime;
+
+    @XmlAttribute(name = "time_base")
+    private String timeBase;
+
+    @XmlAttribute(name = "width")
+    private Integer width;
 
     /**
-     * @return the colorSpace
+     * 
      */
-    public String getColorSpace() {
-        return colorSpace;
-    }
+    public StreamWrapper() {
 
-    /**
-     * @param colorSpace the colorSpace to set
-     */
-    public void setColorSpace(String colorSpace) {
-        this.colorSpace = colorSpace;
-    }
-
-    /**
-     * @return the pixelFormat
-     */
-    public String getPixelFormat() {
-        return pixelFormat;
-    }
-
-    /**
-     * @param pixelFormat the pixelFormat to set
-     */
-    public void setPixelFormat(String pixelFormat) {
-        this.pixelFormat = pixelFormat;
-    }
-
-    /**
-     * @return the chromaLocation
-     */
-    public String getChromaLocation() {
-        return chromaLocation;
-    }
-
-    /**
-     * @param chromaLocation the chromaLocation to set
-     */
-    public void setChromaLocation(String chromaLocation) {
-        this.chromaLocation = chromaLocation;
-    }
-
-    /**
-     * @return the bitsPerRawSample
-     */
-    public String getBitsPerRawSample() {
-        return bitsPerRawSample;
-    }
-
-    /**
-     * @param bitsPerRawSample the bitsPerRawSample to set
-     */
-    public void setBitsPerRawSample(String bitsPerRawSample) {
-        this.bitsPerRawSample = bitsPerRawSample;
-    }
-
-    /**
-     * @return the codecType
-     */
-    public String getCodecType() {
-        return codecType;
-    }
-
-    /**
-     * @param codecType the codecType to set
-     */
-    public void setCodecType(String codecType) {
-        this.codecType = codecType;
-    }
-
-    /**
-     * @return the level
-     */
-    public String getLevel() {
-        return level;
-    }
-
-    /**
-     * @param level the level to set
-     */
-    public void setLevel(String level) {
-        this.level = level;
-    }
-
-    /**
-     * @return the height
-     */
-    public Integer getHeight() {
-        return height;
-    }
-
-    /**
-     * @param height the height to set
-     */
-    public void setHeight(Integer height) {
-        this.height = height;
-    }
-
-    /**
-     * @return the startPts
-     */
-    public String getStartPts() {
-        return startPts;
-    }
-
-    /**
-     * @param startPts the startPts to set
-     */
-    public void setStartPts(String startPts) {
-        this.startPts = startPts;
-    }
-
-    /**
-     * @return the colorTransfer
-     */
-    public String getColorTransfer() {
-        return colorTransfer;
-    }
-
-    /**
-     * @param colorTransfer the colorTransfer to set
-     */
-    public void setColorTransfer(String colorTransfer) {
-        this.colorTransfer = colorTransfer;
-    }
-
-    /**
-     * @return the codecTimeBase
-     */
-    public String getCodecTimeBase() {
-        return codecTimeBase;
-    }
-
-    /**
-     * @param codecTimeBase the codecTimeBase to set
-     */
-    public void setCodecTimeBase(String codecTimeBase) {
-        this.codecTimeBase = codecTimeBase;
-    }
-
-    /**
-     * @return the colorRange
-     */
-    public String getColorRange() {
-        return colorRange;
-    }
-
-    /**
-     * @param colorRange the colorRange to set
-     */
-    public void setColorRange(String colorRange) {
-        this.colorRange = colorRange;
-    }
-
-    /**
-     * @return the disposition
-     */
-    public DispositionWrapper getDisposition() {
-        return disposition;
-    }
-
-    /**
-     * @param disposition the disposition to set
-     */
-    public void setDisposition(DispositionWrapper disposition) {
-        this.disposition = disposition;
-    }
-
-    /**
-     * @return the profile
-     */
-    public String getProfile() {
-        return profile;
-    }
-
-    /**
-     * @param profile the profile to set
-     */
-    public void setProfile(String profile) {
-        this.profile = profile;
-    }
-
-    /**
-     * @return the colorPrimaries
-     */
-    public String getColorPrimaries() {
-        return colorPrimaries;
-    }
-
-    /**
-     * @param colorPrimaries the colorPrimaries to set
-     */
-    public void setColorPrimaries(String colorPrimaries) {
-        this.colorPrimaries = colorPrimaries;
-    }
-
-    /**
-     * @return the index
-     */
-    public String getIndex() {
-        return index;
-    }
-
-    /**
-     * @param index the index to set
-     */
-    public void setIndex(String index) {
-        this.index = index;
-    }
-
-    /**
-     * @return the codecLongName
-     */
-    public String getCodecLongName() {
-        return codecLongName;
-    }
-
-    /**
-     * @param codecLongName the codecLongName to set
-     */
-    public void setCodecLongName(String codecLongName) {
-        this.codecLongName = codecLongName;
-    }
-
-    /**
-     * @return the width
-     */
-    public Integer getWidth() {
-        return width;
-    }
-
-    /**
-     * @param width the width to set
-     */
-    public void setWidth(Integer width) {
-        this.width = width;
-    }
-
-    /**
-     * @return the timeBase
-     */
-    public String getTimeBase() {
-        return timeBase;
-    }
-
-    /**
-     * @param timeBase the timeBase to set
-     */
-    public void setTimeBase(String timeBase) {
-        this.timeBase = timeBase;
-    }
-
-    /**
-     * @return the codedWidth
-     */
-    public String getCodedWidth() {
-        return codedWidth;
-    }
-
-    /**
-     * @param codedWidth the codedWidth to set
-     */
-    public void setCodedWidth(String codedWidth) {
-        this.codedWidth = codedWidth;
-    }
-
-    /**
-     * @return the codecName
-     */
-    public String getCodecName() {
-        return codecName;
-    }
-
-    /**
-     * @param codecName the codecName to set
-     */
-    public void setCodecName(String codecName) {
-        this.codecName = codecName;
-    }
-
-    /**
-     * @return the sampleAspectRatio
-     */
-    public String getSampleAspectRatio() {
-        return sampleAspectRatio;
-    }
-
-    /**
-     * @param sampleAspectRatio the sampleAspectRatio to set
-     */
-    public void setSampleAspectRatio(String sampleAspectRatio) {
-        this.sampleAspectRatio = sampleAspectRatio;
     }
 
     /**
@@ -438,17 +162,115 @@ public class StreamWrapper {
     }
 
     /**
-     * @return the isAVC
+     * @return the bitRate
      */
-    public String getIsAVC() {
-        return isAVC;
+    public Integer getBitRate() {
+        return bitRate;
     }
 
     /**
-     * @param isAVC the isAVC to set
+     * @param bitRate the bitRate to set
      */
-    public void setIsAVC(String isAVC) {
-        this.isAVC = isAVC;
+    public void setBitRate(Integer bitRate) {
+        this.bitRate = bitRate;
+    }
+
+    /**
+     * @return the bitsPerRawSample
+     */
+    public Integer getBitsPerRawSample() {
+        return bitsPerRawSample;
+    }
+
+    /**
+     * @param bitsPerRawSample the bitsPerRawSample to set
+     */
+    public void setBitsPerRawSample(Integer bitsPerRawSample) {
+        this.bitsPerRawSample = bitsPerRawSample;
+    }
+
+    /**
+     * @return the bitsPerSample
+     */
+    public Integer getBitsPerSample() {
+        return bitsPerSample;
+    }
+
+    /**
+     * @param bitsPerSample the bitsPerSample to set
+     */
+    public void setBitsPerSample(Integer bitsPerSample) {
+        this.bitsPerSample = bitsPerSample;
+    }
+
+    /**
+     * @return the channelLayout
+     */
+    public String getChannelLayout() {
+        return channelLayout;
+    }
+
+    /**
+     * @param channelLayout the channelLayout to set
+     */
+    public void setChannelLayout(String channelLayout) {
+        this.channelLayout = channelLayout;
+    }
+
+    /**
+     * @return the channels
+     */
+    public Integer getChannels() {
+        return channels;
+    }
+
+    /**
+     * @param channels the channels to set
+     */
+    public void setChannels(Integer channels) {
+        this.channels = channels;
+    }
+
+    /**
+     * @return the chromaLocation
+     */
+    public String getChromaLocation() {
+        return chromaLocation;
+    }
+
+    /**
+     * @param chromaLocation the chromaLocation to set
+     */
+    public void setChromaLocation(String chromaLocation) {
+        this.chromaLocation = chromaLocation;
+    }
+
+    /**
+     * @return the codecLongName
+     */
+    public String getCodecLongName() {
+        return codecLongName;
+    }
+
+    /**
+     * @param codecLongName the codecLongName to set
+     */
+    public void setCodecLongName(String codecLongName) {
+        this.codecLongName = codecLongName;
+    }
+
+    /**
+     * @return the codecName
+     */
+    public String getCodecName() {
+        return codecName;
+    }
+
+    /**
+     * @param codecName the codecName to set
+     */
+    public void setCodecName(String codecName) {
+        this.codecName = codecName;
     }
 
     /**
@@ -466,45 +288,73 @@ public class StreamWrapper {
     }
 
     /**
-     * @return the refs
+     * @return the codecTagString
      */
-    public String getRefs() {
-        return refs;
+    public String getCodecTagString() {
+        return codecTagString;
     }
 
     /**
-     * @param refs the refs to set
+     * @param codecTagString the codecTagString to set
      */
-    public void setRefs(String refs) {
-        this.refs = refs;
+    public void setCodecTagString(String codecTagString) {
+        this.codecTagString = codecTagString;
     }
 
     /**
-     * @return the nalLengthSize
+     * @return the codecTimeBase
      */
-    public String getNalLengthSize() {
-        return nalLengthSize;
+    public String getCodecTimeBase() {
+        return codecTimeBase;
     }
 
     /**
-     * @param nalLengthSize the nalLengthSize to set
+     * @param codecTimeBase the codecTimeBase to set
      */
-    public void setNalLengthSize(String nalLengthSize) {
-        this.nalLengthSize = nalLengthSize;
+    public void setCodecTimeBase(String codecTimeBase) {
+        this.codecTimeBase = codecTimeBase;
     }
 
     /**
-     * @return the startTime
+     * @return the codecType
      */
-    public String getStartTime() {
-        return startTime;
+    public String getCodecType() {
+        return codecType;
     }
 
     /**
-     * @param startTime the startTime to set
+     * @param codecType the codecType to set
      */
-    public void setStartTime(String startTime) {
-        this.startTime = startTime;
+    public void setCodecType(String codecType) {
+        this.codecType = codecType;
+    }
+
+    /**
+     * @return the codedHeight
+     */
+    public Integer getCodedHeight() {
+        return codedHeight;
+    }
+
+    /**
+     * @param codedHeight the codedHeight to set
+     */
+    public void setCodedHeight(Integer codedHeight) {
+        this.codedHeight = codedHeight;
+    }
+
+    /**
+     * @return the codedWidth
+     */
+    public Integer getCodedWidth() {
+        return codedWidth;
+    }
+
+    /**
+     * @param codedWidth the codedWidth to set
+     */
+    public void setCodedWidth(Integer codedWidth) {
+        this.codedWidth = codedWidth;
     }
 
     /**
@@ -522,17 +372,157 @@ public class StreamWrapper {
     }
 
     /**
+     * @return the duration
+     */
+    public String getDuration() {
+        return duration;
+    }
+
+    /**
+     * @param duration the duration to set
+     */
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
+
+    /**
+     * @return the durationTs
+     */
+    public Integer getDurationTs() {
+        return durationTs;
+    }
+
+    /**
+     * @param durationTs the durationTs to set
+     */
+    public void setDurationTs(Integer durationTs) {
+        this.durationTs = durationTs;
+    }
+
+    /**
      * @return the hasBFrames
      */
-    public String getHasBFrames() {
+    public Integer getHasBFrames() {
         return hasBFrames;
     }
 
     /**
      * @param hasBFrames the hasBFrames to set
      */
-    public void setHasBFrames(String hasBFrames) {
+    public void setHasBFrames(Integer hasBFrames) {
         this.hasBFrames = hasBFrames;
+    }
+
+    /**
+     * @return the height
+     */
+    public Integer getHeight() {
+        return height;
+    }
+
+    /**
+     * @param height the height to set
+     */
+    public void setHeight(Integer height) {
+        this.height = height;
+    }
+
+    /**
+     * @return the index
+     */
+    public Integer getIndex() {
+        return index;
+    }
+
+    /**
+     * @param index the index to set
+     */
+    public void setIndex(Integer index) {
+        this.index = index;
+    }
+
+    /**
+     * @return the isAvc
+     */
+    public String getIsAvc() {
+        return isAvc;
+    }
+
+    /**
+     * @param isAvc the isAvc to set
+     */
+    public void setIsAvc(String isAvc) {
+        this.isAvc = isAvc;
+    }
+
+    /**
+     * @return the level
+     */
+    public Integer getLevel() {
+        return level;
+    }
+
+    /**
+     * @param level the level to set
+     */
+    public void setLevel(Integer level) {
+        this.level = level;
+    }
+
+    /**
+     * @return the nalLengthSize
+     */
+    public Integer getNalLengthSize() {
+        return nalLengthSize;
+    }
+
+    /**
+     * @param nalLengthSize the nalLengthSize to set
+     */
+    public void setNalLengthSize(Integer nalLengthSize) {
+        this.nalLengthSize = nalLengthSize;
+    }
+
+    /**
+     * @return the nbFrames
+     */
+    public Integer getNbFrames() {
+        return nbFrames;
+    }
+
+    /**
+     * @param nbFrames the nbFrames to set
+     */
+    public void setNbFrames(Integer nbFrames) {
+        this.nbFrames = nbFrames;
+    }
+
+    /**
+     * @return the pixFmt
+     */
+    public String getPixFmt() {
+        return pixFmt;
+    }
+
+    /**
+     * @param pixFmt the pixFmt to set
+     */
+    public void setPixFmt(String pixFmt) {
+        this.pixFmt = pixFmt;
+    }
+
+    /**
+     * @return the profile
+     */
+    public String getProfile() {
+        return profile;
+    }
+
+    /**
+     * @param profile the profile to set
+     */
+    public void setProfile(String profile) {
+        this.profile = profile;
     }
 
     /**
@@ -550,201 +540,115 @@ public class StreamWrapper {
     }
 
     /**
-     * @return the codecTagString
+     * @return the refs
      */
-    public String getCodecTagString() {
-        return codecTagString;
+    public Integer getRefs() {
+        return refs;
     }
 
     /**
-     * @param codecTagString the codecTagString to set
+     * @param refs the refs to set
      */
-    public void setCodecTagString(String codecTagString) {
-        this.codecTagString = codecTagString;
+    public void setRefs(Integer refs) {
+        this.refs = refs;
     }
 
     /**
-     * @return the codedHeight
+     * @return the sampleAspectRatio
      */
-    public String getCodedHeight() {
-        return codedHeight;
+    public String getSampleAspectRatio() {
+        return sampleAspectRatio;
     }
 
     /**
-     * @param codedHeight the codedHeight to set
+     * @param sampleAspectRatio the sampleAspectRatio to set
      */
-    public void setCodedHeight(String codedHeight) {
-        this.codedHeight = codedHeight;
+    public void setSampleAspectRatio(String sampleAspectRatio) {
+        this.sampleAspectRatio = sampleAspectRatio;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
+    /**
+     * @return the sampleFmt
      */
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("StreamWrapper [");
-        if (colorSpace != null) {
-            builder.append("colorSpace=");
-            builder.append(colorSpace);
-            builder.append(", ");
-        }
-        if (pixelFormat != null) {
-            builder.append("pixelFormat=");
-            builder.append(pixelFormat);
-            builder.append(", ");
-        }
-        if (chromaLocation != null) {
-            builder.append("chromaLocation=");
-            builder.append(chromaLocation);
-            builder.append(", ");
-        }
-        if (bitsPerRawSample != null) {
-            builder.append("bitsPerRawSample=");
-            builder.append(bitsPerRawSample);
-            builder.append(", ");
-        }
-        if (codecType != null) {
-            builder.append("codecType=");
-            builder.append(codecType);
-            builder.append(", ");
-        }
-        if (level != null) {
-            builder.append("level=");
-            builder.append(level);
-            builder.append(", ");
-        }
-        if (height != null) {
-            builder.append("height=");
-            builder.append(height);
-            builder.append(", ");
-        }
-        if (startPts != null) {
-            builder.append("startPts=");
-            builder.append(startPts);
-            builder.append(", ");
-        }
-        if (colorTransfer != null) {
-            builder.append("colorTransfer=");
-            builder.append(colorTransfer);
-            builder.append(", ");
-        }
-        if (codecTimeBase != null) {
-            builder.append("codecTimeBase=");
-            builder.append(codecTimeBase);
-            builder.append(", ");
-        }
-        if (colorRange != null) {
-            builder.append("colorRange=");
-            builder.append(colorRange);
-            builder.append(", ");
-        }
-        if (disposition != null) {
-            builder.append("disposition=");
-            builder.append(disposition);
-            builder.append(", ");
-        }
-        if (profile != null) {
-            builder.append("profile=");
-            builder.append(profile);
-            builder.append(", ");
-        }
-        if (colorPrimaries != null) {
-            builder.append("colorPrimaries=");
-            builder.append(colorPrimaries);
-            builder.append(", ");
-        }
-        if (index != null) {
-            builder.append("index=");
-            builder.append(index);
-            builder.append(", ");
-        }
-        if (codecLongName != null) {
-            builder.append("codecLongName=");
-            builder.append(codecLongName);
-            builder.append(", ");
-        }
-        if (width != null) {
-            builder.append("width=");
-            builder.append(width);
-            builder.append(", ");
-        }
-        if (timeBase != null) {
-            builder.append("timeBase=");
-            builder.append(timeBase);
-            builder.append(", ");
-        }
-        if (codedWidth != null) {
-            builder.append("codedWidth=");
-            builder.append(codedWidth);
-            builder.append(", ");
-        }
-        if (codecName != null) {
-            builder.append("codecName=");
-            builder.append(codecName);
-            builder.append(", ");
-        }
-        if (sampleAspectRatio != null) {
-            builder.append("sampleAspectRatio=");
-            builder.append(sampleAspectRatio);
-            builder.append(", ");
-        }
-        if (avgFrameRate != null) {
-            builder.append("avgFrameRate=");
-            builder.append(avgFrameRate);
-            builder.append(", ");
-        }
-        if (isAVC != null) {
-            builder.append("isAVC=");
-            builder.append(isAVC);
-            builder.append(", ");
-        }
-        if (codecTag != null) {
-            builder.append("codecTag=");
-            builder.append(codecTag);
-            builder.append(", ");
-        }
-        if (refs != null) {
-            builder.append("refs=");
-            builder.append(refs);
-            builder.append(", ");
-        }
-        if (nalLengthSize != null) {
-            builder.append("nalLengthSize=");
-            builder.append(nalLengthSize);
-            builder.append(", ");
-        }
-        if (startTime != null) {
-            builder.append("startTime=");
-            builder.append(startTime);
-            builder.append(", ");
-        }
-        if (displayAspectRatio != null) {
-            builder.append("displayAspectRatio=");
-            builder.append(displayAspectRatio);
-            builder.append(", ");
-        }
-        if (hasBFrames != null) {
-            builder.append("hasBFrames=");
-            builder.append(hasBFrames);
-            builder.append(", ");
-        }
-        if (rFrameRate != null) {
-            builder.append("rFrameRate=");
-            builder.append(rFrameRate);
-            builder.append(", ");
-        }
-        if (codecTagString != null) {
-            builder.append("codecTagString=");
-            builder.append(codecTagString);
-            builder.append(", ");
-        }
-        if (codedHeight != null) {
-            builder.append("codedHeight=");
-            builder.append(codedHeight);
-        }
-        builder.append("]");
-        return builder.toString();
+    public String getSampleFmt() {
+        return sampleFmt;
+    }
+
+    /**
+     * @param sampleFmt the sampleFmt to set
+     */
+    public void setSampleFmt(String sampleFmt) {
+        this.sampleFmt = sampleFmt;
+    }
+
+    /**
+     * @return the sampleRate
+     */
+    public Integer getSampleRate() {
+        return sampleRate;
+    }
+
+    /**
+     * @param sampleRate the sampleRate to set
+     */
+    public void setSampleRate(Integer sampleRate) {
+        this.sampleRate = sampleRate;
+    }
+
+    /**
+     * @return the startPts
+     */
+    public String getStartPts() {
+        return startPts;
+    }
+
+    /**
+     * @param startPts the startPts to set
+     */
+    public void setStartPts(String startPts) {
+        this.startPts = startPts;
+    }
+
+    /**
+     * @return the startTime
+     */
+    public String getStartTime() {
+        return startTime;
+    }
+
+    /**
+     * @param startTime the startTime to set
+     */
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    /**
+     * @return the timeBase
+     */
+    public String getTimeBase() {
+        return timeBase;
+    }
+
+    /**
+     * @param timeBase the timeBase to set
+     */
+    public void setTimeBase(String timeBase) {
+        this.timeBase = timeBase;
+    }
+
+    /**
+     * @return the width
+     */
+    public Integer getWidth() {
+        return width;
+    }
+
+    /**
+     * @param width the width to set
+     */
+    public void setWidth(Integer width) {
+        this.width = width;
     }
 
 }
