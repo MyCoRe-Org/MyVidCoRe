@@ -22,6 +22,7 @@ package org.mycore.vidconv.entity.probe;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -139,6 +140,9 @@ public class StreamWrapper {
 
     @XmlAttribute(name = "width")
     private Integer width;
+
+    @XmlElement
+    private DispositionWrapper disposition;
 
     /**
      * 
@@ -649,6 +653,20 @@ public class StreamWrapper {
      */
     public void setWidth(Integer width) {
         this.width = width;
+    }
+
+    /**
+     * @return the disposition
+     */
+    public DispositionWrapper getDisposition() {
+        return disposition;
+    }
+
+    /**
+     * @param disposition the disposition to set
+     */
+    public void setDisposition(DispositionWrapper disposition) {
+        this.disposition = disposition;
     }
 
 }
