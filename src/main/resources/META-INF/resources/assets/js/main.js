@@ -176,6 +176,19 @@ app.controller("converterStatus", function($scope, $http, $interval, $timeout) {
 		return converter.done && diff > removeTimeout ? true : false;
 	}
 
+	$scope.pagination = function(items) {
+		var total = Math.floor(items.length / 10) + (items.length % 10 > 0 ? 1 : 0);
+		if (total > 1) {
+			var pagination = [];
+			for (var p = 0; p < total; p++) {
+				pagination[p] = p + 1;
+			}
+			return pagination;
+		}
+
+		return [];
+	}
+
 	$scope.formatStream = function(stream) {
 		if (stream !== undefined) {
 			return stream.replace(/\r/g, "\n");
