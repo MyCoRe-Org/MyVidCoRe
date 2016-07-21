@@ -496,7 +496,7 @@ public class FFMpegImpl {
             throws InterruptedException {
         final StringBuffer cmd = new StringBuffer();
 
-        cmd.append("ffmpeg -i {0} -stats -threads 1 -y");
+        cmd.append("ffmpeg -i {0} -stats -y");
 
         Video video = output.getVideo();
 
