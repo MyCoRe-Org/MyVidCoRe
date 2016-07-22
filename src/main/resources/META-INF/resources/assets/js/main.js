@@ -116,43 +116,53 @@ app.controller("directoryWatcherStatus", function($scope, $http, $interval) {
 	}, 60000);
 });
 
-app.controller("converterStatus", function($scope, $http, $interval, $timeout) {
+app.controller("converterStatus", function($scope, $http, $interval, asyncQueue) {
 	var refresh;
 	var removeTimeout = 30000;
-	$scope.converters = [];
-
-	$scope.getConverterById = function(id) {
-		for (var i = 0; i < $scope.converters.length; i++) {
-			if ($scope.converters[i].id == id) {
-				return $scope.converters[i];
-			}
-		}
-
-		return undefined;
-	}
+	$scope.converters = {
+		"active" : {},
+		"done" : {}
+	};
+	$scope.details = [];
 
 	$scope.loadData = function() {
-		$http({
-			method : "GET",
-			url : "/widget/converter/status"
-		}).then(function(response) {
-			if (response.status = 200) {
-				angular.merge($scope.converters, response.data.converter);
-			}
+		var urls = [];
+		for ( var type in $scope.converters) {
+			var c = $scope.converters[type];
+			var start = c.start || 0;
+			var limit = c.limit || (type == "active" ? 50 : 10);
+			urls.push("/widget/converter/" + (start / limit + 1) + "/" + limit + (type == "done" ? "/!isdone" : "") + "/status")
+		}
+
+		asyncQueue.load(urls).then(function(results) {
+			results.forEach(function(result) {
+				if (result.status == 200) {
+					var type = result.config.url.indexOf("!isdone") != -1 ? "done" : "active";
+					if ($scope.converters[type].length != 0)
+						$scope.converters[type] = result.data;
+					else
+						angular.merge($scope.converters[type], result.data);
+
+				}
+			});
 		}, function(error) {
-			$scope.converters = [];
+			console.error(error);
+			$scope.converters = {
+				"active" : {},
+				"done" : {}
+			};
 		});
 	}
 
 	$scope.loadDetailData = function(id) {
-		var converter = $scope.getConverterById(id);
+		var converter = $scope.details[id] || {};
 		if (converter.outputStream === undefined && converter.errorStream === undefined) {
 			$http({
 				method : "GET",
 				url : "/widget/converter/" + id + "/status"
 			}).then(function(response) {
 				if (response.status = 200) {
-					angular.merge(converter, response.data);
+					$scope.details[id] = response.data;
 				}
 			});
 		}
@@ -162,31 +172,54 @@ app.controller("converterStatus", function($scope, $http, $interval, $timeout) {
 		return converter.progress ? converter.progress.percent : -1;
 	}
 
-	$scope.orderByEndTime = function(converter) {
-		return converter.endTime;
-	}
-
 	$scope.filterDone = function(converter) {
 		var diff = new Date() - new Date(converter.endTime);
 		return converter.running || !converter.running && !converter.done ? true : converter.done && diff < removeTimeout ? true : false;
 	}
 
-	$scope.filterNotDone = function(converter) {
-		var diff = new Date() - new Date(converter.endTime);
-		return converter.done && diff > removeTimeout ? true : false;
-	}
-
-	$scope.pagination = function(items) {
-		var total = Math.floor(items.length / 10) + (items.length % 10 > 0 ? 1 : 0);
+	$scope.pagination = function(pagination) {
+		var maxPages = 5;
+		var total = Math.floor(pagination.total / pagination.limit) + (pagination.total % pagination.limit > 0 ? 1 : 0);
+		var page = pagination.start / pagination.limit + 1;
 		if (total > 1) {
+			var pS = (page - (maxPages - 1) / 2) - 1;
+			(pS < 0) && (pS = 0);
+			var pE = pS + maxPages;
+			(pE >= total) && (pE = total) && (pS = pE - (maxPages > total ? total : maxPages));
 			var pagination = [];
-			for (var p = 0; p < total; p++) {
-				pagination[p] = p + 1;
+			for (var p = pS; p < pE; p++) {
+				pagination.push(p + 1);
 			}
 			return pagination;
 		}
 
 		return [];
+	}
+
+	$scope.paginationPage = function(pagination, page) {
+		if ($scope.paginationDisabled(pagination, page))
+			return;
+
+		if (typeof page === 'string') {
+			page = page[0] == "-" ? (pagination.start / pagination.limit) + 1 - parseInt(page.substring(1))
+					: page[0] == "+" ? page = (pagination.start / pagination.limit) + 1 + parseInt(page.substring(1)) : 0;
+		}
+		var start = (page - 1) * pagination.limit;
+		pagination.start = start;
+		$scope.loadData();
+	}
+
+	$scope.paginationActive = function(pagination, page) {
+		return pagination.start == (page - 1) * pagination.limit;
+	}
+
+	$scope.paginationDisabled = function(pagination, page) {
+		if (typeof page === 'string') {
+			page = page[0] == "-" ? (pagination.start / pagination.limit) + 1 - parseInt(page.substring(1))
+					: page[0] == "+" ? page = (pagination.start / pagination.limit) + 1 + parseInt(page.substring(1)) : 0;
+		}
+		var total = Math.floor(pagination.total / pagination.limit) + (pagination.total % pagination.limit > 0 ? 1 : 0);
+		return page <= 0 || page > total;
 	}
 
 	$scope.formatStream = function(stream) {

@@ -45,7 +45,7 @@
   <div class="container">
 
     <div id="settings" class="content-container" ng-controller="settings">
-      <div id="status-message" class="alert alert-{{status.style}} alert-dismissible" role="alert" ng-if="status.style">
+      <div id="status-message animate" class="alert alert-{{status.style}} alert-dismissible" role="alert" ng-if="status.style">
         <button type="button" class="close" data-dismiss="alert" aria-label="{{ 'btn.close' | translate}}">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -65,7 +65,7 @@
             ></span></li>
             <li role="presentation"><a href="#settings" ng-click="addOutput()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></a></li>
           </ul>
-          <div class="tab-content">
+          <div class="tab-content animate">
             <div role="tabpanel" class="tab-pane fade in" ng-class="{active:$index == 0}" id="output{{$index}}" ng-repeat="output in settings.output">
               <div class="form-group">
                 <label for="format">{{'settings.format' | translate}}</label> <select id="format" class="form-control" ng-model="output.format"

@@ -2,6 +2,41 @@ body {
   padding-top: 50px;
 }
 
+.animate {
+  .ng-enter , .ng-leave {
+    -webkit-transition: 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    -moz-transition: 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    -ms-transition: 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    -o-transition: 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    transition: 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    display: block;
+  }
+
+  .ng-enter , .ng-leave.ng-leave-active {
+    height: 0;
+    opacity: 0;
+  }
+
+  .ng-leave , .ng-enter.ng-enter-active {
+    height: unset;
+    opacity: 1;
+  }
+
+  .ng-hide-add , .ng-hide-remove {
+    -webkit-transition: 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    -moz-transition: 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    -ms-transition: 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    -o-transition: 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    transition: 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
+    display: block;
+  }
+
+  .ng-hide {
+    height: 0;
+    opacity: 0;
+  }
+}
+
 .content-container {
   padding: 40px 0;
 }
@@ -100,45 +135,6 @@ body {
     .slider-selection {
       background-image: linear-gradient(to bottom, #e0e0e0 0px, #f5f5f5 100%);
     }
-  }
-}
-
-#settings form , #converter-jobs , #converter-done {
-  .ng-enter , .ng-leave {
-    -webkit-transition: 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
-    -moz-transition: 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
-    -ms-transition: 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
-    -o-transition: 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
-    transition: 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
-  }
-
-  .ng-enter , .ng-leave.ng-leave-active {
-    opacity: 0;
-    height: 0;
-    & * {
-      height: 0;
-    }
-  }
-
-  .ng-leave , .ng-enter.ng-enter-active {
-    opacity: 1;
-    height: auto;
-    & * {
-      height: auto;
-    }
-  }
-
-  .ng-hide-add , .ng-hide-remove {
-    -webkit-transition: 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
-    -moz-transition: 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
-    -ms-transition: 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
-    -o-transition: 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
-    transition: 500ms cubic-bezier(0.250, 0.250, 0.750, 0.750) all;
-  }
-
-  .ng-hide {
-    line-height: 0;
-    opacity: 0;
   }
 }
 
