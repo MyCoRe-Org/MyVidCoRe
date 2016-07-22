@@ -136,20 +136,24 @@
           </div>
         </div>
         <div class="panel-footer" ng-if="converters.done.total > converters.done.limit">
-          <nav>
-            <ul class="pagination pagination-sm no-margin">
-              <li ng-class="{disabled:paginationDisabled(converters.done, '-1')}"><a href="#" aria-label="Previous"
-                ng-click="paginationPage(converters.done, '-1')"
-              > <span aria-hidden="true">&laquo;</span>
-              </a></li>
-              <li ng-repeat="p in pagination(converters.done)" ng-class="{active:paginationActive(converters.done, p)}"><a href="#"
-                ng-click="paginationPage(converters.done, p)"
-              >{{p}}</a></li>
-              <li ng-class="{disabled:paginationDisabled(converters.done, '+1')}"><a href="#" aria-label="Next" ng-click="paginationPage(converters.done, '+1')">
-                  <span aria-hidden="true">&raquo;</span>
-              </a></li>
-            </ul>
-          </nav>
+          <div class="row">
+            <div class="col-xs-12">
+              <nav class="pull-right">
+                <ul class="pagination pagination-sm no-margin">
+                  <li ng-class="{disabled:paginationDisabled(converters.done, '-1')}"><a href="#" aria-label="Previous"
+                    ng-click="paginationPage(converters.done, '-1')"
+                  > <span aria-hidden="true">&laquo;</span>
+                  </a></li>
+                  <li ng-repeat="p in pagination(converters.done)" ng-class="{active:paginationActive(converters.done, p)}"><a href="#"
+                    ng-click="paginationPage(converters.done, p)"
+                  >{{p}}</a></li>
+                  <li ng-class="{disabled:paginationDisabled(converters.done, '+1')}"><a href="#" aria-label="Next" ng-click="paginationPage(converters.done, '+1')">
+                      <span aria-hidden="true">&raquo;</span>
+                  </a></li>
+                </ul>
+            </div>
+            </nav>
+          </div>
         </div>
       </div>
     </div>
