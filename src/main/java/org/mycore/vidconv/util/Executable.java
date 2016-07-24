@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
  */
 public class Executable {
 
-    private final static ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
+    private final static ExecutorService EXECUTOR = Executors.newCachedThreadPool();
 
     private final List<String> command;
 
