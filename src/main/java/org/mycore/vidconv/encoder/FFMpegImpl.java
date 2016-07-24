@@ -102,11 +102,12 @@ public class FFMpegImpl {
         final Executable exec = new Executable("ffmpeg", "-codecs");
 
         if (exec.runAndWait() == 0) {
-            final List<CodecWrapper> codecs = new ArrayList<>();
             final String outputStream = exec.output();
 
-            if (outputStream != null) {
+            if (outputStream != null && !outputStream.isEmpty()) {
+                final List<CodecWrapper> codecs = new ArrayList<>();
                 final Matcher m = PATTERN_CODECS.matcher(outputStream);
+
                 while (m.find()) {
                     final CodecWrapper codec = new CodecWrapper();
 
@@ -144,10 +145,10 @@ public class FFMpegImpl {
                     codec.setDescription(desc.trim());
                     codecs.add(codec);
                 }
-            }
 
-            supportedCodecs = new CodecsWrapper().setCodecs(codecs);
-            return supportedCodecs;
+                supportedCodecs = new CodecsWrapper().setCodecs(codecs);
+                return supportedCodecs;
+            }
         }
 
         return null;
@@ -174,11 +175,12 @@ public class FFMpegImpl {
         final Executable exec = new Executable("ffmpeg", "-formats");
 
         if (exec.runAndWait() == 0) {
-            final List<FormatWrapper> formats = new ArrayList<>();
             final String outputStream = exec.output();
 
-            if (outputStream != null) {
+            if (outputStream != null && !outputStream.isEmpty()) {
+                final List<FormatWrapper> formats = new ArrayList<>();
                 final Matcher m = PATTERN_FORMATS.matcher(outputStream);
+
                 while (m.find()) {
                     final FormatWrapper format = new FormatWrapper();
 
@@ -189,10 +191,10 @@ public class FFMpegImpl {
 
                     formats.add(format);
                 }
-            }
 
-            supportedFormats = new FormatsWrapper().setFormats(formats);
-            return supportedFormats;
+                supportedFormats = new FormatsWrapper().setFormats(formats);
+                return supportedFormats;
+            }
         }
 
         return null;
@@ -244,7 +246,7 @@ public class FFMpegImpl {
         if (exec.runAndWait() == 0) {
             final String outputStream = exec.output();
 
-            if (outputStream != null) {
+            if (outputStream != null && !outputStream.isEmpty()) {
                 final List<EncoderWrapper> encoders = PATTERN_ENTRY_SPLIT.splitAsStream(outputStream)
                         .filter(os -> !os.isEmpty())
                         .map(os -> {
@@ -362,7 +364,7 @@ public class FFMpegImpl {
         if (exec.runAndWait() == 0) {
             final String outputStream = exec.output();
 
-            if (outputStream != null) {
+            if (outputStream != null && !outputStream.isEmpty()) {
                 final Matcher m = PATTERN_MUXER.matcher(outputStream);
                 while (m.find()) {
                     final MuxerWrapper muxer = new MuxerWrapper();
@@ -376,8 +378,9 @@ public class FFMpegImpl {
                     muxer.setSubtitleCodec(getPatternGroup(PATTERN_SUBTITLE_CODEC, m.group(2), 1));
 
                     supportedMuxers.put(name, muxer);
-                    return supportedMuxers.get(name);
                 }
+
+                return supportedMuxers.get(name);
             }
         }
 
@@ -594,7 +597,7 @@ public class FFMpegImpl {
         if (exec.runAndWait() == 0) {
             final String outputStream = exec.output();
 
-            if (outputStream != null) {
+            if (outputStream != null && !outputStream.isEmpty()) {
                 final JAXBContext jc = JAXBContext.newInstance(ProbeWrapper.class);
                 final Unmarshaller unmarshaller = jc.createUnmarshaller();
 

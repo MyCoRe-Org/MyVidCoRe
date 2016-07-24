@@ -77,9 +77,8 @@ public class Executable {
         Future<Integer> future = EXECUTOR.submit(new Callable<Integer>() {
             public Integer call() throws Exception {
                 process = run();
-                process.waitFor();
 
-                return process.exitValue();
+                return process.waitFor();
             }
         });
 
