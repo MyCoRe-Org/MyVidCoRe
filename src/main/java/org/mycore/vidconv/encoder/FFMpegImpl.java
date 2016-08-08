@@ -389,7 +389,7 @@ public class FFMpegImpl {
 
     private static final Pattern PATTERN_DURATION = Pattern.compile("Duration: (.*), start:");
 
-    private static final Pattern PATTERN_CURRENT = Pattern.compile(".*time=([0-9:\\.]+) bitrate[^\r|\n]+$");
+    private static final Pattern PATTERN_CURRENT = Pattern.compile("time=([\\d:\\.]+)(?!.*time=[\\d:\\.]+)");
 
     /**
      * Returns the current progress value in percent.
@@ -404,7 +404,12 @@ public class FFMpegImpl {
 
             if (dm.find() && cm.find()) {
                 long duration = parseMillis(dm.group(1));
-                long current = parseMillis(cm.group(1));
+                
+                String last = "";
+                while (cm.find()) {
+                    last = cm.group(1);
+                }
+                long current = parseMillis(last);
 
                 return (int) ((float) current / (float) duration * 100.0);
             }
