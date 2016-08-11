@@ -1,7 +1,7 @@
 {
     "name": "${project.artifactId}",
     "description": "${project.description}",
-    "version": "1.0.0",
+    "version": "${project.version}",
     "author": "René Adler (eagle)",
   	"homepage": "${project.url}",
   	"repository": {
@@ -16,12 +16,12 @@
     "devDependencies": {
         "bower": "~1.6.5",
         "grunt": "~0.4.5",
+        "grunt-bowercopy": "^1.2.3",
         "grunt-cli": "~0.1.13",
         "grunt-contrib-concat": "^0.5.1",
         "grunt-contrib-less": "^1.0.0",
-        "grunt-replace": "^0.8.0",
-        "grunt-bowercopy": "^1.2.3",
+        "grunt-contrib-jshint": "^0.10.0",
         "grunt-google-fonts": "^0.3.5",
-        "grunt-coveralls": "^1.0.1"
+        "grunt-replace": "^0.8.0"
     }
 }

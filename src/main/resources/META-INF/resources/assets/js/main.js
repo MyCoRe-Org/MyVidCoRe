@@ -25,23 +25,23 @@ app.directive("convertToNumber", function() {
 				return parseInt(val, 10);
 			});
 			ngModel.$formatters.push(function(val) {
-				return val === undefined || val.length == 0 ? null : val;
+				return val === undefined || val.length === 0 ? null : val;
 			});
 		}
 	};
 });
 
-app.directive("slider", function($parse) {
+app.directive("slider", function() {
 	return {
 		require : 'ngModel',
 		link : function(scope, element, attrs, ngModel) {
 			var slider;
-			if (attrs.slider.length == 0) {
+			if (attrs.slider.length === 0) {
 				var options = {};
 				var data = $(element).data();
 
 				angular.forEach(data, function(value, key) {
-					if (key.indexOf("slider") == 0) {
+					if (key.indexOf("slider") === 0) {
 						var k = key.replace("slider", "");
 						k = k.substring(0, 1).toLowerCase() + k.substring(1);
 						options[k] = value;
@@ -52,7 +52,7 @@ app.directive("slider", function($parse) {
 			} else {
 				scope.$watch(function(scope) {
 					var options = scope.$eval(attrs.slider);
-					if (options != false && options.length > 2) {
+					if (options !== false && options.length > 2) {
 						slider = $(element).slider(JSON.parse(options));
 					}
 				});
@@ -84,7 +84,7 @@ app.service("asyncQueue", function($http, $q) {
 			deferred.update(updates);
 		});
 		return deferred.promise;
-	}
+	};
 });
 
 app.controller("directoryWatcherStatus", function($scope, $http, $interval) {
@@ -96,12 +96,13 @@ app.controller("directoryWatcherStatus", function($scope, $http, $interval) {
 			method : "GET",
 			url : "/widget/directoryWatcher/status"
 		}).then(function(response) {
-			if (response.status = 200)
+			if (response.status = 200) {
 				angular.merge($scope.status, response.data);
-		}, function(error) {
+			}
+		}, function() {
 			$scope.status = {};
 		});
-	}
+	};
 
 	$scope.$on("$destroy", function() {
 		if (refresh) {
@@ -130,18 +131,19 @@ app.controller("converterStatus", function($scope, $http, $interval, asyncQueue)
 		for ( var type in $scope.converters) {
 			var c = $scope.converters[type];
 			var start = c.start || 0;
-			var limit = c.limit || (type == "active" ? 50 : 10);
-			urls.push("/widget/converter/" + (start / limit + 1) + "/" + limit + (type == "done" ? "/!isdone" : "") + "/status")
+			var limit = c.limit || (type === "active" ? 50 : 10);
+			urls.push("/widget/converter/" + (start / limit + 1) + "/" + limit + (type === "done" ? "/!isdone" : "") + "/status");
 		}
 
 		asyncQueue.load(urls).then(function(results) {
 			results.forEach(function(result) {
-				if (result.status == 200) {
-					var type = result.config.url.indexOf("!isdone") != -1 ? "done" : "active";
-					if ($scope.converters[type].length != 0)
+				if (result.status === 200) {
+					var type = result.config.url.indexOf("!isdone") !== -1 ? "done" : "active";
+					if ($scope.converters[type].length !== 0) {
 						$scope.converters[type] = result.data;
-					else
+					} else {
 						angular.merge($scope.converters[type], result.data);
+					}
 
 				}
 			});
@@ -152,7 +154,7 @@ app.controller("converterStatus", function($scope, $http, $interval, asyncQueue)
 				"done" : {}
 			};
 		});
-	}
+	};
 
 	$scope.loadDetailData = function(id) {
 		var converter = $scope.details[id] || {};
@@ -166,16 +168,16 @@ app.controller("converterStatus", function($scope, $http, $interval, asyncQueue)
 				}
 			});
 		}
-	}
+	};
 
 	$scope.orderByPercent = function(converter) {
 		return converter.progress ? converter.progress.percent : -1;
-	}
+	};
 
 	$scope.filterDone = function(converter) {
 		var diff = new Date() - new Date(converter.endTime);
 		return converter.running || !converter.running && !converter.done ? true : converter.done && diff < removeTimeout ? true : false;
-	}
+	};
 
 	$scope.pagination = function(pagination) {
 		var maxPages = 5;
@@ -183,10 +185,15 @@ app.controller("converterStatus", function($scope, $http, $interval, asyncQueue)
 		var page = pagination.start / pagination.limit + 1;
 		if (total > 1) {
 			var pS = (page - (maxPages - 1) / 2) - 1;
-			(pS < 0) && (pS = 0);
+			if (pS < 0) {
+				pS = 0;
+			}
 			var pE = pS + maxPages;
-			(pE >= total) && (pE = total) && (pS = pE - (maxPages > total ? total : maxPages));
-			var pagination = [];
+			if (pE >= total) {
+				pE = total;
+				pS = pE - (maxPages > total ? total : maxPages);
+			}
+			pagination = [];
 			for (var p = pS; p < pE; p++) {
 				pagination.push(p + 1);
 			}
@@ -194,39 +201,40 @@ app.controller("converterStatus", function($scope, $http, $interval, asyncQueue)
 		}
 
 		return [];
-	}
+	};
 
 	$scope.paginationPage = function(pagination, page) {
-		if ($scope.paginationDisabled(pagination, page))
+		if ($scope.paginationDisabled(pagination, page)) {
 			return;
+		}
 
 		if (typeof page === 'string') {
-			page = page[0] == "-" ? (pagination.start / pagination.limit) + 1 - parseInt(page.substring(1))
-					: page[0] == "+" ? page = (pagination.start / pagination.limit) + 1 + parseInt(page.substring(1)) : 0;
+			page = page[0] === "-" ? (pagination.start / pagination.limit) + 1 - parseInt(page.substring(1))
+					: page[0] === "+" ? page = (pagination.start / pagination.limit) + 1 + parseInt(page.substring(1)) : 0;
 		}
 		var start = (page - 1) * pagination.limit;
 		pagination.start = start;
 		$scope.loadData();
-	}
+	};
 
 	$scope.paginationActive = function(pagination, page) {
-		return pagination.start == (page - 1) * pagination.limit;
-	}
+		return pagination.start === (page - 1) * pagination.limit;
+	};
 
 	$scope.paginationDisabled = function(pagination, page) {
 		if (typeof page === 'string') {
-			page = page[0] == "-" ? (pagination.start / pagination.limit) + 1 - parseInt(page.substring(1))
-					: page[0] == "+" ? page = (pagination.start / pagination.limit) + 1 + parseInt(page.substring(1)) : 0;
+			page = page[0] === "-" ? (pagination.start / pagination.limit) + 1 - parseInt(page.substring(1))
+					: page[0] === "+" ? page = (pagination.start / pagination.limit) + 1 + parseInt(page.substring(1)) : 0;
 		}
 		var total = Math.floor(pagination.total / pagination.limit) + (pagination.total % pagination.limit > 0 ? 1 : 0);
 		return page <= 0 || page > total;
-	}
+	};
 
 	$scope.formatStream = function(stream) {
 		if (stream !== undefined) {
 			return stream.replace(/\r/g, "\n");
 		}
-	}
+	};
 
 	$scope.$on("$destroy", function() {
 		if (refresh) {
@@ -249,11 +257,12 @@ app.service("formatService", function($http, $q, asyncQueue) {
 		var urls = [];
 		angular.forEach(formats, function(options, format) {
 			urls.push("/converter/formats/name/" + format);
-			angular.forEach(options, function(codecs, type) {
+			angular.forEach(options, function(codecs) {
 				angular.forEach(codecs, function(codec) {
 					var url = "/converter/codecs/name/" + codec;
-					if ($.inArray(url, urls) == -1)
+					if ($.inArray(url, urls) === -1) {
 						urls.push(url);
+					}
 				});
 			});
 		});
@@ -262,18 +271,20 @@ app.service("formatService", function($http, $q, asyncQueue) {
 
 	function buildEncoderURLs(codecs) {
 		var urls = [];
-		angular.forEach(codecs, function(cs, type) {
+		angular.forEach(codecs, function(cs) {
 			angular.forEach(cs, function(c) {
-				if (c.encoders !== undefined && c.encoders.length != 0) {
+				if (c.encoders !== undefined && c.encoders.length !== 0) {
 					angular.forEach(c.encoders.encoder, function(e) {
 						var url = "/converter/encoder/" + e;
-						if ($.inArray(url, urls) == -1)
+						if ($.inArray(url, urls) === -1) {
 							urls.push(url);
+						}
 					});
 				} else {
 					var url = "/converter/encoder/" + c.name;
-					if ($.inArray(url, urls) == -1)
+					if ($.inArray(url, urls) === -1) {
 						urls.push(url);
+					}
 				}
 			});
 		});
@@ -283,7 +294,7 @@ app.service("formatService", function($http, $q, asyncQueue) {
 	function getByProperty(array, prop, value) {
 		if (array !== undefined) {
 			for (var i = 0; i < array.length; i++) {
-				if (array[i][prop] !== undefined && array[i][prop] == value) {
+				if (array[i][prop] !== undefined && array[i][prop] === value) {
 					return array[i];
 				}
 			}
@@ -293,11 +304,11 @@ app.service("formatService", function($http, $q, asyncQueue) {
 
 	this.getByProperty = function(array, prop, value) {
 		return getByProperty(array, prop, value);
-	}
+	};
 
 	this.getSupportedEncoders = function() {
 		return this.supportedEncoders;
-	}
+	};
 
 	this.getSupportedFormats = function(formats) {
 		var that = this;
@@ -314,9 +325,9 @@ app.service("formatService", function($http, $q, asyncQueue) {
 			// load formats and codecs
 			angular.forEach(results, function(result) {
 				var json = result.data;
-				if (json.formats !== undefined && json.formats.length != 0) {
+				if (json.formats !== undefined && json.formats.length !== 0) {
 					fs.push(json.formats[0]);
-				} else if (json.codecs !== undefined && json.codecs.length != 0) {
+				} else if (json.codecs !== undefined && json.codecs.length !== 0) {
 					var codec = json.codecs[0];
 					cc[codec.type.toLowerCase()].push(codec);
 				}
@@ -332,7 +343,7 @@ app.service("formatService", function($http, $q, asyncQueue) {
 				// cache it
 				that.supportedEncoders = ec;
 
-				angular.forEach(cc, function(codecs, type) {
+				angular.forEach(cc, function(codecs) {
 					angular.forEach(codecs, function(codec) {
 						if (codec.encoders !== undefined) {
 							var encoders = [];
@@ -349,14 +360,14 @@ app.service("formatService", function($http, $q, asyncQueue) {
 
 				angular.forEach(formats, function(options, format) {
 					var f = getByProperty(fs, "name", format);
-					if (f != null) {
+					if (f !== null) {
 						formats[format]["description"] = f.description;
 						angular.forEach(options, function(codecs, type) {
 							if (Array.isArray(formats[format][type])) {
 								var re = [];
 								angular.forEach(codecs, function(codec, index) {
 									var c = angular.copy(getByProperty(cc[type], "name", codec));
-									if (c != null) {
+									if (c !== null) {
 										formats[format][type][index] = c;
 									} else {
 										re.push(index);
@@ -378,7 +389,7 @@ app.service("formatService", function($http, $q, asyncQueue) {
 		});
 
 		return deferred.promise;
-	}
+	};
 });
 
 app.controller("settings", function($scope, $http, $translate, $log, $timeout, formatService) {
@@ -533,83 +544,88 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 		}, function(error) {
 			$log.error("failure loading formats", error);
 		});
-	}
+	};
 
 	$scope.load = function() {
 		$http.get("/settings").then(function(response) {
 			if (response.status = 200) {
-				if (response.data.output.length > 0)
+				if (response.data.output.length > 0) {
 					$scope.settings = response.data;
+				}
 			}
 		}, function(error) {
 			$log.error("failure loading settings", error);
 		});
-	}
+	};
 
 	$scope.save = function(settings) {
-		$http.post("/settings", settings).then(function(response) {
+		$http.post("/settings", settings).then(function() {
 			$scope.showStatusMessage("success", $translate.instant("settings.saved.success"));
-		}, function(error) {
+		}, function() {
 			$scope.showStatusMessage("error", $translate.instant("settings.saved.error"));
 		});
-	}
+	};
 
 	$scope.filterCodecs = function(format, type) {
 		return format !== undefined ? $scope.formats[format][type] : null;
-	}
+	};
 
 	$scope.filterEncoder = function(name) {
 		var encoders = formatService.getSupportedEncoders();
-		return encoders !== undefined && encoders.length != 0 && formatService.getByProperty(encoders, "name", name);
-	}
+		return encoders !== undefined && encoders.length !== 0 && formatService.getByProperty(encoders, "name", name);
+	};
 
 	$scope.encoderParameter = function(obj, param) {
-		var encoder = typeof obj == "String" ? $scope.filterEncoder(obj) : obj;
-		if (encoder === undefined || encoder == null || encoder.length == 0)
+		var encoder = typeof obj === "string" ? $scope.filterEncoder(obj) : obj;
+		if (encoder === undefined || encoder === null || encoder.length === 0) {
 			return false;
-		if (encoder.parameters === undefined || encoder.parameters.length == 0)
+		}
+		if (encoder.parameters === undefined || encoder.parameters.length === 0) {
 			return false;
+		}
 
 		return formatService.getByProperty(encoder.parameters, "name", param);
-	}
+	};
 
 	$scope.qualityData = function(obj, param, value) {
-		var encoder = typeof obj == "String" ? $scope.filterEncoder(obj) : obj;
-		if (encoder === undefined || encoder == null || encoder.length == 0)
+		var encoder = typeof obj === "string" ? $scope.filterEncoder(obj) : obj;
+		if (encoder === undefined || encoder === null || encoder.length === 0) {
 			return false;
+		}
 
 		var data = {};
-		if (param == "qscale") {
+		if (param === "qscale") {
 			data = {
 				id : "qualitySlider",
 				min : 0,
 				max : 31,
 				step : 1,
-				value : value !== undefined && value != null ? parsetInt(value) : 14,
+				value : value !== undefined && value !== null ? parseInt(value) : 14,
 				reversed : true
 			};
-		} else if (encoder.name == "libx264") {
+		} else if (encoder.name === "libx264") {
 			data = {
 				id : "qualitySlider",
 				min : 0,
 				max : 51,
 				step : 0.25,
 				precision : 2,
-				value : value !== undefined && value != null ? parseInt(value) : 23,
+				value : value !== undefined && value !== null ? parseInt(value) : 23,
 				reversed : true
 			};
 		} else {
-			if (encoder.parameters === undefined || encoder.parameters.length == 0)
+			if (encoder.parameters === undefined || encoder.parameters.length === 0) {
 				return false;
+			}
 			var p = formatService.getByProperty(encoder.parameters, "name", param);
-			if (p !== undefined && p != null) {
+			if (p !== undefined && p !== null) {
 				data = {
 					id : "qualitySlider",
-					min : p.type == "float" ? parseFloat(p.fromValue) : parseInt(p.fromValue),
-					max : p.type == "float" ? parseFloat(p.toValue) : parseInt(p.toValue),
-					step : p.type == "float" ? 0.25 : 1,
-					precision : p.type == "float" ? 2 : 0,
-					value : value !== undefined && value != null ? p.type == "float" ? parseFloat(value) : parseInt(value) : Math
+					min : p.type === "float" ? parseFloat(p.fromValue) : parseInt(p.fromValue),
+					max : p.type === "float" ? parseFloat(p.toValue) : parseInt(p.toValue),
+					step : p.type === "float" ? 0.25 : 1,
+					precision : p.type === "float" ? 2 : 0,
+					value : value !== undefined && value !== null ? p.type === "float" ? parseFloat(value) : parseInt(value) : Math
 							.floor((p.toValue - p.fromValue) / 2),
 					reversed : true
 				};
@@ -617,15 +633,16 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 		}
 
 		return JSON.stringify(data);
-	}
+	};
 
 	$scope.getLength = function(obj) {
 		return Object.keys(obj).length;
-	}
+	};
 
 	$scope.changeCodec = function(index, type) {
-		if ($scope.settings.output[index] === undefined || $scope.settings.output[index][type] === undefined)
+		if ($scope.settings.output[index] === undefined || $scope.settings.output[index][type] === undefined) {
 			return;
+		}
 
 		var codec = $scope.settings.output[index][type].codec;
 
@@ -633,15 +650,15 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 		$scope.settings.output[index][type] = {
 			"codec" : codec
 		};
-	}
+	};
 
 	$scope.addOutput = function() {
 		$scope.settings.output.push({});
-	}
+	};
 
 	$scope.removeOutput = function(index) {
 		$scope.settings.output.splice(index, 1);
-	}
+	};
 
 	$scope.showStatusMessage = function(type, msg) {
 		var style = "primary";
@@ -676,7 +693,7 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 				$elm.remove();
 			});
 		}, removeTimeout);
-	}
+	};
 
 	// init
 	$scope.load();

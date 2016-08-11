@@ -1,10 +1,9 @@
 module.exports = function(grunt) {
-	var fs = require('fs');
 	var path = require('path');
 
 	var getAbsoluteDir = function(dir) {
 		return path.isAbsolute(dir) ? dir : path.resolve(process.cwd(), dir);
-	}
+	};
 	var globalConfig = {
 		assetsDirectory : getAbsoluteDir(grunt.option('assetsDirectory')),
 		assetsDirectoryRelative : path.basename(grunt.option('assetsDirectory')),
@@ -16,8 +15,8 @@ module.exports = function(grunt) {
 		globalConfig : globalConfig,
 		pkg : grunt.file.readJSON('package.json'),
 		bootstrap : grunt.file.readJSON('bower_components/bootstrap/package.json'),
-		banner : '/*!\n' + ' * <%= pkg.name %> v${project.version}\n' + ' * Homepage: <%= pkg.homepage %>\n'
-				+ ' * Copyright 2016-<%= grunt.template.today("yyyy") %> <%= pkg.author %> and others\n' + ' * Licensed under <%= pkg.license %>\n' + '*/\n',
+		banner : '/*!\n' + ' * <%= pkg.name %> v${project.version}\n' + ' * Homepage: <%= pkg.homepage %>\n' +
+				' * Copyright 2016-<%= grunt.template.today("yyyy") %> <%= pkg.author %> and others\n' + ' * Licensed under <%= pkg.license %>\n' + '*/\n',
 		bowercopy : {
 			build : {
 				options : {
@@ -30,13 +29,6 @@ module.exports = function(grunt) {
 							'angular-translate-loader-static-files/*.min.*', 'bootstrap/dist/js/*min.js', 'seiyria-bootstrap-slider/dist/*.min.js',
 							'html5shiv/dist/*min.js', 'jquery/dist/*min.js', 'respond/dest/*min.js', 'video.js/dist/*min.js*' ],
 				},
-			}
-		},
-		coveralls : {
-			options : {
-				// warn instead of failing when coveralls errors
-				// we've seen coveralls 503 relatively frequently
-				force : true
 			}
 		},
 		googlefonts : {
@@ -53,6 +45,12 @@ module.exports = function(grunt) {
 						styles : [ 400, 300, 500 ]
 					} ]
 				}
+			}
+		},
+		jshint : {
+			all : [ 'Gruntfile.js', '<%=globalConfig.assetsDirectory%>/js/main.js' ],
+			options : {
+				jshintrc : '.jshintrc'
 			}
 		},
 		less : {
@@ -89,12 +87,11 @@ module.exports = function(grunt) {
 	});
 
 	grunt.loadNpmTasks('grunt-contrib-concat');
+	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-less');
 	grunt.loadNpmTasks('grunt-bowercopy');
 	grunt.loadNpmTasks('grunt-google-fonts');
-	grunt.loadNpmTasks('grunt-coveralls');
 
-	grunt.registerTask('default', 'build static webapp resources', [ 'bowercopy', 'googlefonts', 'less' ].concat(process.env.TRAVIS && 'coveralls').filter(
-			Boolean));
-
-}
+	grunt.registerTask('test', [ 'jshint' ]);
+	grunt.registerTask('default', 'build static webapp resources', [ 'test', 'bowercopy', 'googlefonts', 'less' ]);
+};
