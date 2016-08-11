@@ -1,4 +1,4 @@
-# MyVidCoRe - My Video Converter [![Build Status](https://travis-ci.org/MyCoRe-Org/MyVidCoRe.svg?branch=master)](https://travis-ci.org/MyCoRe-Org/MyVidCoRe)
+# MyVidCoRe - My Video Converter [![Build Status](https://travis-ci.org/MyCoRe-Org/MyVidCoRe.svg?branch=master)](https://travis-ci.org/MyCoRe-Org/MyVidCoRe) [![Coverage Status](https://coveralls.io/repos/github/MyCoRe-Org/MyVidCoRe/badge.svg?branch=master)](https://coveralls.io/github/MyCoRe-Org/MyVidCoRe?branch=master)
 
 Converts Videos from hotfolder to output directory with given settings. 
 

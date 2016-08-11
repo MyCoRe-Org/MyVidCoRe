@@ -32,6 +32,13 @@ module.exports = function(grunt) {
 				},
 			}
 		},
+		coveralls : {
+			options : {
+				// warn instead of failing when coveralls errors
+				// we've seen coveralls 503 relatively frequently
+				force : true
+			}
+		},
 		googlefonts : {
 			build : {
 				options : {
@@ -85,7 +92,9 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-less');
 	grunt.loadNpmTasks('grunt-bowercopy');
 	grunt.loadNpmTasks('grunt-google-fonts');
+	grunt.loadNpmTasks('grunt-coveralls');
 
-	grunt.registerTask('default', 'build static webapp resources', [ 'bowercopy', 'googlefonts', 'less' ]);
+	grunt.registerTask('default', 'build static webapp resources', [ 'bowercopy', 'googlefonts', 'less' ].concat(process.env.TRAVIS && 'coveralls').filter(
+			Boolean));
 
 }
