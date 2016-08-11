@@ -23,6 +23,7 @@
 package org.mycore.vidconv;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import org.apache.logging.log4j.LogManager;
@@ -73,7 +74,10 @@ public class Application implements Listener {
             jcmd.usage();
         } else {
             try {
-                if (Paths.get(app.watchDir).equals(Paths.get(app.outputDir).getParent())
+                if (Files.notExists(Paths.get(app.watchDir))) {
+                    throw new RuntimeException(
+                            "Watching directory \"" + app.watchDir + "\" isn't exists.");
+                } else if (Paths.get(app.watchDir).equals(Paths.get(app.outputDir).getParent())
                         || Paths.get(app.watchDir).equals(Paths.get(app.outputDir))) {
                     throw new RuntimeException(
                             "Watching directory isn't allowed to be the parent of output directory or the same.");
@@ -93,7 +97,7 @@ public class Application implements Listener {
         embeddedHttpServer.start();
 
         DirectoryWatchService directoryWatchService = new DirectoryWatchService();
-        directoryWatchService.registerDirectory((new File(watchDir)).toPath());
+        directoryWatchService.registerDirectory(Paths.get(watchDir));
 
         int availableProcessors = Runtime.getRuntime().availableProcessors();
         converterThreads = converterThreads == null ? availableProcessors - Math.floorDiv(availableProcessors, 4)
