@@ -133,29 +133,29 @@ public class ConverterService extends Widget implements Listener {
             int start = (page - 1) * limit;
 
             final List<ConverterWrapper> filteredList = converters.entrySet().stream()
-                    .map(e -> new ConverterWrapper(e.getKey(), e.getValue())).filter(cw -> {
-                        boolean ret = true;
-                        final String filter = params.size() == 3 ? params.get(2).toLowerCase(Locale.ROOT) : null;
-                        if (filter != null) {
-                            ret = Pattern.compile(",").splitAsStream(filter).map(f -> {
-                                boolean fb = true;
-                                if (f.endsWith("isdone"))
-                                    fb = cw.isDone();
-                                if (f.endsWith("isrunning"))
-                                    fb = cw.isRunning();
+                .map(e -> new ConverterWrapper(e.getKey(), e.getValue())).filter(cw -> {
+                    boolean ret = true;
+                    final String filter = params.size() == 3 ? params.get(2).toLowerCase(Locale.ROOT) : null;
+                    if (filter != null) {
+                        ret = Pattern.compile(",").splitAsStream(filter).map(f -> {
+                            boolean fb = true;
+                            if (f.endsWith("isdone"))
+                                fb = cw.isDone();
+                            if (f.endsWith("isrunning"))
+                                fb = cw.isRunning();
 
-                                if (f.startsWith("!"))
-                                    fb = !fb;
-                                return fb;
-                            }).filter(b -> !b).count() != 0;
-                        }
+                            if (f.startsWith("!"))
+                                fb = !fb;
+                            return fb;
+                        }).filter(b -> !b).count() != 0;
+                    }
 
-                        return ret;
-                    }).collect(Collectors.toCollection(ArrayList<ConverterWrapper>::new));
+                    return ret;
+                }).collect(Collectors.toCollection(ArrayList<ConverterWrapper>::new));
 
             final ConvertersWrapper wrapper = new ConvertersWrapper(
-                    filteredList.stream().sorted().skip(start).limit(limit)
-                            .collect(Collectors.toCollection(ArrayList<ConverterWrapper>::new)));
+                (ArrayList<ConverterWrapper>) filteredList.stream().sorted().skip(start).limit(limit)
+                    .collect(Collectors.toCollection(ArrayList<ConverterWrapper>::new)));
 
             wrapper.setTotal((int) filteredList.size());
             wrapper.setStart(start);
@@ -190,13 +190,13 @@ public class ConverterService extends Widget implements Listener {
     @Override
     public void handleEvent(Event event) throws Exception {
         if (DirectoryWatchService.EVENT_ENTRY_CREATE.equals(event.getType())
-                && event.getSource().equals(DirectoryWatchService.class)) {
+            && event.getSource().equals(DirectoryWatchService.class)) {
             Path inputPath = event.getParameter("path");
             addConverter(inputPath);
         }
 
         if (ConverterJob.DONE.equals(event.getType())
-                && event.getSource().equals(ConverterJob.class)) {
+            && event.getSource().equals(ConverterJob.class)) {
 
             final List<ConverterJob> jobs = converters.values().stream().filter(cj -> {
                 return cj.parentId().equals(event.getParameter("parentId"));
@@ -206,7 +206,7 @@ public class ConverterService extends Widget implements Listener {
                 final ConverterJob job = jobs.get(0);
                 final String fileName = job.inputPath.getFileName().toString();
                 final Path file = job.outputPath.getParent()
-                        .resolve(fileName.substring(0, fileName.lastIndexOf(".")) + ".smil");
+                    .resolve(fileName.substring(0, fileName.lastIndexOf(".")) + ".smil");
                 SMILWrapper.saveTo(file, jobs.stream().map(cj -> {
                     try {
                         return FFMpegImpl.probe(cj.outputPath);
@@ -228,34 +228,34 @@ public class ConverterService extends Widget implements Listener {
                     final String fileName = inputPath.getFileName().toString();
 
                     List<Output> outputs = settings.getOutput().stream()
-                            .sorted((o2, o1) -> o1.getFormat().equals(o2.getFormat())
-                                    ? o1.getVideo().getScale().compareTo(o2.getVideo().getScale())
-                                    : o1.getFormat().compareTo(o2.getFormat()))
-                            .filter(output -> {
-                                try {
-                                    return output.getVideo().getUpscale()
-                                            || !FFMpegImpl.isUpscaling(inputPath, output.getVideo().getScale());
-                                } catch (Exception e) {
-                                    throw new RuntimeException(e);
-                                }
-                            }).collect(Collectors.toList());
+                        .sorted((o2, o1) -> o1.getFormat().equals(o2.getFormat())
+                            ? o1.getVideo().getScale().compareTo(o2.getVideo().getScale())
+                            : o1.getFormat().compareTo(o2.getFormat()))
+                        .filter(output -> {
+                            try {
+                                return output.getVideo().getUpscale()
+                                    || !FFMpegImpl.isUpscaling(inputPath, output.getVideo().getScale());
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        }).collect(Collectors.toList());
 
                     outputs.forEach(output -> {
                         try {
                             final String id = outputs.size() == 1 ? parentId
-                                    : Long.toHexString(new Random().nextLong());
+                                : Long.toHexString(new Random().nextLong());
 
                             final String appendix = Optional.ofNullable(output.getFilenameAppendix()).orElse(id);
                             final Path outputPath = Paths.get(outputDir, parentId,
-                                    FFMpegImpl.filename(output.getFormat(), fileName,
-                                            appendix));
+                                FFMpegImpl.filename(output.getFormat(), fileName,
+                                    appendix));
 
                             if (!Files.exists(outputPath.getParent()))
                                 Files.createDirectories(outputPath.getParent());
 
                             final String command = FFMpegImpl.command(output);
                             final ConverterJob converter = new ConverterJob(parentId, id, command, inputPath,
-                                    outputPath);
+                                outputPath);
 
                             converters.put(id, converter);
                             converterThreadPool.submit(converter);
@@ -301,7 +301,7 @@ public class ConverterService extends Widget implements Listener {
         private StreamConsumer errorConsumer;
 
         public ConverterJob(final String parentId, final String id, final String command, final Path inputPath,
-                final Path outputPath) {
+            final Path outputPath) {
             this.parentId = parentId;
             this.id = id;
             this.command = command;
@@ -325,9 +325,9 @@ public class ConverterService extends Widget implements Listener {
                 startTime = Instant.now();
 
                 final Executable exec = new Executable(
-                        Arrays.stream(command.split(" ")).map(s -> MessageFormat.format(s,
-                                inputPath.toFile().getAbsolutePath(), outputPath.toFile().getAbsolutePath()))
-                                .collect(Collectors.toList()));
+                    Arrays.stream(command.split(" ")).map(s -> MessageFormat.format(s,
+                        inputPath.toFile().getAbsolutePath(), outputPath.toFile().getAbsolutePath()))
+                        .collect(Collectors.toList()));
 
                 final Process p = exec.run();
 
@@ -366,7 +366,7 @@ public class ConverterService extends Widget implements Listener {
 
         public String command() {
             return MessageFormat.format(command,
-                    inputPath.toFile().getAbsolutePath(), outputPath.toFile().getAbsolutePath());
+                inputPath.toFile().getAbsolutePath(), outputPath.toFile().getAbsolutePath());
         }
 
         public String fileName() {
@@ -413,7 +413,7 @@ public class ConverterService extends Widget implements Listener {
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
             marshaller.marshal(new ConverterWrapper(id, this),
-                    outputPath.getParent().resolve(".convert").toFile());
+                outputPath.getParent().resolve(".convert").toFile());
         }
     }
 }
