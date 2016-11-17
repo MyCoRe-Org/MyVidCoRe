@@ -44,8 +44,9 @@ public class Hash {
     private static String getHash(int iterations, byte[] salt, String str, String algorithm)
         throws NoSuchAlgorithmException, UnsupportedEncodingException {
         MessageDigest digest;
-        if (--iterations < 0) {
-            iterations = 0;
+        int it = iterations;
+        if (--it < 0) {
+            it = 0;
         }
         byte[] data;
 
@@ -55,7 +56,7 @@ public class Hash {
             digest.update(salt);
         }
         data = digest.digest(text.getBytes("UTF-8"));
-        for (int i = 0; i < iterations; i++) {
+        for (int i = 0; i < it; i++) {
             data = digest.digest(data);
         }
 

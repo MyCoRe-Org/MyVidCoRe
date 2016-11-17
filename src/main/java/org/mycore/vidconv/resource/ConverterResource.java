@@ -58,20 +58,20 @@ public class ConverterResource {
         try {
             CodecsWrapper codecs = FFMpegImpl.codecs();
 
-            filter = Optional.ofNullable(filter.replaceAll("/", "")).orElse("");
-            String val = Optional.ofNullable(value.replaceAll("/", "")).orElse("");
+            String f = Optional.ofNullable(filter.replaceAll("/", "")).orElse("");
+            String v = Optional.ofNullable(value.replaceAll("/", "")).orElse("");
 
-            if (!filter.isEmpty() && !val.isEmpty()) {
-                if ("type".equals(filter)) {
-                    codecs = CodecsWrapper.getByType(codecs, Type.valueOf(val));
-                } else if ("name".equals(filter)) {
-                    codecs = CodecsWrapper.getByName(codecs, val);
-                } else if ("description".equals(filter)) {
-                    codecs = CodecsWrapper.getByDescription(codecs, val);
-                } else if ("encoder".equals(filter)) {
-                    codecs = CodecsWrapper.getByEncoder(codecs, val);
-                } else if ("decoder".equals(filter)) {
-                    codecs = CodecsWrapper.getByDecoder(codecs, val);
+            if (!f.isEmpty() && !v.isEmpty()) {
+                if ("type".equals(f)) {
+                    codecs = CodecsWrapper.getByType(codecs, Type.valueOf(v));
+                } else if ("name".equals(f)) {
+                    codecs = CodecsWrapper.getByName(codecs, v);
+                } else if ("description".equals(f)) {
+                    codecs = CodecsWrapper.getByDescription(codecs, v);
+                } else if ("encoder".equals(f)) {
+                    codecs = CodecsWrapper.getByEncoder(codecs, v);
+                } else if ("decoder".equals(f)) {
+                    codecs = CodecsWrapper.getByDecoder(codecs, v);
                 }
             }
 
@@ -92,14 +92,14 @@ public class ConverterResource {
         try {
             FormatsWrapper formats = FFMpegImpl.formats();
 
-            filter = Optional.ofNullable(filter.replaceAll("/", "")).orElse("");
-            String val = Optional.ofNullable(value.replaceAll("/", "")).orElse("");
+            String f = Optional.ofNullable(filter.replaceAll("/", "")).orElse("");
+            String v = Optional.ofNullable(value.replaceAll("/", "")).orElse("");
 
-            if (!filter.isEmpty() && !val.isEmpty()) {
-                if ("name".equals(filter)) {
-                    formats = FormatsWrapper.getByName(formats, val);
-                } else if ("description".equals(filter)) {
-                    formats = FormatsWrapper.getByDescription(formats, val);
+            if (!f.isEmpty() && !v.isEmpty()) {
+                if ("name".equals(f)) {
+                    formats = FormatsWrapper.getByName(formats, v);
+                } else if ("description".equals(f)) {
+                    formats = FormatsWrapper.getByDescription(formats, v);
                 }
             }
 

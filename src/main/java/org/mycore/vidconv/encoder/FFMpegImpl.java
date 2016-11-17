@@ -289,7 +289,7 @@ public class FFMpegImpl {
 
                             final List<ParameterWrapper> parameters = new ArrayList<>();
                             final Matcher pm = PATTERN_PARAMS.matcher(m.group(3));
-                            while (pm.find()) {
+                            if (pm.find()) {
                                 final ParameterWrapper param = new ParameterWrapper();
                                 param.setName(pm.group(1));
                                 param.setType(pm.group(2));
@@ -525,8 +525,8 @@ public class FFMpegImpl {
 
         Optional.ofNullable(video.getFramerate()).ifPresent(v -> {
             cmd.append(" -r " + v);
-            Optional.ofNullable(video.getFramerateType()).ifPresent(t -> cmd.append(" -vsync " + (t.equals("CFR") ? "1"
-                : t.equals("VFR") ? "2" : "0")));
+            Optional.ofNullable(video.getFramerateType()).ifPresent(t -> cmd.append(" -vsync " + ("CFR".equals(t) ? "1"
+                : "VFR".equals(t) ? "2" : "0")));
         });
 
         Optional.ofNullable(video.getQuality()).ifPresent(quality -> {
