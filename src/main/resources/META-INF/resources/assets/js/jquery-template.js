@@ -17,7 +17,7 @@
 
 		var v = vars[p[0]];
 		if (v)
-			return p.length == 1 ? v : propertyValue(v, p.slice(1).join());
+			return p.length === 1 ? v : propertyValue(v, p.slice(1).join());
 
 		return null;
 	};
@@ -42,7 +42,7 @@
 			if (selector === undefined)
 				selector = "";
 
-			if (elm.parentNode.nodeType == 1) {
+			if (elm.parentNode.nodeType === 1) {
 				if (selector !== undefined && selector.length > 0)
 					selector += " > ";
 
@@ -54,7 +54,7 @@
 					var clss = elm.className.split(/\s/g);
 					for (var i = 0; i < clss.length; i++) {
 						var cls = clss[i];
-						if (EXP_VAR.exec(cls) || cls.length == 0)
+						if (EXP_VAR.exec(cls) || cls.length === 0)
 							continue;
 						selector += "." + cls;
 					}
@@ -80,9 +80,9 @@
 			if (elm.childNodes && elm.childNodes.length) {
 				for (var i = 0; i < elm.childNodes.length; i++) {
 					var cn = elm.childNodes[i];
-					if (cn.nodeType == 1) {
+					if (cn.nodeType === 1) {
 						vars = extractVariableSelectors(cn, selector, vars);
-					} else if (cn.nodeType == 3) {
+					} else if (cn.nodeType === 3) {
 						while (m = EXP_VAR.exec(cn.nodeValue)) {
 							var vn = m[1];
 							var vs = vars[vn] || [];
@@ -110,7 +110,7 @@
 				var offset = path.lastIndexOf(">");
 				var selector = offset != -1 ? path.substring(0, offset).trim() : null;
 				var elm = offset != -1 ? path.substring(offset + 1).trim() : path.trim();
-				var $elm = selector == null ? $template : $template.find(selector);
+				var $elm = selector === null ? $template : $template.find(selector);
 
 				if (elm === "text()") {
 					$elm.text(replaceVariables(vt.template, vars));
@@ -143,7 +143,7 @@
 
 			var $elm = $("#" + rootId, this.$el);
 
-			if ($elm.length == 0) {
+			if ($elm.length === 0) {
 				$elm = this.$template.clone();
 				updateSelectors($elm, this.selectors, vars);
 				this.$el.append($elm);
@@ -163,7 +163,7 @@
 				}
 			});
 		} else if (typeof options === 'string' && options[0] !== '_' && options !== 'init') {
-			if (Array.prototype.slice.call(args, 1).length == 0 && $.inArray(options, $.fn[pluginName].getters) != -1) {
+			if (Array.prototype.slice.call(args, 1).length === 0 && $.inArray(options, $.fn[pluginName].getters) != -1) {
 				var instance = $.data(this[0], 'plugin_' + pluginName);
 				return instance[options].apply(instance, Array.prototype.slice.call(args, 1));
 			} else {
