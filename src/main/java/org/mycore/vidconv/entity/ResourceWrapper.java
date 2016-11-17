@@ -26,6 +26,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 
 import org.mycore.vidconv.util.Hash;
@@ -56,7 +57,7 @@ public class ResourceWrapper implements Serializable {
             this.fileName = fileName;
             this.mimeType = mimeType != null ? mimeType : MimeType.detect(fileName);
             this.content = toByteArray(is);
-            this.etag = Hash.getMD5String(new String(this.content));
+            this.etag = Hash.getMD5String(new String(this.content, StandardCharsets.UTF_8));
         } catch (IOException | NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }

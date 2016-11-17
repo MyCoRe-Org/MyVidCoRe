@@ -45,6 +45,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -120,7 +121,7 @@ public class DirectoryWatchService extends Widget {
                             Path name = event.context();
                             Path child = path.resolve(name);
 
-                            LOGGER.debug(String.format("%s: %s %s", kind.name(), path, child));
+                            LOGGER.debug(String.format(Locale.ROOT, "%s: %s %s", kind.name(), path, child));
 
                             if (!events.containsKey(child)) {
                                 events.put(child, new InitialEvent(kind, Instant.now()));
@@ -140,7 +141,7 @@ public class DirectoryWatchService extends Widget {
                         });
 
                         if (key.reset() == false) {
-                            LOGGER.debug(String.format("%s is invalid", key));
+                            LOGGER.debug(String.format(Locale.ROOT, "%s is invalid", key));
                             keys.remove(key);
                             if (keys.isEmpty()) {
                                 break;
@@ -183,7 +184,7 @@ public class DirectoryWatchService extends Widget {
         Files.walkFileTree(root, new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult preVisitDirectory(Path dir,
-                    BasicFileAttributes attrs) throws IOException {
+                BasicFileAttributes attrs) throws IOException {
                 reg(dir, keys, ws);
                 return super.preVisitDirectory(dir, attrs);
             }
@@ -242,6 +243,7 @@ public class DirectoryWatchService extends Widget {
 
     static class InitialEvent {
         final Kind<Path> kind;
+
         Instant lastModified;
 
         InitialEvent(final Kind<Path> kind, final Instant lastModified) {

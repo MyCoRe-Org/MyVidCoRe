@@ -24,6 +24,7 @@ package org.mycore.vidconv.resource;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
@@ -57,7 +58,7 @@ public class SettingsResource {
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public Response getSettings() {
         return Response.ok().status(Response.Status.OK).entity(SETTINGS.getSettings())
-                .build();
+            .build();
     }
 
     @POST
@@ -67,10 +68,11 @@ public class SettingsResource {
             SETTINGS.setSettings(settings);
 
             return Response.ok().status(Response.Status.OK).entity(settings)
-                    .build();
+                .build();
         } catch (JAXBException e) {
             LOGGER.error(e.getMessage(), e);
-            final StreamingOutput so = (OutputStream os) -> e.printStackTrace(new PrintStream(os));
+            final StreamingOutput so = (OutputStream os) -> e
+                .printStackTrace(new PrintStream(os, false, StandardCharsets.UTF_8.toString()));
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(so).build();
         }
     }

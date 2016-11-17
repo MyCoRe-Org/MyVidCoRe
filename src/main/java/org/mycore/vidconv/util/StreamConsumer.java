@@ -24,6 +24,7 @@ package org.mycore.vidconv.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -51,7 +52,7 @@ public class StreamConsumer implements Runnable {
         int read;
         try {
             while ((read = is.read(buf)) != -1) {
-                sb.append(new String(buf, 0, read));
+                sb.append(new String(buf, 0, read, StandardCharsets.UTF_8));
             }
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);

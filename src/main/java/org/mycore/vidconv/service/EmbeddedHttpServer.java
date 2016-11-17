@@ -27,6 +27,7 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
+import java.util.Locale;
 
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriBuilderException;
@@ -75,9 +76,9 @@ public class EmbeddedHttpServer extends Widget {
         if (httpServer == null) {
             httpServer = createHttpServer();
             LOGGER.info(
-                    String.format(
-                            "Jersey Application Server started with WADL available at " + "%sapplication.wadl",
-                            getURI()));
+                String.format(Locale.ROOT,
+                    "Jersey Application Server started with WADL available at " + "%sapplication.wadl",
+                    getURI()));
         }
         httpServer.start();
     }
@@ -89,9 +90,9 @@ public class EmbeddedHttpServer extends Widget {
     }
 
     private HttpServer createHttpServer()
-            throws IOException, IllegalArgumentException, UriBuilderException, URISyntaxException {
+        throws IOException, IllegalArgumentException, UriBuilderException, URISyntaxException {
         ResourceConfig resourceConfig = new ResourceConfig().packages("org.mycore.vidconv.resource")
-                .register(MoxyJsonFeature.class);
+            .register(MoxyJsonFeature.class);
         return JdkHttpServerFactory.createHttpServer(getURI(), resourceConfig, false);
     }
 

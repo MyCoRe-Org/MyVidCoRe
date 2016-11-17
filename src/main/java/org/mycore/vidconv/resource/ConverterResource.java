@@ -21,6 +21,7 @@ package org.mycore.vidconv.resource;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
@@ -75,10 +76,11 @@ public class ConverterResource {
             }
 
             return Response.ok().status(Response.Status.OK).entity(codecs)
-                    .build();
+                .build();
         } catch (InterruptedException | ExecutionException e) {
             LOGGER.error(e.getMessage(), e);
-            final StreamingOutput so = (OutputStream os) -> e.printStackTrace(new PrintStream(os));
+            final StreamingOutput so = (OutputStream os) -> e
+                .printStackTrace(new PrintStream(os, false, StandardCharsets.UTF_8.toString()));
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(so).build();
         }
     }
@@ -102,10 +104,11 @@ public class ConverterResource {
             }
 
             return Response.ok().status(Response.Status.OK).entity(formats)
-                    .build();
+                .build();
         } catch (InterruptedException | ExecutionException e) {
             LOGGER.error(e.getMessage(), e);
-            final StreamingOutput so = (OutputStream os) -> e.printStackTrace(new PrintStream(os));
+            final StreamingOutput so = (OutputStream os) -> e
+                .printStackTrace(new PrintStream(os, false, StandardCharsets.UTF_8.toString()));
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(so).build();
         }
     }
@@ -116,10 +119,11 @@ public class ConverterResource {
     public Response getEncoder(@PathParam("name") String name) {
         try {
             return Response.ok().status(Response.Status.OK).entity(FFMpegImpl.encoder(name))
-                    .build();
+                .build();
         } catch (InterruptedException | NumberFormatException | ExecutionException e) {
             LOGGER.error(e.getMessage(), e);
-            final StreamingOutput so = (OutputStream os) -> e.printStackTrace(new PrintStream(os));
+            final StreamingOutput so = (OutputStream os) -> e
+                .printStackTrace(new PrintStream(os, false, StandardCharsets.UTF_8.toString()));
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(so).build();
         }
     }

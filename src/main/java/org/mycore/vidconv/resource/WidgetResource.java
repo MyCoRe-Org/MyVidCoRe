@@ -30,6 +30,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
@@ -87,8 +88,8 @@ public class WidgetResource {
             if (widget != null) {
                 if ("status".equals(action)) {
                     return Response.ok().status(Response.Status.OK)
-                            .entity(widgetParams.isEmpty() ? widget.status() : widget.status(widgetParams))
-                            .build();
+                        .entity(widgetParams.isEmpty() ? widget.status() : widget.status(widgetParams))
+                        .build();
                 } else if ("start".equals(action)) {
                     if (widgetParams.isEmpty())
                         widget.start();
@@ -102,7 +103,7 @@ public class WidgetResource {
                 }
 
                 return Response.ok().status(Response.Status.OK)
-                        .build();
+                    .build();
             } else {
                 LOGGER.error("widget \"" + widgetOptions + "\" not found.");
                 return Response.status(Response.Status.NOT_FOUND).build();
@@ -117,7 +118,7 @@ public class WidgetResource {
     @HEAD
     @Path("{widget:.+}/{action:(download)}")
     public Response widgetDownloadHeader(@PathParam("widget") String widgetOptions,
-            @PathParam("action") String action) {
+        @PathParam("action") String action) {
         try {
             final StringTokenizer tok = new StringTokenizer(widgetOptions, "/");
 
@@ -132,11 +133,11 @@ public class WidgetResource {
 
             if (widget != null) {
                 final java.nio.file.Path path = widgetParams.isEmpty() ? widget.download()
-                        : widget.download(widgetParams);
+                    : widget.download(widgetParams);
 
                 if (path != null) {
                     return Response.ok().status(Response.Status.PARTIAL_CONTENT)
-                            .header(HttpHeaders.CONTENT_LENGTH, path.toFile().length()).build();
+                        .header(HttpHeaders.CONTENT_LENGTH, path.toFile().length()).build();
                 } else {
                     LOGGER.error("download path was empty.");
                     return Response.status(Response.Status.NOT_FOUND).build();
@@ -155,7 +156,7 @@ public class WidgetResource {
     @GET
     @Path("{widget:.+}/{action:(download)}")
     public Response widgetDownload(@HeaderParam("Range") String range, @PathParam("widget") String widgetOptions,
-            @PathParam("action") String action) {
+        @PathParam("action") String action) {
         try {
             final StringTokenizer tok = new StringTokenizer(widgetOptions, "/");
 
@@ -170,7 +171,7 @@ public class WidgetResource {
 
             if (widget != null) {
                 final java.nio.file.Path path = widgetParams.isEmpty() ? widget.download()
-                        : widget.download(widgetParams);
+                    : widget.download(widgetParams);
 
                 if (path != null) {
                     return buildStream(path, range);
@@ -195,49 +196,50 @@ public class WidgetResource {
         final String mimeType = MimeType.detect(asset);
 
         return Stream.of(RANGE_PATTERN.matcher(Optional.ofNullable(range).orElse("")))
-                .filter(rm -> rm.find()).findFirst()
-                .map(rm -> {
-                    try {
-                        final File assetFile = asset.toFile();
-                        final int from = new Integer(rm.group(2));
-                        final Optional<String> toVal = Optional.ofNullable(rm.group(3));
-                        final int to = toVal.isPresent() ? new Integer(toVal.get()) : (int) (assetFile.length() - 1);
+            .filter(rm -> rm.find()).findFirst()
+            .map(rm -> {
+                try {
+                    final File assetFile = asset.toFile();
+                    final int from = new Integer(rm.group(2));
+                    final Optional<String> toVal = Optional.ofNullable(rm.group(3));
+                    final int to = toVal.isPresent() ? new Integer(toVal.get()) : (int) (assetFile.length() - 1);
 
-                        final String responseRange = String.format("bytes %d-%d/%d", from, to, assetFile.length());
-                        final RandomAccessFile raf = new RandomAccessFile(assetFile, "r");
-                        raf.seek(from);
+                    final String responseRange = String.format(Locale.ROOT, "bytes %d-%d/%d", from, to,
+                        assetFile.length());
+                    final RandomAccessFile raf = new RandomAccessFile(assetFile, "r");
+                    raf.seek(from);
 
-                        final int len = to - from + 1;
-                        final RangeStreamingOutput streamer = new RangeStreamingOutput(len, raf);
+                    final int len = to - from + 1;
+                    final RangeStreamingOutput streamer = new RangeStreamingOutput(len, raf);
 
-                        return Response.ok(streamer, mimeType)
-                                .status(Response.Status.PARTIAL_CONTENT)
-                                .header("Accept-Ranges", "bytes")
-                                .header("Content-Range", responseRange)
-                                .header(HttpHeaders.CONTENT_LENGTH, streamer.getLenth())
-                                .header(HttpHeaders.LAST_MODIFIED, new Date(assetFile.lastModified())).build();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }).orElseGet(() -> {
-                    final StreamingOutput streamer = new StreamingOutput() {
-                        @Override
-                        public void write(final OutputStream output) throws IOException, WebApplicationException {
-                            try {
-                                byte[] data = Files.readAllBytes(asset);
-                                output.write(data);
-                                output.flush();
-                            } catch (Exception e) {
-                                throw new RuntimeException(e);
-                            }
+                    return Response.ok(streamer, mimeType)
+                        .status(Response.Status.PARTIAL_CONTENT)
+                        .header("Accept-Ranges", "bytes")
+                        .header("Content-Range", responseRange)
+                        .header(HttpHeaders.CONTENT_LENGTH, streamer.getLenth())
+                        .header(HttpHeaders.LAST_MODIFIED, new Date(assetFile.lastModified())).build();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }).orElseGet(() -> {
+                final StreamingOutput streamer = new StreamingOutput() {
+                    @Override
+                    public void write(final OutputStream output) throws IOException, WebApplicationException {
+                        try {
+                            byte[] data = Files.readAllBytes(asset);
+                            output.write(data);
+                            output.flush();
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
                         }
-                    };
+                    }
+                };
 
-                    return Response
-                            .ok(streamer, mimeType)
-                            .header("content-disposition",
-                                    "attachment; filename = \"" + asset.getFileName().toString() + "\"")
-                            .build();
-                });
+                return Response
+                    .ok(streamer, mimeType)
+                    .header("content-disposition",
+                        "attachment; filename = \"" + asset.getFileName().toString() + "\"")
+                    .build();
+            });
     }
 }

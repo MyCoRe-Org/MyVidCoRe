@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 import javax.inject.Singleton;
@@ -78,18 +79,19 @@ public class WebResource {
                 cc.setPrivate(true);
 
                 return Response.ok().status(Response.Status.OK)
-                        .tag(r.getETag())
-                        .type(r.getMimeType())
-                        .entity(r.getContent())
-                        .cacheControl(cc)
-                        .build();
+                    .tag(r.getETag())
+                    .type(r.getMimeType())
+                    .entity(r.getContent())
+                    .cacheControl(cc)
+                    .build();
             } else {
                 LOGGER.error("resource \"" + fileName + "\" not found.");
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
-            final StreamingOutput so = (OutputStream os) -> e.printStackTrace(new PrintStream(os));
+            final StreamingOutput so = (OutputStream os) -> e
+                .printStackTrace(new PrintStream(os, false, StandardCharsets.UTF_8.toString()));
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(so).build();
         }
     }
