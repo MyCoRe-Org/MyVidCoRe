@@ -302,7 +302,6 @@
             <bundledSignatures>
               <bundledSignature>jdk-unsafe</bundledSignature>
               <bundledSignature>jdk-deprecated</bundledSignature>
-              <bundledSignature>commons-io-unsafe-2.4</bundledSignature>
             </bundledSignatures>
           </configuration>
         </plugin>
