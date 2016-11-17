@@ -59,19 +59,19 @@ public class ConverterResource {
             CodecsWrapper codecs = FFMpegImpl.codecs();
 
             filter = Optional.ofNullable(filter.replaceAll("/", "")).orElse("");
-            value = Optional.ofNullable(value.replaceAll("/", "")).orElse("");
+            String val = Optional.ofNullable(value.replaceAll("/", "")).orElse("");
 
-            if (!filter.isEmpty() && !value.isEmpty()) {
+            if (!filter.isEmpty() && !val.isEmpty()) {
                 if ("type".equals(filter)) {
-                    codecs = CodecsWrapper.getByType(codecs, Type.valueOf(value));
+                    codecs = CodecsWrapper.getByType(codecs, Type.valueOf(val));
                 } else if ("name".equals(filter)) {
-                    codecs = CodecsWrapper.getByName(codecs, value);
+                    codecs = CodecsWrapper.getByName(codecs, val);
                 } else if ("description".equals(filter)) {
-                    codecs = CodecsWrapper.getByDescription(codecs, value);
+                    codecs = CodecsWrapper.getByDescription(codecs, val);
                 } else if ("encoder".equals(filter)) {
-                    codecs = CodecsWrapper.getByEncoder(codecs, value);
+                    codecs = CodecsWrapper.getByEncoder(codecs, val);
                 } else if ("decoder".equals(filter)) {
-                    codecs = CodecsWrapper.getByDecoder(codecs, value);
+                    codecs = CodecsWrapper.getByDecoder(codecs, val);
                 }
             }
 
@@ -93,13 +93,13 @@ public class ConverterResource {
             FormatsWrapper formats = FFMpegImpl.formats();
 
             filter = Optional.ofNullable(filter.replaceAll("/", "")).orElse("");
-            value = Optional.ofNullable(value.replaceAll("/", "")).orElse("");
+            String val = Optional.ofNullable(value.replaceAll("/", "")).orElse("");
 
-            if (!filter.isEmpty() && !value.isEmpty()) {
+            if (!filter.isEmpty() && !val.isEmpty()) {
                 if ("name".equals(filter)) {
-                    formats = FormatsWrapper.getByName(formats, value);
+                    formats = FormatsWrapper.getByName(formats, val);
                 } else if ("description".equals(filter)) {
-                    formats = FormatsWrapper.getByDescription(formats, value);
+                    formats = FormatsWrapper.getByDescription(formats, val);
                 }
             }
 

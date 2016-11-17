@@ -41,8 +41,8 @@ public class Hash {
         return getHash(1, null, text, "md5");
     }
 
-    private static String getHash(int iterations, byte[] salt, String text, String algorithm)
-            throws NoSuchAlgorithmException, UnsupportedEncodingException {
+    private static String getHash(int iterations, byte[] salt, String str, String algorithm)
+        throws NoSuchAlgorithmException, UnsupportedEncodingException {
         MessageDigest digest;
         if (--iterations < 0) {
             iterations = 0;
@@ -50,7 +50,7 @@ public class Hash {
         byte[] data;
 
         digest = MessageDigest.getInstance(algorithm);
-        text = Normalizer.normalize(text, Form.NFC);
+        String text = Normalizer.normalize(str, Form.NFC);
         if (salt != null) {
             digest.update(salt);
         }

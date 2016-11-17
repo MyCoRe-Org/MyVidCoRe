@@ -67,7 +67,7 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
 
     private String errorStream;
 
-    ConverterWrapper() {
+    protected ConverterWrapper() {
     }
 
     public ConverterWrapper(final String id, final ConverterJob converter) {
@@ -204,10 +204,10 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
         @XmlAttribute(name = "estimate")
         private String estimate;
 
-        Progress() {
+        protected Progress() {
         }
 
-        static Progress buildProgress(final ConverterWrapper wrapper) {
+        protected static Progress buildProgress(final ConverterWrapper wrapper) {
             final Progress p = new Progress();
 
             if (wrapper.done) {
@@ -231,11 +231,11 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
             return p;
         }
 
-        static String formatDuration(final Duration dur) {
+        protected static String formatDuration(final Duration dur) {
             return formatDuration(dur.toNanos());
         }
 
-        static String formatDuration(final long dur) {
+        protected static String formatDuration(final long dur) {
             LocalTime fTime = LocalTime.ofNanoOfDay(dur);
             return fTime.format(DURATION_FORMAT);
         }

@@ -69,16 +69,16 @@ import org.mycore.vidconv.util.Executable;
  */
 public class FFMpegImpl {
     private static final CacheManager CACHE_MGR = CacheManagerBuilder.newCacheManagerBuilder()
-            .withCache("probe",
-                    CacheConfigurationBuilder.newCacheConfigurationBuilder(Path.class, ProbeWrapper.class,
-                            ResourcePoolsBuilder.heap(100))
-                            .build())
-            .build(true);
+        .withCache("probe",
+            CacheConfigurationBuilder.newCacheConfigurationBuilder(Path.class, ProbeWrapper.class,
+                ResourcePoolsBuilder.heap(100))
+                .build())
+        .build(true);
 
     private static final Pattern PATTERN_ENTRY_SPLIT = Pattern.compile("\\n\\n");
 
     private static final Pattern PATTERN_CODECS = Pattern
-            .compile("\\s(D|\\.|\\s)(E|\\.|\\s)(V|A|S|\\s)(I|\\.|\\s)(L|\\.|\\s)(S|\\.|\\s)\\s([^=\\s\\t]+)([^\\n]+)");
+        .compile("\\s(D|\\.|\\s)(E|\\.|\\s)(V|A|S|\\s)(I|\\.|\\s)(L|\\.|\\s)(S|\\.|\\s)\\s([^=\\s\\t]+)([^\\n]+)");
 
     private static final Pattern PATTERN_ENCODER_LIB = Pattern.compile("\\(encoders:\\s([^\\)]+)\\)");
 
@@ -112,17 +112,17 @@ public class FFMpegImpl {
                     final CodecWrapper codec = new CodecWrapper();
 
                     switch (m.group(3)) {
-                    case "A":
-                        codec.setType(CodecWrapper.Type.AUDIO);
-                        break;
-                    case "V":
-                        codec.setType(CodecWrapper.Type.VIDEO);
-                        break;
-                    case "S":
-                        codec.setType(CodecWrapper.Type.SUBTITLE);
-                        break;
-                    default:
-                        continue;
+                        case "A":
+                            codec.setType(CodecWrapper.Type.AUDIO);
+                            break;
+                        case "V":
+                            codec.setType(CodecWrapper.Type.VIDEO);
+                            break;
+                        case "S":
+                            codec.setType(CodecWrapper.Type.SUBTITLE);
+                            break;
+                        default:
+                            continue;
                     }
 
                     codec.setLossy(m.group(5).equalsIgnoreCase("L"));
@@ -155,7 +155,7 @@ public class FFMpegImpl {
     }
 
     private static final Pattern PATTERN_FORMATS = Pattern
-            .compile("\\s(D|\\.|\\s)(E|\\.|\\s)\\s([^=\\s\\t]+)([^\\n]+)");
+        .compile("\\s(D|\\.|\\s)(E|\\.|\\s)\\s([^=\\s\\t]+)([^\\n]+)");
 
     private static FormatsWrapper supportedFormats;
 
@@ -201,7 +201,7 @@ public class FFMpegImpl {
     }
 
     private static final Pattern PATTERN_ENCODER = Pattern
-            .compile("^Encoder\\s([^\\s]+)\\s\\[([^\\]]+)\\]:\\n([\\S\\s]+)$");
+        .compile("^Encoder\\s([^\\s]+)\\s\\[([^\\]]+)\\]:\\n([\\S\\s]+)$");
 
     private static final Pattern PATTERN_PIX_FMT = Pattern.compile("pixel formats:(.*)");
 
@@ -214,15 +214,15 @@ public class FFMpegImpl {
     private static final Pattern PATTERN_CH_LAYOUTS = Pattern.compile("channel layouts:(.*)");
 
     private static final Pattern PATTERN_PARAMS = Pattern
-            .compile("\\s+-([^\\s]+)\\s+<([^>]+)>\\s+(?:[^\\s]+)\\s([^\\n]+)([\\S\\s]+?(?=\\s+-))?");
+        .compile("\\s+-([^\\s]+)\\s+<([^>]+)>\\s+(?:[^\\s]+)\\s([^\\n]+)([\\S\\s]+?(?=\\s+-))?");
 
     private static final Pattern PATTERN_PARAM_VALUES = Pattern.compile("\\s+([^\\s]+)\\s+(?:[^\\s]+)([^\\n]*)");
 
     private static final Pattern PATTERN_PARAM_FROM_TO = Pattern
-            .compile("\\(from\\s([^\\s]+)\\sto\\s([^\\s]+)\\)");
+        .compile("\\(from\\s([^\\s]+)\\sto\\s([^\\s]+)\\)");
 
     private static final Pattern PATTERN_PARAM_DEFAULT = Pattern
-            .compile("\\(default\\s([^\\)]+)\\)");
+        .compile("\\(default\\s([^\\)]+)\\)");
 
     private static Map<String, EncodersWrapper> supportedEncoders = new ConcurrentHashMap<>();
 
@@ -236,7 +236,7 @@ public class FFMpegImpl {
      * @throws NumberFormatException 
      */
     public static EncodersWrapper encoder(final String name)
-            throws InterruptedException, NumberFormatException, ExecutionException {
+        throws InterruptedException, NumberFormatException, ExecutionException {
         if (supportedEncoders.containsKey(name)) {
             return supportedEncoders.get(name);
         }
@@ -248,88 +248,88 @@ public class FFMpegImpl {
 
             if (outputStream != null && !outputStream.isEmpty()) {
                 final List<EncoderWrapper> encoders = PATTERN_ENTRY_SPLIT.splitAsStream(outputStream)
-                        .filter(os -> !os.isEmpty())
-                        .map(os -> {
-                            final Matcher m = PATTERN_ENCODER.matcher(os);
-                            while (m.find()) {
-                                final EncoderWrapper encoder = new EncoderWrapper();
+                    .filter(os -> !os.isEmpty())
+                    .map(os -> {
+                        final Matcher m = PATTERN_ENCODER.matcher(os);
+                        while (m.find()) {
+                            final EncoderWrapper encoder = new EncoderWrapper();
 
-                                encoder.setName(m.group(1));
-                                encoder.setDescription(m.group(2));
+                            encoder.setName(m.group(1));
+                            encoder.setDescription(m.group(2));
 
-                                encoder.setPixelFormats(
-                                        Stream.of(m.group(3)).map(s -> PATTERN_PIX_FMT.matcher(s))
-                                                .filter(ma -> ma.find())
-                                                .flatMap(ma -> splitString(ma.group(1)))
-                                                .collect(Collectors.toList()));
+                            encoder.setPixelFormats(
+                                Stream.of(m.group(3)).map(s -> PATTERN_PIX_FMT.matcher(s))
+                                    .filter(ma -> ma.find())
+                                    .flatMap(ma -> splitString(ma.group(1)))
+                                    .collect(Collectors.toList()));
 
-                                encoder.setFrameRates(
-                                        Stream.of(m.group(3)).map(s -> PATTERN_FRM_RATES.matcher(s))
-                                                .filter(ma -> ma.find())
-                                                .flatMap(ma -> splitString(ma.group(1)))
-                                                .collect(Collectors.toList()));
+                            encoder.setFrameRates(
+                                Stream.of(m.group(3)).map(s -> PATTERN_FRM_RATES.matcher(s))
+                                    .filter(ma -> ma.find())
+                                    .flatMap(ma -> splitString(ma.group(1)))
+                                    .collect(Collectors.toList()));
 
-                                encoder.setSampleFormats(
-                                        Stream.of(m.group(3)).map(s -> PATTERN_SMP_FROMATS.matcher(s))
-                                                .filter(ma -> ma.find())
-                                                .flatMap(ma -> splitString(ma.group(1)))
-                                                .collect(Collectors.toList()));
+                            encoder.setSampleFormats(
+                                Stream.of(m.group(3)).map(s -> PATTERN_SMP_FROMATS.matcher(s))
+                                    .filter(ma -> ma.find())
+                                    .flatMap(ma -> splitString(ma.group(1)))
+                                    .collect(Collectors.toList()));
 
-                                encoder.setSampleRates(
-                                        Stream.of(m.group(3)).map(s -> PATTERN_SMP_RATES.matcher(s))
-                                                .filter(ma -> ma.find())
-                                                .flatMap(ma -> splitString(ma.group(1))).map(s -> new Integer(s))
-                                                .collect(Collectors.toList()));
+                            encoder.setSampleRates(
+                                Stream.of(m.group(3)).map(s -> PATTERN_SMP_RATES.matcher(s))
+                                    .filter(ma -> ma.find())
+                                    .flatMap(ma -> splitString(ma.group(1))).map(s -> new Integer(s))
+                                    .collect(Collectors.toList()));
 
-                                encoder.setChannelLayouts(
-                                        Stream.of(m.group(3)).map(s -> PATTERN_CH_LAYOUTS.matcher(s))
-                                                .filter(ma -> ma.find())
-                                                .flatMap(ma -> splitString(ma.group(1)))
-                                                .collect(Collectors.toList()));
+                            encoder.setChannelLayouts(
+                                Stream.of(m.group(3)).map(s -> PATTERN_CH_LAYOUTS.matcher(s))
+                                    .filter(ma -> ma.find())
+                                    .flatMap(ma -> splitString(ma.group(1)))
+                                    .collect(Collectors.toList()));
 
-                                final List<ParameterWrapper> parameters = new ArrayList<>();
-                                final Matcher pm = PATTERN_PARAMS.matcher(m.group(3));
-                                while (pm.find()) {
-                                    final ParameterWrapper param = new ParameterWrapper();
-                                    param.setName(pm.group(1));
-                                    param.setType(pm.group(2));
-                                    param.setDescription(pm.group(3));
+                            final List<ParameterWrapper> parameters = new ArrayList<>();
+                            final Matcher pm = PATTERN_PARAMS.matcher(m.group(3));
+                            while (pm.find()) {
+                                final ParameterWrapper param = new ParameterWrapper();
+                                param.setName(pm.group(1));
+                                param.setType(pm.group(2));
+                                param.setDescription(pm.group(3));
 
-                                    Optional.ofNullable(getPatternGroup(PATTERN_PARAM_FROM_TO, pm.group(3), 1))
-                                            .ifPresent(v -> param.setFromValue(v));
-                                    Optional.ofNullable(getPatternGroup(PATTERN_PARAM_FROM_TO, pm.group(3), 2))
-                                            .ifPresent(v -> param.setToValue(v));
-                                    Optional.ofNullable(getPatternGroup(PATTERN_PARAM_DEFAULT, pm.group(3), 1))
-                                            .ifPresent(v -> param.setDefaultValue(v));
+                                Optional.ofNullable(getPatternGroup(PATTERN_PARAM_FROM_TO, pm.group(3), 1))
+                                    .ifPresent(v -> param.setFromValue(v));
+                                Optional.ofNullable(getPatternGroup(PATTERN_PARAM_FROM_TO, pm.group(3), 2))
+                                    .ifPresent(v -> param.setToValue(v));
+                                Optional.ofNullable(getPatternGroup(PATTERN_PARAM_DEFAULT, pm.group(3), 1))
+                                    .ifPresent(v -> param.setDefaultValue(v));
 
-                                    Optional.ofNullable(pm.group(4)).ifPresent(vs -> {
-                                        if (!vs.isEmpty()) {
-                                            final List<ParameterValue> values = new ArrayList<>();
-                                            final Matcher pv = PATTERN_PARAM_VALUES.matcher(vs);
-                                            while (pv.find()) {
-                                                final ParameterValue value = new ParameterValue();
-                                                value.setName(pv.group(1));
-                                                Optional.ofNullable(pv.group(2)).ifPresent(v -> {
-                                                    v = v.trim();
-                                                    if (!v.isEmpty())
-                                                        value.setDescription(v);
-                                                });
-                                                values.add(value);
-                                            }
-                                            if (!values.isEmpty())
-                                                param.setValues(values);
+                                Optional.ofNullable(pm.group(4)).ifPresent(vs -> {
+                                    if (!vs.isEmpty()) {
+                                        final List<ParameterValue> values = new ArrayList<>();
+                                        final Matcher pv = PATTERN_PARAM_VALUES.matcher(vs);
+                                        while (pv.find()) {
+                                            final ParameterValue value = new ParameterValue();
+                                            value.setName(pv.group(1));
+                                            Optional.ofNullable(pv.group(2)).ifPresent(v -> {
+                                                v = v.trim();
+                                                if (!v.isEmpty())
+                                                    value.setDescription(v);
+                                            });
+                                            values.add(value);
                                         }
-                                    });
+                                        if (!values.isEmpty())
+                                            param.setValues(values);
+                                    }
+                                });
 
-                                    parameters.add(param);
-                                }
-                                encoder.setParameters(parameters);
-
-                                return encoder;
+                                parameters.add(param);
                             }
+                            encoder.setParameters(parameters);
 
-                            return null;
-                        }).filter(e -> e != null).collect(Collectors.toList());
+                            return encoder;
+                        }
+
+                        return null;
+                    }).filter(e -> e != null).collect(Collectors.toList());
 
                 supportedEncoders.put(name, new EncodersWrapper().setEncoders(encoders));
                 return supportedEncoders.get(name);
@@ -340,7 +340,7 @@ public class FFMpegImpl {
     }
 
     private static final Pattern PATTERN_MUXER = Pattern
-            .compile("^Muxer\\s([^\\s]+)\\s\\[(?:[^\\]]+)\\]:\\n([\\S\\s]+)$");
+        .compile("^Muxer\\s([^\\s]+)\\s\\[(?:[^\\]]+)\\]:\\n([\\S\\s]+)$");
 
     private static final Pattern PATTERN_EXTENSION = Pattern.compile("Common extensions:(.*)\\.");
 
@@ -404,7 +404,7 @@ public class FFMpegImpl {
 
             if (dm.find() && cm.find()) {
                 long duration = parseMillis(dm.group(1));
-                
+
                 String last = "";
                 while (cm.find()) {
                     last = cm.group(1);
@@ -445,19 +445,19 @@ public class FFMpegImpl {
      * @throws ExecutionException 
      */
     public static boolean isEncodingSupported(final Path inputFile)
-            throws InterruptedException, JAXBException, ExecutionException {
+        throws InterruptedException, JAXBException, ExecutionException {
         final ProbeWrapper probe = probe(inputFile);
 
         if (probe != null && probe.getFormat() != null && probe.getStreams() != null) {
             return probe.getStreams().stream().filter(
-                    s -> s.getCodecType().equalsIgnoreCase("audio") || s.getCodecType().equalsIgnoreCase("video"))
-                    .map(s -> {
-                        try {
-                            return !codecs().getByName(s.getCodecName()).isEmpty();
-                        } catch (Exception ex) {
-                            return false;
-                        }
-                    }).filter(rt -> !rt).count() == 0;
+                s -> s.getCodecType().equalsIgnoreCase("audio") || s.getCodecType().equalsIgnoreCase("video"))
+                .map(s -> {
+                    try {
+                        return !codecs().getByName(s.getCodecName()).isEmpty();
+                    } catch (Exception ex) {
+                        return false;
+                    }
+                }).filter(rt -> !rt).count() == 0;
         }
 
         return false;
@@ -474,7 +474,7 @@ public class FFMpegImpl {
      * @throws ExecutionException
      */
     public static boolean isUpscaling(final Path inputFile, final String scale)
-            throws InterruptedException, JAXBException, ExecutionException {
+        throws InterruptedException, JAXBException, ExecutionException {
         final ProbeWrapper probe = probe(inputFile);
         final Integer[] sc = Arrays.stream(scale.split(":")).map(Integer::new).toArray(Integer[]::new);
 
@@ -482,7 +482,7 @@ public class FFMpegImpl {
             return probe.getStreams().stream().filter(s -> s.getCodecType().equalsIgnoreCase("video")).map(s -> {
                 try {
                     return (sc[0] < 0 || sc[0] < s.getWidth())
-                            && (sc[1] < 0 || sc[1] < s.getHeight());
+                        && (sc[1] < 0 || sc[1] < s.getHeight());
                 } catch (Exception ex) {
                     return true;
                 }
@@ -501,7 +501,7 @@ public class FFMpegImpl {
      * @throws InterruptedException
      */
     public static String command(final Output output)
-            throws InterruptedException {
+        throws InterruptedException {
         final StringBuffer cmd = new StringBuffer();
 
         cmd.append("ffmpeg -i {0} -stats -y");
@@ -519,27 +519,29 @@ public class FFMpegImpl {
         Optional.ofNullable(video.getProfile()).ifPresent(v -> cmd.append(" -profile:v " + v));
         Optional.ofNullable(video.getLevel()).ifPresent(v -> cmd.append(" -level " + v));
         Optional.ofNullable(video.getPixelFormat())
-                .ifPresent(v -> cmd.append(" -pix_fmt " + (!v.isEmpty() ? v : "yuv420p")));
+            .ifPresent(v -> cmd.append(" -pix_fmt " + (!v.isEmpty() ? v : "yuv420p")));
 
         Optional.ofNullable(video.getScale()).ifPresent(v -> cmd.append(" -vf 'scale=" + v + "'"));
 
         Optional.ofNullable(video.getFramerate()).ifPresent(v -> {
             cmd.append(" -r " + v);
             Optional.ofNullable(video.getFramerateType()).ifPresent(t -> cmd.append(" -vsync " + (t.equals("CFR") ? "1"
-                    : t.equals("VFR") ? "2" : "0")));
+                : t.equals("VFR") ? "2" : "0")));
         });
 
         Optional.ofNullable(video.getQuality()).ifPresent(quality -> {
             switch (quality.getType()) {
-            case "CRF":
-                Optional.ofNullable(quality.getRateFactor()).ifPresent(v -> cmd.append(" -crf " + v));
-                break;
-            case "CQ":
-                Optional.ofNullable(quality.getScale()).ifPresent(v -> cmd.append(" -qscale:v " + v));
-                break;
-            case "ABR":
-                Optional.ofNullable(quality.getBitrate()).ifPresent(v -> cmd.append(" -b:v " + v + "k"));
-                break;
+                case "CRF":
+                    Optional.ofNullable(quality.getRateFactor()).ifPresent(v -> cmd.append(" -crf " + v));
+                    break;
+                case "CQ":
+                    Optional.ofNullable(quality.getScale()).ifPresent(v -> cmd.append(" -qscale:v " + v));
+                    break;
+                case "ABR":
+                    Optional.ofNullable(quality.getBitrate()).ifPresent(v -> cmd.append(" -b:v " + v + "k"));
+                    break;
+                default:
+                    break;
             }
         });
 
@@ -566,11 +568,11 @@ public class FFMpegImpl {
      * @throws ExecutionException 
      */
     public static String filename(final String format, final String fileName, final String appendix)
-            throws ExecutionException {
+        throws ExecutionException {
         try {
             final String extension = muxer(format).getExtension();
             return fileName.substring(0, fileName.lastIndexOf('.'))
-                    + Optional.ofNullable(appendix).orElse("") + "." + extension;
+                + Optional.ofNullable(appendix).orElse("") + "." + extension;
         } catch (InterruptedException e) {
             return null;
         }
@@ -587,17 +589,17 @@ public class FFMpegImpl {
      * @throws ExecutionException 
      */
     public static ProbeWrapper probe(final Path inputFile)
-            throws InterruptedException, JAXBException, ExecutionException {
+        throws InterruptedException, JAXBException, ExecutionException {
         final Cache<Path, ProbeWrapper> cache = CACHE_MGR.getCache("probe", Path.class,
-                ProbeWrapper.class);
+            ProbeWrapper.class);
 
         if (cache.containsKey(inputFile)) {
             return cache.get(inputFile);
         }
 
         final Executable exec = new Executable("ffprobe", "-v", "quiet", "-print_format", "xml", "-show_format",
-                "-show_streams",
-                inputFile.toFile().getAbsolutePath());
+            "-show_streams",
+            inputFile.toFile().getAbsolutePath());
 
         if (exec.runAndWait() == 0) {
             final String outputStream = exec.output();
@@ -607,8 +609,8 @@ public class FFMpegImpl {
                 final Unmarshaller unmarshaller = jc.createUnmarshaller();
 
                 final ProbeWrapper pw = unmarshaller
-                        .unmarshal(new StreamSource(new StringReader(outputStream)), ProbeWrapper.class)
-                        .getValue();
+                    .unmarshal(new StreamSource(new StringReader(outputStream)), ProbeWrapper.class)
+                    .getValue();
 
                 cache.put(inputFile, pw);
                 return pw;

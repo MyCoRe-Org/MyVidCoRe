@@ -91,7 +91,7 @@ public class ResourceWrapper implements Serializable {
         return content;
     }
 
-    static byte[] toByteArray(InputStream input) throws IOException {
+    protected static byte[] toByteArray(InputStream input) throws IOException {
         byte[] buffer = new byte[8192];
         int bytesRead;
         ByteArrayOutputStream output = new ByteArrayOutputStream();

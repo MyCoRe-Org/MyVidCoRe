@@ -33,8 +33,10 @@ import javax.ws.rs.core.StreamingOutput;
 public class RangeStreamingOutput implements StreamingOutput {
 
     private int length;
+
     private RandomAccessFile raf;
-    final byte[] buf = new byte[4096];
+
+    private final byte[] buf = new byte[4096];
 
     public RangeStreamingOutput(int length, RandomAccessFile raf) {
         this.length = length;

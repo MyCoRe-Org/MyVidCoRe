@@ -35,7 +35,6 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
-import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchEvent.Kind;
 import java.nio.file.WatchKey;
@@ -106,7 +105,7 @@ public class DirectoryWatchService extends Widget {
             @SuppressWarnings("serial")
             @Override
             public void run() {
-                while (Thread.interrupted() == false) {
+                while (!Thread.interrupted()) {
                     WatchKey key;
                     try {
                         key = ws.poll(10, TimeUnit.MILLISECONDS);
@@ -129,7 +128,7 @@ public class DirectoryWatchService extends Widget {
                                 events.get(child).lastModified = Instant.now();
                             }
 
-                            if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
+                            if (kind == ENTRY_CREATE) {
                                 if (Files.isDirectory(child, LinkOption.NOFOLLOW_LINKS)) {
                                     try {
                                         walk(child, keys, ws);
@@ -140,7 +139,7 @@ public class DirectoryWatchService extends Widget {
                             }
                         });
 
-                        if (key.reset() == false) {
+                        if (!key.reset()) {
                             LOGGER.debug(String.format(Locale.ROOT, "%s is invalid", key));
                             keys.remove(key);
                             if (keys.isEmpty()) {
@@ -239,11 +238,11 @@ public class DirectoryWatchService extends Widget {
     }
 
     static class InitialEvent {
-        final Kind<Path> kind;
+        protected final Kind<Path> kind;
 
-        Instant lastModified;
+        protected Instant lastModified;
 
-        InitialEvent(final Kind<Path> kind, final Instant lastModified) {
+        protected InitialEvent(final Kind<Path> kind, final Instant lastModified) {
             this.kind = kind;
             this.lastModified = lastModified;
         }

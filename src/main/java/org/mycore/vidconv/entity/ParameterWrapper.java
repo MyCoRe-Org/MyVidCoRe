@@ -144,18 +144,20 @@ public class ParameterWrapper {
 
     private String parseValueConstant(String value) {
         switch (value) {
-        case "I64_MIN":
-        case "INT_MIN":
-            return new Integer(Integer.MIN_VALUE).toString();
-        case "I64_MAX":
-        case "INT_MAX":
-            return new Integer(Integer.MAX_VALUE).toString();
-        case "FLT_MIN":
-            return new Float(Float.MIN_VALUE).toString();
-        case "-FLT_MAX":
-            return new Float(Float.MAX_VALUE * -1).toString();
-        case "FLT_MAX":
-            return new Float(Float.MAX_VALUE).toString();
+            case "I64_MIN":
+            case "INT_MIN":
+                return new Integer(Integer.MIN_VALUE).toString();
+            case "I64_MAX":
+            case "INT_MAX":
+                return new Integer(Integer.MAX_VALUE).toString();
+            case "FLT_MIN":
+                return new Float(Float.MIN_VALUE).toString();
+            case "-FLT_MAX":
+                return new Float(Float.MAX_VALUE * -1).toString();
+            case "FLT_MAX":
+                return new Float(Float.MAX_VALUE).toString();
+            default:
+                break;
         }
 
         return value;
