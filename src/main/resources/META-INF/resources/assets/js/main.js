@@ -96,7 +96,7 @@ app.controller("directoryWatcherStatus", function($scope, $http, $interval) {
 			method : "GET",
 			url : "/widget/directoryWatcher/status"
 		}).then(function(response) {
-			if (response.status = 200) {
+			if (response.status == 200) {
 				angular.merge($scope.status, response.data);
 			}
 		}, function() {
