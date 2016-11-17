@@ -43,13 +43,6 @@ public class FormatWrapper {
     private String description;
 
     /**
-     * 
-     */
-    public FormatWrapper() {
-        // TODO Auto-generated constructor stub
-    }
-
-    /**
      * @return the muxer
      */
     @XmlAttribute

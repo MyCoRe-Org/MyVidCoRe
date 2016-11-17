@@ -62,13 +62,6 @@ public class CodecsWrapper {
     }
 
     /**
-     * 
-     */
-    public CodecsWrapper() {
-        // TODO Auto-generated constructor stub
-    }
-
-    /**
      * @return the codecs
      */
     @XmlElement

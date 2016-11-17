@@ -41,13 +41,6 @@ public class MuxerWrapper {
     private String subtitleCodec;
 
     /**
-     * 
-     */
-    public MuxerWrapper() {
-        // TODO Auto-generated constructor stub
-    }
-
-    /**
      * @return the name
      */
     public String getName() {

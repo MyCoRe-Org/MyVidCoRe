@@ -207,9 +207,6 @@ public class DirectoryWatchService extends Widget {
 
         private List<String> paths;
 
-        public Status() {
-        }
-
         /**
          * @return the active
          */

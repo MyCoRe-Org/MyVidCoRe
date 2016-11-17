@@ -45,13 +45,6 @@ public class ParameterWrapper {
     private List<ParameterValue> values;
 
     /**
-     * 
-     */
-    public ParameterWrapper() {
-        // TODO Auto-generated constructor stub
-    }
-
-    /**
      * @return the name
      */
     public String getName() {

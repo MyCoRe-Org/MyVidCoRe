@@ -145,13 +145,6 @@ public class StreamWrapper {
     private DispositionWrapper disposition;
 
     /**
-     * 
-     */
-    public StreamWrapper() {
-
-    }
-
-    /**
      * @return the avgFrameRate
      */
     public String getAvgFrameRate() {

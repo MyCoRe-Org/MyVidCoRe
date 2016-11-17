@@ -56,9 +56,6 @@ public class CodecWrapper {
 
     private List<String> decoderLib;
 
-    public CodecWrapper() {
-    }
-
     /**
      * @return the type
      */

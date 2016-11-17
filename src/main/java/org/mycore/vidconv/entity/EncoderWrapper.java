@@ -47,13 +47,6 @@ public class EncoderWrapper {
     private List<ParameterWrapper> parameters;
 
     /**
-     * 
-     */
-    public EncoderWrapper() {
-        // TODO Auto-generated constructor stub
-    }
-
-    /**
      * @return the name
      */
     public String getName() {

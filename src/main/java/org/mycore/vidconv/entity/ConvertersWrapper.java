@@ -49,7 +49,7 @@ public class ConvertersWrapper {
 
     private List<ConverterWrapper> converters;
 
-    ConvertersWrapper() {
+    protected ConvertersWrapper() {
         this.converters = new ArrayList<>();
     }
 

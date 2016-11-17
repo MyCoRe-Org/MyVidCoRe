@@ -34,13 +34,6 @@ public class EncodersWrapper {
     private List<EncoderWrapper> encoders;
 
     /**
-     * 
-     */
-    public EncodersWrapper() {
-        // TODO Auto-generated constructor stub
-    }
-
-    /**
      * @return the encoders
      */
     public List<EncoderWrapper> getEncoders() {

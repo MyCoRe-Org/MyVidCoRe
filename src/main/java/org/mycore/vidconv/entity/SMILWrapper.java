@@ -55,9 +55,9 @@ public class SMILWrapper {
         probes.forEach(p -> {
             if (p.getFormat() != null && p.getStreams() != null) {
                 final StreamWrapper vs = p.getStreams().stream().filter(s -> s.getCodecType().equalsIgnoreCase("video"))
-                        .findFirst().orElse(null);
+                    .findFirst().orElse(null);
                 final StreamWrapper as = p.getStreams().stream().filter(s -> s.getCodecType().equalsIgnoreCase("audio"))
-                        .findFirst().orElse(null);
+                    .findFirst().orElse(null);
                 if (vs != null && as != null) {
                     final Video video = new Video();
 
@@ -67,7 +67,7 @@ public class SMILWrapper {
                     video.setWidth(vs.getWidth());
 
                     video.withParam(new Param<Integer>("videoBitrate", vs.getBitRate(), "data"))
-                            .withParam(new Param<Integer>("audioBitrate", as.getBitRate(), "data"));
+                        .withParam(new Param<Integer>("audioBitrate", as.getBitRate(), "data"));
 
                     videos.add(video);
                 }
@@ -84,13 +84,6 @@ public class SMILWrapper {
         final Marshaller marshaller = jc.createMarshaller();
         System.out.println(outputPath.toFile().getAbsolutePath());
         marshaller.marshal(SMILWrapper.build(probes), outputPath.toFile());
-    }
-
-    /**
-     * 
-     */
-    public SMILWrapper() {
-        // TODO Auto-generated constructor stub
     }
 
     /**
@@ -128,9 +121,6 @@ public class SMILWrapper {
 
         private List<Video> switchBody;
 
-        public Body() {
-        }
-
         public Body(List<Video> switchBody) {
             this.switchBody = switchBody;
         }
@@ -163,9 +153,6 @@ public class SMILWrapper {
         private Integer width;
 
         private List<Param<?>> params;
-
-        public Video() {
-        }
 
         /**
          * @return the src
@@ -259,9 +246,6 @@ public class SMILWrapper {
         private T value;
 
         private String valueType;
-
-        public Param() {
-        }
 
         /**
          * @param name

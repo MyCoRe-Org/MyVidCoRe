@@ -38,9 +38,6 @@ public class SettingsWrapper {
 
     private List<Output> output = new ArrayList<>();
 
-    public SettingsWrapper() {
-    }
-
     /**
      * @return the output
      */
@@ -64,9 +61,6 @@ public class SettingsWrapper {
         private Video video;
 
         private Audio audio;
-
-        public Output() {
-        }
 
         /**
          * @return the filenameAppendix
@@ -153,9 +147,6 @@ public class SettingsWrapper {
         private Quality quality;
 
         private String advancedOptions;
-
-        public Video() {
-        }
 
         /**
          * @return the codec
@@ -335,9 +326,6 @@ public class SettingsWrapper {
 
             private Integer bitrate;
 
-            public Quality() {
-            }
-
             /**
              * @return the type
              */
@@ -406,9 +394,6 @@ public class SettingsWrapper {
         private Integer samplerate;
 
         private Integer bitrate;
-
-        public Audio() {
-        }
 
         /**
          * @return the codec

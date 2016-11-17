@@ -41,22 +41,15 @@ public class FormatsWrapper {
 
     public static FormatsWrapper getByName(FormatsWrapper formats, String name) {
         return new FormatsWrapper()
-                .setFormats(formats.getFormats().stream().filter(c -> StringUtils.filter(c.getName(), name))
-                        .collect(Collectors.toList()));
+            .setFormats(formats.getFormats().stream().filter(c -> StringUtils.filter(c.getName(), name))
+                .collect(Collectors.toList()));
     }
 
     public static FormatsWrapper getByDescription(FormatsWrapper formats, String search) {
         return new FormatsWrapper()
-                .setFormats(formats.getFormats().stream()
-                        .filter(c -> StringUtils.containsIgnoreCase(c.getDescription(), search))
-                        .collect(Collectors.toList()));
-    }
-
-    /**
-     * 
-     */
-    public FormatsWrapper() {
-        // TODO Auto-generated constructor stub
+            .setFormats(formats.getFormats().stream()
+                .filter(c -> StringUtils.containsIgnoreCase(c.getDescription(), search))
+                .collect(Collectors.toList()));
     }
 
     /**
