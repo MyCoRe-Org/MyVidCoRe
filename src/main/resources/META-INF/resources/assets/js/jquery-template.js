@@ -33,7 +33,9 @@
 	}
 
 	var extractVariableSelectors = function(elm, selector, vars) {
-		(elm instanceof jQuery) && (elm = elm.get(0));
+		if (elm instanceof jQuery)
+			elm = elm.get(0);
+
 		vars = vars || [];
 
 		if (elm) {
