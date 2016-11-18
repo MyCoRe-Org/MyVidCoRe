@@ -50,19 +50,19 @@ import javax.xml.bind.Marshaller;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.persistence.jaxb.MarshallerProperties;
-import org.mycore.vidconv.config.Settings;
-import org.mycore.vidconv.encoder.FFMpegImpl;
-import org.mycore.vidconv.entity.ConverterWrapper;
-import org.mycore.vidconv.entity.ConvertersWrapper;
-import org.mycore.vidconv.entity.SMILWrapper;
-import org.mycore.vidconv.entity.SettingsWrapper;
-import org.mycore.vidconv.entity.SettingsWrapper.Output;
-import org.mycore.vidconv.event.Event;
-import org.mycore.vidconv.event.EventManager;
-import org.mycore.vidconv.event.Listener;
+import org.mycore.vidconv.backend.encoder.FFMpegImpl;
+import org.mycore.vidconv.common.config.Settings;
+import org.mycore.vidconv.common.event.Event;
+import org.mycore.vidconv.common.event.EventManager;
+import org.mycore.vidconv.common.event.Listener;
+import org.mycore.vidconv.frontend.entity.ConverterWrapper;
+import org.mycore.vidconv.frontend.entity.ConvertersWrapper;
+import org.mycore.vidconv.frontend.entity.SMILWrapper;
+import org.mycore.vidconv.frontend.entity.SettingsWrapper;
+import org.mycore.vidconv.frontend.entity.SettingsWrapper.Output;
+import org.mycore.vidconv.frontend.widget.Widget;
 import org.mycore.vidconv.util.Executable;
 import org.mycore.vidconv.util.StreamConsumer;
-import org.mycore.vidconv.widget.Widget;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
@@ -107,7 +107,7 @@ public class ConverterService extends Widget implements Listener {
     }
 
     /* (non-Javadoc)
-     * @see org.mycore.vidconv.widget.Widget#status()
+     * @see org.mycore.vidconv.frontend.widget.Widget#status()
      */
     @Override
     public ConvertersWrapper status() {
@@ -115,7 +115,7 @@ public class ConverterService extends Widget implements Listener {
     }
 
     /* (non-Javadoc)
-     * @see org.mycore.vidconv.widget.Widget#status(java.util.List)
+     * @see org.mycore.vidconv.frontend.widget.Widget#status(java.util.List)
      */
     @Override
     public Object status(List<String> params) {
@@ -168,7 +168,7 @@ public class ConverterService extends Widget implements Listener {
     }
 
     /* (non-Javadoc)
-     * @see org.mycore.vidconv.widget.Widget#download(java.util.List)
+     * @see org.mycore.vidconv.frontend.widget.Widget#download(java.util.List)
      */
     @Override
     public Path download(List<String> params) throws Exception {
@@ -185,7 +185,7 @@ public class ConverterService extends Widget implements Listener {
     }
 
     /* (non-Javadoc)
-     * @see org.mycore.vidconv.event.Listener#handleEvent(org.mycore.vidconv.event.Event)
+     * @see org.mycore.vidconv.common.event.Listener#handleEvent(org.mycore.vidconv.common.event.Event)
      */
     @Override
     public void handleEvent(Event event) throws Exception {

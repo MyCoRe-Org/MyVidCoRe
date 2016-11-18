@@ -58,9 +58,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.vidconv.event.Event;
-import org.mycore.vidconv.event.EventManager;
-import org.mycore.vidconv.widget.Widget;
+import org.mycore.vidconv.common.event.Event;
+import org.mycore.vidconv.common.event.EventManager;
+import org.mycore.vidconv.frontend.widget.Widget;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
@@ -165,7 +165,7 @@ public class DirectoryWatchService extends Widget {
     }
 
     /* (non-Javadoc)
-     * @see org.mycore.vidconv.widget.Widget#status()
+     * @see org.mycore.vidconv.frontend.widget.Widget#status()
      */
     @Override
     public Status status() {

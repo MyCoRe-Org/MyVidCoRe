@@ -37,7 +37,7 @@ import org.apache.logging.log4j.Logger;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.moxy.json.MoxyJsonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.mycore.vidconv.widget.Widget;
+import org.mycore.vidconv.frontend.widget.Widget;
 
 import com.sun.net.httpserver.HttpServer;
 
@@ -91,7 +91,7 @@ public class EmbeddedHttpServer extends Widget {
 
     private HttpServer createHttpServer()
         throws IOException, IllegalArgumentException, UriBuilderException, URISyntaxException {
-        ResourceConfig resourceConfig = new ResourceConfig().packages("org.mycore.vidconv.resource")
+        ResourceConfig resourceConfig = new ResourceConfig().packages("org.mycore.vidconv.frontend.resource")
             .register(MoxyJsonFeature.class);
         return JdkHttpServerFactory.createHttpServer(getURI(), resourceConfig, false);
     }

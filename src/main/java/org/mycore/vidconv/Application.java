@@ -27,9 +27,9 @@ import java.nio.file.Paths;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.vidconv.event.Event;
-import org.mycore.vidconv.event.EventManager;
-import org.mycore.vidconv.event.Listener;
+import org.mycore.vidconv.common.event.Event;
+import org.mycore.vidconv.common.event.EventManager;
+import org.mycore.vidconv.common.event.Listener;
 import org.mycore.vidconv.service.ConverterService;
 import org.mycore.vidconv.service.DirectoryWatchService;
 import org.mycore.vidconv.service.EmbeddedHttpServer;
@@ -107,7 +107,7 @@ public class Application implements Listener {
     }
 
     /* (non-Javadoc)
-     * @see org.mycore.vidconv.event.Listener#handleEvent(org.mycore.vidconv.event.Event)
+     * @see org.mycore.vidconv.common.event.Listener#handleEvent(org.mycore.vidconv.common.event.Event)
      */
     @Override
     public void handleEvent(Event event) throws Exception {
