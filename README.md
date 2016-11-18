@@ -67,4 +67,8 @@ For a help and/or overview about default settings run:
 
   Set directory to output converted videos
 
+* **-cd, --configDir**
+
+  Set configuration dir
+
   
