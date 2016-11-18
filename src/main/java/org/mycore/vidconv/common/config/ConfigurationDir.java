@@ -37,14 +37,21 @@ public class ConfigurationDir {
 
     private static final String APP_NAME = "MyVidCoRe";
 
-    private static File getMyCoReDirectory() {
-        String mcrHome = System.getProperty("MCR.Home");
-        if (mcrHome != null) {
-            return new File(mcrHome);
+    private static String configDir;
+
+    public static void setConfigurationDirectory(String configDir) {
+        if (configDir != null) {
+            ConfigurationDir.configDir = configDir;
         }
-        //Windows Vista onwards:
+    }
+
+    public static File getConfigurationDirectory() {
+        if (configDir != null) {
+            return new File(configDir);
+        }
+        // Windows Vista onwards:
         String localAppData = isWindows() ? System.getenv("LOCALAPPDATA") : null;
-        //on every other platform
+        // on every other platform
         String userDir = System.getProperty("user.home");
         String parentDir = localAppData != null ? localAppData : userDir;
         return new File(parentDir, getConfigBaseName());
@@ -55,20 +62,16 @@ public class ConfigurationDir {
     }
 
     private static String getConfigBaseName() {
-        return isWindows() ? "MyCoRe" : ".mycore";
+        return isWindows() ? APP_NAME : "." + APP_NAME.toLowerCase(Locale.ROOT);
     }
 
     /**
-     * Returns the configuration directory for this MyCoRe instance.
-     * @return null if System property {@value #DISABLE_CONFIG_DIR_PROPERTY} is set.
-     */
-    public static File getConfigurationDirectory() {
-        return new File(getMyCoReDirectory(), APP_NAME);
-    }
-
-    /**
-     * Returns a File object, if {@link #getConfigurationDirectory()} does not return <code>null</code> and directory exists.
-     * @param relativePath relative path to file or directory with configuration directory as base.
+     * Returns a File object, if {@link #getConfigurationDirectory()} does not
+     * return <code>null</code> and directory exists.
+     * 
+     * @param relativePath
+     *            relative path to file or directory with configuration
+     *            directory as base.
      * @return null if configuration directory does not exist or is disabled.
      */
     public static File getConfigFile(String relativePath) {
@@ -80,20 +83,28 @@ public class ConfigurationDir {
     }
 
     /**
-     * Returns URL of a config resource.
-     * Same as {@link #getConfigResource(String, ClassLoader)} with second argument <code>null</code>.
-     * @param relativePath as defined in {@link #getConfigFile(String)}
+     * Returns URL of a config resource. Same as
+     * {@link #getConfigResource(String, ClassLoader)} with second argument
+     * <code>null</code>.
+     * 
+     * @param relativePath
+     *            as defined in {@link #getConfigFile(String)}
      */
     public static URL getConfigResource(String relativePath) {
         return getConfigResource(relativePath, null);
     }
 
     /**
-     * Returns URL of a config resource.
-     * If {@link #getConfigFile(String)} returns an existing file for "resources"+{relativePath}, its URL is returned.
-     * In any other case this method returns the same as {@link ClassLoader#getResource(String)} 
-     * @param relativePath as defined in {@link #getConfigFile(String)}
-     * @param classLoader a classLoader to resolve the resource (see above), null defaults to this class' class loader
+     * Returns URL of a config resource. If {@link #getConfigFile(String)}
+     * returns an existing file for "resources"+{relativePath}, its URL is
+     * returned. In any other case this method returns the same as
+     * {@link ClassLoader#getResource(String)}
+     * 
+     * @param relativePath
+     *            as defined in {@link #getConfigFile(String)}
+     * @param classLoader
+     *            a classLoader to resolve the resource (see above), null
+     *            defaults to this class' class loader
      */
     public static URL getConfigResource(String relativePath, ClassLoader classLoader) {
         File resolvedFile = getConfigFile("resources/" + relativePath);
@@ -101,12 +112,12 @@ public class ConfigurationDir {
             try {
                 return resolvedFile.toURI().toURL();
             } catch (MalformedURLException e) {
-                LogManager.getLogger(ConfigurationDir.class).warn(
-                        "Exception while returning URL for file: " + resolvedFile, e);
+                LogManager.getLogger(ConfigurationDir.class)
+                    .warn("Exception while returning URL for file: " + resolvedFile, e);
             }
         }
-        return getClassPathResource(relativePath, classLoader == null ? ConfigurationDir.class.getClassLoader()
-                : classLoader);
+        return getClassPathResource(relativePath,
+            classLoader == null ? ConfigurationDir.class.getClassLoader() : classLoader);
     }
 
     private static URL getClassPathResource(String relativePath, ClassLoader classLoader) {

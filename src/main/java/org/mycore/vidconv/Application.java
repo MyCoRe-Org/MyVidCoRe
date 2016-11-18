@@ -27,9 +27,8 @@ import java.nio.file.Paths;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mycore.vidconv.common.event.Event;
-import org.mycore.vidconv.common.event.EventManager;
-import org.mycore.vidconv.common.event.Listener;
+import org.mycore.vidconv.common.config.ConfigurationDir;
+import org.mycore.vidconv.common.event.AutoExecutableHandler;
 import org.mycore.vidconv.service.ConverterService;
 import org.mycore.vidconv.service.DirectoryWatchService;
 import org.mycore.vidconv.service.EmbeddedHttpServer;
@@ -41,11 +40,9 @@ import com.beust.jcommander.Parameter;
  * @author Ren\u00E9 Adler (eagle)
  *
  */
-public class Application implements Listener {
+public class Application {
 
     private static final Logger LOGGER = LogManager.getRootLogger();
-
-    private static final EventManager EVENT_MANGER = EventManager.instance();
 
     @Parameter(names = { "-h", "--help" }, description = "Print help (this message) and exit", help = true)
     private boolean help;
@@ -65,6 +62,9 @@ public class Application implements Listener {
     @Parameter(names = "--outputDir", description = "Set directory to output converted videos")
     private String outputDir = System.getProperty("java.io.tmpdir");
 
+    @Parameter(names = { "--configDir", "-cd" }, description = "Set configuration dir")
+    private String configDir;
+
     public static void main(String[] args) {
         Application app = new Application();
         JCommander jcmd = new JCommander(app, args);
@@ -75,11 +75,11 @@ public class Application implements Listener {
             try {
                 if (Files.notExists(Paths.get(app.watchDir))) {
                     throw new RuntimeException(
-                            "Watching directory \"" + app.watchDir + "\" isn't exists.");
+                        "Watching directory \"" + app.watchDir + "\" isn't exists.");
                 } else if (Paths.get(app.watchDir).equals(Paths.get(app.outputDir).getParent())
-                        || Paths.get(app.watchDir).equals(Paths.get(app.outputDir))) {
+                    || Paths.get(app.watchDir).equals(Paths.get(app.outputDir))) {
                     throw new RuntimeException(
-                            "Watching directory isn't allowed to be the parent of output directory or the same.");
+                        "Watching directory isn't allowed to be the parent of output directory or the same.");
                 }
 
                 app.run();
@@ -90,7 +90,18 @@ public class Application implements Listener {
     }
 
     private void run() throws Exception {
-        EVENT_MANGER.addListener(this);
+        if (configDir != null) {
+            ConfigurationDir.setConfigurationDirectory(configDir);
+        }
+
+        AutoExecutableHandler.setHaltOnError(false);
+        AutoExecutableHandler.startup();
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                AutoExecutableHandler.shutdown();
+            }
+        });
 
         EmbeddedHttpServer embeddedHttpServer = new EmbeddedHttpServer(host, port);
         embeddedHttpServer.start();
@@ -100,16 +111,9 @@ public class Application implements Listener {
 
         int availableProcessors = Runtime.getRuntime().availableProcessors();
         converterThreads = converterThreads == null ? availableProcessors - Math.floorDiv(availableProcessors, 4)
-                : converterThreads;
+            : converterThreads;
         LOGGER.info("Make use of " + converterThreads + " from available "
-                + Runtime.getRuntime().availableProcessors() + " processors.");
+            + Runtime.getRuntime().availableProcessors() + " processors.");
         new ConverterService(outputDir, converterThreads);
-    }
-
-    /* (non-Javadoc)
-     * @see org.mycore.vidconv.common.event.Listener#handleEvent(org.mycore.vidconv.common.event.Event)
-     */
-    @Override
-    public void handleEvent(Event event) throws Exception {
     }
 }
