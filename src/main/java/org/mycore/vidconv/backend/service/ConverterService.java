@@ -59,7 +59,6 @@ import org.mycore.vidconv.common.util.Executable;
 import org.mycore.vidconv.common.util.StreamConsumer;
 import org.mycore.vidconv.frontend.entity.ConverterWrapper;
 import org.mycore.vidconv.frontend.entity.ConvertersWrapper;
-import org.mycore.vidconv.frontend.entity.SMILWrapper;
 import org.mycore.vidconv.frontend.entity.SettingsWrapper;
 import org.mycore.vidconv.frontend.entity.SettingsWrapper.Output;
 import org.mycore.vidconv.frontend.widget.Widget;
@@ -72,9 +71,11 @@ public class ConverterService extends Widget implements Listener {
 
     public static final String WIDGET_NAME = "converter";
 
+    public static final String EVENT_CONVERT_DONE = "converter_done";
+
     private static final Logger LOGGER = LogManager.getLogger(ConverterService.class);
 
-    private static final EventManager EVENT_MANGER = EventManager.instance();
+    private static final EventManager EVENT_MANAGER = EventManager.instance();
 
     private static final Settings CONFIG = Settings.instance();
 
@@ -88,7 +89,7 @@ public class ConverterService extends Widget implements Listener {
         super(WIDGET_NAME);
 
         this.outputDir = outputDir;
-        EVENT_MANGER.addListener(this);
+        EVENT_MANAGER.addListener(this);
         converterThreadPool = Executors.newFixedThreadPool(converterThreads);
     }
 
@@ -202,18 +203,10 @@ public class ConverterService extends Widget implements Listener {
                 return cj.parentId().equals(event.getParameter("parentId"));
             }).collect(Collectors.toList());
 
-            if (jobs.size() > 1 && jobs.stream().filter(cj -> !cj.isDone() || cj.isRunning()).count() == 0) {
-                final ConverterJob job = jobs.get(0);
-                final String fileName = job.inputPath.getFileName().toString();
-                final Path file = job.outputPath.getParent()
-                    .resolve(fileName.substring(0, fileName.lastIndexOf(".")) + ".smil");
-                SMILWrapper.saveTo(file, jobs.stream().map(cj -> {
-                    try {
-                        return FFMpegImpl.probe(cj.outputPath);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                }).collect(Collectors.toList()));
+            if (jobs.stream().filter(cj -> !cj.isDone() || cj.isRunning()).count() == 0) {
+                Event ev = new Event(EVENT_CONVERT_DONE, this.getClass());
+                ev.setParameter("jobs", jobs);
+                EVENT_MANAGER.fireEvent(ev);
             }
         }
     }
@@ -345,7 +338,7 @@ public class ConverterService extends Widget implements Listener {
 
                 LOGGER.info("Converting of " + inputPath.toString() + " done.");
 
-                EventManager.instance().fireEvent(new Event(DONE, new HashMap<String, String>() {
+                EVENT_MANAGER.fireEvent(new Event(DONE, new HashMap<String, String>() {
                     {
                         put("parentId", parentId);
                         put("id", id);
@@ -367,6 +360,14 @@ public class ConverterService extends Widget implements Listener {
         public String command() {
             return MessageFormat.format(command,
                 inputPath.toFile().getAbsolutePath(), outputPath.toFile().getAbsolutePath());
+        }
+
+        public Path inputPath() {
+            return inputPath;
+        }
+
+        public Path outputPath() {
+            return outputPath;
         }
 
         public String fileName() {

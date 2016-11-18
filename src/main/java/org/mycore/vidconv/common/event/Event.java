@@ -40,9 +40,12 @@ public class Event {
 
     private Class<?> source;
 
-    @SuppressWarnings("unchecked")
     public Event(final String type) {
-        this(type, Collections.EMPTY_MAP, null);
+        this(type, Collections.emptyMap(), null);
+    }
+
+    public Event(final String type, Class<?> source) {
+        this(type, Collections.emptyMap(), source);
     }
 
     public Event(final String type, Map<String, ?> params) {

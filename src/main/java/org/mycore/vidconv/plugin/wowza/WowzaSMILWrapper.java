@@ -17,7 +17,7 @@
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
-package org.mycore.vidconv.frontend.entity;
+package org.mycore.vidconv.plugin.wowza;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -41,14 +41,14 @@ import org.mycore.vidconv.frontend.entity.probe.StreamWrapper;
  *
  */
 @XmlRootElement(name = "smil")
-public class SMILWrapper {
+public class WowzaSMILWrapper {
 
     private String title;
 
     private Body body;
 
-    public static SMILWrapper build(final List<ProbeWrapper> probes) {
-        final SMILWrapper smil = new SMILWrapper();
+    public static WowzaSMILWrapper build(final List<ProbeWrapper> probes) {
+        final WowzaSMILWrapper smil = new WowzaSMILWrapper();
 
         final List<Video> videos = new ArrayList<>();
 
@@ -80,10 +80,9 @@ public class SMILWrapper {
     }
 
     public static void saveTo(final Path outputPath, final List<ProbeWrapper> probes) throws JAXBException {
-        final JAXBContext jc = JAXBContext.newInstance(SMILWrapper.class);
+        final JAXBContext jc = JAXBContext.newInstance(WowzaSMILWrapper.class);
         final Marshaller marshaller = jc.createMarshaller();
-        System.out.println(outputPath.toFile().getAbsolutePath());
-        marshaller.marshal(SMILWrapper.build(probes), outputPath.toFile());
+        marshaller.marshal(WowzaSMILWrapper.build(probes), outputPath.toFile());
     }
 
     /**

@@ -49,7 +49,7 @@ public class ConfigurationDirSetup {
     private static final StatusLogger LOGGER = StatusLogger.getLogger();
 
     @Startup
-    public void startup() {
+    public static void startup() {
         loadExternalLibs();
     }
 
@@ -94,7 +94,7 @@ public class ConfigurationDirSetup {
         Stream<File> toClassPath = Stream.of(resourceDir);
         if (libDir.isDirectory()) {
             File[] listFiles = libDir
-                    .listFiles((FilenameFilter) (dir, name) -> name.toLowerCase(Locale.ROOT).endsWith(".jar"));
+                .listFiles((FilenameFilter) (dir, name) -> name.toLowerCase(Locale.ROOT).endsWith(".jar"));
             if (listFiles.length != 0) {
                 toClassPath = Stream.concat(toClassPath, Stream.of(listFiles));
             }
@@ -107,7 +107,7 @@ public class ConfigurationDirSetup {
             LOGGER.error(msg);
         } else {
             System.err.println(MessageFormat.format("{0} ERROR\t{1}: {2}", Instant.now().toString(),
-                    AutoExecutableHandler.class.getSimpleName(), msg));
+                AutoExecutableHandler.class.getSimpleName(), msg));
         }
     }
 
@@ -116,7 +116,7 @@ public class ConfigurationDirSetup {
             LOGGER.info(msg);
         } else {
             System.out.println(MessageFormat.format("{0} INFO\t{1}: {2}", Instant.now().toString(),
-                    AutoExecutableHandler.class.getSimpleName(), msg));
+                AutoExecutableHandler.class.getSimpleName(), msg));
         }
     }
 }

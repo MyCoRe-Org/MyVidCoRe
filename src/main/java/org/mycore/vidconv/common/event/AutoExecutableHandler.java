@@ -21,6 +21,7 @@ package org.mycore.vidconv.common.event;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.text.MessageFormat;
 import java.time.Instant;
 import java.util.Arrays;
@@ -93,8 +94,13 @@ public class AutoExecutableHandler {
             sort(type, Arrays.stream(autoExecutable.getDeclaredMethods()).filter(m -> m.isAnnotationPresent(type)))
                 .forEachOrdered(m -> {
                     try {
-                        log("...invoke " + m.getName() + "() for " + type.getSimpleName());
-                        m.invoke(autoExecutable.newInstance());
+                        if (Modifier.isStatic(m.getModifiers())) {
+                            log("...invoke (static) " + m.getName() + "() for " + type.getSimpleName());
+                            m.invoke(null);
+                        } else {
+                            log("...invoke " + m.getName() + "() for " + type.getSimpleName());
+                            m.invoke(autoExecutable.newInstance());
+                        }
                     } catch (Exception e) {
                         throw new RuntimeException(e.getCause());
                     }

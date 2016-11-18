@@ -106,14 +106,13 @@ public class Application {
         EmbeddedHttpServer embeddedHttpServer = new EmbeddedHttpServer(host, port);
         embeddedHttpServer.start();
 
-        DirectoryWatchService directoryWatchService = new DirectoryWatchService();
-        directoryWatchService.registerDirectory(Paths.get(watchDir));
-
         int availableProcessors = Runtime.getRuntime().availableProcessors();
         converterThreads = converterThreads == null ? availableProcessors - Math.floorDiv(availableProcessors, 4)
             : converterThreads;
         LOGGER.info("Make use of " + converterThreads + " from available "
             + Runtime.getRuntime().availableProcessors() + " processors.");
         new ConverterService(outputDir, converterThreads);
+
+        DirectoryWatchService.instance().registerDirectory(Paths.get(watchDir));
     }
 }

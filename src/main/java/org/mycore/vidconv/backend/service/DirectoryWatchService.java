@@ -60,15 +60,21 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.vidconv.common.event.Event;
 import org.mycore.vidconv.common.event.EventManager;
+import org.mycore.vidconv.common.event.Listener;
+import org.mycore.vidconv.common.event.annotation.AutoExecutable;
+import org.mycore.vidconv.common.event.annotation.Startup;
 import org.mycore.vidconv.frontend.widget.Widget;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
  *
  */
-public class DirectoryWatchService extends Widget {
+@AutoExecutable(name = "Directory Watch Service")
+public class DirectoryWatchService extends Widget implements Listener {
 
     public static final String WIDGET_NAME = "directoryWatcher";
+
+    public static final String EVENT_REGISTER_PATH = "registerPath";
 
     public static final String EVENT_ENTRY_CREATE = ENTRY_CREATE.name();
 
@@ -80,7 +86,9 @@ public class DirectoryWatchService extends Widget {
 
     private static final long EVENT_DELAY = 30000;
 
-    private static final EventManager EVENT_MANGER = EventManager.instance();
+    private static final EventManager EVENT_MANAGER = EventManager.instance();
+
+    private static DirectoryWatchService INSTANCE = null;
 
     private final Map<WatchKey, Path> keys = new ConcurrentHashMap<>();
 
@@ -90,12 +98,26 @@ public class DirectoryWatchService extends Widget {
 
     private WatchService ws;
 
+    @Startup
+    public static DirectoryWatchService instance() throws IOException {
+        if (INSTANCE == null) {
+            synchronized (DirectoryWatchService.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new DirectoryWatchService();
+                }
+            }
+        }
+
+        return INSTANCE;
+    }
+
     public DirectoryWatchService() throws IOException {
         this(FileSystems.getDefault());
     }
 
-    private DirectoryWatchService(final FileSystem fs) throws IOException {
+    protected DirectoryWatchService(final FileSystem fs) throws IOException {
         super(WIDGET_NAME);
+        EVENT_MANAGER.addListener(this);
 
         final DirectoryWatchService that = this;
         service = Executors.newCachedThreadPool();
@@ -151,7 +173,7 @@ public class DirectoryWatchService extends Widget {
                     // fire event after a given time without changes
                     events.forEach((p, ie) -> {
                         if (Duration.between(ie.lastModified, Instant.now()).toMillis() > EVENT_DELAY) {
-                            EVENT_MANGER.fireEvent(new Event(ie.kind.name(), new HashMap<String, Object>() {
+                            EVENT_MANAGER.fireEvent(new Event(ie.kind.name(), new HashMap<String, Object>() {
                                 {
                                     put("path", p);
                                 }
@@ -162,6 +184,16 @@ public class DirectoryWatchService extends Widget {
                 }
             }
         });
+    }
+
+    /* (non-Javadoc)
+     * @see org.mycore.vidconv.common.event.Listener#handleEvent(org.mycore.vidconv.common.event.Event)
+     */
+    @Override
+    public void handleEvent(Event event) throws Exception {
+        if (EVENT_REGISTER_PATH.equals(event.getType())) {
+            registerDirectory(event.getParameter("path"));
+        }
     }
 
     /* (non-Javadoc)
@@ -176,10 +208,11 @@ public class DirectoryWatchService extends Widget {
     }
 
     public void registerDirectory(Path dir) throws IOException {
+        LOGGER.info("register for path: " + dir.toString());
         reg(dir, keys, ws);
     }
 
-    private static void walk(Path root, final Map<WatchKey, Path> keys, final WatchService ws) throws IOException {
+    private void walk(Path root, final Map<WatchKey, Path> keys, final WatchService ws) throws IOException {
         Files.walkFileTree(root, new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult preVisitDirectory(Path dir,
@@ -190,7 +223,7 @@ public class DirectoryWatchService extends Widget {
         });
     }
 
-    private static void reg(Path dir, Map<WatchKey, Path> keys, WatchService ws) throws IOException {
+    private void reg(Path dir, Map<WatchKey, Path> keys, WatchService ws) throws IOException {
         WatchKey key = dir.register(ws, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
         keys.put(key, dir);
     }
