@@ -1,4 +1,7 @@
 /*
+ * $Id$ 
+ * $Revision$ $Date$
+ *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
  *
@@ -17,32 +20,47 @@
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
-package org.mycore.vidconv.util;
+package org.mycore.vidconv.common.util;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
-import javax.activation.MimetypesFileTypeMap;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
  *
  */
-public class MimeType {
+public class StreamConsumer implements Runnable {
 
-    public static String detect(final String fileName) throws IOException {
-        // Missing mime type should be add to META-INF/mime.types
-        MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
-        return mimeTypesMap.getContentType(fileName);
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    private final StringBuffer sb;
+
+    private final InputStream is;
+
+    public StreamConsumer(final InputStream stream) {
+        sb = new StringBuffer();
+        is = stream;
     }
 
-    public static String detect(final File file) throws IOException {
-        return detect(file.getName());
+    @Override
+    public void run() {
+        byte[] buf = new byte[1024];
+        int read;
+        try {
+            while ((read = is.read(buf)) != -1) {
+                sb.append(new String(buf, 0, read, StandardCharsets.UTF_8));
+            }
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
     }
 
-    public static String detect(final Path file) throws IOException {
-        return detect(file.getFileName().toString());
+    public synchronized String getStreamOutput() {
+        return sb.toString();
     }
 
 }

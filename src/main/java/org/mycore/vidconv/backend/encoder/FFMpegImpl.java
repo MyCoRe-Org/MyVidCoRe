@@ -47,6 +47,7 @@ import org.ehcache.CacheManager;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.CacheManagerBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
+import org.mycore.vidconv.common.util.Executable;
 import org.mycore.vidconv.frontend.entity.CodecWrapper;
 import org.mycore.vidconv.frontend.entity.CodecsWrapper;
 import org.mycore.vidconv.frontend.entity.EncoderWrapper;
@@ -61,7 +62,6 @@ import org.mycore.vidconv.frontend.entity.SettingsWrapper.Audio;
 import org.mycore.vidconv.frontend.entity.SettingsWrapper.Output;
 import org.mycore.vidconv.frontend.entity.SettingsWrapper.Video;
 import org.mycore.vidconv.frontend.entity.probe.ProbeWrapper;
-import org.mycore.vidconv.util.Executable;
 
 /**
  * @author Ren\u00E9 Adler (eagle)

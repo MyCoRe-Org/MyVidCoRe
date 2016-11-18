@@ -24,4 +24,4 @@
  * @author Ren\u00E9 Adler (eagle)
  *
  */
-package org.mycore.vidconv.util;
+package org.mycore.vidconv.backend.service;

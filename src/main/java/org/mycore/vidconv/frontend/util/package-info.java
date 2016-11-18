@@ -1,7 +1,4 @@
 /*
- * $Id$ 
- * $Revision$ $Date$
- *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
  *
@@ -24,4 +21,4 @@
  * @author Ren\u00E9 Adler (eagle)
  *
  */
-package org.mycore.vidconv.service;
+package org.mycore.vidconv.frontend.util;

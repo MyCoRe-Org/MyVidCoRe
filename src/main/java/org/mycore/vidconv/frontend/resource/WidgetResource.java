@@ -51,11 +51,11 @@ import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.vidconv.common.util.MimeType;
 import org.mycore.vidconv.frontend.entity.ExceptionWrapper;
+import org.mycore.vidconv.frontend.util.RangeStreamingOutput;
 import org.mycore.vidconv.frontend.widget.Widget;
 import org.mycore.vidconv.frontend.widget.WidgetManager;
-import org.mycore.vidconv.util.MimeType;
-import org.mycore.vidconv.util.RangeStreamingOutput;
 
 /**
  * @author Ren\u00E9 Adler (eagle)

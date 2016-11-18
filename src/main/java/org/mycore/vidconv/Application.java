@@ -27,11 +27,11 @@ import java.nio.file.Paths;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.vidconv.backend.service.ConverterService;
+import org.mycore.vidconv.backend.service.DirectoryWatchService;
+import org.mycore.vidconv.backend.service.EmbeddedHttpServer;
 import org.mycore.vidconv.common.config.ConfigurationDir;
 import org.mycore.vidconv.common.event.AutoExecutableHandler;
-import org.mycore.vidconv.service.ConverterService;
-import org.mycore.vidconv.service.DirectoryWatchService;
-import org.mycore.vidconv.service.EmbeddedHttpServer;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;

@@ -20,7 +20,7 @@
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
-package org.mycore.vidconv.service;
+package org.mycore.vidconv.backend.service;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -55,14 +55,14 @@ import org.mycore.vidconv.common.config.Settings;
 import org.mycore.vidconv.common.event.Event;
 import org.mycore.vidconv.common.event.EventManager;
 import org.mycore.vidconv.common.event.Listener;
+import org.mycore.vidconv.common.util.Executable;
+import org.mycore.vidconv.common.util.StreamConsumer;
 import org.mycore.vidconv.frontend.entity.ConverterWrapper;
 import org.mycore.vidconv.frontend.entity.ConvertersWrapper;
 import org.mycore.vidconv.frontend.entity.SMILWrapper;
 import org.mycore.vidconv.frontend.entity.SettingsWrapper;
 import org.mycore.vidconv.frontend.entity.SettingsWrapper.Output;
 import org.mycore.vidconv.frontend.widget.Widget;
-import org.mycore.vidconv.util.Executable;
-import org.mycore.vidconv.util.StreamConsumer;
 
 /**
  * @author Ren\u00E9 Adler (eagle)

@@ -32,7 +32,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.mycore.vidconv.service.ConverterService.ConverterJob;
+import org.mycore.vidconv.backend.service.ConverterService.ConverterJob;
 
 /**
  * @author Ren\u00E9 Adler (eagle)

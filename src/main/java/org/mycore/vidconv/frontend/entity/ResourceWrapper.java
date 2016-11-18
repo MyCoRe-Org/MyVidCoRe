@@ -29,8 +29,8 @@ import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 
-import org.mycore.vidconv.util.Hash;
-import org.mycore.vidconv.util.MimeType;
+import org.mycore.vidconv.common.util.Hash;
+import org.mycore.vidconv.common.util.MimeType;
 
 /**
  * @author Ren\u00E9 Adler (eagle)

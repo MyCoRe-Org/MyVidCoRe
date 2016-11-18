@@ -29,8 +29,8 @@ import java.util.stream.Collectors;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.mycore.vidconv.common.util.StringUtils;
 import org.mycore.vidconv.frontend.entity.CodecWrapper.Type;
-import org.mycore.vidconv.util.StringUtils;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
