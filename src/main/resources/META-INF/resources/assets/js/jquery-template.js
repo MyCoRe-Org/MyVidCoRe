@@ -104,19 +104,21 @@
 
 	var updateSelectors = function($template, varSels, vars) {
 		for ( var name in varSels) {
-			for (var i = 0; i < varSels[name].length; i++) {
-				var vt = varSels[name][i];
-				var path = vt.selector;
-				var offset = path.lastIndexOf(">");
-				var selector = offset != -1 ? path.substring(0, offset).trim() : null;
-				var elm = offset != -1 ? path.substring(offset + 1).trim() : path.trim();
-				var $elm = selector === null ? $template : $template.find(selector);
+			if ({}.hasOwnProperty.call(varSels, name)) {
+				for (var i = 0; i < varSels[name].length; i++) {
+					var vt = varSels[name][i];
+					var path = vt.selector;
+					var offset = path.lastIndexOf(">");
+					var selector = offset !=0 -1 ? path.substring(0, offset).trim() : null;
+					var elm = offset !== -1 ? path.substring(offset + 1).trim() : path.trim();
+					var $elm = selector === null ? $template : $template.find(selector);
 
-				if (elm === "text()") {
-					$elm.text(replaceVariables(vt.template, vars));
-				} else if (elm.startsWith("@")) {
-					var attr = elm.substring(1);
-					$elm.attr(attr, replaceVariables(vt.template, vars));
+					if (elm === "text()") {
+						$elm.text(replaceVariables(vt.template, vars));
+					} else if (elm.startsWith("@")) {
+						var attr = elm.substring(1);
+						$elm.attr(attr, replaceVariables(vt.template, vars));
+					}
 				}
 			}
 		}
@@ -163,7 +165,7 @@
 				}
 			});
 		} else if (typeof options === 'string' && options[0] !== '_' && options !== 'init') {
-			if (Array.prototype.slice.call(args, 1).length === 0 && $.inArray(options, $.fn[pluginName].getters) != -1) {
+			if (Array.prototype.slice.call(args, 1).length === 0 && $.inArray(options, $.fn[pluginName].getters) !== -1) {
 				var instance = $.data(this[0], 'plugin_' + pluginName);
 				return instance[options].apply(instance, Array.prototype.slice.call(args, 1));
 			} else {

@@ -129,10 +129,12 @@ app.controller("converterStatus", function($scope, $http, $interval, asyncQueue)
 	$scope.loadData = function() {
 		var urls = [];
 		for ( var type in $scope.converters) {
-			var c = $scope.converters[type];
-			var start = c.start || 0;
-			var limit = c.limit || (type === "active" ? 50 : 10);
-			urls.push("/widget/converter/" + (start / limit + 1) + "/" + limit + (type === "done" ? "/!isdone" : "") + "/status");
+			if ({}.hasOwnProperty.call($scope.converters, type)) {
+				var c = $scope.converters[type];
+				var start = c.start || 0;
+				var limit = c.limit || (type === "active" ? 50 : 10);
+				urls.push("/widget/converter/" + (start / limit + 1) + "/" + limit + (type === "done" ? "/!isdone" : "") + "/status");
+			}
 		}
 
 		asyncQueue.load(urls).then(function(results) {
@@ -163,7 +165,7 @@ app.controller("converterStatus", function($scope, $http, $interval, asyncQueue)
 				method : "GET",
 				url : "/widget/converter/" + id + "/status"
 			}).then(function(response) {
-				if (response.status = 200) {
+				if (response.status == 200) {
 					$scope.details[id] = response.data;
 				}
 			});
