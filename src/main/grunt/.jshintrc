@@ -11,6 +11,8 @@
   "browser": true,
   "jquery": true,
   "laxbreak": true,
+  "-W004": true,
+  "-W084": true,
   "globals": {
     "$": true,
     "angular": true
