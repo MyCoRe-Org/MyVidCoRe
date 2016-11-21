@@ -15,4 +15,4 @@
 		document.querySelector("head").appendChild(msViewportStyle);
 	}
 
-})();
+}());

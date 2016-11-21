@@ -24,15 +24,14 @@
 	};
 
 	var replaceVariables = function(text, vars) {
-		var m;
-		while ((m = EXP_VAR.exec(text))) {
+		for (var m; m = EXP_VAR.exec(text);) {
 			var name = m[1];
 			text = text.replace(RegExp("\\{" + name + "\\}", "g"), propertyValue(vars, name));
 			m = EXP_VAR.exec(text);
 		}
 
 		return text;
-	}
+	};
 
 	var extractVariableSelectors = function(elm, selector, vars) {
 		if (elm instanceof jQuery) {
@@ -47,8 +46,9 @@
 			}
 
 			if (elm.parentNode.nodeType === 1) {
-				if (selector !== undefined && selector.length > 0)
+				if (selector !== undefined && selector.length > 0) {
 					selector += " > ";
+				}
 
 				selector += elm.localName;
 
@@ -58,8 +58,9 @@
 					var clss = elm.className.split(/\s/g);
 					for (var i = 0; i < clss.length; i++) {
 						var cls = clss[i];
-						if (EXP_VAR.exec(cls) || cls.length === 0)
+						if (EXP_VAR.exec(cls) || cls.length === 0) {
 							continue;
+						}
 						selector += "." + cls;
 					}
 				}
@@ -68,8 +69,7 @@
 			if (elm.attributes && elm.attributes.length) {
 				for (var i = 0; i < elm.attributes.length; i++) {
 					var attr = elm.attributes[i];
-					var m;
-					while (m = EXP_VAR.exec(attr.value)) {
+					for (var m; m = EXP_VAR.exec(attr.value);) {
 						var vn = m[1];
 						var vs = vars[vn] || [];
 						var vt = {
@@ -88,8 +88,7 @@
 					if (cn.nodeType === 1) {
 						vars = extractVariableSelectors(cn, selector, vars);
 					} else if (cn.nodeType === 3) {
-						var m;
-						while (m = EXP_VAR.exec(cn.nodeValue)) {
+						for (var m; m = EXP_VAR.exec(cn.nodeValue);) {
 							var vn = m[1];
 							var vs = vars[vn] || [];
 							var vt = {
