@@ -77,7 +77,7 @@ public class ConverterService extends Widget implements Listener {
 
     private static final EventManager EVENT_MANAGER = EventManager.instance();
 
-    private static final Settings CONFIG = Settings.instance();
+    private static final Settings SETTINGS = Settings.instance();
 
     private final Map<String, ConverterJob> converters = new ConcurrentHashMap<>();
 
@@ -212,7 +212,7 @@ public class ConverterService extends Widget implements Listener {
     }
 
     private void addConverter(final Path inputPath) throws InterruptedException, JAXBException, ExecutionException {
-        final SettingsWrapper settings = CONFIG.getSettings();
+        final SettingsWrapper settings = SETTINGS.getSettings();
 
         if (settings != null && !settings.getOutput().isEmpty() && !Files.isDirectory(inputPath)) {
             if (FFMpegImpl.isEncodingSupported(inputPath)) {
