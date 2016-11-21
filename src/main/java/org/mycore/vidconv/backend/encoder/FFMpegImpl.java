@@ -251,7 +251,7 @@ public class FFMpegImpl {
                     .filter(os -> !os.isEmpty())
                     .map(os -> {
                         final Matcher m = PATTERN_ENCODER.matcher(os);
-                        while (m.find()) {
+                        if (m.find()) {
                             final EncoderWrapper encoder = new EncoderWrapper();
 
                             encoder.setName(m.group(1));
