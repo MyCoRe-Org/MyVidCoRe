@@ -4,7 +4,7 @@ module.exports = function(grunt) {
 	var getAbsoluteDir = function(dir) {
 		return path.isAbsolute(dir) ? dir : path.resolve(process.cwd(), dir);
 	};
-	var globalConfig = {
+	var dirConfig = {
 		assetsDirectory : getAbsoluteDir(grunt.option("assetsDirectory")),
 		assetsDirectoryRelative : path.basename(grunt.option("assetsDirectory")),
 
@@ -12,7 +12,7 @@ module.exports = function(grunt) {
 	};
 
 	grunt.initConfig({
-		globalConfig : globalConfig,
+		globalConfig : dirConfig,
 		pkg : grunt.file.readJSON("package.json"),
 		bootstrap : grunt.file.readJSON("bower_components/bootstrap/package.json"),
 		banner : "/*!\n" + " * <%= pkg.name %> v${project.version}\n" + " * Homepage: <%= pkg.homepage %>\n"
