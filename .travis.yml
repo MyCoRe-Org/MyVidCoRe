@@ -1,6 +1,8 @@
 language: java
 jdk:
   - oraclejdk8
+after_script:
+  - mvn com.gavinmogan:codacy-maven-plugin:coverage -DcoverageReportFile=target/site/jacoco/jacoco.xml -DprojectToken=${CODACY_PROJECT_TOKEN} -DapiToken=${CODACY_API_TOKEN}
 deploy:
   provider: releases
   api_key: ${GH_TOKEN}
