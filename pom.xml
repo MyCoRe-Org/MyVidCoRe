@@ -112,13 +112,13 @@
 
         <executions>
           <execution>
-            <id>install node and npm</id>
+            <id>install node and yarn</id>
             <goals>
-              <goal>install-node-and-npm</goal>
+              <goal>install-node-and-yarn</goal>
             </goals>
             <configuration>
-              <nodeVersion>v4.2.2</nodeVersion>
-              <npmVersion>3.5.0</npmVersion>
+              <nodeVersion>v6.9.1</nodeVersion>
+              <yarnVersion>v0.16.1</yarnVersion>
             </configuration>
           </execution>
 
@@ -126,7 +126,7 @@
             <id>webapp-deps</id>
             <phase>process-resources</phase>
             <goals>
-              <goal>npm</goal>
+              <goal>yarn</goal>
               <goal>bower</goal>
             </goals>
             <configuration>
@@ -328,6 +328,19 @@
                   </pluginExecutionFilter>
                   <action>
                     <ignore></ignore>
+                  </action>
+                </pluginExecution>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>de.thetaphi</groupId>
+                    <artifactId>forbiddenapis</artifactId>
+                    <versionRange>[1.6.1,)</versionRange>
+                    <goals>
+                      <goal>check</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore />
                   </action>
                 </pluginExecution>
               </pluginExecutions>

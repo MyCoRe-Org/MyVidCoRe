@@ -48,9 +48,10 @@ module.exports = function(grunt) {
 			}
 		},
 		jshint : {
-			all : [ "Gruntfile.js", "<%=globalConfig.assetsDirectory%>/js/main.js" ],
+			files : [ "Gruntfile.js", "${project.basedir}/src/*/*.js" ],
 			options : {
-				jshintrc : ".jshintrc"
+				jshintrc : ".jshintrc",
+				reporterOutput : ""
 			}
 		},
 		less : {
