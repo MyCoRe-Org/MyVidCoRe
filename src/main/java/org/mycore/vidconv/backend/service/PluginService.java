@@ -19,14 +19,19 @@
  */
 package org.mycore.vidconv.backend.service;
 
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.vidconv.common.config.Settings;
 import org.mycore.vidconv.common.event.EventManager;
 import org.mycore.vidconv.common.event.Listener;
 import org.mycore.vidconv.common.event.annotation.AutoExecutable;
 import org.mycore.vidconv.common.event.annotation.Startup;
+import org.mycore.vidconv.frontend.entity.SettingsWrapper;
 import org.mycore.vidconv.plugin.annotation.Plugin;
 import org.reflections.Reflections;
 
@@ -41,29 +46,61 @@ public class PluginService {
 
     private static final EventManager EVENT_MANGER = EventManager.instance();
 
-    private static Set<Class<?>> plugins;
+    private static final Settings SETTINGS = Settings.instance();
+
+    private static final Set<Class<?>> PLUGIN_CACHE;
+
+    private static Map<String, Listener> plugins;
 
     static {
         final Reflections reflections = new Reflections("org.mycore.vidconv.plugin");
-        plugins = reflections.getTypesAnnotatedWith(Plugin.class);
+        PLUGIN_CACHE = reflections.getTypesAnnotatedWith(Plugin.class);
     }
 
     @Startup
-    public static void startup() {
-        loadPlugins();
+    public static void loadPlugins() {
+        plugins = new ConcurrentHashMap<>();
+
+        PLUGIN_CACHE.stream().forEach(p -> loadPlugin(p));
     }
 
-    private static void loadPlugins() {
-        plugins.stream().forEach(p -> loadPlugin(p));
-    }
-
-    private static void loadPlugin(Class<?> plugin) {
+    private static void loadPlugin(Class<?> p) {
+        Plugin pa = p.getAnnotation(Plugin.class);
+        LOGGER.info("load plugin " + pa.name() + "...");
         try {
-            LOGGER.info("...load plugin " + plugin.getName());
-            EVENT_MANGER.addListener((Listener) plugin.newInstance());
+            plugins.put(pa.name(), (Listener) p.newInstance());
+
+            boolean enabled = Optional.ofNullable(isPluginEnabled(pa.name())).orElse(pa.enabled());
+            if (enabled) {
+                LOGGER.info("...enabled.");
+                enablePlugin(pa.name());
+            } else {
+                LOGGER.info("...disabled.");
+            }
         } catch (InstantiationException | IllegalAccessException e) {
-            LOGGER.error("Couldn't load plugin \"" + plugin.getName() + "\".", e);
+            LOGGER.error("...error on loading", e);
         }
     }
 
+    private static Boolean isPluginEnabled(String name) {
+        Optional<SettingsWrapper.Plugin> pn = SETTINGS.getSettings().getPlugins().stream()
+            .filter(sp -> sp.getName() == name)
+            .findFirst();
+
+        return pn.isPresent() ? pn.get().isEnabled() : null;
+    }
+
+    public static void enablePlugin(String name) {
+        Listener plugin = plugins.get(name);
+        if (plugin != null) {
+            EVENT_MANGER.addListener(plugin);
+        }
+    }
+
+    public static void disablePlugin(String name) {
+        Listener plugin = plugins.get(name);
+        if (plugin != null) {
+            EVENT_MANGER.removeListner(plugin);
+        }
+    }
 }

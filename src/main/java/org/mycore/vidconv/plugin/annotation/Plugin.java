@@ -46,4 +46,9 @@ public @interface Plugin {
      * The plugin <code>description</code>. Default is an empty String.
      */
     String description() default "";
+
+    /**
+     * Defines is plugin enabled by default. Default is <code>true</code>.
+     */
+    boolean enabled() default true;
 }

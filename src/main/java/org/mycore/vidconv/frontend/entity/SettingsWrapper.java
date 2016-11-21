@@ -38,6 +38,8 @@ public class SettingsWrapper {
 
     private List<Output> output = new ArrayList<>();
 
+    private List<Plugin> plugins = new ArrayList<>();
+
     /**
      * @return the output
      */
@@ -50,6 +52,20 @@ public class SettingsWrapper {
      */
     public void setOutput(List<Output> output) {
         this.output = output;
+    }
+
+    /**
+     * @return the plugins
+     */
+    public List<Plugin> getPlugins() {
+        return plugins;
+    }
+
+    /**
+     * @param plugins the plugins to set
+     */
+    public void setPlugins(List<Plugin> plugins) {
+        this.plugins = plugins;
     }
 
     public static class Output {
@@ -450,6 +466,40 @@ public class SettingsWrapper {
         public void setBitrate(Integer bitrate) {
             this.bitrate = bitrate;
         }
+    }
 
+    @XmlRootElement(name = "plugin")
+    public static class Plugin {
+        private String name;
+
+        private boolean enabled;
+
+        /**
+         * @return the name
+         */
+        public String getName() {
+            return name;
+        }
+
+        /**
+         * @param name the name to set
+         */
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        /**
+         * @return the enabled
+         */
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        /**
+         * @param enabled the enabled to set
+         */
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
     }
 }
