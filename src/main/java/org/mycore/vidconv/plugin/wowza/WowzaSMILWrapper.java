@@ -119,6 +119,10 @@ public class WowzaSMILWrapper {
     public static class Body {
 
         private List<Video> switchBody;
+        
+        protected Body() {
+            super();
+        }
 
         public Body(List<Video> switchBody) {
             this.switchBody = switchBody;
@@ -245,6 +249,10 @@ public class WowzaSMILWrapper {
         private T value;
 
         private String valueType;
+        
+        protected Param() {
+            super();
+        }
 
         /**
          * @param name
