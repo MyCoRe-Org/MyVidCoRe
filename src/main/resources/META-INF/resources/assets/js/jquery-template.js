@@ -109,7 +109,7 @@
 					var vt = varSels[name][i];
 					var path = vt.selector;
 					var offset = path.lastIndexOf(">");
-					var selector = offset !=0 -1 ? path.substring(0, offset).trim() : null;
+					var selector = offset !== -1 ? path.substring(0, offset).trim() : null;
 					var elm = offset !== -1 ? path.substring(offset + 1).trim() : path.trim();
 					var $elm = selector === null ? $template : $template.find(selector);
 

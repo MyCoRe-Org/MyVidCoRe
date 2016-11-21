@@ -165,7 +165,7 @@ app.controller("converterStatus", function($scope, $http, $interval, asyncQueue)
 				method : "GET",
 				url : "/widget/converter/" + id + "/status"
 			}).then(function(response) {
-				if (response.status == 200) {
+				if (response.status === 200) {
 					$scope.details[id] = response.data;
 				}
 			});
@@ -550,7 +550,7 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 
 	$scope.load = function() {
 		$http.get("/settings").then(function(response) {
-			if (response.status = 200) {
+			if (response.status === 200) {
 				if (response.data.output.length > 0) {
 					$scope.settings = response.data;
 				}
