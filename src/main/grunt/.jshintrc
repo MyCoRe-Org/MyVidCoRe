@@ -1,18 +1,18 @@
 {
-  "curly": true,
-  "eqeqeq": true,
-  "immed": true,
-  "latedef": true,
-  "newcap": true,
-  "noarg": true,
-  "sub": true,
-  "undef": true,
-  "unused": true,
-  "boss": true,
-  "eqnull": true,
   "node": true,
+  "bitwise": true,
+  "undef": true,
+  "eqeqeq": true,
+  "noarg": true,
+  "mocha": true,
+  "unused": true,
+  "asi": true,
+  "esnext": true,
+  "browser": true,
+  "jquery": true,
+  "laxbreak": true,
   "globals": {
-        "$": false
-    }
+    "$": true,
+    "angular": true
+  }
 }
-

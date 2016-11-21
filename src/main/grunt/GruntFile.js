@@ -1,56 +1,56 @@
 module.exports = function(grunt) {
-	var path = require('path');
+	var path = require("path");
 
 	var getAbsoluteDir = function(dir) {
 		return path.isAbsolute(dir) ? dir : path.resolve(process.cwd(), dir);
 	};
 	var globalConfig = {
-		assetsDirectory : getAbsoluteDir(grunt.option('assetsDirectory')),
-		assetsDirectoryRelative : path.basename(grunt.option('assetsDirectory')),
+		assetsDirectory : getAbsoluteDir(grunt.option("assetsDirectory")),
+		assetsDirectoryRelative : path.basename(grunt.option("assetsDirectory")),
 
-		lessDirectory : getAbsoluteDir(grunt.option('lessDirectory')),
+		lessDirectory : getAbsoluteDir(grunt.option("lessDirectory")),
 	};
 
 	grunt.initConfig({
 		globalConfig : globalConfig,
-		pkg : grunt.file.readJSON('package.json'),
-		bootstrap : grunt.file.readJSON('bower_components/bootstrap/package.json'),
-		banner : '/*!\n' + ' * <%= pkg.name %> v${project.version}\n' + ' * Homepage: <%= pkg.homepage %>\n' +
-				' * Copyright 2016-<%= grunt.template.today("yyyy") %> <%= pkg.author %> and others\n' + ' * Licensed under <%= pkg.license %>\n' + '*/\n',
+		pkg : grunt.file.readJSON("package.json"),
+		bootstrap : grunt.file.readJSON("bower_components/bootstrap/package.json"),
+		banner : "/*!\n" + " * <%= pkg.name %> v${project.version}\n" + " * Homepage: <%= pkg.homepage %>\n"
+				+ " * Copyright 2016-<%= grunt.template.today('yyyy') %> <%= pkg.author %> and others\n" + " * Licensed under <%= pkg.license %>\n" + "*/\n",
 		bowercopy : {
 			build : {
 				options : {
-					destPrefix : '<%=globalConfig.assetsDirectory%>/'
+					destPrefix : "<%=globalConfig.assetsDirectory%>/"
 				},
 				files : {
-					'css' : [ 'seiyria-bootstrap-slider/dist/css/*.min.css', 'video.js/dist/*.min.css' ],
-					'fonts' : [ 'bootstrap/dist/fonts', 'font-awesome/fonts', 'video.js/dist/font' ],
-					'js' : [ 'angular/*.min.*', 'angular-animate/*.min.*', 'angular-sanitize/*.min.*', 'angular-translate/*.min.*',
-							'angular-translate-loader-static-files/*.min.*', 'bootstrap/dist/js/*min.js', 'seiyria-bootstrap-slider/dist/*.min.js',
-							'html5shiv/dist/*min.js', 'jquery/dist/*min.js', 'respond/dest/*min.js', 'video.js/dist/*min.js*' ],
+					"css" : [ "seiyria-bootstrap-slider/dist/css/*.min.css", "video.js/dist/*.min.css" ],
+					"fonts" : [ "bootstrap/dist/fonts", "font-awesome/fonts", "video.js/dist/font" ],
+					"js" : [ "angular/*.min.*", "angular-animate/*.min.*", "angular-sanitize/*.min.*", "angular-translate/*.min.*",
+							"angular-translate-loader-static-files/*.min.*", "bootstrap/dist/js/*min.js", "seiyria-bootstrap-slider/dist/*.min.js",
+							"html5shiv/dist/*min.js", "jquery/dist/*min.js", "respond/dest/*min.js", "video.js/dist/*min.js*" ],
 				},
 			}
 		},
 		googlefonts : {
 			build : {
 				options : {
-					fontPath : '<%=globalConfig.assetsDirectory%>/fonts/',
-					cssFile : '<%=globalConfig.assetsDirectory%>/css/fonts.css',
-					httpPath : '../fonts/',
+					fontPath : "<%=globalConfig.assetsDirectory%>/fonts/",
+					cssFile : "<%=globalConfig.assetsDirectory%>/css/fonts.css",
+					httpPath : "../fonts/",
 					fonts : [ {
-						family : 'Titillium Web',
-						styles : [ 200, 400, 600, 700, '200italic', '400italic', '600italic', '700italic' ]
+						family : "Titillium Web",
+						styles : [ 200, 400, 600, 700, "200italic", "400italic", "600italic", "700italic" ]
 					}, {
-						family : 'Source Code Pro',
+						family : "Source Code Pro",
 						styles : [ 400, 300, 500 ]
 					} ]
 				}
 			}
 		},
 		jshint : {
-			all : [ 'Gruntfile.js', '<%=globalConfig.assetsDirectory%>/js/main.js' ],
+			all : [ "Gruntfile.js", "<%=globalConfig.assetsDirectory%>/js/main.js" ],
 			options : {
-				jshintrc : '.jshintrc'
+				jshintrc : ".jshintrc"
 			}
 		},
 		less : {
@@ -61,9 +61,9 @@ module.exports = function(grunt) {
 					outputSourceFiles : true,
 					modifyVars : {
 						// font-awesome
-						"fa-font-path" : "'../fonts'",
+						"fa-font-path" : "\"../fonts\"",
 						// bootstrap
-						"icon-font-path" : "'../fonts/'",
+						"icon-font-path" : "\"../fonts/\"",
 						"font-family-sans-serif" : "\"Titillium Web\", sans-serif",
 						"brand-primary" : "orange",
 						// "brand-success" : "#5cb85c",
@@ -77,21 +77,21 @@ module.exports = function(grunt) {
 				},
 				files : [ {
 					expand : true,
-					cwd : '<%=globalConfig.lessDirectory%>/',
-					src : [ '*.less' ],
-					dest : '<%=globalConfig.assetsDirectory%>/css/',
-					ext : '.css'
+					cwd : "<%=globalConfig.lessDirectory%>/",
+					src : [ "*.less" ],
+					dest : "<%=globalConfig.assetsDirectory%>/css/",
+					ext : ".css"
 				} ]
 			}
 		}
 	});
 
-	grunt.loadNpmTasks('grunt-contrib-concat');
-	grunt.loadNpmTasks('grunt-contrib-jshint');
-	grunt.loadNpmTasks('grunt-contrib-less');
-	grunt.loadNpmTasks('grunt-bowercopy');
-	grunt.loadNpmTasks('grunt-google-fonts');
+	grunt.loadNpmTasks("grunt-contrib-concat");
+	grunt.loadNpmTasks("grunt-contrib-jshint");
+	grunt.loadNpmTasks("grunt-contrib-less");
+	grunt.loadNpmTasks("grunt-bowercopy");
+	grunt.loadNpmTasks("grunt-google-fonts");
 
-	grunt.registerTask('test', [ 'jshint' ]);
-	grunt.registerTask('default', 'build static webapp resources', [ 'test', 'bowercopy', 'googlefonts', 'less' ]);
+	grunt.registerTask("test", [ "jshint" ]);
+	grunt.registerTask("default", "build static webapp resources", [ "test", "bowercopy", "googlefonts", "less" ]);
 };

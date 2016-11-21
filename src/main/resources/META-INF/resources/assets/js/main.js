@@ -363,7 +363,7 @@ app.service("formatService", function($http, $q, asyncQueue) {
 				angular.forEach(formats, function(options, format) {
 					var f = getByProperty(fs, "name", format);
 					if (f !== null) {
-						formats[format]["description"] = f.description;
+						formats[format].description = f.description;
 						angular.forEach(options, function(codecs, type) {
 							if (Array.isArray(formats[format][type])) {
 								var re = [];
