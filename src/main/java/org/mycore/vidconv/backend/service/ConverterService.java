@@ -214,51 +214,49 @@ public class ConverterService extends Widget implements Listener {
     private void addConverter(final Path inputPath) throws InterruptedException, JAXBException, ExecutionException {
         final SettingsWrapper settings = CONFIG.getSettings();
 
-        if (settings != null && !settings.getOutput().isEmpty()) {
-            if (!Files.isDirectory(inputPath)) {
-                if (FFMpegImpl.isEncodingSupported(inputPath)) {
-                    final String parentId = Long.toHexString(new Random().nextLong());
-                    final String fileName = inputPath.getFileName().toString();
+        if (settings != null && !settings.getOutput().isEmpty() && !Files.isDirectory(inputPath)) {
+            if (FFMpegImpl.isEncodingSupported(inputPath)) {
+                final String parentId = Long.toHexString(new Random().nextLong());
+                final String fileName = inputPath.getFileName().toString();
 
-                    List<Output> outputs = settings.getOutput().stream()
-                        .sorted((o2, o1) -> o1.getFormat().equals(o2.getFormat())
-                            ? o1.getVideo().getScale().compareTo(o2.getVideo().getScale())
-                            : o1.getFormat().compareTo(o2.getFormat()))
-                        .filter(output -> {
-                            try {
-                                return output.getVideo().getUpscale()
-                                    || !FFMpegImpl.isUpscaling(inputPath, output.getVideo().getScale());
-                            } catch (Exception e) {
-                                throw new RuntimeException(e);
-                            }
-                        }).collect(Collectors.toList());
-
-                    outputs.forEach(output -> {
+                List<Output> outputs = settings.getOutput().stream()
+                    .sorted((o2, o1) -> o1.getFormat().equals(o2.getFormat())
+                        ? o1.getVideo().getScale().compareTo(o2.getVideo().getScale())
+                        : o1.getFormat().compareTo(o2.getFormat()))
+                    .filter(output -> {
                         try {
-                            final String id = outputs.size() == 1 ? parentId
-                                : Long.toHexString(new Random().nextLong());
-
-                            final String appendix = Optional.ofNullable(output.getFilenameAppendix()).orElse(id);
-                            final Path outputPath = Paths.get(outputDir, parentId,
-                                FFMpegImpl.filename(output.getFormat(), fileName,
-                                    appendix));
-
-                            if (!Files.exists(outputPath.getParent()))
-                                Files.createDirectories(outputPath.getParent());
-
-                            final String command = FFMpegImpl.command(output);
-                            final ConverterJob converter = new ConverterJob(parentId, id, command, inputPath,
-                                outputPath);
-
-                            converters.put(id, converter);
-                            converterThreadPool.submit(converter);
+                            return output.getVideo().getUpscale()
+                                || !FFMpegImpl.isUpscaling(inputPath, output.getVideo().getScale());
                         } catch (Exception e) {
                             throw new RuntimeException(e);
                         }
-                    });
-                } else {
-                    LOGGER.warn("encoding of file \"" + inputPath.toFile().getAbsolutePath() + "\" isn't supported.");
-                }
+                    }).collect(Collectors.toList());
+
+                outputs.forEach(output -> {
+                    try {
+                        final String id = outputs.size() == 1 ? parentId
+                            : Long.toHexString(new Random().nextLong());
+
+                        final String appendix = Optional.ofNullable(output.getFilenameAppendix()).orElse(id);
+                        final Path outputPath = Paths.get(outputDir, parentId,
+                            FFMpegImpl.filename(output.getFormat(), fileName,
+                                appendix));
+
+                        if (!Files.exists(outputPath.getParent()))
+                            Files.createDirectories(outputPath.getParent());
+
+                        final String command = FFMpegImpl.command(output);
+                        final ConverterJob converter = new ConverterJob(parentId, id, command, inputPath,
+                            outputPath);
+
+                        converters.put(id, converter);
+                        converterThreadPool.submit(converter);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+            } else {
+                LOGGER.warn("encoding of file \"" + inputPath.toFile().getAbsolutePath() + "\" isn't supported.");
             }
         }
     }

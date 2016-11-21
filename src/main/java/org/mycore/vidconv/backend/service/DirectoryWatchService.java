@@ -150,13 +150,11 @@ public class DirectoryWatchService extends Widget implements Listener {
                                 events.get(child).lastModified = Instant.now();
                             }
 
-                            if (kind == ENTRY_CREATE) {
-                                if (Files.isDirectory(child, LinkOption.NOFOLLOW_LINKS)) {
-                                    try {
-                                        walk(child, keys, ws);
-                                    } catch (IOException e) {
-                                        LOGGER.error(e.getMessage(), e);
-                                    }
+                            if (kind == ENTRY_CREATE && Files.isDirectory(child, LinkOption.NOFOLLOW_LINKS)) {
+                                try {
+                                    walk(child, keys, ws);
+                                } catch (IOException e) {
+                                    LOGGER.error(e.getMessage(), e);
                                 }
                             }
                         });
