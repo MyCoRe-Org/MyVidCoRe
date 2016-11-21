@@ -105,7 +105,7 @@
 		}
 
 		return vars;
-	}
+	};
 
 	var updateSelectors = function($template, varSels, vars) {
 		for ( var name in varSels) {
@@ -127,7 +127,7 @@
 				}
 			}
 		}
-	}
+	};
 
 	Template.prototype = {
 		init : function() {
@@ -158,7 +158,7 @@
 				updateSelectors($elm, this.selectors, vars);
 			}
 		}
-	}
+	};
 
 	$.fn[pluginName] = function(options) {
 		var args = arguments;
