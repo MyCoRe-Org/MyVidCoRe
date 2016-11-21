@@ -68,6 +68,7 @@
 			if (elm.attributes && elm.attributes.length) {
 				for (var i = 0; i < elm.attributes.length; i++) {
 					var attr = elm.attributes[i];
+					var m;
 					while (m = EXP_VAR.exec(attr.value)) {
 						var vn = m[1];
 						var vs = vars[vn] || [];
