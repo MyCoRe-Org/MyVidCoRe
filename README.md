@@ -1,4 +1,4 @@
-# MyVidCoRe - My Video Converter [![Build Status](https://travis-ci.org/MyCoRe-Org/MyVidCoRe.svg?branch=master)](https://travis-ci.org/MyCoRe-Org/MyVidCoRe)
+# MyVidCoRe - My Video Converter [![Build Status](https://travis-ci.org/MyCoRe-Org/MyVidCoRe.svg?branch=master)](https://travis-ci.org/MyCoRe-Org/MyVidCoRe) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/18bc16e5e20c43b5b99112a4b81525f7)](https://www.codacy.com/app/adlerre/MyVidCoRe?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=MyCoRe-Org/MyVidCoRe&amp;utm_campaign=Badge_Grade)
 
 Converts Videos from hotfolder to output directory with given settings. 
 
@@ -19,9 +19,9 @@ You also need to install FFMpeg and FFProbe, please visit the [FFMpeg download p
 Run Server with:
 
     # run with default settings
-    $ java -jar target/myvidcore.jar
+    $ java -jar myvidcore.jar
     # run with custom settings
-    $ java -jar target/myvidcore.jar --watchDir convert/input --outputDir convert/output
+    $ java -jar myvidcore.jar --watchDir convert/input --outputDir convert/output
 
 Now you should be able to access the WEB-Interface on [http://localhost:8085/web](http://localhost:8085/web).
  
@@ -40,7 +40,7 @@ WEB-Interface:
 
 For a help and/or overview about default settings run:
 
-    $ java -jar target/myvidcore.jar -h
+    $ java -jar myvidcore.jar -h
     
 * **-h, --help**
 
