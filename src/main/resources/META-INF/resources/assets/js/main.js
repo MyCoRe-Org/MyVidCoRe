@@ -19,7 +19,7 @@ app.config(function($translateProvider) {
 
 app.directive("convertToNumber", function() {
 	return {
-		require : 'ngModel',
+		require : "ngModel",
 		link : function(scope, element, attrs, ngModel) {
 			ngModel.$parsers.push(function(val) {
 				return parseInt(val, 10);
@@ -33,7 +33,7 @@ app.directive("convertToNumber", function() {
 
 app.directive("slider", function() {
 	return {
-		require : 'ngModel',
+		require : "ngModel",
 		link : function(scope, element, attrs, ngModel) {
 			var slider;
 			if (attrs.slider.length === 0) {
@@ -210,7 +210,7 @@ app.controller("converterStatus", function($scope, $http, $interval, asyncQueue)
 			return;
 		}
 
-		if (typeof page === 'string') {
+		if (typeof page === "string") {
 			page = page[0] === "-" ? (pagination.start / pagination.limit) + 1 - parseInt(page.substring(1))
 					: page[0] === "+" ? page = (pagination.start / pagination.limit) + 1 + parseInt(page.substring(1)) : 0;
 		}
@@ -224,7 +224,7 @@ app.controller("converterStatus", function($scope, $http, $interval, asyncQueue)
 	};
 
 	$scope.paginationDisabled = function(pagination, page) {
-		if (typeof page === 'string') {
+		if (typeof page === "string") {
 			page = page[0] === "-" ? (pagination.start / pagination.limit) + 1 - parseInt(page.substring(1))
 					: page[0] === "+" ? page = (pagination.start / pagination.limit) + 1 + parseInt(page.substring(1)) : 0;
 		}
