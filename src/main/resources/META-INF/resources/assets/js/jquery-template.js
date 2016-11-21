@@ -10,22 +10,24 @@
 		this.init();
 	}
 
-	var EXP_VAR = RegExp("\\{([^\\}]+)", 'g');
+	var EXP_VAR = RegExp("\\{([^\\}]+)", "g");
 
 	var propertyValue = function(vars, property) {
 		var p = property.split(".");
 
 		var v = vars[p[0]];
-		if (v)
+		if (v) {
 			return p.length === 1 ? v : propertyValue(v, p.slice(1).join());
+		}
 
 		return null;
 	};
 
 	var replaceVariables = function(text, vars) {
+		var m;
 		while ((m = EXP_VAR.exec(text))) {
 			var name = m[1];
-			text = text.replace(RegExp("\\{" + name + "\\}", 'g'), propertyValue(vars, name));
+			text = text.replace(RegExp("\\{" + name + "\\}", "g"), propertyValue(vars, name));
 			m = EXP_VAR.exec(text);
 		}
 
@@ -33,14 +35,16 @@
 	}
 
 	var extractVariableSelectors = function(elm, selector, vars) {
-		if (elm instanceof jQuery)
+		if (elm instanceof jQuery) {
 			elm = elm.get(0);
+		}
 
 		vars = vars || [];
 
 		if (elm) {
-			if (selector === undefined)
+			if (selector === undefined) {
 				selector = "";
+			}
 
 			if (elm.parentNode.nodeType === 1) {
 				if (selector !== undefined && selector.length > 0)
@@ -83,6 +87,7 @@
 					if (cn.nodeType === 1) {
 						vars = extractVariableSelectors(cn, selector, vars);
 					} else if (cn.nodeType === 3) {
+						var m;
 						while (m = EXP_VAR.exec(cn.nodeValue)) {
 							var vn = m[1];
 							var vs = vars[vn] || [];
@@ -158,20 +163,20 @@
 	$.fn[pluginName] = function(options) {
 		var args = arguments;
 
-		if (options === undefined || typeof options === 'object') {
+		if (options === undefined || typeof options === "object") {
 			return this.each(function() {
-				if (!$.data(this, 'plugin_' + pluginName)) {
-					$.data(this, 'plugin_' + pluginName, new Template(this, options));
+				if (!$.data(this, "plugin_" + pluginName)) {
+					$.data(this, "plugin_" + pluginName, new Template(this, options));
 				}
 			});
-		} else if (typeof options === 'string' && options[0] !== '_' && options !== 'init') {
+		} else if (typeof options === "string" && options[0] !== "_" && options !== "init") {
 			if (Array.prototype.slice.call(args, 1).length === 0 && $.inArray(options, $.fn[pluginName].getters) !== -1) {
-				var instance = $.data(this[0], 'plugin_' + pluginName);
+				var instance = $.data(this[0], "plugin_" + pluginName);
 				return instance[options].apply(instance, Array.prototype.slice.call(args, 1));
 			} else {
 				return this.each(function() {
-					var instance = $.data(this, 'plugin_' + pluginName);
-					if (instance instanceof Template && typeof instance[options] === 'function') {
+					var instance = $.data(this, "plugin_" + pluginName);
+					if (instance instanceof Template && typeof instance[options] === "function") {
 						instance[options].apply(instance, Array.prototype.slice.call(args, 1));
 					}
 				});
@@ -179,7 +184,7 @@
 		}
 	};
 
-	$.fn[pluginName].getters = [ 'compile' ];
+	$.fn[pluginName].getters = [ "compile" ];
 
 	/**
 	 * Default options
