@@ -85,7 +85,6 @@ public class EventManager {
                 e.getValue().handleEvent(event);
             } catch (Exception ex) {
                 LogManager.getLogger(e.getValue().getClass()).error(ex.getMessage(), ex);
-                throw new RuntimeException(ex);
             }
         });
     }
