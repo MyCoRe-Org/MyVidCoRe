@@ -21,6 +21,7 @@ package org.mycore.vidconv.frontend.resource;
 
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
@@ -31,6 +32,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.mycore.vidconv.backend.encoder.FFMpegImpl;
 import org.mycore.vidconv.frontend.entity.CodecWrapper.Type;
+import org.mycore.vidconv.frontend.annotation.CacheMaxAge;
 import org.mycore.vidconv.frontend.entity.CodecsWrapper;
 import org.mycore.vidconv.frontend.entity.EncodersWrapper;
 import org.mycore.vidconv.frontend.entity.FormatsWrapper;
@@ -44,6 +46,7 @@ import org.mycore.vidconv.frontend.entity.FormatsWrapper;
 public class ConverterResource {
 
     @GET
+    @CacheMaxAge(time = 1, unit = TimeUnit.HOURS)
     @Path("codecs{filter:(/[^/]+?)?}{value:(/([^/]+)?)?}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public CodecsWrapper getCodecs(@PathParam("filter") String filter, @PathParam("value") String value)
@@ -71,6 +74,7 @@ public class ConverterResource {
     }
 
     @GET
+    @CacheMaxAge(time = 1, unit = TimeUnit.HOURS)
     @Path("formats{filter:(/[^/]+?)?}{value:(/([^/]+)?)?}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public FormatsWrapper getFormats(@PathParam("filter") String filter, @PathParam("value") String value)
@@ -92,6 +96,7 @@ public class ConverterResource {
     }
 
     @GET
+    @CacheMaxAge(time = 1, unit = TimeUnit.HOURS)
     @Path("encoder/{name}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public EncodersWrapper getEncoder(@PathParam("name") String name)
