@@ -54,8 +54,8 @@
   </developers>
 
   <properties>
-    <jersey.version>2.24</jersey.version>
-    <log4j.version>2.7</log4j.version>
+    <jersey.version>2.25</jersey.version>
+    <log4j.version>2.8.2</log4j.version>
     <grunt.projectBase>${project.build.directory}/grunt</grunt.projectBase>
     <template.assetsdir>${project.build.directory}/classes/META-INF/resources/assets</template.assetsdir>
     <encoding>UTF-8</encoding>
@@ -371,19 +371,13 @@
     </dependency>
 
     <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>javax.ws.rs-api</artifactId>
-      <version>2.0.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.glassfish.hk2.external</groupId>
-      <artifactId>javax.inject</artifactId>
-      <version>2.5.0-b05</version>
-    </dependency>
-    <dependency>
       <groupId>org.glassfish.jersey.core</groupId>
       <artifactId>jersey-server</artifactId>
+      <version>${jersey.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.containers</groupId>
+      <artifactId>jersey-container-jdk-http</artifactId>
       <version>${jersey.version}</version>
     </dependency>
     <dependency>
@@ -392,21 +386,26 @@
       <version>${jersey.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.glassfish.jersey.containers</groupId>
-      <artifactId>jersey-container-jdk-http</artifactId>
-      <version>${jersey.version}</version>
+      <groupId>org.glassfish.hk2.external</groupId>
+      <artifactId>javax.inject</artifactId>
+      <version>2.5.0-b05</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>javax.ws.rs-api</artifactId>
+      <version>2.0.1</version>
     </dependency>
 
     <dependency>
       <groupId>org.reflections</groupId>
       <artifactId>reflections</artifactId>
-      <version>0.9.10</version>
+      <version>0.9.11</version>
     </dependency>
 
     <dependency>
       <groupId>com.beust</groupId>
       <artifactId>jcommander</artifactId>
-      <version>1.58</version>
+      <version>1.69</version>
     </dependency>
 
     <dependency>
@@ -414,6 +413,19 @@
       <artifactId>ehcache</artifactId>
       <version>3.1.3</version>
     </dependency>
+
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>21.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.5</version>
+    </dependency>
+
   </dependencies>
 
 </project>

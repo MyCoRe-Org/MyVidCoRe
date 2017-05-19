@@ -1,4 +1,7 @@
 /*
+ * $Id$ 
+ * $Revision$ $Date$
+ *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
  *
@@ -25,9 +28,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.text.MessageFormat;
 import java.time.Instant;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -35,7 +38,6 @@ import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.status.StatusLogger;
-import org.mycore.vidconv.common.event.AutoExecutableHandler;
 import org.mycore.vidconv.common.event.annotation.AutoExecutable;
 import org.mycore.vidconv.common.event.annotation.Startup;
 
@@ -46,77 +48,84 @@ import org.mycore.vidconv.common.event.annotation.Startup;
 @AutoExecutable(name = "Configuration Dir Setup", priority = Integer.MAX_VALUE - 100)
 public class ConfigurationDirSetup {
 
-    private static final StatusLogger LOGGER = StatusLogger.getLogger();
+	private static final StatusLogger LOGGER = StatusLogger.getLogger();
 
-    @Startup
-    protected static void startup() {
-        loadExternalLibs();
-    }
+	@Startup
+	public void startup() {
+		loadExternalLibs();
+		loadProperties();
+	}
 
-    public static void loadExternalLibs() {
-        File resourceDir = ConfigurationDir.getConfigFile("resources");
-        if (resourceDir == null) {
-            // no configuration dir exists
-            return;
-        }
-        ClassLoader classLoader = ConfigurationDir.class.getClassLoader();
-        if (!(classLoader instanceof URLClassLoader)) {
-            error(classLoader.getClass() + " is unsupported for adding extending CLASSPATH at runtime.");
-            return;
-        }
-        File libDir = ConfigurationDir.getConfigFile("lib");
-        Set<URL> currentCPElements = Stream.of(((URLClassLoader) classLoader).getURLs()).collect(Collectors.toSet());
-        Class<? extends ClassLoader> classLoaderClass = classLoader.getClass();
-        try {
-            Method addUrlMethod = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
-            addUrlMethod.setAccessible(true);
-            getFileStream(resourceDir, libDir).map(File::toURI).map(u -> {
-                try {
-                    return u.toURL();
-                } catch (Exception e) {
-                    // should never happen for "file://" URIS
-                    return null;
-                }
-            }).filter(Objects::nonNull).filter(u -> !currentCPElements.contains(u)).forEach(u -> {
-                info("Adding to CLASSPATH: " + u);
-                try {
-                    addUrlMethod.invoke(classLoader, u);
-                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                    LOGGER.error("Could not add " + u + " to current classloader.", e);
-                }
-            });
-        } catch (NoSuchMethodException | SecurityException e) {
-            LogManager.getLogger().warn(classLoaderClass + " does not support adding additional JARs at runtime", e);
-        }
-    }
+	public static void loadExternalLibs() {
+		File resourceDir = ConfigurationDir.getConfigFile("resources");
+		if (resourceDir == null) {
+			// no configuration dir exists
+			return;
+		}
+		ClassLoader classLoader = ConfigurationDir.class.getClassLoader();
+		if (!(classLoader instanceof URLClassLoader)) {
+			error(classLoader.getClass() + " is unsupported for adding extending CLASSPATH at runtime.");
+			return;
+		}
+		File libDir = ConfigurationDir.getConfigFile("lib");
+		Set<URL> currentCPElements = Stream.of(((URLClassLoader) classLoader).getURLs()).collect(Collectors.toSet());
+		Class<? extends ClassLoader> classLoaderClass = classLoader.getClass();
+		try {
+			Method addUrlMethod = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+			addUrlMethod.setAccessible(true);
+			getFileStream(resourceDir, libDir).map(File::toURI).map(u -> {
+				try {
+					return u.toURL();
+				} catch (Exception e) {
+					// should never happen for "file://" URIS
+					return null;
+				}
+			}).filter(Objects::nonNull).filter(u -> !currentCPElements.contains(u)).forEach(u -> {
+				info("Adding to CLASSPATH: " + u);
+				try {
+					addUrlMethod.invoke(classLoader, u);
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+					LOGGER.error("Could not add " + u + " to current classloader.", e);
+				}
+			});
+		} catch (NoSuchMethodException | SecurityException e) {
+			LogManager.getLogger().warn(classLoaderClass + " does not support adding additional JARs at runtime", e);
+		}
+	}
 
-    private static Stream<File> getFileStream(File resourceDir, File libDir) {
-        Stream<File> toClassPath = Stream.of(resourceDir);
-        if (libDir.isDirectory()) {
-            File[] listFiles = libDir
-                .listFiles((FilenameFilter) (dir, name) -> name.toLowerCase(Locale.ROOT).endsWith(".jar"));
-            if (listFiles.length != 0) {
-                toClassPath = Stream.concat(toClassPath, Stream.of(listFiles));
-            }
-        }
-        return toClassPath;
-    }
+	public static void loadProperties() {
+		ConfigurationLoader configurationLoader = new ConfigurationLoader();
+		Map<String, String> properties = configurationLoader.load();
+		Configuration.instance().initialize(properties, true);
+	}
 
-    private static void error(String msg) {
-        if (LOGGER.isErrorEnabled()) {
-            LOGGER.error(msg);
-        } else {
-            System.err.println(MessageFormat.format("{0} ERROR\t{1}: {2}", Instant.now().toString(),
-                AutoExecutableHandler.class.getSimpleName(), msg));
-        }
-    }
+	private static Stream<File> getFileStream(File resourceDir, File libDir) {
+		Stream<File> toClassPath = Stream.of(resourceDir);
+		if (libDir.isDirectory()) {
+			File[] listFiles = libDir
+					.listFiles((FilenameFilter) (dir, name) -> name.toLowerCase(Locale.ROOT).endsWith(".jar"));
+			if (listFiles.length != 0) {
+				toClassPath = Stream.concat(toClassPath, Stream.of(listFiles));
+			}
+		}
+		return toClassPath;
+	}
 
-    private static void info(String msg) {
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info(msg);
-        } else {
-            System.out.println(MessageFormat.format("{0} INFO\t{1}: {2}", Instant.now().toString(),
-                AutoExecutableHandler.class.getSimpleName(), msg));
-        }
-    }
+	private static void error(String msg) {
+		if (LOGGER.isErrorEnabled()) {
+			LOGGER.error(msg);
+		} else {
+			System.err.println(
+					Instant.now().toString() + " ERROR\t" + ConfigurationDirSetup.class.getSimpleName() + ": " + msg);
+		}
+	}
+
+	private static void info(String msg) {
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info(msg);
+		} else {
+			System.out.println(
+					Instant.now().toString() + " INFO\t" + ConfigurationDirSetup.class.getSimpleName() + ": " + msg);
+		}
+	}
 }
