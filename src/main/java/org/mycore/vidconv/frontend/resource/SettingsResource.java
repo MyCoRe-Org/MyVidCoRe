@@ -29,7 +29,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBException;
 
 import org.mycore.vidconv.common.config.Settings;
 import org.mycore.vidconv.frontend.entity.SettingsWrapper;
@@ -52,7 +51,7 @@ public class SettingsResource {
 
     @POST
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public SettingsWrapper postSettings(final SettingsWrapper settings) throws JAXBException {
+    public SettingsWrapper postSettings(final SettingsWrapper settings) throws Exception {
         SETTINGS.setSettings(settings);
         return settings;
     }

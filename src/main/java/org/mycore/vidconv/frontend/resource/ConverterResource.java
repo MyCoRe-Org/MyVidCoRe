@@ -20,7 +20,6 @@
 package org.mycore.vidconv.frontend.resource;
 
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Singleton;
@@ -31,8 +30,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.mycore.vidconv.backend.encoder.FFMpegImpl;
-import org.mycore.vidconv.frontend.entity.CodecWrapper.Type;
 import org.mycore.vidconv.frontend.annotation.CacheMaxAge;
+import org.mycore.vidconv.frontend.entity.CodecWrapper.Type;
 import org.mycore.vidconv.frontend.entity.CodecsWrapper;
 import org.mycore.vidconv.frontend.entity.EncodersWrapper;
 import org.mycore.vidconv.frontend.entity.FormatsWrapper;
@@ -50,7 +49,7 @@ public class ConverterResource {
     @Path("codecs{filter:(/[^/]+?)?}{value:(/([^/]+)?)?}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public CodecsWrapper getCodecs(@PathParam("filter") String filter, @PathParam("value") String value)
-        throws InterruptedException, ExecutionException {
+        throws Exception {
         CodecsWrapper codecs = FFMpegImpl.codecs();
 
         String f = Optional.ofNullable(filter.replaceAll("/", "")).orElse("");
@@ -78,7 +77,7 @@ public class ConverterResource {
     @Path("formats{filter:(/[^/]+?)?}{value:(/([^/]+)?)?}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public FormatsWrapper getFormats(@PathParam("filter") String filter, @PathParam("value") String value)
-        throws InterruptedException, ExecutionException {
+        throws Exception {
         FormatsWrapper formats = FFMpegImpl.formats();
 
         String f = Optional.ofNullable(filter.replaceAll("/", "")).orElse("");
@@ -99,8 +98,7 @@ public class ConverterResource {
     @CacheMaxAge(time = 1, unit = TimeUnit.HOURS)
     @Path("encoder/{name}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public EncodersWrapper getEncoder(@PathParam("name") String name)
-        throws NumberFormatException, InterruptedException, ExecutionException {
+    public EncodersWrapper getEncoder(@PathParam("name") String name) throws Exception {
         return FFMpegImpl.encoder(name);
     }
 }

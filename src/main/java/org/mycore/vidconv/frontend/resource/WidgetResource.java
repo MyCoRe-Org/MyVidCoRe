@@ -52,6 +52,7 @@ import javax.ws.rs.core.StreamingOutput;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.vidconv.common.util.MimeType;
+import org.mycore.vidconv.frontend.annotation.NoCache;
 import org.mycore.vidconv.frontend.entity.ExceptionWrapper;
 import org.mycore.vidconv.frontend.util.RangeStreamingOutput;
 import org.mycore.vidconv.frontend.widget.Widget;
@@ -70,6 +71,7 @@ public class WidgetResource {
     private static final WidgetManager WIDGET_MANAGER = WidgetManager.instance();
 
     @GET()
+    @NoCache
     @Path("{widget:.+}/{action:(status|start|stop)}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public Response widgetActions(@PathParam("widget") String widgetOptions, @PathParam("action") String action) {
@@ -116,6 +118,7 @@ public class WidgetResource {
     }
 
     @HEAD
+    @NoCache
     @Path("{widget:.+}/{action:(download)}")
     public Response widgetDownloadHeader(@PathParam("widget") String widgetOptions,
         @PathParam("action") String action) {
@@ -154,6 +157,7 @@ public class WidgetResource {
     }
 
     @GET
+    @NoCache
     @Path("{widget:.+}/{action:(download)}")
     public Response widgetDownload(@HeaderParam("Range") String range, @PathParam("widget") String widgetOptions,
         @PathParam("action") String action) {
