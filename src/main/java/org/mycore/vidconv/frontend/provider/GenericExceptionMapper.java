@@ -20,6 +20,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import org.apache.logging.log4j.LogManager;
 import org.mycore.vidconv.frontend.entity.ExceptionWrapper;
 
 /**
@@ -36,6 +37,7 @@ public class GenericExceptionMapper implements ExceptionMapper<Exception> {
 	 */
 	@Override
 	public Response toResponse(Exception exception) {
+	    LogManager.getLogger().error(exception);
 		return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ExceptionWrapper(exception)).build();
 	}
 
