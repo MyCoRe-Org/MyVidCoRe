@@ -31,6 +31,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 import org.mycore.vidconv.frontend.entity.probe.ProbeWrapper;
 import org.mycore.vidconv.frontend.entity.probe.StreamWrapper;
@@ -116,6 +117,7 @@ public class WowzaSMILWrapper {
     }
 
     @XmlRootElement(name = "body")
+    @XmlType(name="SMIL.Body")
     public static class Body {
 
         private List<Video> switchBody;
@@ -146,6 +148,7 @@ public class WowzaSMILWrapper {
     }
 
     @XmlRootElement(name = "video")
+    @XmlType(name="SMIL.Video")
     public static class Video {
         private String src;
 
@@ -243,6 +246,7 @@ public class WowzaSMILWrapper {
     }
 
     @XmlRootElement(name = "param")
+    @XmlType(name="SMIL.Param")
     public static class Param<T> {
         private String name;
 

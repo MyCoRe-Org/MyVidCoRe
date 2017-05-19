@@ -28,6 +28,7 @@ import java.util.Optional;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
@@ -68,6 +69,8 @@ public class SettingsWrapper {
         this.plugins = plugins;
     }
 
+    @XmlRootElement(name = "output")
+    @XmlType(name = "Settings.Output")
     public static class Output {
 
         private String filenameAppendix;
@@ -139,6 +142,7 @@ public class SettingsWrapper {
     }
 
     @XmlRootElement(name = "video")
+    @XmlType(name = "Settings.Video")
     public static class Video {
         private String codec;
 
@@ -402,6 +406,7 @@ public class SettingsWrapper {
     }
 
     @XmlRootElement(name = "audio")
+    @XmlType(name = "Settings.Audio")
     public static class Audio {
         private String codec;
 
@@ -469,6 +474,7 @@ public class SettingsWrapper {
     }
 
     @XmlRootElement(name = "plugin")
+    @XmlType(name = "Settings.Plugin")
     public static class Plugin {
         private String name;
 
