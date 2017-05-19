@@ -118,7 +118,6 @@ public class WidgetResource {
     }
 
     @HEAD
-    @NoCache
     @Path("{widget:.+}/{action:(download)}")
     public Response widgetDownloadHeader(@PathParam("widget") String widgetOptions,
         @PathParam("action") String action) {
