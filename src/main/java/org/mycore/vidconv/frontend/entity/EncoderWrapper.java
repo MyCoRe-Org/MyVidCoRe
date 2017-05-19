@@ -24,10 +24,13 @@ package org.mycore.vidconv.frontend.entity;
 
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * @author Ren\u00E9 Adler (eagle)
  *
  */
+@XmlRootElement(name = "encoder")
 public class EncoderWrapper {
 
     private String name;

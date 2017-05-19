@@ -26,8 +26,11 @@ import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.glassfish.jersey.moxy.json.MoxyJsonFeature;
 import org.glassfish.jersey.moxy.xml.MoxyXmlFeature;
+import org.mycore.vidconv.common.config.Configuration;
 import org.mycore.vidconv.frontend.filter.CacheFilter;
 import org.mycore.vidconv.frontend.provider.GenericExceptionMapper;
 import org.mycore.vidconv.frontend.provider.XmlMessageBodyReader;
@@ -40,33 +43,44 @@ import org.reflections.Reflections;
  */
 public class FrontendFeature implements Feature {
 
-	private static final List<Class<?>> CACHED_ENTITIES = Collections.synchronizedList(new ArrayList<>());
+    private static final Logger LOGGER = LogManager.getLogger();
 
-	public static List<Class<?>> populateEntities(List<String> pkgs) throws IOException {
-		if (CACHED_ENTITIES.isEmpty()) {
-			CACHED_ENTITIES.addAll(
-					pkgs.stream().map(pkg -> new Reflections(pkg).getTypesAnnotatedWith(XmlRootElement.class))
-							.flatMap(ts -> ts.stream()).collect(Collectors.toList()));
-		}
-		return CACHED_ENTITIES;
-	}
+    private static final List<Class<?>> CACHED_ENTITIES = Collections.synchronizedList(new ArrayList<>());
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.ws.rs.core.Feature#configure(javax.ws.rs.core.FeatureContext)
-	 */
-	@Override
-	public boolean configure(FeatureContext context) {
-		context.register(MoxyJsonFeature.class);
-		context.register(MoxyXmlFeature.class);
+    public static List<Class<?>> populateEntities(List<String> pkgs) throws IOException {
+        if (CACHED_ENTITIES.isEmpty()) {
+            CACHED_ENTITIES.addAll(
+                pkgs.stream().map(pkg -> new Reflections(pkg).getTypesAnnotatedWith(XmlRootElement.class))
+                    .flatMap(ts -> ts.stream()).collect(Collectors.toList()));
+        }
+        return CACHED_ENTITIES;
+    }
 
-		// internal features
-		context.register(CacheFilter.class);
-		context.register(GenericExceptionMapper.class);
-		context.register(XmlMessageBodyReader.class);
-		context.register(XmlMessageBodyWriter.class);
+    /*
+     * (non-Javadoc)
+     * 
+     * @see javax.ws.rs.core.Feature#configure(javax.ws.rs.core.FeatureContext)
+     */
+    @Override
+    public boolean configure(FeatureContext context) {
+        context.register(MoxyJsonFeature.class);
+        context.register(MoxyXmlFeature.class);
 
-		return true;
-	}
+        // internal features
+        context.register(CacheFilter.class);
+        context.register(GenericExceptionMapper.class);
+        context.register(XmlMessageBodyReader.class);
+        context.register(XmlMessageBodyWriter.class);
+
+        Configuration.instance().getStrings("APP.Jersey.Features").forEach(cn -> {
+            try {
+                LOGGER.info("Register Jersey Feature: {}", cn);
+                context.register(this.getClass().getClassLoader().loadClass(cn));
+            } catch (ClassNotFoundException e) {
+                LOGGER.error(e.getMessage(), e);
+            }
+        });
+
+        return true;
+    }
 }

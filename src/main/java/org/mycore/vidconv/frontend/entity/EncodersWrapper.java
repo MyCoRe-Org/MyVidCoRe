@@ -25,10 +25,13 @@ package org.mycore.vidconv.frontend.entity;
 import java.util.Collections;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * @author Ren\u00E9 Adler (eagle)
  *
  */
+@XmlRootElement(name = "encoders")
 public class EncodersWrapper {
 
     private List<EncoderWrapper> encoders;

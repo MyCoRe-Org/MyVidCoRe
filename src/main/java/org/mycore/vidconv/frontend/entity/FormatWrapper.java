@@ -31,7 +31,7 @@ import javax.xml.bind.annotation.XmlType;
  *
  */
 @XmlRootElement(name = "format")
-@XmlType(propOrder = { "name", "description", "demuxer", "muxer" })
+@XmlType(name="Format", propOrder = { "name", "description", "demuxer", "muxer" })
 public class FormatWrapper {
 
     private Boolean muxer;

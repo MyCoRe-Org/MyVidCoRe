@@ -26,12 +26,14 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
  *
  */
 @XmlRootElement(name = "format")
+@XmlType(name="Probe.Format")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class FormatWrapper {
 

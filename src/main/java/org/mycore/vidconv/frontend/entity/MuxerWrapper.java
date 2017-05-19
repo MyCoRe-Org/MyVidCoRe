@@ -22,10 +22,13 @@
  */
 package org.mycore.vidconv.frontend.entity;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * @author Ren\u00E9 Adler (eagle)
  *
  */
+@XmlRootElement(name = "muxer")
 public class MuxerWrapper {
 
     private String name;
