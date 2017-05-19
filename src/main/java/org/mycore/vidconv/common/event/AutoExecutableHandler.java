@@ -30,6 +30,7 @@ import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.vidconv.Application;
 import org.mycore.vidconv.common.event.annotation.AutoExecutable;
 import org.mycore.vidconv.common.event.annotation.Shutdown;
 import org.mycore.vidconv.common.event.annotation.Startup;
@@ -48,8 +49,22 @@ public class AutoExecutableHandler {
     private static Set<Class<?>> executables;
 
     static {
-        final Reflections reflections = new Reflections("org.mycore.vidconv");
+        final Reflections reflections = new Reflections(Application.class.getPackage().getName());
         executables = reflections.getTypesAnnotatedWith(AutoExecutable.class);
+    }
+
+    /**
+     * Register class as {@link AutoExecutable}.
+     *
+     * @param executable
+     *            the class to execute
+     */
+    public static void register(Class<?> executable) {
+        if (executable.isAnnotationPresent(AutoExecutable.class)) {
+            executables.add(executable);
+        } else {
+            LOGGER.warn("Class \"" + executable.getName() + "\" should have the \"AutoExecutable\" annotation.");
+        }
     }
 
     /**
@@ -94,11 +109,13 @@ public class AutoExecutableHandler {
             sort(type, Arrays.stream(autoExecutable.getDeclaredMethods()).filter(m -> m.isAnnotationPresent(type)))
                 .forEachOrdered(m -> {
                     try {
+                        log("...invoke " + m.getName() + "() for " + type.getSimpleName());
+                        if (!m.isAccessible()) {
+                            m.setAccessible(true);
+                        }
                         if (Modifier.isStatic(m.getModifiers())) {
-                            log("...invoke (static) " + m.getName() + "() for " + type.getSimpleName());
                             m.invoke(null);
                         } else {
-                            log("...invoke " + m.getName() + "() for " + type.getSimpleName());
                             m.invoke(autoExecutable.newInstance());
                         }
                     } catch (Exception e) {

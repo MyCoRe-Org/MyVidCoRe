@@ -58,7 +58,7 @@ public class PluginService {
     }
 
     @Startup
-    public static void loadPlugins() {
+    protected static void loadPlugins() {
         plugins = new ConcurrentHashMap<>();
 
         PLUGIN_CACHE.stream().forEach(p -> loadPlugin(p));

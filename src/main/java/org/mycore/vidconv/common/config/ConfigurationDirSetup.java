@@ -49,7 +49,7 @@ public class ConfigurationDirSetup {
     private static final StatusLogger LOGGER = StatusLogger.getLogger();
 
     @Startup
-    public static void startup() {
+    protected static void startup() {
         loadExternalLibs();
     }
 
