@@ -22,10 +22,6 @@
  */
 package org.mycore.vidconv.frontend.resource;
 
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
-
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -33,12 +29,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
 import javax.xml.bind.JAXBException;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.mycore.vidconv.common.config.Settings;
 import org.mycore.vidconv.frontend.entity.SettingsWrapper;
 
@@ -50,30 +42,18 @@ import org.mycore.vidconv.frontend.entity.SettingsWrapper;
 @Singleton
 public class SettingsResource {
 
-    private static final Logger LOGGER = LogManager.getLogger(SettingsResource.class);
-
     private static final Settings SETTINGS = Settings.instance();
 
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Response getSettings() {
-        return Response.ok().status(Response.Status.OK).entity(SETTINGS.getSettings())
-            .build();
+    public SettingsWrapper getSettings() {
+        return SETTINGS.getSettings();
     }
 
     @POST
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Response postSettings(final SettingsWrapper settings) {
-        try {
-            SETTINGS.setSettings(settings);
-
-            return Response.ok().status(Response.Status.OK).entity(settings)
-                .build();
-        } catch (JAXBException e) {
-            LOGGER.error(e.getMessage(), e);
-            final StreamingOutput so = (OutputStream os) -> e
-                .printStackTrace(new PrintStream(os, false, StandardCharsets.UTF_8.toString()));
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(so).build();
-        }
+    public SettingsWrapper postSettings(final SettingsWrapper settings) throws JAXBException {
+        SETTINGS.setSettings(settings);
+        return settings;
     }
 }
