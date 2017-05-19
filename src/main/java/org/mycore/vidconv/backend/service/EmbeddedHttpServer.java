@@ -35,8 +35,9 @@ import javax.ws.rs.core.UriBuilderException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
-import org.glassfish.jersey.moxy.json.MoxyJsonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.mycore.vidconv.common.config.Configuration;
+import org.mycore.vidconv.frontend.FrontendFeature;
 import org.mycore.vidconv.frontend.widget.Widget;
 
 import com.sun.net.httpserver.HttpServer;
@@ -91,8 +92,9 @@ public class EmbeddedHttpServer extends Widget {
 
     private HttpServer createHttpServer()
         throws IOException, IllegalArgumentException, UriBuilderException, URISyntaxException {
-        ResourceConfig resourceConfig = new ResourceConfig().packages("org.mycore.vidconv.frontend.resource")
-            .register(MoxyJsonFeature.class);
+        ResourceConfig resourceConfig = new ResourceConfig()
+            .packages(true, Configuration.instance().getStrings("APP.Jersey.Resources").toArray(new String[0]))
+            .register(FrontendFeature.class);
         return JdkHttpServerFactory.createHttpServer(getURI(), resourceConfig, false);
     }
 
