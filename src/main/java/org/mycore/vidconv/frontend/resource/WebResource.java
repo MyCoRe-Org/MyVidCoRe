@@ -25,22 +25,20 @@ package org.mycore.vidconv.frontend.resource;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.vidconv.frontend.annotation.CacheMaxAge;
+import org.mycore.vidconv.frontend.entity.ExceptionWrapper;
 import org.mycore.vidconv.frontend.entity.ResourceWrapper;
 
 /**
@@ -60,12 +58,14 @@ public class WebResource {
     private static final String INDEX_FILE = "index.html";
 
     @GET
+    @CacheMaxAge(time = 1, unit = TimeUnit.HOURS)
     @Produces("*/*")
     public Response getWebResource() {
         return getWebResource(INDEX_FILE);
     }
 
     @GET
+    @CacheMaxAge(time = 1, unit = TimeUnit.HOURS)
     @Path("{fileName:.+}")
     @Produces("*/*")
     public Response getWebResource(@PathParam("fileName") String fileName) {
@@ -73,26 +73,14 @@ public class WebResource {
             final Optional<ResourceWrapper> res = getResource(fileName);
             if (res.isPresent()) {
                 final ResourceWrapper r = res.get();
-
-                CacheControl cc = new CacheControl();
-                cc.setMaxAge(86400);
-                cc.setPrivate(true);
-
-                return Response.ok().status(Response.Status.OK)
-                    .tag(r.getETag())
-                    .type(r.getMimeType())
-                    .entity(r.getContent())
-                    .cacheControl(cc)
-                    .build();
+                return Response.ok().tag(r.getETag()).type(r.getMimeType()).entity(r.getContent()).build();
             } else {
-                LOGGER.error("resource \"" + fileName + "\" not found.");
+                LOGGER.error("resource \"{}\" not found.", fileName);
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
-            final StreamingOutput so = (OutputStream os) -> e
-                .printStackTrace(new PrintStream(os, false, StandardCharsets.UTF_8.toString()));
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(so).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ExceptionWrapper(e)).build();
         }
     }
 
