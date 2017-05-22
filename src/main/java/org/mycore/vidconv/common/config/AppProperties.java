@@ -98,7 +98,7 @@ public class AppProperties extends Properties {
 	 *
 	 * @return the as map
 	 */
-	Map<String, String> getAsMap() {
+	protected Map<String, String> getAsMap() {
 		@SuppressWarnings("rawtypes")
 		Map compileFix = this;
 		@SuppressWarnings("unchecked")
