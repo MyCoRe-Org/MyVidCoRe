@@ -215,7 +215,7 @@ public class ConfigurationInputStream extends InputStream {
         if (e.hasMoreElements()) {
             in = e.nextElement();
             if (in == null) {
-                throw new NullPointerException();
+                throw new IllegalArgumentException();
             }
         } else {
             in = null;
