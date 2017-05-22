@@ -156,8 +156,9 @@ public class WidgetResource {
     }
 
     @GET
-    @NoCache
     @Path("{widget:.+}/{action:(download)}")
+    @NoCache
+    @Produces("*/*")
     public Response widgetDownload(@HeaderParam("Range") String range, @PathParam("widget") String widgetOptions,
         @PathParam("action") String action) {
         try {
@@ -187,9 +188,7 @@ public class WidgetResource {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            final ExceptionWrapper error = new ExceptionWrapper(e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(error).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ExceptionWrapper(e)).build();
         }
     }
 
@@ -227,14 +226,10 @@ public class WidgetResource {
             }).orElseGet(() -> {
                 final StreamingOutput streamer = new StreamingOutput() {
                     @Override
-                    public void write(final OutputStream output) throws IOException, WebApplicationException {
-                        try {
-                            byte[] data = Files.readAllBytes(asset);
-                            output.write(data);
-                            output.flush();
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
+                    public void write(final OutputStream output) throws IOException {
+                        byte[] data = Files.readAllBytes(asset);
+                        output.write(data);
+                        output.flush();
                     }
                 };
 
