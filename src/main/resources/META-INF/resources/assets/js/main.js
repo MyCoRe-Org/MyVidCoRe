@@ -296,7 +296,7 @@ app.service("formatService", function($http, $q, asyncQueue) {
 	function getByProperty(array, prop, value) {
 		if (array !== undefined) {
 			for (var i = 0; i < array.length; i++) {
-				if (array[i][prop] !== undefined && array[i][prop] === value) {
+				if (array[i] !== undefined && array[i][prop] !== undefined && array[i][prop] === value) {
 					return array[i];
 				}
 			}
