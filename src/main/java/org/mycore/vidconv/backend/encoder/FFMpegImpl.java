@@ -289,7 +289,7 @@ public class FFMpegImpl {
 
                             final List<ParameterWrapper> parameters = new ArrayList<>();
                             final Matcher pm = PATTERN_PARAMS.matcher(m.group(3));
-                            if (pm.find()) {
+                            while (pm.find()) {
                                 final ParameterWrapper param = new ParameterWrapper();
                                 param.setName(pm.group(1));
                                 param.setType(pm.group(2));
