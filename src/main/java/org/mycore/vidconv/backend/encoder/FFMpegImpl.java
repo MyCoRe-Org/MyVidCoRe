@@ -56,8 +56,8 @@ import org.mycore.vidconv.frontend.entity.FormatWrapper;
 import org.mycore.vidconv.frontend.entity.FormatsWrapper;
 import org.mycore.vidconv.frontend.entity.MuxerWrapper;
 import org.mycore.vidconv.frontend.entity.ParameterWrapper;
-import org.mycore.vidconv.frontend.entity.SettingsWrapper;
 import org.mycore.vidconv.frontend.entity.ParameterWrapper.ParameterValue;
+import org.mycore.vidconv.frontend.entity.SettingsWrapper;
 import org.mycore.vidconv.frontend.entity.SettingsWrapper.Audio;
 import org.mycore.vidconv.frontend.entity.SettingsWrapper.Output;
 import org.mycore.vidconv.frontend.entity.SettingsWrapper.Video;
@@ -481,8 +481,8 @@ public class FFMpegImpl {
         if (probe != null && probe.getStreams() != null) {
             return probe.getStreams().stream().filter(s -> s.getCodecType().equalsIgnoreCase("video")).map(s -> {
                 try {
-                    return (sc[0] < 0 || sc[0] < s.getWidth())
-                        && (sc[1] < 0 || sc[1] < s.getHeight());
+                    return (sc[0] < 0 || (sc[0] > 0 && sc[0] <= s.getWidth()))
+                        && (sc[1] < 0 || (sc[1] > 0 && sc[1] <= s.getHeight()));
                 } catch (Exception ex) {
                     return true;
                 }
