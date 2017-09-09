@@ -311,14 +311,8 @@ public class ConverterService extends Widget implements Listener {
                 running = true;
                 startTime = Instant.now();
 
-                List<String> cmdParts = new ArrayList<String>();
-                Matcher m = Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(MessageFormat.format(command,
+                final Executable exec = new Executable(MessageFormat.format(command,
                     inputPath.toFile().getAbsolutePath(), outputPath.toFile().getAbsolutePath()));
-                while (m.find()) {
-                    cmdParts.add(m.group(1).replace("\"", ""));
-                }
-
-                final Executable exec = new Executable(cmdParts);
 
                 final Process p = exec.run();
 
