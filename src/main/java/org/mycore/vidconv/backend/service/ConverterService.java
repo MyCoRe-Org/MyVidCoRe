@@ -216,8 +216,10 @@ public class ConverterService extends Widget implements Listener {
         if (settings != null && !settings.getOutput().isEmpty() && !Files.isDirectory(inputPath)) {
             if (FFMpegImpl.isEncodingSupported(inputPath)) {
                 final String id = Long.toHexString(new Random().nextLong());
+                final String fileName = inputPath.getFileName().toString();
+                final Path outputPath = Paths.get(outputDir, id);
 
-                List<Output> outputs = settings.getOutput().stream()
+                final List<Output> outputs = settings.getOutput().stream()
                     .sorted((o2, o1) -> o1.getFormat().equals(o2.getFormat())
                         ? o1.getVideo().getScale().compareTo(o2.getVideo().getScale())
                         : o1.getFormat().compareTo(o2.getFormat()))
@@ -228,9 +230,21 @@ public class ConverterService extends Widget implements Listener {
                         } catch (Exception e) {
                             throw new RuntimeException(e);
                         }
+                    }).map(o -> {
+                        final Output out = o.getCopy();
+                        final String appendix = Optional.ofNullable(o.getFilenameAppendix()).orElse(id);
+                        try {
+                            out.setInputPath(inputPath);
+                            out.setOutputPath(outputPath.resolve(FFMpegImpl.filename(o.getFormat(), fileName,
+                                appendix)));
+
+                            return out;
+                        } catch (ExecutionException e) {
+                            throw new RuntimeException(e);
+                        }
                     }).collect(Collectors.toList());
 
-                final ConverterJob converter = new ConverterJob(id, outputs, inputPath, Paths.get(outputDir, id));
+                final ConverterJob converter = new ConverterJob(id, outputs, inputPath, outputPath);
 
                 converters.put(id, converter);
                 converterThreadPool.submit(converter);
@@ -280,19 +294,7 @@ public class ConverterService extends Widget implements Listener {
             this.done = false;
             this.running = false;
 
-            final String fileName = inputPath.getFileName().toString();
-            command = FFMpegImpl.command(outputs.stream().map(output -> {
-                final String appendix = Optional.ofNullable(output.getFilenameAppendix()).orElse(id);
-                try {
-                    output.setInputPath(inputPath);
-                    output.setOutputPath(outputPath.resolve(FFMpegImpl.filename(output.getFormat(), fileName,
-                        appendix)));
-
-                    return output;
-                } catch (ExecutionException e) {
-                    throw new RuntimeException(e);
-                }
-            }).collect(Collectors.toList()));
+            command = FFMpegImpl.command(outputs);
 
             if (!Files.exists(outputPath))
                 Files.createDirectories(outputPath);

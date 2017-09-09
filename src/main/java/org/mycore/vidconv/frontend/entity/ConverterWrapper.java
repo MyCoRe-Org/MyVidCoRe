@@ -109,7 +109,7 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
     @XmlElement(name = "files")
     public List<String> getFiles() {
         return Optional.ofNullable(outputs)
-            .map(os -> os.stream().map(o -> o.getOutputPath().toFile().getAbsolutePath()).collect(Collectors.toList()))
+            .map(os -> os.stream().map(o -> o.getOutputPath().getFileName().toString()).collect(Collectors.toList()))
             .orElse(null);
     }
 

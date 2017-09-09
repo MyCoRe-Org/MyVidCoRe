@@ -176,6 +176,17 @@ public class SettingsWrapper {
             this.outputPath = outputPath;
         }
 
+        public Output getCopy() {
+            Output out = new Output();
+            out.audio = this.audio;
+            out.video = this.video;
+            out.filenameAppendix = this.filenameAppendix;
+            out.format = this.format;
+            out.inputPath = this.inputPath;
+            out.outputPath = this.outputPath;
+
+            return out;
+        }
     }
 
     @XmlRootElement(name = "video")
