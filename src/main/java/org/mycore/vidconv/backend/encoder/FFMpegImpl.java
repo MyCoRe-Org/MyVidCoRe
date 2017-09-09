@@ -500,60 +500,64 @@ public class FFMpegImpl {
      * @throws IOException
      * @throws InterruptedException
      */
-    public static String command(final Output output)
+    public static String command(final List<Output> outputs)
         throws InterruptedException {
         final StringBuffer cmd = new StringBuffer();
 
-        cmd.append("ffmpeg -i {0} -stats -y");
+        cmd.append("ffmpeg -i \"{0}\" -stats -y");
 
-        Video video = output.getVideo();
+        outputs.forEach(output -> {
+            cmd.append(" ");
+            Video video = output.getVideo();
 
-        cmd.append(" -codec:v " + video.getCodec());
+            cmd.append("-codec:v " + video.getCodec());
 
-        Optional.ofNullable(video.getAdvancedOptions()).ifPresent(ao -> {
-            cmd.append(" " + ao);
+            Optional.ofNullable(video.getAdvancedOptions()).ifPresent(ao -> {
+                cmd.append(" " + ao);
+            });
+
+            Optional.ofNullable(video.getPreset()).ifPresent(v -> cmd.append(" -preset " + v));
+            Optional.ofNullable(video.getTune()).ifPresent(v -> cmd.append(" -tune " + v));
+            Optional.ofNullable(video.getProfile()).ifPresent(v -> cmd.append(" -profile:v " + v));
+            Optional.ofNullable(video.getLevel()).ifPresent(v -> cmd.append(" -level " + v));
+            Optional.ofNullable(video.getPixelFormat())
+                .ifPresent(v -> cmd.append(" -pix_fmt " + (!v.isEmpty() ? v : "yuv420p")));
+
+            Optional.ofNullable(video.getScale()).ifPresent(v -> cmd.append(" -vf 'scale=" + v + "'"));
+
+            Optional.ofNullable(video.getFramerate()).ifPresent(v -> {
+                cmd.append(" -r " + v);
+                Optional.ofNullable(video.getFramerateType())
+                    .ifPresent(t -> cmd.append(" -vsync " + ("CFR".equals(t) ? "1"
+                        : "VFR".equals(t) ? "2" : "0")));
+            });
+
+            Optional.ofNullable(video.getQuality()).ifPresent(quality -> {
+                switch (quality.getType()) {
+                    case "CRF":
+                        Optional.ofNullable(quality.getRateFactor()).ifPresent(v -> cmd.append(" -crf " + v));
+                        break;
+                    case "CQ":
+                        Optional.ofNullable(quality.getScale()).ifPresent(v -> cmd.append(" -qscale:v " + v));
+                        break;
+                    case "ABR":
+                        Optional.ofNullable(quality.getBitrate()).ifPresent(v -> cmd.append(" -b:v " + v + "k"));
+                        break;
+                    default:
+                        break;
+                }
+            });
+
+            Audio audio = output.getAudio();
+
+            cmd.append(" -codec:a " + audio.getCodec());
+            cmd.append(" -ac 2");
+
+            Optional.ofNullable(audio.getBitrate()).ifPresent(v -> cmd.append(" -b:a " + v + "k"));
+            Optional.ofNullable(audio.getSamplerate()).ifPresent(v -> cmd.append(" -ar " + v));
+
+            cmd.append(" \"" + output.getOutputPath().toFile().getAbsolutePath() + "\"");
         });
-
-        Optional.ofNullable(video.getPreset()).ifPresent(v -> cmd.append(" -preset " + v));
-        Optional.ofNullable(video.getTune()).ifPresent(v -> cmd.append(" -tune " + v));
-        Optional.ofNullable(video.getProfile()).ifPresent(v -> cmd.append(" -profile:v " + v));
-        Optional.ofNullable(video.getLevel()).ifPresent(v -> cmd.append(" -level " + v));
-        Optional.ofNullable(video.getPixelFormat())
-            .ifPresent(v -> cmd.append(" -pix_fmt " + (!v.isEmpty() ? v : "yuv420p")));
-
-        Optional.ofNullable(video.getScale()).ifPresent(v -> cmd.append(" -vf 'scale=" + v + "'"));
-
-        Optional.ofNullable(video.getFramerate()).ifPresent(v -> {
-            cmd.append(" -r " + v);
-            Optional.ofNullable(video.getFramerateType()).ifPresent(t -> cmd.append(" -vsync " + ("CFR".equals(t) ? "1"
-                : "VFR".equals(t) ? "2" : "0")));
-        });
-
-        Optional.ofNullable(video.getQuality()).ifPresent(quality -> {
-            switch (quality.getType()) {
-                case "CRF":
-                    Optional.ofNullable(quality.getRateFactor()).ifPresent(v -> cmd.append(" -crf " + v));
-                    break;
-                case "CQ":
-                    Optional.ofNullable(quality.getScale()).ifPresent(v -> cmd.append(" -qscale:v " + v));
-                    break;
-                case "ABR":
-                    Optional.ofNullable(quality.getBitrate()).ifPresent(v -> cmd.append(" -b:v " + v + "k"));
-                    break;
-                default:
-                    break;
-            }
-        });
-
-        Audio audio = output.getAudio();
-
-        cmd.append(" -codec:a " + audio.getCodec());
-        cmd.append(" -ac 2");
-
-        Optional.ofNullable(audio.getBitrate()).ifPresent(v -> cmd.append(" -b:a " + v + "k"));
-        Optional.ofNullable(audio.getSamplerate()).ifPresent(v -> cmd.append(" -ar " + v));
-
-        cmd.append(" {1}");
 
         return cmd.toString();
     }

@@ -22,12 +22,14 @@
  */
 package org.mycore.vidconv.frontend.entity;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 /**
@@ -80,6 +82,10 @@ public class SettingsWrapper {
         private Video video;
 
         private Audio audio;
+
+        private Path inputPath;
+
+        private Path outputPath;
 
         /**
          * @return the filenameAppendix
@@ -139,6 +145,37 @@ public class SettingsWrapper {
         public void setAudio(Audio audio) {
             this.audio = audio;
         }
+
+        /**
+         * @return the inputPath
+         */
+        @XmlTransient
+        public Path getInputPath() {
+            return inputPath;
+        }
+
+        /**
+         * @param inputPath the inputPath to set
+         */
+        public void setInputPath(Path inputPath) {
+            this.inputPath = inputPath;
+        }
+
+        /**
+         * @return the outputPath
+         */
+        @XmlTransient
+        public Path getOutputPath() {
+            return outputPath;
+        }
+
+        /**
+         * @param outputPath the outputPath to set
+         */
+        public void setOutputPath(Path outputPath) {
+            this.outputPath = outputPath;
+        }
+
     }
 
     @XmlRootElement(name = "video")

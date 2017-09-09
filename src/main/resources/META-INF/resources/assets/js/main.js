@@ -17,6 +17,30 @@ app.config(function($translateProvider) {
 	$translateProvider.preferredLanguage("de_DE");
 });
 
+app.filter("endsWith", function() {
+	return function(input, search) {
+		if (typeof input === "array" || typeof input === "object") {
+			for (var i in input) {
+				if (input[i].endsWith(search)) {
+					return true;
+				}
+			}
+		} else if (typeof someVar === "string") {
+			input = input || "";
+			return input.endsWith(search);
+		}
+		
+		return false;
+	};
+});
+
+app.filter("fileName", function() {
+	return function(input) {
+		input = input || "";
+		return input.split(/\/|\\/).pop();
+	};
+});
+
 app.directive("convertToNumber", function() {
 	return {
 		require : "ngModel",

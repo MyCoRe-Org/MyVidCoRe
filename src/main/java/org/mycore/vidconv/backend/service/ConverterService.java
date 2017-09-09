@@ -22,6 +22,7 @@
  */
 package org.mycore.vidconv.backend.service;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,7 +30,6 @@ import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -40,6 +40,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -175,10 +176,14 @@ public class ConverterService extends Widget implements Listener {
     public Path download(List<String> params) throws Exception {
         if (!params.isEmpty()) {
             final String converterId = params.get(0);
+            final String fileName = params.get(1);
             final ConverterJob converter = converters.get(converterId);
 
             if (converter != null) {
-                return converter.outputPath;
+                return converter.outputs.stream()
+                    .filter(o -> !o.getOutputPath().getFileName().equals(fileName))
+                    .findFirst()
+                    .map(o -> o.getOutputPath()).orElseThrow(() -> new FileNotFoundException());
             }
         }
 
@@ -199,25 +204,19 @@ public class ConverterService extends Widget implements Listener {
         if (ConverterJob.DONE.equals(event.getType())
             && event.getSource().equals(ConverterJob.class)) {
 
-            final List<ConverterJob> jobs = converters.values().stream().filter(cj -> {
-                return cj.parentId().equals(event.getParameter("parentId"));
-            }).collect(Collectors.toList());
-
-            if (jobs.stream().filter(cj -> !cj.isDone() || cj.isRunning()).count() == 0) {
-                Event ev = new Event(EVENT_CONVERT_DONE, this.getClass());
-                ev.setParameter("jobs", jobs);
-                EVENT_MANAGER.fireEvent(ev);
-            }
+            Event ev = new Event(EVENT_CONVERT_DONE, this.getClass());
+            ev.setParameter("job", converters.get(event.getParameter("id")));
+            EVENT_MANAGER.fireEvent(ev);
         }
     }
 
-    private void addConverter(final Path inputPath) throws InterruptedException, JAXBException, ExecutionException {
+    private void addConverter(final Path inputPath)
+        throws InterruptedException, JAXBException, ExecutionException, IOException {
         final SettingsWrapper settings = SETTINGS.getSettings();
 
         if (settings != null && !settings.getOutput().isEmpty() && !Files.isDirectory(inputPath)) {
             if (FFMpegImpl.isEncodingSupported(inputPath)) {
-                final String parentId = Long.toHexString(new Random().nextLong());
-                final String fileName = inputPath.getFileName().toString();
+                final String id = Long.toHexString(new Random().nextLong());
 
                 List<Output> outputs = settings.getOutput().stream()
                     .sorted((o2, o1) -> o1.getFormat().equals(o2.getFormat())
@@ -232,29 +231,10 @@ public class ConverterService extends Widget implements Listener {
                         }
                     }).collect(Collectors.toList());
 
-                outputs.forEach(output -> {
-                    try {
-                        final String id = outputs.size() == 1 ? parentId
-                            : Long.toHexString(new Random().nextLong());
+                final ConverterJob converter = new ConverterJob(id, outputs, inputPath, Paths.get(outputDir, id));
 
-                        final String appendix = Optional.ofNullable(output.getFilenameAppendix()).orElse(id);
-                        final Path outputPath = Paths.get(outputDir, parentId,
-                            FFMpegImpl.filename(output.getFormat(), fileName,
-                                appendix));
-
-                        if (!Files.exists(outputPath.getParent()))
-                            Files.createDirectories(outputPath.getParent());
-
-                        final String command = FFMpegImpl.command(output);
-                        final ConverterJob converter = new ConverterJob(parentId, id, command, inputPath,
-                            outputPath);
-
-                        converters.put(id, converter);
-                        converterThreadPool.submit(converter);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+                converters.put(id, converter);
+                converterThreadPool.submit(converter);
             } else {
                 LOGGER.warn("encoding of file \"" + inputPath.toFile().getAbsolutePath() + "\" isn't supported.");
             }
@@ -265,15 +245,15 @@ public class ConverterService extends Widget implements Listener {
 
         public static final String DONE = "done";
 
-        private final String parentId;
-
         private final String id;
 
         private final Path inputPath;
 
         private final Path outputPath;
 
-        private final String command;
+        private final List<Output> outputs;
+
+        private String command;
 
         private boolean running;
 
@@ -291,16 +271,32 @@ public class ConverterService extends Widget implements Listener {
 
         private StreamConsumer errorConsumer;
 
-        public ConverterJob(final String parentId, final String id, final String command, final Path inputPath,
-            final Path outputPath) {
-            this.parentId = parentId;
+        public ConverterJob(final String id, final List<Output> outputs, final Path inputPath, final Path outputPath)
+            throws InterruptedException, IOException {
             this.id = id;
-            this.command = command;
+            this.outputs = outputs;
             this.inputPath = inputPath;
             this.outputPath = outputPath;
             this.addTime = Instant.now();
             this.done = false;
             this.running = false;
+
+            final String fileName = inputPath.getFileName().toString();
+            command = FFMpegImpl.command(outputs.stream().map(output -> {
+                final String appendix = Optional.ofNullable(output.getFilenameAppendix()).orElse(id);
+                try {
+                    output.setInputPath(inputPath);
+                    output.setOutputPath(outputPath.resolve(FFMpegImpl.filename(output.getFormat(), fileName,
+                        appendix)));
+
+                    return output;
+                } catch (ExecutionException e) {
+                    throw new RuntimeException(e);
+                }
+            }).collect(Collectors.toList()));
+
+            if (!Files.exists(outputPath))
+                Files.createDirectories(outputPath);
         }
 
         @SuppressWarnings("serial")
@@ -315,10 +311,14 @@ public class ConverterService extends Widget implements Listener {
                 running = true;
                 startTime = Instant.now();
 
-                final Executable exec = new Executable(
-                    Arrays.stream(command.split(" ")).map(s -> MessageFormat.format(s,
-                        inputPath.toFile().getAbsolutePath(), outputPath.toFile().getAbsolutePath()))
-                        .collect(Collectors.toList()));
+                List<String> cmdParts = new ArrayList<String>();
+                Matcher m = Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(MessageFormat.format(command,
+                    inputPath.toFile().getAbsolutePath(), outputPath.toFile().getAbsolutePath()));
+                while (m.find()) {
+                    cmdParts.add(m.group(1).replace("\"", ""));
+                }
+
+                final Executable exec = new Executable(cmdParts);
 
                 final Process p = exec.run();
 
@@ -338,17 +338,12 @@ public class ConverterService extends Widget implements Listener {
 
                 EVENT_MANAGER.fireEvent(new Event(DONE, new HashMap<String, String>() {
                     {
-                        put("parentId", parentId);
                         put("id", id);
                     }
                 }, this.getClass()));
             } catch (InterruptedException | JAXBException | ExecutionException | IOException e) {
                 LOGGER.error(e.getMessage(), e);
             }
-        }
-
-        public String parentId() {
-            return parentId;
         }
 
         public String id() {
@@ -360,16 +355,16 @@ public class ConverterService extends Widget implements Listener {
                 inputPath.toFile().getAbsolutePath(), outputPath.toFile().getAbsolutePath());
         }
 
+        public List<Output> outputs() {
+            return outputs;
+        }
+
         public Path inputPath() {
             return inputPath;
         }
 
         public Path outputPath() {
             return outputPath;
-        }
-
-        public String fileName() {
-            return outputPath.getFileName().toString();
         }
 
         public boolean isRunning() {
@@ -412,7 +407,7 @@ public class ConverterService extends Widget implements Listener {
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
             marshaller.marshal(new ConverterWrapper(id, this),
-                outputPath.getParent().resolve(".convert").toFile());
+                outputPath.resolve(".convert").toFile());
         }
     }
 }

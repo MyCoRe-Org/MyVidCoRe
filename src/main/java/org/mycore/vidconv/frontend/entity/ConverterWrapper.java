@@ -26,6 +26,9 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -33,6 +36,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.mycore.vidconv.backend.encoder.FFMpegImpl;
 import org.mycore.vidconv.backend.service.ConverterService.ConverterJob;
+import org.mycore.vidconv.frontend.entity.SettingsWrapper.Output;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
@@ -41,13 +45,13 @@ import org.mycore.vidconv.backend.service.ConverterService.ConverterJob;
 @XmlRootElement
 public class ConverterWrapper implements Comparable<ConverterWrapper> {
 
-    private String parentId;
-
     private String id;
 
     private String command;
 
     private String fileName;
+
+    private List<Output> outputs;
 
     private boolean running;
 
@@ -74,9 +78,9 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
         this();
 
         this.id = id;
-        this.parentId = converter.parentId();
         this.command = converter.command();
-        this.fileName = converter.fileName();
+        this.fileName = converter.inputPath().getFileName().toString();
+        this.outputs = converter.outputs();
         this.running = converter.isRunning();
         this.done = converter.isDone();
         this.addTime = converter.addTime();
@@ -85,11 +89,6 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
         this.exitValue = converter.exitValue();
         this.outputStream = converter.outputStream();
         this.errorStream = converter.errorStream();
-    }
-
-    @XmlAttribute(name = "parentId")
-    public String getParentId() {
-        return parentId;
     }
 
     @XmlAttribute(name = "id")
@@ -105,6 +104,13 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
     @XmlAttribute(name = "file")
     public String getFileName() {
         return fileName;
+    }
+
+    @XmlElement(name = "files")
+    public List<String> getFiles() {
+        return Optional.ofNullable(outputs)
+            .map(os -> os.stream().map(o -> o.getOutputPath().toFile().getAbsolutePath()).collect(Collectors.toList()))
+            .orElse(null);
     }
 
     @XmlAttribute(name = "running")
@@ -158,9 +164,9 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
     public ConverterWrapper getBasicCopy() {
         final ConverterWrapper copy = new ConverterWrapper();
 
-        copy.parentId = this.parentId;
         copy.id = this.id;
         copy.fileName = this.fileName;
+        copy.outputs = this.outputs;
         copy.running = this.running;
         copy.done = this.done;
         copy.addTime = this.addTime;

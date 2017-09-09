@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="MyVidCoRe">
+<html lang="en" data-ng-app="MyVidCoRe">
 <head>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -19,164 +19,184 @@
 
 <body>
 
-  <nav class="navbar navbar-inverse navbar-fixed-top">
-    <div class="container">
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-          <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="/web"><span class="glyphicon glyphicon-film" aria-hidden="true"></span> MyVidCoRe</a>
-      </div>
-      <div id="navbar" class="collapse navbar-collapse">
-        <ul class="nav navbar-nav">
-          <li class="nav-item active"><a class="nav-link" href="/web"><span class="glyphicon
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+					<span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="/web"><span class="glyphicon glyphicon-film" aria-hidden="true"></span> MyVidCoRe</a>
+			</div>
+			<div id="navbar" class="collapse navbar-collapse">
+				<ul class="nav navbar-nav">
+					<li class="nav-item active"><a class="nav-link" href="/web"><span class="glyphicon
               glyphicon-dashboard" aria-hidden="true"></span>
-              {{ 'nav.dashboard' | translate }} <span class="sr-only">(current)</span> </a></li>
-          <li class="nav-item"><a class="nav-link" href="/web/settings.html"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> {{
-              'nav.settings' | translate }}</a></li>
-        </ul>
-        <div class="nav navbar-nav navbar-right">
-          <span id="directoryWatcherStatus" ng-controller="directoryWatcherStatus" class="label {{status.active ? 'label-success' : 'label-danger'}}">Watcher</span>
-        </div>
-      </div>
-    </div>
-  </nav>
+							{{ 'nav.dashboard' | translate }} <span class="sr-only">(current)</span> </a></li>
+					<li class="nav-item"><a class="nav-link" href="/web/settings.html"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> {{
+							'nav.settings' | translate }}</a></li>
+				</ul>
+				<div class="nav navbar-nav navbar-right">
+					<span id="directoryWatcherStatus" data-ng-controller="directoryWatcherStatus" class="label {{status.active ? 'label-success' : 'label-danger'}}">Watcher</span>
+				</div>
+			</div>
+		</div>
+	</nav>
 
-  <div class="container">
+	<div class="container">
 
-    <div class="content-container" ng-controller="converterStatus">
+		<div class="content-container" data-ng-controller="converterStatus">
 
-      <div id="converter-jobs" class="panel panel-default">
-        <div class="panel-heading">{{ 'converter.headline' | translate }}</div>
-        <div class="panel-body animate">
-          <div class="row no-jobs" ng-show="(filteredActive = (converters.active.converter | filter:filterDone | orderBy:orderByPercent:true) || []).length == 0">
-            <div class="col-sm-12 text-center">
-              <strong>{{ 'converter.noJobs' | translate }}</strong>
-            </div>
-          </div>
-          <div class="row converter" id="converter-{{converter.id}}" ng-if="filteredActive.length > 0"
-            ng-repeat="converter in filteredActive | limitTo: 10 track by converter.id"
-          >
-            <div class="col-sm-12">
-              <strong>{{converter.file}}</strong>
-            </div>
-            <div ng-if="converter.running || converter.done">
-              <div class="col-sm-12 col-md-10">
-                <div class="progress">
-                  <div class="progress-bar progress-bar-striped {{converter.done ? 'progress-bar-success' : ''}}" ng-class="{active:converter.running}"
-                    role="progressbar" aria-valuenow="{{converter.progress.percent}}" aria-valuemin="0" aria-valuemax="100"
-                    style="min-width: 2em; width: {{ converter.progress.percent ? converter.progress.percent: 0 }}%"
-                  >{{converter.progress.percent}}%</div>
-                </div>
-              </div>
-              <div class="col-sm-12 col-md-2 text-right">
-                <i class="fa fa-hourglass-start" aria-hidden="true"></i> {{converter.progress.elapsed}} / <i class="fa fa-hourglass-end" aria-hidden="true"></i>
-                {{converter.progress.estimate}}
-              </div>
-            </div>
-            <div ng-if="!converter.running && !converter.done">
-              <div class="col-sm-12 padding-bottom">
-                <span class="status-icon queued pull-left">
-                  <div class="is-rotating">
-                    <span class="circle"></span> <span class="circle"></span>
-                  </div>
-                </span> {{ 'converter.queued' | translate }}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+			<div id="converter-jobs" class="panel panel-default">
+				<div class="panel-heading">{{ 'converter.headline' | translate }}</div>
+				<div class="panel-body animate">
+					<div class="row no-jobs"
+						data-ng-show="(filteredActive = (converters.active.converter | filter:filterDone | orderBy:orderByPercent:true) || []).length == 0"
+					>
+						<div class="col-sm-12 text-center">
+							<strong>{{ 'converter.noJobs' | translate }}</strong>
+						</div>
+					</div>
+					<div class="row converter" id="converter-{{converter.id}}" data-ng-if="filteredActive.length > 0"
+						data-ng-repeat="converter in filteredActive | limitTo: 10 track by converter.id"
+					>
+						<div class="col-sm-12">
+							<strong>{{converter.file}}</strong>
+						</div>
+						<div data-ng-if="converter.running || converter.done">
+							<div class="col-sm-12 col-md-10">
+								<div class="progress">
+									<div class="progress-bar progress-bar-striped {{converter.done ? 'progress-bar-success' : ''}}" data-ng-class="{active:converter.running}"
+										role="progressbar" aria-valuenow="{{converter.progress.percent}}" aria-valuemin="0" aria-valuemax="100"
+										style="min-width: 2em; width: {{ converter.progress.percent ? converter.progress.percent: 0 }}%"
+									>{{converter.progress.percent}}%</div>
+								</div>
+							</div>
+							<div class="col-sm-12 col-md-2 text-right">
+								<i class="fa fa-hourglass-start" aria-hidden="true"></i> {{converter.progress.elapsed}} / <i class="fa fa-hourglass-end" aria-hidden="true"></i>
+								{{converter.progress.estimate}}
+							</div>
+						</div>
+						<div data-ng-if="!converter.running && !converter.done">
+							<div class="col-sm-12 paddidata-ng-bottom">
+								<span class="status-icon queued pull-left"> <span class="is-rotating"> <span class="circle"></span> <span class="circle"></span>
+								</span>
+								</span> {{ 'converter.queued' | translate }}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 
-      <div id="converter-done" class="panel panel-default">
-        <div class="panel-heading">{{ 'converter.done.headline' | translate }}</div>
-        <div class="panel-body animate">
-          <div class="row" ng-show="converters.done.total === undefined || converters.done.total == 0">
-            <div class="col-sm-12 text-center">
-              <strong>{{ 'converter.noDoneJobs' | translate }}</strong>
-            </div>
-          </div>
-          <div class="row converter" id="converter-{{converter.id}}" ng-if="converters.done.total > 0"
-            ng-repeat="converter in converters.done.converter track by converter.id"
-          >
-            <div class="col-xs-8 col-sm-7">
-              <span class="glyphicon" aria-hidden="true" ng-class="converter.exitValue == 0 ? 'glyphicon-ok text-success' : 'glyphicon-remove text-danger'"></span> <strong>{{converter.file}}</strong>
-            </div>
-            <div class="col-sm-3 hidden-xs text-right">
-              <i class="fa fa-hourglass-end" aria-hidden="true"></i> {{converter.progress.elapsed}}
-            </div>
-            <div class="col-xs-4 col-sm-2">
-              <div class="btn-group pull-right" role="group">
-                <button class="btn btn-xs btn-default" data-toggle="collapse" data-target="#details-{{converter.id}}" aria-expanded="false"
-                  aria-controls="details-{{converter.id}}" ng-click="loadDetailData(converter.id)"
-                >
-                  <span class="glyphicon glyphicon-console" aria-hidden="true"></span>
-                </button>
-                <button class="btn btn-xs btn-default hidden-xs" data-toggle="collapse" data-target="#preview-{{converter.id}}" aria-expanded="false"
-                  aria-controls="preview-{{converter.id}}" ng-disabled="!(converter.file.endsWith('.mp4') || converter.file.endsWith('.webm'))"
-                >
-                  <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
-                </button>
-                <a class="btn btn-xs btn-default" href="/widget/converter/{{converter.id}}/download"><span class="glyphicon glyphicon-save" aria-hidden="true"></span>
-                </a>
-              </div>
-            </div>
-            <div class="col-xs-12 collapse" id="details-{{converter.id}}">
-              <pre class="pre-scrollable console">{{formatStream(details[converter.id].errorStream)}}</pre>
-            </div>
-            <div class="col-xs-12 hidden-xs collapse" id="preview-{{converter.id}}" ng-if="converter.file.endsWith('.mp4') || converter.file.endsWith('.webm')">
-              <video id="video-{{converter.id}}" class="video-preview video-js vjs-default-skin vjs-big-play-centered" controls preload="none">
-                <source ng-src="{{'/widget/converter/' + converter.id + '/download'}}">
-                <p class="vjs-no-js">
-                  To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/"
-                    target="_blank"
-                  >supports HTML5 video</a>
-                </p>
-              </video>
-            </div>
-          </div>
-        </div>
-        <div class="panel-footer" ng-if="converters.done.total > converters.done.limit">
-          <div class="row">
-            <div class="col-xs-12">
-              <nav class="pull-right">
-                <ul class="pagination pagination-sm no-margin">
-                  <li ng-class="{disabled:paginationDisabled(converters.done, '-1')}"><a href="#" aria-label="Previous"
-                    ng-click="paginationPage(converters.done, '-1')"
-                  > <span aria-hidden="true">&laquo;</span>
-                  </a></li>
-                  <li ng-repeat="p in pagination(converters.done)" ng-class="{active:paginationActive(converters.done, p)}"><a href="#"
-                    ng-click="paginationPage(converters.done, p)"
-                  >{{p}}</a></li>
-                  <li ng-class="{disabled:paginationDisabled(converters.done, '+1')}"><a href="#" aria-label="Next" ng-click="paginationPage(converters.done, '+1')">
-                      <span aria-hidden="true">&raquo;</span>
-                  </a></li>
-                </ul>
-            </div>
-            </nav>
-          </div>
-        </div>
-      </div>
-    </div>
+			<div id="converter-done" class="panel panel-default">
+				<div class="panel-heading">{{ 'converter.done.headline' | translate }}</div>
+				<div class="panel-body animate">
+					<div class="row" data-ng-show="converters.done.total === undefined || converters.done.total == 0">
+						<div class="col-sm-12 text-center">
+							<strong>{{ 'converter.noDoneJobs' | translate }}</strong>
+						</div>
+					</div>
+					<div class="row converter" id="converter-{{converter.id}}" data-ng-if="converters.done.total > 0"
+						data-ng-repeat="converter in converters.done.converter track by converter.id"
+					>
+						<div class="col-xs-8 col-sm-7">
+							<span class="glyphicon" aria-hidden="true" data-ng-class="converter.exitValue == 0 ? 'glyphicon-ok text-success' : 'glyphicon-remove text-danger'"></span>
+							<strong>{{converter.file}}</strong>
+						</div>
+						<div class="col-sm-3 hidden-xs text-right">
+							<i class="fa fa-hourglass-end" aria-hidden="true"></i> {{converter.progress.elapsed}}
+						</div>
+						<div class="col-xs-4 col-sm-2">
+							<div class="btn-group pull-right" role="group">
+								<button class="btn btn-xs btn-default" data-toggle="collapse" data-target="#details-{{converter.id}}" aria-expanded="false"
+									aria-controls="details-{{converter.id}}" data-ng-click="loadDetailData(converter.id)"
+								>
+									<span class="glyphicon glyphicon-console" aria-hidden="true"></span>
+								</button>
+								<div class="btn-group" role="group">
+									<button class="btn btn-xs btn-default hidden-xs dropdown-toggle" id="preview-menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+										data-ng-disabled="!((converter.files | endsWith:'.mp4') || (converter.files | endsWith:'.webm'))"
+									>
+										<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> <span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="preview-menu">
+										<li data-ng-repeat="file in converter.files"><a role="button" aria-expanded="false" aria-controls="video-{{converter.id}}-{{$index}}"
+											href="#video-{{converter.id}}-{{$index}}" data-target="#video-{{converter.id}}-{{$index}}" data-parent="#preview-{{converter.id}}"
+											data-toggle="collapse"
+										>{{ file | fileName }}</a></li>
+									</ul>
+								</div>
+								<div class="btn-group pull-right" role="group">
+									<button class="btn btn-xs btn-default dropdown-toggle" id="download-menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+										<span class="glyphicon glyphicon-save" aria-hidden="true"></span> <span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="donwload-menu">
+										<li data-ng-repeat="file in converter.files"><a href="/widget/converter/{{converter.id}}/{{file | fileName}}/download"> {{ file | fileName }}</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-12 collapse" id="details-{{converter.id}}">
+							<pre class="pre-scrollable console">{{formatStream(details[converter.id].errorStream)}}</pre>
+						</div>
+						<div class="col-xs-12 hidden-xs" role="tablist" id="preview-{{converter.id}}"
+							data-ng-if="((converter.files | endsWith:'.mp4') || (converter.files | endsWith:'.webm'))"
+						>
+							<div data-ng-repeat="file in converter.files" id="video-{{converter.id}}-{{$index}}" class="collapse" role="tabpanel">
+								<video class="video-preview video-js vjs-default-skin vjs-big-play-centered" controls preload="none">
+									<source data-ng-src="{{'/widget/converter/' + converter.id + '/' + (file | fileName) + '/download'}}">
+									<p class="vjs-no-js">
+										To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/"
+											target="_blank"
+										>supports HTML5 video</a>
+									</p>
+								</video>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="panel-footer" data-ng-if="converters.done.total > converters.done.limit">
+					<div class="row">
+						<div class="col-xs-12">
+							<nav class="pull-right">
+								<ul class="pagination pagination-sm no-margin">
+									<li data-ng-class="{disabled:paginationDisabled(converters.done, '-1')}"><a href="#" aria-label="Previous"
+										data-ng-click="paginationPage(converters.done, '-1')"
+									> <span aria-hidden="true">&laquo;</span>
+									</a></li>
+									<li data-ng-repeat="p in pagination(converters.done)" data-ng-class="{active:paginationActive(converters.done, p)}"><a href="#"
+										data-ng-click="paginationPage(converters.done, p)"
+									>{{p}}</a></li>
+									<li data-ng-class="{disabled:paginationDisabled(converters.done, '+1')}"><a href="#" aria-label="Next"
+										data-ng-click="paginationPage(converters.done, '+1')"
+									> <span aria-hidden="true">&raquo;</span>
+									</a></li>
+								</ul>
+							</nav>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 
-  </div>
-  <!-- /.container -->
+	</div>
+	<!-- /.container -->
 
 
-  <!-- Bootstrap core JavaScript
+	<!-- Bootstrap core JavaScript
     ================================================== -->
-  <!-- Placed at the end of the document so the pages load faster -->
-  <script type="text/javascript" src="/web/assets/js/jquery.min.js"></script>
-  <script type="text/javascript" src="/web/assets/js/bootstrap.min.js"></script>
-  <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-  <script type="text/javascript" src="/web/assets/js/ie10-viewport-bug-workaround.js"></script>
+	<!-- Placed at the end of the document so the pages load faster -->
+	<script type="text/javascript" src="/web/assets/js/jquery.min.js"></script>
+	<script type="text/javascript" src="/web/assets/js/bootstrap.min.js"></script>
+	<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+	<script type="text/javascript" src="/web/assets/js/ie10-viewport-bug-workaround.js"></script>
 
-  <script type="text/javascript" src="/web/assets/js/angular.min.js"></script>
-  <script type="text/javascript" src="/web/assets/js/angular-animate.min.js"></script>
-  <script type="text/javascript" src="/web/assets/js/angular-sanitize.min.js"></script>
-  <script type="text/javascript" src="/web/assets/js/angular-translate.min.js"></script>
-  <script type="text/javascript" src="/web/assets/js/angular-translate-loader-static-files.min.js"></script>
-  <script type="text/javascript" src="/web/assets/js/video.min.js"></script>
+	<script type="text/javascript" src="/web/assets/js/angular.min.js"></script>
+	<script type="text/javascript" src="/web/assets/js/angular-animate.min.js"></script>
+	<script type="text/javascript" src="/web/assets/js/angular-sanitize.min.js"></script>
+	<script type="text/javascript" src="/web/assets/js/angular-translate.min.js"></script>
+	<script type="text/javascript" src="/web/assets/js/angular-translate-loader-static-files.min.js"></script>
+	<script type="text/javascript" src="/web/assets/js/video.min.js"></script>
 
-  <script type="text/javascript" src="/web/assets/js/main.js"></script>
+	<script type="text/javascript" src="/web/assets/js/main.js"></script>
 </body>
 </html>

@@ -20,7 +20,6 @@
 package org.mycore.vidconv.plugin.wowza;
 
 import java.nio.file.Path;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -48,22 +47,20 @@ public class WowzaSMILPlugin implements Listener {
     public void handleEvent(Event event) throws Exception {
         if (ConverterService.EVENT_CONVERT_DONE.equals(event.getType())
             && event.getSource().equals(ConverterService.class)) {
-            final List<ConverterJob> jobs = event.getParameter("jobs");
-            if (jobs.size() > 1) {
-                final ConverterJob job = jobs.get(0);
-                final String fileName = job.inputPath().getFileName().toString();
-                final Path file = job.outputPath().getParent()
-                    .resolve(fileName.substring(0, fileName.lastIndexOf(".")) + ".smil");
 
-                LOGGER.info("save to " + file);
-                WowzaSMILWrapper.saveTo(file, jobs.stream().map(cj -> {
-                    try {
-                        return FFMpegImpl.probe(cj.outputPath());
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                }).collect(Collectors.toList()));
-            }
+            final ConverterJob job = event.getParameter("job");
+            final String fileName = job.inputPath().getFileName().toString();
+            final Path file = job.outputPath()
+                .resolve(fileName.substring(0, fileName.lastIndexOf(".")) + ".smil");
+
+            LOGGER.info("save to " + file);
+            WowzaSMILWrapper.saveTo(file, job.outputs().stream().map(o -> {
+                try {
+                    return FFMpegImpl.probe(o.getOutputPath());
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }).collect(Collectors.toList()));
         }
     }
 
