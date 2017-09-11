@@ -24,12 +24,16 @@ package org.mycore.vidconv.backend.service;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -84,6 +88,18 @@ public class ConverterService extends Widget implements Listener {
     private final ExecutorService converterThreadPool;
 
     private String outputDir;
+
+    private Comparator<Output> sortOutputs = (o1, o2) -> {
+        if (o1.getFormat().equals(o2.getFormat())) {
+            final Integer[] sc1 = Arrays.stream(o1.getVideo().getScale().split(":")).map(Integer::new)
+                .toArray(Integer[]::new);
+            final Integer[] sc2 = Arrays.stream(o2.getVideo().getScale().split(":")).map(Integer::new)
+                .toArray(Integer[]::new);
+            return sc1[0] < 0 && sc1[0] < 0 ? Integer.compare(sc2[1], sc1[1]) : Integer.compare(sc2[1], sc1[1]);
+        }
+
+        return o1.getFormat().compareTo(o2.getFormat());
+    };
 
     public ConverterService(final String outputDir, int converterThreads) {
         super(WIDGET_NAME);
@@ -175,14 +191,15 @@ public class ConverterService extends Widget implements Listener {
     public Path download(List<String> params) throws Exception {
         if (!params.isEmpty()) {
             final String converterId = params.get(0);
-            final String fileName = params.get(1);
+            final String fileName = URLDecoder.decode(params.get(1), StandardCharsets.UTF_8.toString());
             final ConverterJob converter = converters.get(converterId);
 
             if (converter != null) {
                 return converter.outputs.stream()
-                    .filter(o -> !o.getOutputPath().getFileName().equals(fileName))
+                    .filter(o -> o.getOutputPath().getFileName().toString().equals(fileName))
                     .findFirst()
-                    .map(o -> o.getOutputPath()).orElseThrow(() -> new FileNotFoundException());
+                    .map(o -> o.getOutputPath())
+                    .orElseThrow(() -> new FileNotFoundException("File \"" + fileName + "\" not found."));
             }
         }
 
@@ -220,9 +237,7 @@ public class ConverterService extends Widget implements Listener {
                 final Path outputPath = Paths.get(outputDir, id);
 
                 final List<Output> outputs = settings.getOutput().stream()
-                    .sorted((o2, o1) -> o1.getFormat().equals(o2.getFormat())
-                        ? o1.getVideo().getScale().compareTo(o2.getVideo().getScale())
-                        : o1.getFormat().compareTo(o2.getFormat()))
+                    .sorted(sortOutputs)
                     .filter(output -> {
                         try {
                             return output.getVideo().getUpscale()
