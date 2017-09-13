@@ -1,4 +1,5 @@
 /*global angular */
+/*global videojs */
 "use strict";
 
 var appName = "MyVidCoRe";
@@ -19,10 +20,10 @@ app.config(function($translateProvider) {
 });
 
 app.filter("endsWith", function() {
-	return function(input, search) {
+	return function(input, search, prop) {
 		if (typeof input === "array" || typeof input === "object") {
 			for (var i in input) {
-				if (input[i].endsWith(search)) {
+				if (prop && input[i][prop].endsWith(search)|| input[i].endsWith(search)) {
 					return true;
 				}
 			}
@@ -47,6 +48,13 @@ app.filter("fileName", function() {
 	return function(input) {
 		input = input || "";
 		return input.split(/\/|\\/).pop();
+	};
+});
+
+app.filter("formatScale", function() {
+	return function(input) {
+		var scale = (input || "").split(":");
+		return parseInt(scale[0]) < 0 ? scale[1] + "p" : scale[0] + "x" + scale[1];
 	};
 });
 
@@ -276,6 +284,13 @@ app.controller("converterStatus", function($scope, $http, $interval, asyncQueue)
 		if (stream !== undefined) {
 			return stream.replace(/\r/g, "\n");
 		}
+	};
+	
+	$scope.initPreview = function(id, files) {
+		console.log("init preview for id " + id);
+		videojs("video-" + id).videoJsResolutionSwitcher({
+			dynamicLabel: true
+		});
 	};
 
 	$scope.$on("$destroy", function() {

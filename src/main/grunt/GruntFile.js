@@ -23,11 +23,12 @@ module.exports = function(grunt) {
 					destPrefix : "<%=globalConfig.assetsDirectory%>/"
 				},
 				files : {
-					"css" : [ "seiyria-bootstrap-slider/dist/css/*.min.css", "video.js/dist/*.min.css" ],
+					"css" : [ "seiyria-bootstrap-slider/dist/css/*.min.css", "video.js/dist/*.min.css", "videojs-resolution-switcher/lib/*.css" ],
 					"fonts" : [ "bootstrap/dist/fonts", "font-awesome/fonts", "video.js/dist/font" ],
 					"js" : [ "angular/*.min.*", "angular-animate/*.min.*", "angular-sanitize/*.min.*", "angular-translate/*.min.*",
 							"angular-translate-loader-static-files/*.min.*", "bootstrap/dist/js/*min.js", "seiyria-bootstrap-slider/dist/*.min.js",
-							"html5shiv/dist/*min.js", "jquery/dist/*min.js", "respond/dest/*min.js", "video.js/dist/*min.js*" ],
+							"html5shiv/dist/*min.js", "jquery/dist/*min.js", "respond/dest/*min.js", "video.js/dist/*min.js*",
+							"videojs-resolution-switcher/lib/*.js*" ],
 				},
 			}
 		},

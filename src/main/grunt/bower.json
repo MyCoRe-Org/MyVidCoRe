@@ -25,6 +25,7 @@
     "font-awesome": "~4.6.3",
     "html5shiv": "^3.7.3",
     "respond": "^1.4.2",
-    "video.js": "^5.10.7"
+    "video.js": "^5.20.3",
+    "videojs-resolution-switcher": "^0.4.2"
   }
 }

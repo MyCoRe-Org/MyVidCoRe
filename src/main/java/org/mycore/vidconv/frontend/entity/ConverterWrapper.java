@@ -107,9 +107,11 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
     }
 
     @XmlElement(name = "files")
-    public List<String> getFiles() {
+    public List<File> getFiles() {
         return Optional.ofNullable(outputs)
-            .map(os -> os.stream().map(o -> o.getOutputPath().getFileName().toString()).collect(Collectors.toList()))
+            .map(os -> os.stream()
+                .map(o -> new File(o.getOutputPath().getFileName().toString(), o.getFormat(), o.getVideo().getScale()))
+                .collect(Collectors.toList()))
             .orElse(null);
     }
 
@@ -253,5 +255,75 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
         public int compareTo(Progress p) {
             return this.percent == null ? -1 : p.percent == null ? 1 : this.percent.compareTo(p.percent);
         }
+    }
+
+    @XmlRootElement
+    static class File {
+
+        private String fileName;
+
+        private String format;
+
+        private String scale;
+
+        private File() {
+        }
+
+        /**
+         * @param fileName
+         * @param format
+         * @param scale
+         */
+        public File(String fileName, String format, String scale) {
+            this.fileName = fileName;
+            this.format = format;
+            this.scale = scale;
+        }
+
+        /**
+         * @return the fileName
+         */
+        @XmlAttribute(name = "name")
+        public String getFileName() {
+            return fileName;
+        }
+
+        /**
+         * @param fileName the fileName to set
+         */
+        public void setFileName(String fileName) {
+            this.fileName = fileName;
+        }
+
+        /**
+         * @return the format
+         */
+        @XmlAttribute(name = "format")
+        public String getFormat() {
+            return format;
+        }
+
+        /**
+         * @param format the format to set
+         */
+        public void setFormat(String format) {
+            this.format = format;
+        }
+
+        /**
+         * @return the scale
+         */
+        @XmlAttribute(name = "scale")
+        public String getScale() {
+            return scale;
+        }
+
+        /**
+         * @param scale the scale to set
+         */
+        public void setScale(String scale) {
+            this.scale = scale;
+        }
+
     }
 }
