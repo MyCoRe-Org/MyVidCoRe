@@ -91,11 +91,11 @@
                       <optgroup data-ng-if="codec.encoders && getLength(codec.encoders) > 1" data-ng-repeat="codec in filterCodecs(output.format, 'video')"
                         label="{{codec.description}}"
                       >
-                        <option data-ng-repeat="encoder in codec.encoders" value="{{encoder.name}}">{{encoder.description}}</option>
+                        <option data-ng-repeat="encoder in codec.encoders" value="{{encoder.name}}">{{encoder.description}} {{ '(' + encoder.name + ')' }}</option>
                       </optgroup>
                       <option data-ng-if="codec.encoders && getLength(codec.encoders) == 1" data-ng-repeat="codec in filterCodecs(output.format, 'video')"
                         value="{{codec.encoders[0].name}}"
-                      >{{codec.description}}</option>
+                      >{{codec.description}} {{ '(' + codec.name + ')' }}</option>
                     </select>
                   </div>
 
@@ -304,11 +304,11 @@
                       <optgroup data-ng-if="codec.encoders && getLength(codec.encoders) > 1" data-ng-repeat="codec in filterCodecs(output.format, 'audio')"
                         label="{{codec.description}}"
                       >
-                        <option data-ng-repeat="encoder in codec.encoders" value="{{encoder.name}}">{{encoder.description}}</option>
+                        <option data-ng-repeat="encoder in codec.encoders" value="{{encoder.name}}">{{encoder.description}} {{ '(' + encoder.name + ') ' }}</option>
                       </optgroup>
                       <option data-ng-if="codec.encoders && getLength(codec.encoders) == 1" data-ng-repeat="codec in filterCodecs(output.format, 'audio')"
                         value="{{codec.encoders[0].name}}"
-                      >{{codec.description}}</option>
+                      >{{codec.description}} {{ '(' + codec.name + ')' }}</option>
                     </select>
                   </div>
                   <!--              <div class="form-group"> -->
