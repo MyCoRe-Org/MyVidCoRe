@@ -30,15 +30,15 @@ import org.mycore.vidconv.frontend.entity.ExceptionWrapper;
 @Provider
 public class GenericExceptionMapper implements ExceptionMapper<Exception> {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.ws.rs.ext.ExceptionMapper#toResponse(java.lang.Exception)
-	 */
-	@Override
-	public Response toResponse(Exception exception) {
-	    LogManager.getLogger().error(exception);
-		return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ExceptionWrapper(exception)).build();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see javax.ws.rs.ext.ExceptionMapper#toResponse(java.lang.Exception)
+     */
+    @Override
+    public Response toResponse(Exception exception) {
+        LogManager.getLogger().error(exception.getMessage(), exception);
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ExceptionWrapper(exception)).build();
+    }
 
 }
