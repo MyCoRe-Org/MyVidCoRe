@@ -287,8 +287,8 @@ app.controller("converterStatus", function($scope, $http, $interval, asyncQueue)
 	};
 	
 	$scope.initPreview = function(id, files) {
-		console.log("init preview for id " + id);
 		videojs("video-" + id).videoJsResolutionSwitcher({
+			default: "high",
 			dynamicLabel: true
 		});
 	};
