@@ -50,9 +50,9 @@ public class Executable {
 
     public Executable(final String command) {
         List<String> cmdParts = new ArrayList<String>();
-        Matcher m = Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(command);
+        Matcher m = Pattern.compile("([^\"]\\S*|\".+?\"|[^\']\\S*|\'.+?\')\\s*").matcher(command);
         while (m.find()) {
-            cmdParts.add(m.group(1).replace("\"", ""));
+            cmdParts.add(m.group(1).replaceAll("\"|\'", ""));
         }
         this.command = cmdParts;
     }
