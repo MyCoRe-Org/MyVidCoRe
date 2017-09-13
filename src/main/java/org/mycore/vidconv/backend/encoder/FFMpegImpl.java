@@ -494,36 +494,31 @@ public class FFMpegImpl {
 
     /**
      * Build the command line for given {@link SettingsWrapper}.
-     *  
+     * 
+     * @param input the inut file
      * @param output the settings
      * @return the command
      * @throws IOException
      * @throws InterruptedException
      */
-    public static String command(final List<Output> outputs)
+    public static String command(final Path input, final List<Output> outputs)
         throws InterruptedException {
         final StringBuffer cmd = new StringBuffer();
 
-        cmd.append("ffmpeg -i \"{0}\" -stats -y");
+        cmd.append("ffmpeg -i \"" + input.toFile().getAbsolutePath() + "\" -stats -y");
 
         outputs.forEach(output -> {
             cmd.append(" ");
             Video video = output.getVideo();
 
-            cmd.append("-codec:v " + video.getCodec());
+            Optional.ofNullable(video.getScale()).ifPresent(v -> cmd.append("-vf 'scale=" + v + "'"));
 
-            Optional.ofNullable(video.getAdvancedOptions()).ifPresent(ao -> {
-                cmd.append(" " + ao);
-            });
+            cmd.append(" -codec:v " + video.getCodec());
 
-            Optional.ofNullable(video.getPreset()).ifPresent(v -> cmd.append(" -preset " + v));
-            Optional.ofNullable(video.getTune()).ifPresent(v -> cmd.append(" -tune " + v));
-            Optional.ofNullable(video.getProfile()).ifPresent(v -> cmd.append(" -profile:v " + v));
-            Optional.ofNullable(video.getLevel()).ifPresent(v -> cmd.append(" -level " + v));
+            cmd.append(buildParameters(video.getParameters(), video.getCodec()));
+
             Optional.ofNullable(video.getPixelFormat())
                 .ifPresent(v -> cmd.append(" -pix_fmt " + (!v.isEmpty() ? v : "yuv420p")));
-
-            Optional.ofNullable(video.getScale()).ifPresent(v -> cmd.append(" -vf 'scale=" + v + "'"));
 
             Optional.ofNullable(video.getFramerate()).ifPresent(v -> {
                 cmd.append(" -r " + v);
@@ -546,17 +541,51 @@ public class FFMpegImpl {
                     default:
                         break;
                 }
+
+                Optional.ofNullable(quality.getMinrate()).ifPresent(v -> cmd.append(" -minrate " + v + "k"));
+                Optional.ofNullable(quality.getMaxrate()).ifPresent(v -> cmd.append(" -maxrate " + v + "k"));
+                Optional.ofNullable(quality.getBufsize()).ifPresent(v -> cmd.append(" -bufsize " + v + "k"));
             });
 
             Audio audio = output.getAudio();
 
             cmd.append(" -codec:a " + audio.getCodec());
-            cmd.append(" -ac 2");
+
+            cmd.append(buildParameters(audio.getParameters(), audio.getCodec()));
 
             Optional.ofNullable(audio.getBitrate()).ifPresent(v -> cmd.append(" -b:a " + v + "k"));
             Optional.ofNullable(audio.getSamplerate()).ifPresent(v -> cmd.append(" -ar " + v));
+            cmd.append(" -ac 2");
 
             cmd.append(" \"" + output.getOutputPath().toFile().getAbsolutePath() + "\"");
+        });
+
+        return cmd.toString();
+    }
+
+    private static String buildParameters(Map<String, String> parameters, String codec) {
+        StringBuffer cmd = new StringBuffer();
+
+        Optional.ofNullable(parameters).ifPresent(params -> {
+            EncodersWrapper encoders;
+            try {
+                encoders = encoder(codec);
+            } catch (NumberFormatException | InterruptedException | ExecutionException e1) {
+                encoders = null;
+            }
+
+            EncoderWrapper enc = Optional.ofNullable(encoders.getEncoders())
+                .map(encs -> encs.stream().filter(e -> e.getName().equalsIgnoreCase(codec)).findFirst()
+                    .orElse(null))
+                .orElse(null);
+
+            params.entrySet().stream().filter(
+                entry -> enc == null || enc.getParameters() != null
+                    && enc.getParameters().stream().noneMatch(p -> p.getName().equals(entry.getKey())
+                        && (p.getDefaultValue() != null && p.getDefaultValue().equals(entry.getValue()))))
+                .forEach(
+                    entry -> cmd.append(" -" + entry.getKey() + " " + ("true".equalsIgnoreCase(entry.getValue()) ? "1"
+                        : "false".equalsIgnoreCase(entry.getValue()) ? "0" : entry.getValue())));
         });
 
         return cmd.toString();

@@ -309,7 +309,7 @@ public class ConverterService extends Widget implements Listener {
             this.done = false;
             this.running = false;
 
-            command = FFMpegImpl.command(outputs);
+            command = FFMpegImpl.command(inputPath, outputs);
 
             if (!Files.exists(outputPath))
                 Files.createDirectories(outputPath);
@@ -327,8 +327,7 @@ public class ConverterService extends Widget implements Listener {
                 running = true;
                 startTime = Instant.now();
 
-                final Executable exec = new Executable(MessageFormat.format(command,
-                    inputPath.toFile().getAbsolutePath(), outputPath.toFile().getAbsolutePath()));
+                final Executable exec = new Executable(command);
 
                 final Process p = exec.run();
 

@@ -15,6 +15,7 @@ app.config(function($translateProvider) {
 	});
 
 	$translateProvider.preferredLanguage("de_DE");
+	$translateProvider.determinePreferredLanguage();
 });
 
 app.filter("endsWith", function() {
@@ -34,10 +35,25 @@ app.filter("endsWith", function() {
 	};
 });
 
+app.filter("translateWithFallBack", function($translate) {
+	return function(key, prefix, fallBack, replaceRegExp) {
+		fallBack = replaceRegExp !== undefined ? fallBack.replace(new RegExp(replaceRegExp, "g"), "").trim() : fallBack.trim();
+		var text = $translate.instant(prefix + key);
+		return text === prefix + key ? fallBack || key : text;
+	};
+});
+
 app.filter("fileName", function() {
 	return function(input) {
 		input = input || "";
 		return input.split(/\/|\\/).pop();
+	};
+});
+
+app.filter("parseNumber", function() {
+	return function(input, type) {
+		input = input || "";
+		return type === "int" ? parseInt(input) : type === "float" ? parseFloat(input) : input;
 	};
 });
 
@@ -68,7 +84,7 @@ app.directive("slider", function() {
 					if (key.indexOf("slider") === 0) {
 						var k = key.replace("slider", "");
 						k = k.substring(0, 1).toLowerCase() + k.substring(1);
-						options[k] = value;
+						options[k] = scope.$eval(value);
 					}
 				});
 
@@ -516,21 +532,59 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 		"name" : "main"
 	}, {
 		"name" : "high"
+	}, {
+		"name" : "high10"
+	}, {
+		"name" : "high442"
+	}, {
+		"name" : "high444"
 	} ];
 
 	$scope.defaultLevels = [ {
+		"name" : "1.0"
+	}, {
+		"name" : "1b"
+	}, {
+		"name" : "1.0b"
+	}, {
+		"name" : "1.1"
+	}, {
+		"name" : "1.2"
+	}, {
+		"name" : "1.3"
+	}, {
+		"name" : "2"
+	}, {
+		"name" : "2.0"
+	}, {
+		"name" : "2.1"
+	}, {
+		"name" : "2.2"
+	}, {
+		"name" : "3"
+	}, {
 		"name" : "3.0"
 	}, {
 		"name" : "3.1"
+	}, {
+		"name" : "3.2"
+	}, {
+		"name" : "4"
 	}, {
 		"name" : "4.0"
 	}, {
 		"name" : "4.1"
 	}, {
 		"name" : "4.2"
+	}, {
+		"name" : "5"
+	}, {
+		"name" : "5.0"
+	}, {
+		"name" : "5.1"
 	} ];
-
-	$scope.defaultBitrates = [ 64, 80, 96, 112, 128, 160, 192, 224, 256, 320 ];
+	
+	$scope.defaultBitrates = [ 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384, 448, 512 ];
 
 	// default settings
 	$scope.settings = {

@@ -40,5 +40,8 @@
     "settings.audio.mixdown.mono-r": "Mono (only right)",
     "settings.audio.mixdown.stereo": "Stereo",
     "settings.audio.samplerate" : "Samplerate",
-    "settings.audio.bitrate": "Bitrate"
+    "settings.audio.bitrate": "Bitrate",
+    "settings.minrate": "min. Bitrate (kbps)",
+    "settings.maxrate": "max. Bitrate (kbps)",
+    "settings.bufsize": "Buffer Size (kbps)"
 }

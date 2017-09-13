@@ -124,8 +124,9 @@ body {
     }
   }
 
-  #qualitySlider {
+  .slider {
     display: block;
+    width: 100%;
     .slider-handle {
       background-color: @brand-primary;
       background-image: linear-gradient(to bottom, lighten(@brand-primary, 30%) 0px, darken(@brand-primary, 10%) 100%);
@@ -135,6 +136,10 @@ body {
     .slider-selection {
       background-image: linear-gradient(to bottom, #e0e0e0 0px, #f5f5f5 100%);
     }
+  }
+
+  #qualitySlider {
+    width: 210px;
   }
 }
 

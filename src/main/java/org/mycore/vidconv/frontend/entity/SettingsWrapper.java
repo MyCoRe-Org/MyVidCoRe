@@ -25,12 +25,17 @@ package org.mycore.vidconv.frontend.entity;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+import org.mycore.vidconv.frontend.entity.adapter.ParametersAdapter;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
@@ -202,19 +207,11 @@ public class SettingsWrapper {
 
         private String framerateType;
 
-        private String preset;
-
-        private String tune;
-
-        private String profile;
-
-        private String level;
-
         private String pixelFormat;
 
         private Quality quality;
 
-        private String advancedOptions;
+        private Map<String, String> parameters;
 
         /**
          * @return the codec
@@ -287,62 +284,6 @@ public class SettingsWrapper {
         }
 
         /**
-         * @return the preset
-         */
-        public String getPreset() {
-            return preset;
-        }
-
-        /**
-         * @param preset the preset to set
-         */
-        public void setPreset(String preset) {
-            this.preset = preset;
-        }
-
-        /**
-         * @return the tune
-         */
-        public String getTune() {
-            return tune;
-        }
-
-        /**
-         * @param tune the tune to set
-         */
-        public void setTune(String tune) {
-            this.tune = tune;
-        }
-
-        /**
-         * @return the profile
-         */
-        public String getProfile() {
-            return profile;
-        }
-
-        /**
-         * @param profile the profile to set
-         */
-        public void setProfile(String profile) {
-            this.profile = profile;
-        }
-
-        /**
-         * @return the level
-         */
-        public String getLevel() {
-            return level;
-        }
-
-        /**
-         * @param level the level to set
-         */
-        public void setLevel(String level) {
-            this.level = level;
-        }
-
-        /**
          * @return the pixelFormat
          */
         public String getPixelFormat() {
@@ -371,17 +312,19 @@ public class SettingsWrapper {
         }
 
         /**
-         * @return the advancedOptions
+         * @return the parameters
          */
-        public String getAdvancedOptions() {
-            return advancedOptions;
+        @XmlJavaTypeAdapter(ParametersAdapter.class)
+        @XmlAnyElement
+        public Map<String, String> getParameters() {
+            return parameters;
         }
 
         /**
-         * @param advancedOptions the advancedOptions to set
+         * @param parameters the parameters to set
          */
-        public void setAdvancedOptions(String advancedOptions) {
-            this.advancedOptions = advancedOptions;
+        public void setParameters(Map<String, String> parameters) {
+            this.parameters = parameters;
         }
 
         @XmlRootElement(name = "quality")
@@ -393,6 +336,12 @@ public class SettingsWrapper {
             private Integer scale;
 
             private Integer bitrate;
+
+            private Integer minrate;
+
+            private Integer maxrate;
+
+            private Integer bufsize;
 
             /**
              * @return the type
@@ -450,6 +399,48 @@ public class SettingsWrapper {
                 this.bitrate = bitrate;
             }
 
+            /**
+             * @return the minrate
+             */
+            public Integer getMinrate() {
+                return minrate;
+            }
+
+            /**
+             * @param minrate the minrate to set
+             */
+            public void setMinrate(Integer minrate) {
+                this.minrate = minrate;
+            }
+
+            /**
+             * @return the maxrate
+             */
+            public Integer getMaxrate() {
+                return maxrate;
+            }
+
+            /**
+             * @param maxrate the maxrate to set
+             */
+            public void setMaxrate(Integer maxrate) {
+                this.maxrate = maxrate;
+            }
+
+            /**
+             * @return the bufsize
+             */
+            public Integer getBufsize() {
+                return bufsize;
+            }
+
+            /**
+             * @param bufsize the bufsize to set
+             */
+            public void setBufsize(Integer bufsize) {
+                this.bufsize = bufsize;
+            }
+
         }
     }
 
@@ -463,6 +454,8 @@ public class SettingsWrapper {
         private Integer samplerate;
 
         private Integer bitrate;
+
+        private Map<String, String> parameters;
 
         /**
          * @return the codec
@@ -519,6 +512,23 @@ public class SettingsWrapper {
         public void setBitrate(Integer bitrate) {
             this.bitrate = bitrate;
         }
+
+        /**
+         * @return the parameters
+         */
+        @XmlJavaTypeAdapter(ParametersAdapter.class)
+        @XmlAnyElement
+        public Map<String, String> getParameters() {
+            return parameters;
+        }
+
+        /**
+         * @param parameters the parameters to set
+         */
+        public void setParameters(Map<String, String> parameters) {
+            this.parameters = parameters;
+        }
+
     }
 
     @XmlRootElement(name = "plugin")
