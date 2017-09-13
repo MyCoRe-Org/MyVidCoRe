@@ -127,7 +127,7 @@
 										<span class="glyphicon glyphicon-save" aria-hidden="true"></span> <span class="caret"></span>
 									</button>
 									<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="donwload-menu">
-										<li data-ng-repeat="file in converter.files"><a href="/widget/converter/{{converter.id}}/{{file}}/download"> {{ file }}</a></li>
+										<li data-ng-repeat="file in converter.files"><a href="/widget/converter/{{converter.id}}/{{file.name}}/download"> {{ file.name }}</a></li>
 									</ul>
 								</div>
 							</div>
