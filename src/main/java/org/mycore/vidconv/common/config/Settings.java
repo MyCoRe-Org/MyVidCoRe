@@ -26,6 +26,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -38,12 +41,29 @@ import org.apache.logging.log4j.Logger;
 import org.eclipse.persistence.jaxb.MarshallerProperties;
 import org.eclipse.persistence.jaxb.UnmarshallerProperties;
 import org.mycore.vidconv.frontend.entity.SettingsWrapper;
+import org.mycore.vidconv.frontend.entity.SettingsWrapper.Output;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
  *
  */
 public class Settings {
+
+    public static Comparator<Output> sortOutputs = (o1, o2) -> {
+        if (o1.getFormat().equals(o2.getFormat())) {
+            if (o1.getVideo().getScale() != null && o2.getVideo().getScale() != null) {
+                final Integer[] sc1 = Arrays.stream(o1.getVideo().getScale().split(":")).map(Integer::new)
+                    .toArray(Integer[]::new);
+                final Integer[] sc2 = Arrays.stream(o2.getVideo().getScale().split(":")).map(Integer::new)
+                    .toArray(Integer[]::new);
+                return sc1[0] < 0 && sc1[0] < 0 ? Integer.compare(sc2[1], sc1[1]) : Integer.compare(sc2[1], sc1[1]);
+            }
+
+            return 0;
+        }
+
+        return o1.getFormat().compareTo(o2.getFormat());
+    };
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -85,6 +105,8 @@ public class Settings {
      * @throws JAXBException 
      */
     public void setSettings(SettingsWrapper settings) throws JAXBException {
+        settings.setOutput(settings.getOutput().stream()
+            .sorted(sortOutputs).collect(Collectors.toList()));
         this.settings = settings;
         saveSettings(this.settings);
     }

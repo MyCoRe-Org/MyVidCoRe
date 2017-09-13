@@ -32,8 +32,6 @@ import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -88,18 +86,6 @@ public class ConverterService extends Widget implements Listener {
     private final ExecutorService converterThreadPool;
 
     private String outputDir;
-
-    private Comparator<Output> sortOutputs = (o1, o2) -> {
-        if (o1.getFormat().equals(o2.getFormat())) {
-            final Integer[] sc1 = Arrays.stream(o1.getVideo().getScale().split(":")).map(Integer::new)
-                .toArray(Integer[]::new);
-            final Integer[] sc2 = Arrays.stream(o2.getVideo().getScale().split(":")).map(Integer::new)
-                .toArray(Integer[]::new);
-            return sc1[0] < 0 && sc1[0] < 0 ? Integer.compare(sc2[1], sc1[1]) : Integer.compare(sc2[1], sc1[1]);
-        }
-
-        return o1.getFormat().compareTo(o2.getFormat());
-    };
 
     public ConverterService(final String outputDir, int converterThreads) {
         super(WIDGET_NAME);
@@ -237,7 +223,7 @@ public class ConverterService extends Widget implements Listener {
                 final Path outputPath = Paths.get(outputDir, id);
 
                 final List<Output> outputs = settings.getOutput().stream()
-                    .sorted(sortOutputs)
+                    .sorted(Settings.sortOutputs)
                     .filter(output -> {
                         try {
                             return output.getVideo().getUpscale()
