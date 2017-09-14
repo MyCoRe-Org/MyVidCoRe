@@ -19,417 +19,430 @@
 
 <body>
 
-  <nav class="navbar navbar-inverse navbar-fixed-top">
-    <div class="container">
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-          <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="/web"><span class="glyphicon glyphicon-film" aria-hidden="true"></span> MyVidCoRe</a>
-      </div>
-      <div id="navbar" class="collapse navbar-collapse">
-        <ul class="nav navbar-nav">
-          <li class="nav-item"><a class="nav-link" href="/web"><span class="glyphicon
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+					<span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="/web"><span class="glyphicon glyphicon-film" aria-hidden="true"></span> MyVidCoRe</a>
+			</div>
+			<div id="navbar" class="collapse navbar-collapse">
+				<ul class="nav navbar-nav">
+					<li class="nav-item"><a class="nav-link" href="/web"><span class="glyphicon
               glyphicon-dashboard" aria-hidden="true"></span> {{
-              'nav.dashboard' | translate}}</a></li>
-          <li class="nav-item active"><a class="nav-link" href="/web/settings.html"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> {{
-              'nav.settings' | translate}}<span class="sr-only">(current)</span></a></li>
-        </ul>
-        <div class="nav navbar-nav navbar-right">
-          <span id="directoryWatcherStatus" data-ng-controller="directoryWatcherStatus" class="label {{status.active ? 'label-success' : 'label-danger'}}">Watcher</span>
-        </div>
-      </div>
-    </div>
-  </nav>
+							'nav.dashboard' | translate}}</a></li>
+					<li class="nav-item active"><a class="nav-link" href="/web/settings.html"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> {{
+							'nav.settings' | translate}}<span class="sr-only">(current)</span></a></li>
+				</ul>
+				<div class="nav navbar-nav navbar-right">
+					<span id="directoryWatcherStatus" data-ng-controller="directoryWatcherStatus" class="label {{status.active ? 'label-success' : 'label-danger'}}">Watcher</span>
+				</div>
+			</div>
+		</div>
+	</nav>
 
-  <div class="container">
+	<div class="container">
 
-    <div id="settings" class="content-container" data-ng-controller="settings">
-      <div id="status-message animate" class="alert alert-{{status.style}} alert-dismissible" role="alert" data-ng-if="status.style">
-        <button type="button" class="close" data-dismiss="alert" aria-label="{{ 'btn.close' | translate}}">
-          <span aria-hidden="true">&times;</span>
-        </button>
-        {{ status.msg }}
-      </div>
+		<div id="settings" class="content-container" data-ng-controller="settings">
+			<div id="status-message animate" class="alert alert-{{status.style}} alert-dismissible" role="alert" data-ng-if="status.style">
+				<button type="button" class="close" data-dismiss="alert" aria-label="{{ 'btn.close' | translate}}">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				{{ status.msg }}
+			</div>
 
-      <span class="loadidata-ng-indicator" data-ng-show="isLoading"><i></i> <i></i> <i></i></span>
+			<span class="loadidata-ng-indicator" data-ng-show="isLoading"><i></i> <i></i> <i></i></span>
 
-      <form novalidate data-ng-if="!isLoading && getLength(formats) > 0">
-        <fieldset>
-          <legend>{{'settings.converter.title' | translate}}</legend>
-          <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" data-ng-repeat="output in settings.output" data-ng-class="{active:$index == 0, 'remove-btn':$index != 0}"><a
-              href="#output{{$index}}" aria-controls="output{{$index}}" data-toggle="tab"
-            >{{'settings.output' | translate}} {{$index + 1}}</a> <span class="glyphicon glyphicon-remove text-danger" aria-hidden="true" data-ng-if="$index > 0"
-              data-ng-click="removeOutput($index)"
-            ></span></li>
-            <li role="presentation"><a href="#settings" data-ng-click="addOutput()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></a></li>
-          </ul>
-          <div class="tab-content animate">
-            <div role="tabpanel" class="tab-pane fade in" data-ng-class="{active:$index == 0}" id="output{{$index}}" data-ng-repeat="output in settings.output">
-              <div class="form-group">
-                <label for="format">{{'settings.format' | translate}}</label> <select id="format" class="form-control" data-ng-model="output.format"
-                  data-ng-options="name as format.description for (name, format) in formats"
-                >
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="appendix">{{'settings.filenameAppendix' | translate}}</label> <input id="appendix" class="form-control"
-                  data-ng-model="output.filenameAppendix" data-ng-init="'-' + $index"
-                >
-              </div>
-              <ul class="nav nav-tabs" role="tablist" data-ng-hide="!output.format">
-                <li role="presentation" class="active"><a href="#video{{$index}}" aria-controls="video{{$index}}" data-toggle="tab">Video</a></li>
-                <li role="presentation"><a href="#audio{{$index}}" aria-controls="audio{{$index}}" data-toggle="tab">Audio</a></li>
-              </ul>
-              <div class="tab-content" data-ng-hide="!output.format">
-                <div role="tabpanel" class="tab-pane fade in active" id="video{{$index}}">
-                  <div class="form-group">
-                    <label for="acodec">{{'settings.codec' | translate}}</label> <select id="vcodec" class="form-control" data-ng-model="output.video.codec"
-                      data-ng-change="changeCodec($index, 'video')"
-                    >
-                      <optgroup data-ng-if="codec.encoders && getLength(codec.encoders) > 1" data-ng-repeat="codec in filterCodecs(output.format, 'video')"
-                        label="{{codec.description}}"
-                      >
-                        <option data-ng-repeat="encoder in codec.encoders" value="{{encoder.name}}">{{encoder.description}} {{ '(' + encoder.name + ')' }}</option>
-                      </optgroup>
-                      <option data-ng-if="codec.encoders && getLength(codec.encoders) == 1" data-ng-repeat="codec in filterCodecs(output.format, 'video')"
-                        value="{{codec.encoders[0].name}}"
-                      >{{codec.description}} {{ '(' + codec.name + ')' }}</option>
-                    </select>
-                  </div>
+			<form novalidate data-ng-if="!isLoading && getLength(formats) > 0">
+				<fieldset>
+					<legend>{{'settings.converter.title' | translate}}</legend>
+					<ul class="nav nav-tabs" role="tablist">
+						<li role="presentation" data-ng-repeat="output in settings.output" data-ng-class="{active:$index == 0, 'remove-btn':$index != 0}"><a
+							href="#output{{$index}}" aria-controls="output{{$index}}" data-toggle="tab"
+						>{{'settings.output' | translate}} {{$index + 1}}</a> <span class="glyphicon glyphicon-remove text-danger" aria-hidden="true" data-ng-if="$index > 0"
+							data-ng-click="removeOutput($index)"
+						></span></li>
+						<li role="presentation"><a href="#settings" data-ng-click="addOutput()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></a></li>
+					</ul>
+					<div class="tab-content animate">
+						<div role="tabpanel" class="tab-pane fade in" data-ng-class="{active:$index == 0}" id="output{{$index}}" data-ng-repeat="output in settings.output">
+							<div class="form-group">
+								<label for="format">{{'settings.format' | translate}}</label> <select id="format" class="form-control" data-ng-model="output.format"
+									data-ng-options="name as format.description for (name, format) in formats"
+								>
+								</select>
+							</div>
+							<div class="form-group">
+								<label for="appendix">{{'settings.filenameAppendix' | translate}}</label> <input id="appendix" class="form-control"
+									data-ng-model="output.filenameAppendix" data-ng-init="'-' + $index"
+								>
+							</div>
+							<ul class="nav nav-tabs" role="tablist" data-ng-hide="!output.format">
+								<li role="presentation" class="active"><a href="#video{{$index}}" aria-controls="video{{$index}}" data-toggle="tab">Video</a></li>
+								<li role="presentation"><a href="#audio{{$index}}" aria-controls="audio{{$index}}" data-toggle="tab">Audio</a></li>
+							</ul>
+							<div class="tab-content" data-ng-hide="!output.format">
+								<div role="tabpanel" class="tab-pane fade in active" id="video{{$index}}">
+									<div class="form-group">
+										<label for="acodec">{{'settings.codec' | translate}}</label> <select id="vcodec" class="form-control" data-ng-model="output.video.codec"
+											data-ng-change="changeCodec($index, 'video')"
+										>
+											<optgroup data-ng-if="codec.encoders && getLength(codec.encoders) > 1" data-ng-repeat="codec in filterCodecs(output.format, 'video')"
+												label="{{codec.description}}"
+											>
+												<option data-ng-repeat="encoder in codec.encoders" value="{{encoder.name}}">{{encoder.description}} {{ '(' + encoder.name + ')' }}</option>
+											</optgroup>
+											<option data-ng-if="codec.encoders && getLength(codec.encoders) == 1" data-ng-repeat="codec in filterCodecs(output.format, 'video')"
+												value="{{codec.encoders[0].name}}"
+											>{{codec.description}} {{ '(' + codec.name + ')' }}</option>
+										</select>
+									</div>
 
-                  <div class="row"
-                    data-ng-if="((profile = encoderParameter(selectedCodec[$index].video, 'profile') ) && (level = encoderParameter(selectedCodec[$index].video, 'level')))"
-                  >
-                    <div class="form-group col-sm-6">
-                      <label for="profile">{{'settings.profile' | translate}}</label> <select id="profile" class="form-control"
-                        data-ng-model="output.video.parameter['profile']"
-                        data-ng-init="output.video.parameter['profile'] = output.video.parameter['profile'] || profile.defaultValue"
-                        data-ng-options="value.name as value.name for value in (profile.values || defaultProfiles)"
-                      >
-                        <option value="">{{'settings.auto' | translate}}</option>
-                      </select>
-                    </div>
-                    <div class="form-group col-sm-6">
-                      <label for="level">{{'settings.level' | translate}}</label> <select id="level" class="form-control" data-ng-model="output.video.parameter['level']"
-                        data-ng-init="output.video.parameter['level'] = output.video.parameter['level'] || level.defaultValue"
-                        data-ng-options="value.name as value.name for value in (level.values || defaultLevels)"
-                      >
-                        <option value="">{{'settings.auto' | translate}}</option>
-                      </select>
-                    </div>
-                  </div>
+									<div class="row"
+										data-ng-if="((profile = encoderParameter(selectedCodec[$index].video, 'profile') ) && (level = encoderParameter(selectedCodec[$index].video, 'level')))"
+									>
+										<div class="form-group col-sm-6">
+											<label for="profile">{{'settings.profile' | translate}}</label> <select id="profile" class="form-control"
+												data-ng-model="output.video.parameter['profile']"
+												data-ng-init="output.video.parameter['profile'] = output.video.parameter['profile'] || profile.defaultValue"
+												data-ng-options="value.name as value.name for value in (profile.values || defaultProfiles)"
+											>
+												<option value="">{{'settings.auto' | translate}}</option>
+											</select>
+										</div>
+										<div class="form-group col-sm-6">
+											<label for="level">{{'settings.level' | translate}}</label> <select id="level" class="form-control" data-ng-model="output.video.parameter['level']"
+												data-ng-init="output.video.parameter['level'] = output.video.parameter['level'] || level.defaultValue"
+												data-ng-options="value.name as value.name for value in (level.values || defaultLevels)"
+											>
+												<option value="">{{'settings.auto' | translate}}</option>
+											</select>
+										</div>
+									</div>
 
-                  <div class="form-group" data-ng-if="(preset = encoderParameter(selectedCodec[$index].video, 'preset')).values || defaultPresets[output.video.codec]">
-                    <label for="preset">{{'settings.preset' | translate}}</label> <select id="preset" class="form-control"
-                      data-ng-model="output.video.parameter['preset']"
-                      data-ng-init="output.video.parameter['preset'] = output.video.parameter['preset'] || preset.defaultValue"
-                      data-ng-options="value.name as value.name + (value.description !== undefined ? ' (' + value.description + ')' : '') for value in preset.values || defaultPresets[output.video.codec]"
-                    >
-                      <option value="">{{'settings.auto' | translate}}</option>
-                    </select>
-                  </div>
-                  <div class="form-group" data-ng-if="(tune = encoderParameter(selectedCodec[$index].video, 'tune')).values || defaultTunes[output.video.codec]">
-                    <label for="tune">{{'settings.tune' | translate}}</label> <select id="tune" class="form-control" data-ng-model="output.video.parameter['tune']"
-                      data-ng-init="output.video.parameter['tune'] = output.video.parameter['tune'] || tune.defaultValue"
-                      data-ng-options="value.name as value.name + (value.description !== undefined ? ' (' + value.description + ')' : '') for value in tune.values || defaultTunes[output.video.codec]"
-                    >
-                      <option value="">{{'settings.auto' | translate}}</option>
-                    </select>
-                  </div>
-                  <div class="form-group"
-                    data-ng-if="(selectedCodec[$index].video = selectedCodec[$index].video || filterEncoder(output.video.codec)).pixelFormats.length > 0"
-                  >
-                    <label for="pixelFormat">{{'settings.colorSpace' | translate}}</label> <select id="pixelFormat" class="form-control"
-                      data-ng-model="output.video.pixelFormat" data-ng-options="pf as pf for pf in selectedCodec[$index].video.pixelFormats"
-                    >
-                      <option value="">{{'settings.auto' | translate}}</option>
-                    </select>
-                  </div>
-                  <div class="form-group">
-                    <label for="scale">{{'settings.scale' | translate}}</label> <select id="scale" class="form-control" data-ng-model="output.video.scale"
-                      data-ng-options="scale.value as scale.name for scale in defaultScales"
-                    >
-                      <option value="">{{'settings.auto' | translate}}</option>
-                    </select>
-                    <div class="checkbox">
-                      <label> <input type="checkbox" value="" data-ng-model="output.video.upscale" data-ng-init="false"> {{'settings.upscaleAllowed' |
-                        translate}}
-                      </label>
-                    </div>
-                  </div>
+									<div class="form-group" data-ng-if="(preset = encoderParameter(selectedCodec[$index].video, 'preset')).values || defaultPresets[output.video.codec]">
+										<label for="preset">{{'settings.preset' | translate}}</label> <select id="preset" class="form-control"
+											data-ng-model="output.video.parameter['preset']"
+											data-ng-init="output.video.parameter['preset'] = output.video.parameter['preset'] || preset.defaultValue"
+											data-ng-options="value.name as value.name + (value.description !== undefined ? ' (' + value.description + ')' : '') for value in preset.values || defaultPresets[output.video.codec]"
+										>
+											<option value="">{{'settings.auto' | translate}}</option>
+										</select>
+									</div>
+									<div class="form-group" data-ng-if="(tune = encoderParameter(selectedCodec[$index].video, 'tune')).values || defaultTunes[output.video.codec]">
+										<label for="tune">{{'settings.tune' | translate}}</label> <select id="tune" class="form-control" data-ng-model="output.video.parameter['tune']"
+											data-ng-init="output.video.parameter['tune'] = output.video.parameter['tune'] || tune.defaultValue"
+											data-ng-options="value.name as value.name + (value.description !== undefined ? ' (' + value.description + ')' : '') for value in tune.values || defaultTunes[output.video.codec]"
+										>
+											<option value="">{{'settings.auto' | translate}}</option>
+										</select>
+									</div>
+									<div class="form-group"
+										data-ng-if="(selectedCodec[$index].video = selectedCodec[$index].video || filterEncoder(output.video.codec)).pixelFormats.length > 0"
+									>
+										<label for="pixelFormat">{{'settings.colorSpace' | translate}}</label> <select id="pixelFormat" class="form-control"
+											data-ng-model="output.video.pixelFormat" data-ng-options="pf as pf for pf in selectedCodec[$index].video.pixelFormats"
+										>
+											<option value="">{{'settings.auto' | translate}}</option>
+										</select>
+									</div>
+									<div class="form-group">
+										<label for="scale">{{'settings.scale' | translate}}</label> <select id="scale" class="form-control" data-ng-model="output.video.scale"
+											data-ng-options="scale.value as scale.name for scale in defaultScales"
+										>
+											<option value="">{{'settings.auto' | translate}}</option>
+										</select>
+										<div class="checkbox">
+											<label> <input type="checkbox" value="" data-ng-model="output.video.upscale" data-ng-init="false"> {{'settings.upscaleAllowed' |
+												translate}}
+											</label>
+										</div>
+									</div>
 
-                  <div class="row">
-                    <div class="col-sm-4">
-                      <div class="form-group">
-                        <label for="framerate">{{'settings.framerate' | translate}}</label> <select id="framerate" class="form-control"
-                          data-ng-model="output.video.framerate" data-ng-options="fr for fr in selectedCodec[$index].video.frameRates || defaultFrameRates"
-                        >
-                          <option value="">{{'settings.framerate.auto' | translate}}</option>
-                        </select>
-                      </div>
-                      <div class="radio">
-                        <label> <input type="radio" id="frTypeVFR" value="VFR" data-ng-model="output.video.framerateType"
-                          data-ng-checked="output.video.framerateType === undefined || output.video.framerateType == 'VFR'"
-                        > {{ 'settings.framerate.type.vfr' | translate}}
-                        </label>
-                      </div>
-                      <div class="radio">
-                        <label> <input type="radio" id="frTypeCFR" value="CFR" data-ng-model="output.video.framerateType"> {{'settings.framerate.type.cfr' |
-                          translate}}
-                        </label>
-                      </div>
-                    </div>
-                    <div class="col-sm-1 quality-label">
-                      <label>{{'settings.quality' | translate}}</label>
-                    </div>
-                    <div class="col-sm-4">
-                      <div class="radio" data-ng-if="(encoderParameter(selectedCodec[$index].video, 'crf'))">
-                        <label> <input type="radio" id="qTypeCRF" value="CRF" checked data-ng-model="output.video.quality.type">
-                          {{'settings.quality.type.CRF' | translate}} <input id="quality" class="form-control" type="text" data-ng-model="output.video.quality.rateFactor"
-                          data-ng-disabled="output.video.quality.type != 'CRF'" slider="qualityData(selectedCodec[$index].video, 'crf', output.video.quality.rateFactor)"
-                        />
-                        </label>
-                      </div>
-                      <div class="radio" data-ng-if="!(encoderParameter(selectedCodec[$index].video, 'crf'))">
-                        <label> <input type="radio" id="qTypeCQ" value="CQ" checked data-ng-model="output.video.quality.type"> {{'settings.quality.type.CRF'
-                          | translate}} <input id="quality" class="form-control" type="text" data-ng-model="output.video.quality.scale"
-                          data-ng-disabled="output.video.quality.type != 'CQ'" slider="qualityData(selectedCodec[$index].video, 'qscale', output.video.quality.scale)"
-                        />
-                        </label>
-                      </div>
-                      <div class="radio">
-                        <label> <input type="radio" id="qTypeABR" value="ABR" data-ng-model="output.video.quality.type"> {{'settings.quality.type.ABR' |
-                          translate}} <input type="text" class="form-control text-right" data-ng-model="output.video.quality.bitrate"
-                          data-ng-disabled="output.video.quality.type != 'ABR'"
-                        />
-                        </label>
-                      </div>
-                    </div>
+									<div class="row">
+										<div class="col-sm-4">
+											<div class="form-group">
+												<label for="framerate">{{'settings.framerate' | translate}}</label> <select id="framerate" class="form-control"
+													data-ng-model="output.video.framerate" data-ng-options="fr for fr in selectedCodec[$index].video.frameRates || defaultFrameRates"
+												>
+													<option value="">{{'settings.framerate.auto' | translate}}</option>
+												</select>
+											</div>
+											<div class="radio">
+												<label> <input type="radio" id="frTypeVFR" value="VFR" data-ng-model="output.video.framerateType"
+													data-ng-checked="output.video.framerateType === undefined || output.video.framerateType == 'VFR'"
+												> {{ 'settings.framerate.type.vfr' | translate}}
+												</label>
+											</div>
+											<div class="radio">
+												<label> <input type="radio" id="frTypeCFR" value="CFR" data-ng-model="output.video.framerateType"> {{'settings.framerate.type.cfr' |
+													translate}}
+												</label>
+											</div>
+											<div class="form-group">
+												<label for="forceKeyFrames">{{'settings.forceKeyFrames' | translate}}</label>
+												<div class="input-group">
+													<input id="forceKeyFrames" class="form-control text-right" data-ng-model="output.video.forceKeyFrames"> <span class="input-group-addon">{{'settings.seconds'
+														| translate}}</span>
+												</div>
+											</div>
+										</div>
 
-                    <div class="col-sm-3">
-                      <div class="form-group">
-                        <label for="minrate">{{'settings.minrate' | translate}}</label> <input id="minrate" class="form-control text-right"
-                          data-ng-model="output.video.quality.minrate"
-                        >
-                      </div>
-                      <div class="form-group">
-                        <label for="maxrate">{{'settings.maxrate' | translate}}</label> <input id="maxrate" class="form-control text-right"
-                          data-ng-model="output.video.quality.maxrate"
-                          data-ng-change="output.video.quality.bufsize = output.video.quality.bufsize !== undefined && output.video.quality.bufsize > output.video.quality.maxrate * 2 ? output.video.quality.bufsize : output.video.quality.maxrate * 2"
-                        >
-                      </div>
-                      <div class="form-group">
-                        <label for="bufsize">{{'settings.bufsize' | translate}}</label> <input id="bufsize" class="form-control text-right"
-                          data-ng-model="output.video.quality.bufsize"
-                        >
-                      </div>
-                    </div>
-                  </div>
+										<div class="col-sm-4">
+											<label>{{'settings.quality' | translate}}</label>
+											<div class="radio" data-ng-if="(encoderParameter(selectedCodec[$index].video, 'crf'))">
+												<label> <input type="radio" id="qTypeCRF" value="CRF" checked data-ng-model="output.video.quality.type">
+													{{'settings.quality.type.CRF' | translate}} <input id="quality" class="form-control" type="text" data-ng-model="output.video.quality.rateFactor"
+													data-ng-disabled="output.video.quality.type != 'CRF'" slider="qualityData(selectedCodec[$index].video, 'crf', output.video.quality.rateFactor)"
+												/>
+												</label>
+											</div>
+											<div class="radio" data-ng-if="!(encoderParameter(selectedCodec[$index].video, 'crf'))">
+												<label> <input type="radio" id="qTypeCQ" value="CQ" checked data-ng-model="output.video.quality.type"> {{'settings.quality.type.CRF'
+													| translate}} <input id="quality" class="form-control" type="text" data-ng-model="output.video.quality.scale"
+													data-ng-disabled="output.video.quality.type != 'CQ'" slider="qualityData(selectedCodec[$index].video, 'qscale', output.video.quality.scale)"
+												/>
+												</label>
+											</div>
+											<div class="radio">
+												<label> <input type="radio" id="qTypeABR" value="ABR" data-ng-model="output.video.quality.type"> {{'settings.quality.type.ABR' |
+													translate}}
+													<div class="input-group">
+														<input type="text" class="form-control text-right" data-ng-model="output.video.quality.bitrate"
+															data-ng-disabled="output.video.quality.type != 'ABR'"
+														/> <span class="input-group-addon">kbps</span>
+													</div>
+												</label>
+											</div>
+										</div>
 
-                  <fieldset>
-                    <legend>
-                      <a class="btn" role="button" href="#video-advanced-options-{{ $index }}" data-toggle="collapse" data-target="#video-advanced-options-{{ $index }}"
-                        aria-expanded="false" aria-controls="video-advanced-options-{{ $index }}"
-                      >{{'settings.advancedOptions' | translate}}</a>
-                    </legend>
-                    <div id="video-advanced-options-{{ $index }}" class="collapse">
-                      <div data-ng-repeat="param in selectedCodec[$index].video.parameters"
-                        data-ng-init="param.name = '0123456789'.indexOf(param.name[0]) !== -1 ? '_' + param.name : param.name"
-                      >
+										<div class="col-sm-4">
+											<div class="form-group">
+												<label for="minrate">{{'settings.minrate' | translate}}</label>
+												<div class="input-group">
+													<input id="minrate" class="form-control text-right" data-ng-model="output.video.quality.minrate"> <span class="input-group-addon">kbps</span>
+												</div>
+											</div>
+											<div class="form-group">
+												<label for="maxrate">{{'settings.maxrate' | translate}}</label>
+												<div class="input-group">
+													<input id="maxrate" class="form-control text-right" data-ng-model="output.video.quality.maxrate"
+														data-ng-change="output.video.quality.bufsize = output.video.quality.bufsize !== undefined && output.video.quality.bufsize > output.video.quality.maxrate * 2 ? output.video.quality.bufsize : output.video.quality.maxrate * 2"
+													> <span class="input-group-addon">kbps</span>
+												</div>
+											</div>
+											<div class="form-group">
+												<label for="bufsize">{{'settings.bufsize' | translate}}</label>
+												<div class="input-group">
+													<input id="bufsize" class="form-control text-right" data-ng-model="output.video.quality.bufsize"> <span class="input-group-addon">kbps</span>
+												</div>
+											</div>
+										</div>
+									</div>
 
-                        <div class="form-group"
-                          data-ng-if="('string|int|float'.indexOf(param.type) !== -1) && ('preset|tune|profile|level'.indexOf(param.name) === -1) && (param.values === undefined) && (((param.toValue - param.fromValue) < 1) || ((param.toValue - param.fromValue) > 100))"
-                        >
-                          <label for="{{ param.name }}">{{ param.name |
-                            translateWithFallBack:'settings.':param.description:'\\(((from\\s.*\\sto)|default)\\s[^\\)]+\\)' }}</label> <input id="{{ param.name }}"
-                            class="form-control" data-ng-model="output.video.parameter[param.name]"
-                            data-ng-init="output.video.parameter[param.name] = output.video.parameter[param.name] || (param.defaultValue | parseNumber:param.type)"
-                          >
-                        </div>
+									<fieldset>
+										<legend>
+											<a class="btn" role="button" href="#video-advanced-options-{{ $index }}" data-toggle="collapse" data-target="#video-advanced-options-{{ $index }}"
+												aria-expanded="false" aria-controls="video-advanced-options-{{ $index }}"
+											>{{'settings.advancedOptions' | translate}}</a>
+										</legend>
+										<div id="video-advanced-options-{{ $index }}" class="collapse">
+											<div data-ng-repeat="param in selectedCodec[$index].video.parameters"
+												data-ng-init="param.name = '0123456789'.indexOf(param.name[0]) !== -1 ? '_' + param.name : param.name"
+											>
 
-                        <div class="form-group" data-ng-if="(param.values !== undefined) && ('preset|tune|profile|level'.indexOf(param.name) === -1)">
-                          <label for="{{ param.name }}">{{ param.name |
-                            translateWithFallBack:'settings.':param.description:'\\(((from\\s.*\\sto)|default)\\s[^\\)]+\\)' }}</label> <select id="{{ param.name }}"
-                            class="form-control" data-ng-model="output.video.parameter[param.name]"
-                            data-ng-init="output.video.parameter[param.name] = output.video.parameter[param.name] || param.defaultValue"
-                            data-ng-options="value.name as (value.description || value.name) for value in param.values"
-                          >
-                          </select>
-                        </div>
+												<div class="form-group"
+													data-ng-if="('string|int|float'.indexOf(param.type) !== -1) && ('preset|tune|profile|level'.indexOf(param.name) === -1) && (param.values === undefined) && (((param.toValue - param.fromValue) < 1) || ((param.toValue - param.fromValue) > 100))"
+												>
+													<label for="{{ param.name }}">{{ param.name |
+														translateWithFallBack:'settings.':param.description:'\\(((from\\s.*\\sto)|default)\\s[^\\)]+\\)' }}</label> <input id="{{ param.name }}"
+														class="form-control" data-ng-model="output.video.parameter[param.name]"
+														data-ng-init="output.video.parameter[param.name] = output.video.parameter[param.name] || (param.defaultValue | parseNumber:param.type)"
+													>
+												</div>
 
-                        <div class="form-group"
-                          data-ng-if="('int|float'.indexOf(param.type) !== -1) && ('preset|tune|profile|level'.indexOf(param.name) === -1) && (param.values === undefined) && (((param.toValue - param.fromValue) > 1) && ((param.toValue - param.fromValue) <= 100))"
-                        >
-                          </label> <label for="{{ param.name }}">{{ param.name |
-                            translateWithFallBack:'settings.':param.description:'\\(((from\\s.*\\sto)|default)\\s[^\\)]+\\)' }}</label> <input id="{{ param.name }}"
-                            class="form-control" data-ng-model="output.video.parameter[param.name]"
-                            data-ng-init="output.video.parameter[param.name] = (output.video.parameter[param.name] || param.defaultValue) | parseNumber:param.type" slider
-                            data-slider-id="param.name + 'Slider'" data-slider-step="param.type === 'int' ? 1 : 0.25"
-                            data-slider-min="param.fromValue | parseNumber:param.type" data-slider-max="param.toValue | parseNumber:param.type"
-                            data-slider-value="output.video.parameter[param.name] = (output.video.parameter[param.name] || param.defaultValue) | parseNumber:param.type"
-                            data-slider-precision="param.type === 'float' ? 2 : 0"
-                          >
-                        </div>
+												<div class="form-group" data-ng-if="(param.values !== undefined) && ('preset|tune|profile|level'.indexOf(param.name) === -1)">
+													<label for="{{ param.name }}">{{ param.name |
+														translateWithFallBack:'settings.':param.description:'\\(((from\\s.*\\sto)|default)\\s[^\\)]+\\)' }}</label> <select id="{{ param.name }}"
+														class="form-control" data-ng-model="output.video.parameter[param.name]"
+														data-ng-init="output.video.parameter[param.name] = output.video.parameter[param.name] || param.defaultValue"
+														data-ng-options="value.name as (value.description || value.name) for value in param.values"
+													>
+													</select>
+												</div>
 
-                        <div class="form-group"
-                          data-ng-if="('int|boolean'.indexOf(param.type) !== -1) && (param.values === undefined) && ((param.fromValue === undefined && param.toValue === undefined) || (param.toValue - param.fromValue) === 1)"
-                        >
-                          <div class="checkbox">
-                            <label> <input type="checkbox" value="" data-ng-model="output.video.parameter[param.name]"
-                              data-ng-init="output.video.parameter[param.name] = output.video.parameter[param.name] || ('0|1|true|false'.indexOf(param.defaultValue) !== -1 ? param.defaultValue : undefined)"
-                              data-ng-true-value="{{ param.type === 'int' ? 1 : '\'true\'' }}" data-ng-false-value="{{ param.type === 'int' ? 0 : '\'false\'' }}"
-                            > {{ param.name | translateWithFallBack:'settings.':param.description:'\\(((from\\s.*\\sto)|default)\\s[^\\)]+\\)' }}
-                            </label>
-                          </div>
-                        </div>
+												<div class="form-group"
+													data-ng-if="('int|float'.indexOf(param.type) !== -1) && ('preset|tune|profile|level'.indexOf(param.name) === -1) && (param.values === undefined) && (((param.toValue - param.fromValue) > 1) && ((param.toValue - param.fromValue) <= 100))"
+												>
+													</label> <label for="{{ param.name }}">{{ param.name |
+														translateWithFallBack:'settings.':param.description:'\\(((from\\s.*\\sto)|default)\\s[^\\)]+\\)' }}</label> <input id="{{ param.name }}"
+														class="form-control" data-ng-model="output.video.parameter[param.name]"
+														data-ng-init="output.video.parameter[param.name] = (output.video.parameter[param.name] || param.defaultValue) | parseNumber:param.type" slider
+														data-slider-id="param.name + 'Slider'" data-slider-step="param.type === 'int' ? 1 : 0.25"
+														data-slider-min="param.fromValue | parseNumber:param.type" data-slider-max="param.toValue | parseNumber:param.type"
+														data-slider-value="output.video.parameter[param.name] = (output.video.parameter[param.name] || param.defaultValue) | parseNumber:param.type"
+														data-slider-precision="param.type === 'float' ? 2 : 0"
+													>
+												</div>
 
-                      </div>
-                    </div>
-                  </fieldset>
+												<div class="form-group"
+													data-ng-if="('int|boolean'.indexOf(param.type) !== -1) && (param.values === undefined) && ((param.fromValue === undefined && param.toValue === undefined) || (param.toValue - param.fromValue) === 1)"
+												>
+													<div class="checkbox">
+														<label> <input type="checkbox" value="" data-ng-model="output.video.parameter[param.name]"
+															data-ng-init="output.video.parameter[param.name] = output.video.parameter[param.name] || ('0|1|true|false'.indexOf(param.defaultValue) !== -1 ? param.defaultValue : undefined)"
+															data-ng-true-value="{{ param.type === 'int' ? 1 : '\'true\'' }}" data-ng-false-value="{{ param.type === 'int' ? 0 : '\'false\'' }}"
+														> {{ param.name | translateWithFallBack:'settings.':param.description:'\\(((from\\s.*\\sto)|default)\\s[^\\)]+\\)' }}
+														</label>
+													</div>
+												</div>
 
-                  <div class="row hidden">
-                    <div class="form-group col-sm-12">
-                      <label for="level">{{'settings.advancedOptions' | translate}}</label>
-                      <textarea class="form-control" rows="3" data-ng-model="output.video.advancedOptions"></textarea>
-                    </div>
-                  </div>
-                </div>
-                <div role="tabpanel" class="tab-pane fade" id="audio{{$index}}">
-                  <div class="form-group">
-                    <label for="acodec">{{'settings.codec' | translate}}</label> <select id="acodec" class="form-control" data-ng-model="output.audio.codec"
-                      data-ng-change="changeCodec($index, 'audio')"
-                    >
-                      <optgroup data-ng-if="codec.encoders && getLength(codec.encoders) > 1" data-ng-repeat="codec in filterCodecs(output.format, 'audio')"
-                        label="{{codec.description}}"
-                      >
-                        <option data-ng-repeat="encoder in codec.encoders" value="{{encoder.name}}">{{encoder.description}} {{ '(' + encoder.name + ') ' }}</option>
-                      </optgroup>
-                      <option data-ng-if="codec.encoders && getLength(codec.encoders) == 1" data-ng-repeat="codec in filterCodecs(output.format, 'audio')"
-                        value="{{codec.encoders[0].name}}"
-                      >{{codec.description}} {{ '(' + codec.name + ')' }}</option>
-                    </select>
-                  </div>
-                  <!--              <div class="form-group"> -->
-                  <!--                <label for="mixdown">{{'settings.audio.mixdown' | translate}}</label> <select id="mixdown" class="form-control" data-ng-model="output.audio.mixdown"> -->
-                  <!--                  <option value="mono">{{'settings.audio.mixdown.mono' | translate}}</option> -->
-                  <!--                  <option value="mono-l">{{'settings.audio.mixdown.mono-l' | translate}}</option> -->
-                  <!--                  <option value="mono-r">{{'settings.audio.mixdown.mono-r' | translate}}</option> -->
-                  <!--                  <option value="stereo">{{'settings.audio.mixdown.stereo' | translate}}</option> -->
-                  <!--                </select> -->
-                  <!--              </div> -->
-                  <div class="form-group"
-                    data-ng-if="(selectedCodec[$index].audio = selectedCodec[$index].audio || filterEncoder(output.audio.codec)).sampleRates.length > 0"
-                  >
-                    <label for="samplerate">{{'settings.audio.samplerate' | translate}}</label> <select id="samplerate" class="form-control"
-                      data-ng-model="output.audio.samplerate" convert-to-number data-ng-options="sr as sr for sr in selectedCodec[$index].audio.sampleRates"
-                    >
-                      <option value="">{{'settings.auto' | translate}}</option>
-                    </select>
-                  </div>
-                  <div class="form-group">
-                    <label for="bitrate">{{'settings.audio.bitrate' | translate}}</label> <select id="bitrate" class="form-control" data-ng-model="output.audio.bitrate"
-                      convert-to-number data-ng-options="br as (br + 'k' ) for br in defaultBitrates"
-                    >
-                      <option value="">{{'settings.auto' | translate}}</option>
-                    </select>
-                  </div>
+											</div>
+										</div>
+									</fieldset>
 
-                  <fieldset>
-                    <legend>
-                      <a class="btn" role="button" href="#audio-advanced-options-{{ $index }}" data-toggle="collapse" data-target="#audio-advanced-options-{{ $index }}"
-                        aria-expanded="false" aria-controls="video-advanced-options-{{ $index }}"
-                      >{{'settings.advancedOptions' | translate}}</a>
-                    </legend>
-                    <div id="audio-advanced-options-{{ $index }}" class="collapse">
-                      <div data-ng-repeat="param in selectedCodec[$index].audio.parameters"
-                        data-ng-init="param.name = '0123456789'.indexOf(param.name[0]) !== -1 ? '_' + param.name : param.name"
-                      >
+									<div class="row hidden">
+										<div class="form-group col-sm-12">
+											<label for="level">{{'settings.advancedOptions' | translate}}</label>
+											<textarea class="form-control" rows="3" data-ng-model="output.video.advancedOptions"></textarea>
+										</div>
+									</div>
+								</div>
+								<div role="tabpanel" class="tab-pane fade" id="audio{{$index}}">
+									<div class="form-group">
+										<label for="acodec">{{'settings.codec' | translate}}</label> <select id="acodec" class="form-control" data-ng-model="output.audio.codec"
+											data-ng-change="changeCodec($index, 'audio')"
+										>
+											<optgroup data-ng-if="codec.encoders && getLength(codec.encoders) > 1" data-ng-repeat="codec in filterCodecs(output.format, 'audio')"
+												label="{{codec.description}}"
+											>
+												<option data-ng-repeat="encoder in codec.encoders" value="{{encoder.name}}">{{encoder.description}} {{ '(' + encoder.name + ') ' }}</option>
+											</optgroup>
+											<option data-ng-if="codec.encoders && getLength(codec.encoders) == 1" data-ng-repeat="codec in filterCodecs(output.format, 'audio')"
+												value="{{codec.encoders[0].name}}"
+											>{{codec.description}} {{ '(' + codec.name + ')' }}</option>
+										</select>
+									</div>
+									<!--              <div class="form-group"> -->
+									<!--                <label for="mixdown">{{'settings.audio.mixdown' | translate}}</label> <select id="mixdown" class="form-control" data-ng-model="output.audio.mixdown"> -->
+									<!--                  <option value="mono">{{'settings.audio.mixdown.mono' | translate}}</option> -->
+									<!--                  <option value="mono-l">{{'settings.audio.mixdown.mono-l' | translate}}</option> -->
+									<!--                  <option value="mono-r">{{'settings.audio.mixdown.mono-r' | translate}}</option> -->
+									<!--                  <option value="stereo">{{'settings.audio.mixdown.stereo' | translate}}</option> -->
+									<!--                </select> -->
+									<!--              </div> -->
+									<div class="form-group"
+										data-ng-if="(selectedCodec[$index].audio = selectedCodec[$index].audio || filterEncoder(output.audio.codec)).sampleRates.length > 0"
+									>
+										<label for="samplerate">{{'settings.audio.samplerate' | translate}}</label> <select id="samplerate" class="form-control"
+											data-ng-model="output.audio.samplerate" convert-to-number data-ng-options="sr as sr for sr in selectedCodec[$index].audio.sampleRates"
+										>
+											<option value="">{{'settings.auto' | translate}}</option>
+										</select>
+									</div>
+									<div class="form-group">
+										<label for="bitrate">{{'settings.audio.bitrate' | translate}}</label> <select id="bitrate" class="form-control" data-ng-model="output.audio.bitrate"
+											convert-to-number data-ng-options="br as (br + 'k' ) for br in defaultBitrates"
+										>
+											<option value="">{{'settings.auto' | translate}}</option>
+										</select>
+									</div>
 
-                        <div class="form-group"
-                          data-ng-if="('string|int|float'.indexOf(param.type) !== -1) && (param.values === undefined) && (((param.toValue - param.fromValue) < 1) || ((param.toValue - param.fromValue) > 100))"
-                        >
-                          <label for="{{ param.name }}">{{ param.name |
-                            translateWithFallBack:'settings.':param.description:'\\(((from\\s.*\\sto)|default)\\s[^\\)]+\\)' }}</label> <input id="{{ param.name }}"
-                            class="form-control" data-ng-model="output.audio.parameter[param.name]"
-                            data-ng-init="output.audio.parameter[param.name] = output.audio.parameter[param.name] || (param.defaultValue | parseNumber:param.type)"
-                          >
-                        </div>
+									<fieldset>
+										<legend>
+											<a class="btn" role="button" href="#audio-advanced-options-{{ $index }}" data-toggle="collapse" data-target="#audio-advanced-options-{{ $index }}"
+												aria-expanded="false" aria-controls="video-advanced-options-{{ $index }}"
+											>{{'settings.advancedOptions' | translate}}</a>
+										</legend>
+										<div id="audio-advanced-options-{{ $index }}" class="collapse">
+											<div data-ng-repeat="param in selectedCodec[$index].audio.parameters"
+												data-ng-init="param.name = '0123456789'.indexOf(param.name[0]) !== -1 ? '_' + param.name : param.name"
+											>
 
-                        <div class="form-group" data-ng-if="(param.values !== undefined)">
-                          <label for="{{ param.name }}">{{ param.name |
-                            translateWithFallBack:'settings.':param.description:'\\(((from\\s.*\\sto)|default)\\s[^\\)]+\\)' }}</label> <select id="{{ param.name }}"
-                            class="form-control" data-ng-model="output.audio.parameter[param.name]"
-                            data-ng-init="output.audio.parameter[param.name] = output.audio.parameter[param.name] || param.defaultValue"
-                            data-ng-options="value.name as (value.description || value.name) for value in param.values"
-                          >
-                          </select>
-                        </div>
+												<div class="form-group"
+													data-ng-if="('string|int|float'.indexOf(param.type) !== -1) && (param.values === undefined) && (((param.toValue - param.fromValue) < 1) || ((param.toValue - param.fromValue) > 100))"
+												>
+													<label for="{{ param.name }}">{{ param.name |
+														translateWithFallBack:'settings.':param.description:'\\(((from\\s.*\\sto)|default)\\s[^\\)]+\\)' }}</label> <input id="{{ param.name }}"
+														class="form-control" data-ng-model="output.audio.parameter[param.name]"
+														data-ng-init="output.audio.parameter[param.name] = output.audio.parameter[param.name] || (param.defaultValue | parseNumber:param.type)"
+													>
+												</div>
 
-                        <div class="form-group"
-                          data-ng-if="('int|float'.indexOf(param.type) !== -1) && (param.values === undefined) && (((param.toValue - param.fromValue) > 1) && ((param.toValue - param.fromValue) <= 100))"
-                        >
-                          </label> <label for="{{ param.name }}">{{ param.name |
-                            translateWithFallBack:'settings.':param.description:'\\(((from\\s.*\\sto)|default)\\s[^\\)]+\\)' }}</label> <input id="{{ param.name }}"
-                            class="form-control" data-ng-model="output.audio.parameter[param.name]"
-                            data-ng-init="output.audio.parameter[param.name] = (output.audio.parameter[param.name] || param.defaultValue) | parseNumber:param.type" slider
-                            data-slider-id="param.name + 'Slider'" data-slider-step="param.type === 'int' ? 1 : 0.25"
-                            data-slider-min="param.fromValue | parseNumber:param.type" data-slider-max="param.toValue | parseNumber:param.type"
-                            data-slider-value="output.audio.parameter[param.name] = (output.audio.parameter[param.name] || param.defaultValue) | parseNumber:param.type"
-                            data-slider-precision="param.type === 'float' ? 2 : 0"
-                          >
-                        </div>
+												<div class="form-group" data-ng-if="(param.values !== undefined)">
+													<label for="{{ param.name }}">{{ param.name |
+														translateWithFallBack:'settings.':param.description:'\\(((from\\s.*\\sto)|default)\\s[^\\)]+\\)' }}</label> <select id="{{ param.name }}"
+														class="form-control" data-ng-model="output.audio.parameter[param.name]"
+														data-ng-init="output.audio.parameter[param.name] = output.audio.parameter[param.name] || param.defaultValue"
+														data-ng-options="value.name as (value.description || value.name) for value in param.values"
+													>
+													</select>
+												</div>
 
-                        <div class="form-group"
-                          data-ng-if="('int|boolean'.indexOf(param.type) !== -1) && (param.values === undefined) && ((param.fromValue === undefined && param.toValue === undefined) || (param.toValue - param.fromValue) === 1)"
-                        >
-                          <div class="checkbox">
-                            <label> <input type="checkbox" value="" data-ng-model="output.audio.parameter[param.name]"
-                              data-ng-init="output.audio.parameter[param.name] = output.audio.parameter[param.name] || ('0|1|true|false'.indexOf(param.defaultValue) !== -1 ? param.defaultValue : undefined)"
-                              data-ng-true-value="{{ param.type === 'int' ? 1 : '\'true\'' }}" data-ng-false-value="{{ param.type === 'int' ? 0 : '\'false\'' }}"
-                            > {{ param.name | translateWithFallBack:'settings.':param.description:'\\(((from\\s.*\\sto)|default)\\s[^\\)]+\\)' }}
-                            </label>
-                          </div>
-                        </div>
+												<div class="form-group"
+													data-ng-if="('int|float'.indexOf(param.type) !== -1) && (param.values === undefined) && (((param.toValue - param.fromValue) > 1) && ((param.toValue - param.fromValue) <= 100))"
+												>
+													</label> <label for="{{ param.name }}">{{ param.name |
+														translateWithFallBack:'settings.':param.description:'\\(((from\\s.*\\sto)|default)\\s[^\\)]+\\)' }}</label> <input id="{{ param.name }}"
+														class="form-control" data-ng-model="output.audio.parameter[param.name]"
+														data-ng-init="output.audio.parameter[param.name] = (output.audio.parameter[param.name] || param.defaultValue) | parseNumber:param.type" slider
+														data-slider-id="param.name + 'Slider'" data-slider-step="param.type === 'int' ? 1 : 0.25"
+														data-slider-min="param.fromValue | parseNumber:param.type" data-slider-max="param.toValue | parseNumber:param.type"
+														data-slider-value="output.audio.parameter[param.name] = (output.audio.parameter[param.name] || param.defaultValue) | parseNumber:param.type"
+														data-slider-precision="param.type === 'float' ? 2 : 0"
+													>
+												</div>
 
-                      </div>
-                    </div>
-                  </fieldset>
+												<div class="form-group"
+													data-ng-if="('int|boolean'.indexOf(param.type) !== -1) && (param.values === undefined) && ((param.fromValue === undefined && param.toValue === undefined) || (param.toValue - param.fromValue) === 1)"
+												>
+													<div class="checkbox">
+														<label> <input type="checkbox" value="" data-ng-model="output.audio.parameter[param.name]"
+															data-ng-init="output.audio.parameter[param.name] = output.audio.parameter[param.name] || ('0|1|true|false'.indexOf(param.defaultValue) !== -1 ? param.defaultValue : undefined)"
+															data-ng-true-value="{{ param.type === 'int' ? 1 : '\'true\'' }}" data-ng-false-value="{{ param.type === 'int' ? 0 : '\'false\'' }}"
+														> {{ param.name | translateWithFallBack:'settings.':param.description:'\\(((from\\s.*\\sto)|default)\\s[^\\)]+\\)' }}
+														</label>
+													</div>
+												</div>
 
-                </div>
-              </div>
+											</div>
+										</div>
+									</fieldset>
 
-            </div>
-          </div>
-          <div class="pull-right clear-fix">
-            <button type="submit" class="btn btn-default btn-primary" data-ng-click="save(settings)" data-ng-disabled="!settings.options.length == 0">{{
-              'btn.save' | translate}}</button>
-          </div>
-        </fieldset>
-      </form>
-    </div>
+								</div>
+							</div>
 
-  </div>
-  <!-- /.container -->
+						</div>
+					</div>
+					<div class="pull-right clear-fix">
+						<button type="submit" class="btn btn-default btn-primary" data-ng-click="save(settings)" data-ng-disabled="!settings.options.length == 0">{{
+							'btn.save' | translate}}</button>
+					</div>
+				</fieldset>
+			</form>
+		</div>
+
+	</div>
+	<!-- /.container -->
 
 
-  <!-- Bootstrap core JavaScript
+	<!-- Bootstrap core JavaScript
     ================================================== -->
-  <!-- Placed at the end of the document so the pages load faster -->
-  <script type="text/javascript" src="/web/assets/js/jquery.min.js"></script>
-  <script type="text/javascript" src="/web/assets/js/bootstrap.min.js"></script>
-  <script type="text/javascript" src="/web/assets/js/bootstrap-slider.min.js"></script>
-  <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-  <script type="text/javascript" src="/web/assets/js/ie10-viewport-bug-workaround.js"></script>
+	<!-- Placed at the end of the document so the pages load faster -->
+	<script type="text/javascript" src="/web/assets/js/jquery.min.js"></script>
+	<script type="text/javascript" src="/web/assets/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/web/assets/js/bootstrap-slider.min.js"></script>
+	<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+	<script type="text/javascript" src="/web/assets/js/ie10-viewport-bug-workaround.js"></script>
 
-  <script type="text/javascript" src="/web/assets/js/angular.min.js"></script>
-  <script type="text/javascript" src="/web/assets/js/angular-animate.min.js"></script>
-  <script type="text/javascript" src="/web/assets/js/angular-sanitize.min.js"></script>
-  <script type="text/javascript" src="/web/assets/js/angular-translate.min.js"></script>
-  <script type="text/javascript" src="/web/assets/js/angular-translate-loader-static-files.min.js"></script>
+	<script type="text/javascript" src="/web/assets/js/angular.min.js"></script>
+	<script type="text/javascript" src="/web/assets/js/angular-animate.min.js"></script>
+	<script type="text/javascript" src="/web/assets/js/angular-sanitize.min.js"></script>
+	<script type="text/javascript" src="/web/assets/js/angular-translate.min.js"></script>
+	<script type="text/javascript" src="/web/assets/js/angular-translate-loader-static-files.min.js"></script>
 
-  <script type="text/javascript" src="/web/assets/js/main.js"></script>
+	<script type="text/javascript" src="/web/assets/js/main.js"></script>
 
 </body>
 </html>

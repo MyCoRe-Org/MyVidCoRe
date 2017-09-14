@@ -527,6 +527,9 @@ public class FFMpegImpl {
                         : "VFR".equals(t) ? "2" : "0")));
             });
 
+            Optional.ofNullable(video.getForceKeyFrames())
+                .ifPresent(v -> cmd.append(" -force_key_frames 'expr:gte(t,n_forced*" + v + ")'"));
+
             Optional.ofNullable(video.getQuality()).ifPresent(quality -> {
                 switch (quality.getType()) {
                     case "CRF":

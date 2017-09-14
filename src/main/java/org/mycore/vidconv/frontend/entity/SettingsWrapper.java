@@ -207,6 +207,8 @@ public class SettingsWrapper {
 
         private String framerateType;
 
+        private String forceKeyFrames;
+
         private String pixelFormat;
 
         private Quality quality;
@@ -281,6 +283,20 @@ public class SettingsWrapper {
          */
         public void setFramerateType(String framerateType) {
             this.framerateType = framerateType;
+        }
+
+        /**
+         * @return the forceKeyFrames
+         */
+        public String getForceKeyFrames() {
+            return forceKeyFrames;
+        }
+
+        /**
+         * @param forceKeyFrames the forceKeyFrames to set
+         */
+        public void setForceKeyFrames(String forceKeyFrames) {
+            this.forceKeyFrames = forceKeyFrames;
         }
 
         /**

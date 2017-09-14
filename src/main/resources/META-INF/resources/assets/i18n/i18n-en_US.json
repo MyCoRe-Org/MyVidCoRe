@@ -33,7 +33,7 @@
     "settings.colorSpace": "Color Space",
     "settings.quality": "Quality",
     "settings.quality.type.constant" : "Constant",
-    "settings.quality.type.averange" : "Averange Bitrate (kbps)",
+    "settings.quality.type.averange" : "Averange Bitrate",
     "settings.audio.mixdown" : "Mixdown",
     "settings.audio.mixdown.mono": "Mono",
     "settings.audio.mixdown.mono-l": "Mono (only left)",
@@ -41,7 +41,9 @@
     "settings.audio.mixdown.stereo": "Stereo",
     "settings.audio.samplerate" : "Samplerate",
     "settings.audio.bitrate": "Bitrate",
-    "settings.minrate": "min. Bitrate (kbps)",
-    "settings.maxrate": "max. Bitrate (kbps)",
-    "settings.bufsize": "Buffer Size (kbps)"
+    "settings.minrate": "min. Bitrate",
+    "settings.maxrate": "max. Bitrate",
+    "settings.bufsize": "Buffer Size",
+    "settings.seconds" : "sec.",
+    "settings.forceKeyFrames" : "erzwinge Key Frames"
 }
