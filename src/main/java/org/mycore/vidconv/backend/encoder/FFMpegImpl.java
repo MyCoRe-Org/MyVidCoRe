@@ -42,18 +42,27 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.CacheManagerBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
+import org.mycore.vidconv.common.event.annotation.AutoExecutable;
+import org.mycore.vidconv.common.event.annotation.Startup;
 import org.mycore.vidconv.common.util.Executable;
 import org.mycore.vidconv.frontend.entity.CodecWrapper;
 import org.mycore.vidconv.frontend.entity.CodecsWrapper;
+import org.mycore.vidconv.frontend.entity.DecoderWrapper;
+import org.mycore.vidconv.frontend.entity.DecodersWrapper;
 import org.mycore.vidconv.frontend.entity.EncoderWrapper;
 import org.mycore.vidconv.frontend.entity.EncodersWrapper;
 import org.mycore.vidconv.frontend.entity.FormatWrapper;
 import org.mycore.vidconv.frontend.entity.FormatsWrapper;
+import org.mycore.vidconv.frontend.entity.GPUWrapper;
+import org.mycore.vidconv.frontend.entity.GPUWrapper.GPUType;
+import org.mycore.vidconv.frontend.entity.GPUsWrapper;
 import org.mycore.vidconv.frontend.entity.MuxerWrapper;
 import org.mycore.vidconv.frontend.entity.ParameterWrapper;
 import org.mycore.vidconv.frontend.entity.ParameterWrapper.ParameterValue;
@@ -67,13 +76,39 @@ import org.mycore.vidconv.frontend.entity.probe.ProbeWrapper;
  * @author Ren\u00E9 Adler (eagle)
  *
  */
+@AutoExecutable(name = "FFMpeg Init", priority = 1000)
 public class FFMpegImpl {
+
+    private static final Logger LOGGER = LogManager.getLogger();
+
     private static final CacheManager CACHE_MGR = CacheManagerBuilder.newCacheManagerBuilder()
         .withCache("probe",
             CacheConfigurationBuilder.newCacheConfigurationBuilder(Path.class, ProbeWrapper.class,
                 ResourcePoolsBuilder.heap(100))
                 .build())
         .build(true);
+
+    @Startup
+    protected static void init() {
+        try {
+            LOGGER.info("parse codecs...");
+            LOGGER.info("...found {}.", codecs().getCodecs().size());
+
+            LOGGER.info("parse formats...");
+            LOGGER.info("...found {}.", formats().getFormats().size());
+
+            LOGGER.info("detect GPUs...");
+            GPUsWrapper gpus = detectGPUs();
+            if (gpus != null && !gpus.getGpus().isEmpty()) {
+                gpus.getGpus()
+                    .forEach(gpu -> LOGGER.info("...found {} {} ({}).", gpu.getIndex(), gpu.getName(), gpu.getType()));
+            } else {
+                LOGGER.info("...none found.");
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+    }
 
     private static final Pattern PATTERN_ENTRY_SPLIT = Pattern.compile("\\n\\n");
 
@@ -194,6 +229,94 @@ public class FFMpegImpl {
 
                 supportedFormats = new FormatsWrapper().setFormats(formats);
                 return supportedFormats;
+            }
+        }
+
+        return null;
+    }
+
+    private static final Pattern PATTERN_DECODER = Pattern
+        .compile("^Decoder\\s([^\\s]+)\\s\\[([^\\]]+)\\]:\\n([\\S\\s]+)$");
+
+    private static Map<String, DecodersWrapper> supportedDecoders = new ConcurrentHashMap<>();
+
+    /**
+     * Returns informations for given decoder.
+     *
+     * @param name the name
+     * @return the decoders wrapper
+     * @throws InterruptedException the interrupted exception
+     * @throws NumberFormatException the number format exception
+     * @throws ExecutionException the execution exception
+     */
+    public static DecodersWrapper decoder(final String name)
+        throws InterruptedException, NumberFormatException, ExecutionException {
+        if (supportedDecoders.containsKey(name)) {
+            return supportedDecoders.get(name);
+        }
+
+        final Executable exec = new Executable("ffmpeg", "-h", "decoder=" + name);
+
+        if (exec.runAndWait() == 0) {
+            final String outputStream = exec.output();
+
+            if (outputStream != null && !outputStream.isEmpty()) {
+                final List<DecoderWrapper> decoders = PATTERN_ENTRY_SPLIT.splitAsStream(outputStream)
+                    .filter(os -> !os.isEmpty())
+                    .map(os -> {
+                        final Matcher m = PATTERN_DECODER.matcher(os);
+                        if (m.find()) {
+                            final DecoderWrapper decoder = new DecoderWrapper();
+
+                            decoder.setName(m.group(1));
+                            decoder.setDescription(m.group(2));
+
+                            final List<ParameterWrapper> parameters = new ArrayList<>();
+                            final Matcher pm = PATTERN_PARAMS.matcher(m.group(3));
+                            while (pm.find()) {
+                                final ParameterWrapper param = new ParameterWrapper();
+                                param.setName(pm.group(1));
+                                param.setType(pm.group(2));
+                                param.setDescription(pm.group(3));
+
+                                Optional.ofNullable(getPatternGroup(PATTERN_PARAM_FROM_TO, pm.group(3), 1))
+                                    .ifPresent(v -> param.setFromValue(v));
+                                Optional.ofNullable(getPatternGroup(PATTERN_PARAM_FROM_TO, pm.group(3), 2))
+                                    .ifPresent(v -> param.setToValue(v));
+                                Optional.ofNullable(getPatternGroup(PATTERN_PARAM_DEFAULT, pm.group(3), 1))
+                                    .ifPresent(v -> param.setDefaultValue(v));
+
+                                Optional.ofNullable(pm.group(4)).ifPresent(vs -> {
+                                    if (!vs.isEmpty()) {
+                                        final List<ParameterValue> values = new ArrayList<>();
+                                        final Matcher pv = PATTERN_PARAM_VALUES.matcher(vs);
+                                        while (pv.find()) {
+                                            final ParameterValue value = new ParameterValue();
+                                            value.setName(pv.group(1));
+                                            Optional.ofNullable(pv.group(2)).ifPresent(v -> {
+                                                v = v.trim();
+                                                if (!v.isEmpty())
+                                                    value.setDescription(v);
+                                            });
+                                            values.add(value);
+                                        }
+                                        if (!values.isEmpty())
+                                            param.setValues(values);
+                                    }
+                                });
+
+                                parameters.add(param);
+                            }
+                            decoder.setParameters(parameters);
+
+                            return decoder;
+                        }
+
+                        return null;
+                    }).filter(e -> e != null).collect(Collectors.toList());
+
+                supportedDecoders.put(name, new DecodersWrapper().setDecoders(decoders));
+                return supportedDecoders.get(name);
             }
         }
 
@@ -381,6 +504,42 @@ public class FFMpegImpl {
                 }
 
                 return supportedMuxers.get(name);
+            }
+        }
+
+        return null;
+    }
+
+    private static final Pattern PATTERN_NVENC_GPU = Pattern.compile("GPU\\s#(\\d+).*<([^>]+)(?:.*has\\s([^\\]]+))?");
+
+    private static GPUsWrapper detectedGPUs;
+
+    public static GPUsWrapper detectGPUs() throws InterruptedException, ExecutionException {
+        if (detectedGPUs != null) {
+            return detectedGPUs;
+        }
+
+        final Executable exec = new Executable("ffmpeg -f lavfi -i nullsrc -c:v h264_nvenc -gpu list -f null -");
+
+        if (exec.runAndWait() >= 0) {
+            final String outputStream = exec.error();
+            if (outputStream != null && !outputStream.isEmpty()) {
+                final List<GPUWrapper> gpus = new ArrayList<>();
+                final Matcher m = PATTERN_NVENC_GPU.matcher(outputStream);
+
+                while (m.find()) {
+                    GPUWrapper gpu = new GPUWrapper();
+
+                    gpu.setType(GPUType.NVENC);
+                    gpu.setIndex(Integer.parseInt(m.group(1)));
+                    gpu.setName(m.group(2).trim());
+                    gpu.setCapability(m.group(3).trim());
+
+                    gpus.add(gpu);
+                }
+
+                detectedGPUs = new GPUsWrapper().setGpus(gpus);
+                return detectedGPUs;
             }
         }
 

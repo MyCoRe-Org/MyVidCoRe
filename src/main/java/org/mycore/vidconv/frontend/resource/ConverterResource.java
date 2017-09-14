@@ -33,8 +33,10 @@ import org.mycore.vidconv.backend.encoder.FFMpegImpl;
 import org.mycore.vidconv.frontend.annotation.CacheMaxAge;
 import org.mycore.vidconv.frontend.entity.CodecWrapper.Type;
 import org.mycore.vidconv.frontend.entity.CodecsWrapper;
+import org.mycore.vidconv.frontend.entity.DecodersWrapper;
 import org.mycore.vidconv.frontend.entity.EncodersWrapper;
 import org.mycore.vidconv.frontend.entity.FormatsWrapper;
+import org.mycore.vidconv.frontend.entity.GPUsWrapper;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
@@ -100,5 +102,21 @@ public class ConverterResource {
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public EncodersWrapper getEncoder(@PathParam("name") String name) throws Exception {
         return FFMpegImpl.encoder(name);
+    }
+
+    @GET
+    @CacheMaxAge(time = 1, unit = TimeUnit.HOURS)
+    @Path("decoder/{name}")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    public DecodersWrapper getDecoder(@PathParam("name") String name) throws Exception {
+        return FFMpegImpl.decoder(name);
+    }
+
+    @GET
+    @CacheMaxAge(time = 1, unit = TimeUnit.HOURS)
+    @Path("gpus")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    public GPUsWrapper getGPUs() throws Exception {
+        return FFMpegImpl.detectGPUs();
     }
 }
