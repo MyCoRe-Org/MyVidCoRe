@@ -79,9 +79,12 @@
 						</div>
 						<div data-ng-if="!converter.running && !converter.done">
 							<div class="col-sm-12 paddidata-ng-bottom">
-								<span class="status-icon queued pull-left"> <span class="is-rotating"> <span class="circle"></span> <span class="circle"></span>
-								</span>
-								</span> {{ 'converter.queued' | translate }}
+								<div class="status-icon queued pull-left">
+									<div class="is-rotating">
+										<i class="circle"></i> <i class="circle"></i>
+									</div>
+								</div>
+								{{ 'converter.queued' | translate }}
 							</div>
 						</div>
 					</div>
@@ -115,7 +118,7 @@
 								</button>
 								<div class="btn-group" role="group">
 									<button class="btn btn-xs btn-default hidden-xs dropdown-toggle" aria-expanded="false" aria-controls="preview-{{converter.id}}"
-										href="#preview-{{converter.id}}" data-target="#preview-{{converter.id}}" data-toggle="collapse"
+										data-target="#preview-{{converter.id}}" data-toggle="collapse"
 										data-ng-disabled="!((converter.files | endsWith:'.mp4':'name') || (converter.files | endsWith:'.webm':'name'))"
 										data-ng-click="initPreview(converter.id)"
 									>
