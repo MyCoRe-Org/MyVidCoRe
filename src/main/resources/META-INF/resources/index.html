@@ -68,13 +68,13 @@
 								<div class="progress">
 									<div class="progress-bar progress-bar-striped {{converter.done ? 'progress-bar-success' : ''}}" data-ng-class="{active:converter.running}"
 										role="progressbar" aria-valuenow="{{converter.progress.percent}}" aria-valuemin="0" aria-valuemax="100"
-										style="min-width: 2em; width: {{ converter.progress.percent ? converter.progress.percent: 0 }}%"
-									>{{converter.progress.percent}}%</div>
+										style="min-width: 2em; width: {{ converter.progress.percent || 0 }}%"
+									>{{ converter.progress.percent || 0 }}%</div>
 								</div>
 							</div>
 							<div class="col-sm-12 col-md-2 text-right">
 								<i class="fa fa-hourglass-start" aria-hidden="true"></i> {{converter.progress.elapsed}} / <i class="fa fa-hourglass-end" aria-hidden="true"></i>
-								{{converter.progress.estimate}}
+								{{converter.progress.estimate || '--:--:--'}}
 							</div>
 						</div>
 						<div data-ng-if="!converter.running && !converter.done">
