@@ -27,10 +27,10 @@ import javax.xml.bind.annotation.XmlType;
  * @author Ren\u00E9 Adler (eagle)
  *
  */
-@XmlRootElement(name = "gpu")
-public class GPUWrapper {
+@XmlRootElement(name = "hwaccel")
+public class HWAccelWrapper {
 
-    private GPUType type;
+    private HWAccelType type;
 
     private int index;
 
@@ -41,14 +41,14 @@ public class GPUWrapper {
     /**
      * @return the type
      */
-    public GPUType getType() {
+    public HWAccelType getType() {
         return type;
     }
 
     /**
      * @param type the type to set
      */
-    public void setType(GPUType type) {
+    public void setType(HWAccelType type) {
         this.type = type;
     }
 
@@ -94,9 +94,9 @@ public class GPUWrapper {
         this.capability = capability;
     }
 
-    @XmlType(name = "GPUType")
+    @XmlType(name = "HWAccelType")
     @XmlEnum
-    public static enum GPUType {
+    public static enum HWAccelType {
 
         NVENC, UNKNOWN;
     }

@@ -60,9 +60,9 @@ import org.mycore.vidconv.frontend.entity.EncoderWrapper;
 import org.mycore.vidconv.frontend.entity.EncodersWrapper;
 import org.mycore.vidconv.frontend.entity.FormatWrapper;
 import org.mycore.vidconv.frontend.entity.FormatsWrapper;
-import org.mycore.vidconv.frontend.entity.GPUWrapper;
-import org.mycore.vidconv.frontend.entity.GPUWrapper.GPUType;
-import org.mycore.vidconv.frontend.entity.GPUsWrapper;
+import org.mycore.vidconv.frontend.entity.HWAccelWrapper;
+import org.mycore.vidconv.frontend.entity.HWAccelWrapper.HWAccelType;
+import org.mycore.vidconv.frontend.entity.HWAccelsWrapper;
 import org.mycore.vidconv.frontend.entity.MuxerWrapper;
 import org.mycore.vidconv.frontend.entity.ParameterWrapper;
 import org.mycore.vidconv.frontend.entity.ParameterWrapper.ParameterValue;
@@ -97,10 +97,10 @@ public class FFMpegImpl {
             LOGGER.info("parse formats...");
             LOGGER.info("...found {}.", formats().getFormats().size());
 
-            LOGGER.info("detect GPUs...");
-            GPUsWrapper gpus = detectGPUs();
-            if (gpus != null && !gpus.getGpus().isEmpty()) {
-                gpus.getGpus()
+            LOGGER.info("detect hw accelerators...");
+            HWAccelsWrapper gpus = detectHWAccels();
+            if (gpus != null && !gpus.getHWAccels().isEmpty()) {
+                gpus.getHWAccels()
                     .forEach(gpu -> LOGGER.info("...found {} {} ({}).", gpu.getIndex(), gpu.getName(), gpu.getType()));
             } else {
                 LOGGER.info("...none found.");
@@ -512,11 +512,11 @@ public class FFMpegImpl {
 
     private static final Pattern PATTERN_NVENC_GPU = Pattern.compile("GPU\\s#(\\d+).*<([^>]+)(?:.*has\\s([^\\]]+))?");
 
-    private static GPUsWrapper detectedGPUs;
+    private static HWAccelsWrapper detectedHWAccels;
 
-    public static GPUsWrapper detectGPUs() throws InterruptedException, ExecutionException {
-        if (detectedGPUs != null) {
-            return detectedGPUs;
+    public static HWAccelsWrapper detectHWAccels() throws InterruptedException, ExecutionException {
+        if (detectedHWAccels != null) {
+            return detectedHWAccels;
         }
 
         final Executable exec = new Executable("ffmpeg -f lavfi -i nullsrc -c:v h264_nvenc -gpu list -f null -");
@@ -524,13 +524,13 @@ public class FFMpegImpl {
         if (exec.runAndWait() >= 0) {
             final String outputStream = exec.error();
             if (outputStream != null && !outputStream.isEmpty()) {
-                final List<GPUWrapper> gpus = new ArrayList<>();
+                final List<HWAccelWrapper> gpus = new ArrayList<>();
                 final Matcher m = PATTERN_NVENC_GPU.matcher(outputStream);
 
                 while (m.find()) {
-                    GPUWrapper gpu = new GPUWrapper();
+                    HWAccelWrapper gpu = new HWAccelWrapper();
 
-                    gpu.setType(GPUType.NVENC);
+                    gpu.setType(HWAccelType.NVENC);
                     gpu.setIndex(Integer.parseInt(m.group(1)));
                     gpu.setName(m.group(2).trim());
                     gpu.setCapability(m.group(3).trim());
@@ -538,8 +538,8 @@ public class FFMpegImpl {
                     gpus.add(gpu);
                 }
 
-                detectedGPUs = new GPUsWrapper().setGpus(gpus);
-                return detectedGPUs;
+                detectedHWAccels = new HWAccelsWrapper().setHWAccels(gpus);
+                return detectedHWAccels;
             }
         }
 

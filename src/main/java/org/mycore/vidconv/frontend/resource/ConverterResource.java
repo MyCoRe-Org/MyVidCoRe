@@ -36,7 +36,7 @@ import org.mycore.vidconv.frontend.entity.CodecsWrapper;
 import org.mycore.vidconv.frontend.entity.DecodersWrapper;
 import org.mycore.vidconv.frontend.entity.EncodersWrapper;
 import org.mycore.vidconv.frontend.entity.FormatsWrapper;
-import org.mycore.vidconv.frontend.entity.GPUsWrapper;
+import org.mycore.vidconv.frontend.entity.HWAccelsWrapper;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
@@ -114,9 +114,9 @@ public class ConverterResource {
 
     @GET
     @CacheMaxAge(time = 1, unit = TimeUnit.HOURS)
-    @Path("gpus")
+    @Path("hwaccels")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public GPUsWrapper getGPUs() throws Exception {
-        return FFMpegImpl.detectGPUs();
+    public HWAccelsWrapper getHWAccels() throws Exception {
+        return FFMpegImpl.detectHWAccels();
     }
 }

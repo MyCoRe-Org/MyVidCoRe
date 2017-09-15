@@ -22,29 +22,31 @@ package org.mycore.vidconv.frontend.entity;
 import java.util.Collections;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
  *
  */
-@XmlRootElement(name = "gpus")
-public class GPUsWrapper {
+@XmlRootElement(name = "hwaccels")
+public class HWAccelsWrapper {
 
-    private List<GPUWrapper> gpus;
+    private List<HWAccelWrapper> hwaccels;
 
     /**
-     * @return the gpus
+     * @return the hwaccels
      */
-    public List<GPUWrapper> getGpus() {
-        return gpus;
+    @XmlElement(name = "hwaccels")
+    public List<HWAccelWrapper> getHWAccels() {
+        return hwaccels;
     }
 
     /**
-     * @param gpus the gpus to set
+     * @param hwaccels the hwaccels to set
      */
-    public GPUsWrapper setGpus(List<GPUWrapper> gpus) {
-        this.gpus = Collections.synchronizedList(gpus);
+    public HWAccelsWrapper setHWAccels(List<HWAccelWrapper> hwaccels) {
+        this.hwaccels = Collections.synchronizedList(hwaccels);
         return this;
     }
 
