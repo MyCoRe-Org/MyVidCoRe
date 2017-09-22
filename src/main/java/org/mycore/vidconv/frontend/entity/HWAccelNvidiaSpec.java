@@ -222,11 +222,18 @@ public class HWAccelNvidiaSpec extends HWAccelDeviceSpec {
      */
     @Override
     public synchronized void registerProcessId(String processId) {
-        if (canUseEncoder()) {
+        registerEncoderProcessId(processId);
+        registerDecoderProcessId(processId);
+    }
+
+    public synchronized void registerEncoderProcessId(String processId) {
+        if (canUseEncoder() && !encProcessIds.contains(processId)) {
             encProcessIds.add(processId);
         }
+    }
 
-        if (canUseDecoder()) {
+    public synchronized void registerDecoderProcessId(String processId) {
+        if (canUseDecoder() && !decProcessIds.contains(processId)) {
             decProcessIds.add(processId);
         }
     }

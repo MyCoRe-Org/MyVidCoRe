@@ -46,8 +46,6 @@ public abstract class HWAccelDeviceSpec implements Comparable<HWAccelDeviceSpec>
      * @see java.lang.Object#clone()
      */
     @Override
-    protected HWAccelDeviceSpec clone() {
-        throw new UnsupportedOperationException();
-    }
+    protected abstract HWAccelDeviceSpec clone();
 
 }

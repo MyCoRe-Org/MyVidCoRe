@@ -796,52 +796,60 @@ public class FFMpegImpl {
      * @param outputs the outputs
      * @param hwAccel the optional hw accelerator
      * @return the command
+     * @throws ExecutionException 
+     * @throws JAXBException 
+     * @throws InterruptedException 
      */
     public static String command(final String processId, final Path input, final List<Output> outputs,
-        final Optional<HWAccelWrapper<? extends HWAccelDeviceSpec>> hwAccel) {
+        final Optional<HWAccelWrapper<? extends HWAccelDeviceSpec>> hwAccel)
+        throws InterruptedException, JAXBException, ExecutionException {
         final StringBuffer cmd = new StringBuffer();
+
+        ProbeWrapper inInfo = probe(input);
 
         cmd.append("ffmpeg");
 
-        buildInputStreamCommand(cmd, processId, input, hwAccel);
+        buildInputStreamCommand(cmd, inInfo, processId, hwAccel);
 
         cmd.append(" -i \"" + input.toFile().getAbsolutePath() + "\" -stats -y");
 
         outputs.forEach(output -> {
             buildVideoStreamCommand(cmd, processId, output, hwAccel);
-            buildAudioStreamCommand(cmd, output);
+            buildAudioStreamCommand(cmd, inInfo, output);
+
+            cmd.append(" \"" + output.getOutputPath().toFile().getAbsolutePath() + "\"");
         });
 
         return cmd.toString();
     }
 
-    private static void buildInputStreamCommand(StringBuffer cmd, final String processId, final Path input,
+    private static void buildInputStreamCommand(StringBuffer cmd, final ProbeWrapper inInfo, final String processId,
         final Optional<HWAccelWrapper<? extends HWAccelDeviceSpec>> hwAccel) {
         hwAccel.ifPresent(hw -> {
-            try {
-                ProbeWrapper inInfo = probe(input);
-                CodecWrapper videoCodec = inInfo.getStreams().stream()
-                    .filter(s -> s.getCodecType().equalsIgnoreCase("video"))
-                    .findFirst()
-                    .map(s -> {
-                        try {
-                            return codecs().getByName(s.getCodecName()).stream().findFirst().orElse(null);
-                        } catch (InterruptedException | ExecutionException e) {
-                            return null;
-                        }
-                    }).orElse(null);
-
-                if (HWAccelType.NVIDIA == hw.getType()) {
-                    HWAccelNvidiaSpec devSpec = (HWAccelNvidiaSpec) hw.getDeviceSpec();
-                    if (videoCodec != null && devSpec.canUseDecoder(processId)
-                        && devSpec.getDecoders().entrySet().stream()
-                            .anyMatch(e -> e.getKey().equalsIgnoreCase(videoCodec.getName()) && e.getValue())) {
-                        videoCodec.getDecoderLib().stream().filter(s -> s.contains("cuvid")).findFirst().ifPresent(
-                            dec -> cmd.append(" -hwaccel_device " + hw.getIndex() + " -hwaccel cuvid -c:v " + dec));
+            CodecWrapper videoCodec = inInfo.getStreams().stream()
+                .filter(s -> s.getCodecType().equalsIgnoreCase("video"))
+                .findFirst()
+                .map(s -> {
+                    try {
+                        return codecs().getByName(s.getCodecName()).stream().findFirst().orElse(null);
+                    } catch (InterruptedException | ExecutionException e) {
+                        return null;
                     }
+                }).orElse(null);
+
+            if (HWAccelType.NVIDIA == hw.getType()) {
+                HWAccelNvidiaSpec devSpec = (HWAccelNvidiaSpec) hw.getDeviceSpec();
+                if (videoCodec != null && devSpec.canUseDecoder()
+                    && devSpec.getDecoders().entrySet().stream()
+                        .anyMatch(e -> e.getKey().equalsIgnoreCase(videoCodec.getName()) && e.getValue())) {
+                    videoCodec.getDecoderLib().stream().filter(s -> s.contains("cuvid")).findFirst().ifPresent(
+                        dec -> {
+                            devSpec.registerDecoderProcessId(processId);
+                            cmd.append(" -hwaccel_device " + hw.getIndex() + " -hwaccel cuvid -c:v " + dec);
+                        });
                 }
-            } catch (InterruptedException | JAXBException | ExecutionException e) {
-                LOGGER.warn("Couldn't get media informations for file {}", input);
+            } else {
+                hw.getDeviceSpec().registerProcessId(processId);
             }
         });
     }
@@ -901,7 +909,8 @@ public class FFMpegImpl {
         HWAccelWrapper<? extends HWAccelDeviceSpec> hw = hwAccel.get();
         if (HWAccelType.NVIDIA == hw.getType()) {
             HWAccelNvidiaSpec devSpec = (HWAccelNvidiaSpec) hw.getDeviceSpec();
-            if (devSpec.canUseEncoder(processId)) {
+            if (devSpec.canUseEncoder() || devSpec.canUseEncoder(processId)) {
+                devSpec.registerEncoderProcessId(processId);
                 cmd.append(" -gpu " + hw.getIndex());
 
                 if (devSpec.canUseDecoder(processId)) {
@@ -919,18 +928,18 @@ public class FFMpegImpl {
         }
     }
 
-    private static void buildAudioStreamCommand(StringBuffer cmd, final Output output) {
+    private static void buildAudioStreamCommand(StringBuffer cmd, final ProbeWrapper inInfo, final Output output) {
         Audio audio = output.getAudio();
 
-        cmd.append(" -codec:a " + audio.getCodec());
+        if (inInfo.getStreams().stream().anyMatch(s -> s.getCodecType().equalsIgnoreCase("audio"))) {
+            cmd.append(" -codec:a " + audio.getCodec());
 
-        cmd.append(buildParameters(audio.getParameters(), audio.getCodec()));
+            cmd.append(buildParameters(audio.getParameters(), audio.getCodec()));
 
-        Optional.ofNullable(audio.getBitrate()).ifPresent(v -> cmd.append(" -b:a " + v + "k"));
-        Optional.ofNullable(audio.getSamplerate()).ifPresent(v -> cmd.append(" -ar " + v));
-        cmd.append(" -ac 2");
-
-        cmd.append(" \"" + output.getOutputPath().toFile().getAbsolutePath() + "\"");
+            Optional.ofNullable(audio.getBitrate()).ifPresent(v -> cmd.append(" -b:a " + v + "k"));
+            Optional.ofNullable(audio.getSamplerate()).ifPresent(v -> cmd.append(" -ar " + v));
+            cmd.append(" -ac 2");
+        }
     }
 
     /**

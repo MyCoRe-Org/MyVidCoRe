@@ -104,9 +104,13 @@ public class ConverterService extends Widget implements Listener {
         this.outputDir = outputDir;
         EVENT_MANAGER.addListener(this);
 
-        int hwAccelConverterThreads = hwAccels.stream().mapToInt(hw -> hw.getDeviceSpec().numConcurrentProcesses())
+        int hwAccelConverterThreads = hwAccels.stream()
+            .mapToInt(hw -> hw.getDeviceSpec().numConcurrentProcesses())
             .sum();
-        converterThreadPool = Executors.newFixedThreadPool(Integer.min(hwAccelConverterThreads, converterThreads));
+
+        converterThreadPool = Executors.newFixedThreadPool(
+            hwAccelConverterThreads > 0 ? Integer.min(hwAccelConverterThreads, converterThreads)
+                : converterThreads);
     }
 
     /**
@@ -330,8 +334,6 @@ public class ConverterService extends Widget implements Listener {
                 hwAccel = hwAccels.stream()
                     .filter(hw -> FFMpegImpl.canHWAccelerate(outputs, hw)).sorted()
                     .findFirst();
-
-                hwAccel.ifPresent(hw -> hw.getDeviceSpec().registerProcessId(id));
 
                 command = FFMpegImpl.command(id, inputPath, outputs, hwAccel);
                 final Executable exec = new Executable(command);
