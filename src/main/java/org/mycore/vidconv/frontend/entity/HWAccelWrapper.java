@@ -126,8 +126,8 @@ public class HWAccelWrapper<T extends HWAccelDeviceSpec>
         if (index != other.index) {
             return false;
         }
-        
-        return type != other.type;
+
+        return type == other.type;
     }
 
     /* (non-Javadoc)
