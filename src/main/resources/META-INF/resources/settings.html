@@ -55,6 +55,18 @@
 			<span class="loadidata-ng-indicator" data-ng-show="isLoading"><i></i> <i></i> <i></i></span>
 
 			<form novalidate data-ng-if="!isLoading && getLength(formats) > 0">
+				<fieldset data-ng-if="hwaccels.length !== 0" data-ng-init="initHWAccelsSettings()">
+					<legend>{{'settings.hwaccel' | translate}}</legend>
+					<div class="form-group">
+						<label>{{'settings.hwBalancing' | translate}}</label>
+						<div class="checkbox" data-ng-repeat="hw in hwaccels">
+							<label> <input type="checkbox" data-ng-model="settings.hwaccels[$index]" data-ng-checked="checkedHWAccel($index, hw)"
+								data-ng-true-value="{{ hw }}" data-ng-false-value="{{ undefined }}"
+							>#{{ hw.index }} - {{ hw.name }}
+							</label>
+						</div>
+					</div>
+				</fieldset>
 				<fieldset>
 					<legend>{{'settings.converter.title' | translate}}</legend>
 					<ul class="nav nav-tabs" role="tablist">
@@ -78,6 +90,7 @@
 									data-ng-model="output.filenameAppendix" data-ng-init="'-' + $index"
 								>
 							</div>
+
 							<ul class="nav nav-tabs" role="tablist" data-ng-hide="!output.format">
 								<li role="presentation" class="active"><a href="#video{{$index}}" aria-controls="video{{$index}}" data-toggle="tab">Video</a></li>
 								<li role="presentation"><a href="#audio{{$index}}" aria-controls="audio{{$index}}" data-toggle="tab">Audio</a></li>
@@ -275,7 +288,7 @@
 												<div class="form-group"
 													data-ng-if="('int|float'.indexOf(param.type) !== -1) && ('preset|tune|profile|level'.indexOf(param.name) === -1) && (param.values === undefined) && (((param.toValue - param.fromValue) > 1) && ((param.toValue - param.fromValue) <= 100))"
 												>
-													</label> <label for="{{ param.name }}">{{ param.name |
+													<label for="{{ param.name }}">{{ param.name |
 														translateWithFallBack:'settings.':param.description:'\\(((from\\s.*\\sto)|default)\\s[^\\)]+\\)' }}</label> <input id="{{ param.name }}"
 														class="form-control" data-ng-model="output.video.parameter[param.name]"
 														data-ng-init="output.video.parameter[param.name] = (output.video.parameter[param.name] || param.defaultValue) | parseNumber:param.type" slider

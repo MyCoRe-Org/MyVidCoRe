@@ -28,7 +28,8 @@ import javax.xml.bind.annotation.XmlType;
  *
  */
 @XmlRootElement(name = "hwaccel")
-public class HWAccelWrapper {
+public class HWAccelWrapper<T extends HWAccelDeviceSpec>
+    implements Comparable<HWAccelWrapper<? extends HWAccelDeviceSpec>> {
 
     private HWAccelType type;
 
@@ -36,7 +37,7 @@ public class HWAccelWrapper {
 
     private String name;
 
-    private String capability;
+    private T deviceSpec;
 
     /**
      * @return the type
@@ -81,24 +82,103 @@ public class HWAccelWrapper {
     }
 
     /**
-     * @return the capability
+     * @return the deviceSpec
      */
-    public String getCapability() {
-        return capability;
+    public T getDeviceSpec() {
+        return deviceSpec;
     }
 
     /**
-     * @param capability the capability to set
+     * @param deviceSpech the additionalInfo to set
      */
-    public void setCapability(String capability) {
-        this.capability = capability;
+    @SuppressWarnings("unchecked")
+    public void setDeviceSpec(T deviceSpech) {
+        this.deviceSpec = (T) deviceSpech.clone();
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + index;
+        result = prime * result + ((type == null) ? 0 : type.hashCode());
+        return result;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof HWAccelWrapper)) {
+            return false;
+        }
+        HWAccelWrapper<? extends HWAccelDeviceSpec> other = (HWAccelWrapper<?>) obj;
+        if (index != other.index) {
+            return false;
+        }
+        
+        return type != other.type;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("HWAccelWrapper [");
+        if (type != null) {
+            builder.append("type=");
+            builder.append(type);
+            builder.append(", ");
+        }
+        builder.append("index=");
+        builder.append(index);
+        builder.append(", ");
+        if (name != null) {
+            builder.append("name=");
+            builder.append(name);
+            builder.append(", ");
+        }
+        if (deviceSpec != null) {
+            builder.append("deviceSpec=");
+            builder.append(deviceSpec);
+        }
+        builder.append("]");
+        return builder.toString();
     }
 
     @XmlType(name = "HWAccelType")
     @XmlEnum
     public static enum HWAccelType {
 
-        NVENC, UNKNOWN;
+        NVIDIA, UNKNOWN;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
+    @Override
+    public int compareTo(HWAccelWrapper<? extends HWAccelDeviceSpec> o) {
+        if (o == null || type != o.type) {
+            return -1;
+        }
+
+        if (index != o.index) {
+            return deviceSpec.compareTo(o.deviceSpec);
+        }
+
+        return 0;
     }
 
 }

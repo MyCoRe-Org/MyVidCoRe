@@ -29,9 +29,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.MessageFormat;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -61,6 +61,8 @@ import org.mycore.vidconv.common.util.Executable;
 import org.mycore.vidconv.common.util.StreamConsumer;
 import org.mycore.vidconv.frontend.entity.ConverterWrapper;
 import org.mycore.vidconv.frontend.entity.ConvertersWrapper;
+import org.mycore.vidconv.frontend.entity.HWAccelDeviceSpec;
+import org.mycore.vidconv.frontend.entity.HWAccelWrapper;
 import org.mycore.vidconv.frontend.entity.SettingsWrapper;
 import org.mycore.vidconv.frontend.entity.SettingsWrapper.Output;
 import org.mycore.vidconv.frontend.widget.Widget;
@@ -81,18 +83,30 @@ public class ConverterService extends Widget implements Listener {
 
     private static final Settings SETTINGS = Settings.instance();
 
+    private static final List<HWAccelWrapper<? extends HWAccelDeviceSpec>> hwAccels = Collections
+        .synchronizedList(new ArrayList<>());
+
     private final Map<String, ConverterJob> converters = new ConcurrentHashMap<>();
 
     private final ExecutorService converterThreadPool;
 
     private String outputDir;
 
+    static {
+        Optional.ofNullable(FFMpegImpl.detectHWAccels())
+            .ifPresent(dhw -> dhw.getHWAccels().stream().filter(hw -> SETTINGS.getSettings().getHwaccels().contains(hw))
+                .forEach(hw -> hwAccels.add(hw)));
+    }
+
     public ConverterService(final String outputDir, int converterThreads) {
         super(WIDGET_NAME);
 
         this.outputDir = outputDir;
         EVENT_MANAGER.addListener(this);
-        converterThreadPool = Executors.newFixedThreadPool(converterThreads);
+
+        int hwAccelConverterThreads = hwAccels.stream().mapToInt(hw -> hw.getDeviceSpec().numConcurrentProcesses())
+            .sum();
+        converterThreadPool = Executors.newFixedThreadPool(Integer.min(hwAccelConverterThreads, converterThreads));
     }
 
     /**
@@ -269,6 +283,8 @@ public class ConverterService extends Widget implements Listener {
 
         private String command;
 
+        private Optional<HWAccelWrapper<? extends HWAccelDeviceSpec>> hwAccel;
+
         private boolean running;
 
         private boolean done;
@@ -295,8 +311,6 @@ public class ConverterService extends Widget implements Listener {
             this.done = false;
             this.running = false;
 
-            command = FFMpegImpl.command(inputPath, outputs);
-
             if (!Files.exists(outputPath))
                 Files.createDirectories(outputPath);
         }
@@ -313,6 +327,13 @@ public class ConverterService extends Widget implements Listener {
                 running = true;
                 startTime = Instant.now();
 
+                hwAccel = hwAccels.stream()
+                    .filter(hw -> FFMpegImpl.canHWAccelerate(outputs, hw)).sorted()
+                    .findFirst();
+
+                hwAccel.ifPresent(hw -> hw.getDeviceSpec().registerProcessId(id));
+
+                command = FFMpegImpl.command(id, inputPath, outputs, hwAccel);
                 final Executable exec = new Executable(command);
 
                 final Process p = exec.run();
@@ -326,6 +347,8 @@ public class ConverterService extends Widget implements Listener {
                 running = false;
                 done = true;
                 endTime = Instant.now();
+
+                hwAccel.ifPresent(hw -> hw.getDeviceSpec().unregisterProcessId(id));
 
                 save();
 
@@ -346,8 +369,7 @@ public class ConverterService extends Widget implements Listener {
         }
 
         public String command() {
-            return MessageFormat.format(command,
-                inputPath.toFile().getAbsolutePath(), outputPath.toFile().getAbsolutePath());
+            return command;
         }
 
         public List<Output> outputs() {

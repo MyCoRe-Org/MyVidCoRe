@@ -48,12 +48,14 @@ public class FrontendFeature implements Feature {
     private static final List<Class<?>> CACHED_ENTITIES = Collections.synchronizedList(new ArrayList<>());
 
     public static List<Class<?>> populateEntities(List<String> pkgs) throws IOException {
-        if (CACHED_ENTITIES.isEmpty()) {
-            CACHED_ENTITIES.addAll(
-                pkgs.stream().map(pkg -> new Reflections(pkg).getTypesAnnotatedWith(XmlRootElement.class))
-                    .flatMap(ts -> ts.stream()).collect(Collectors.toList()));
+        synchronized (CACHED_ENTITIES) {
+            if (CACHED_ENTITIES.isEmpty()) {
+                CACHED_ENTITIES.addAll(
+                    pkgs.stream().map(pkg -> new Reflections(pkg).getTypesAnnotatedWith(XmlRootElement.class))
+                        .flatMap(ts -> ts.stream()).collect(Collectors.toList()));
+            }
+            return CACHED_ENTITIES;
         }
-        return CACHED_ENTITIES;
     }
 
     /*

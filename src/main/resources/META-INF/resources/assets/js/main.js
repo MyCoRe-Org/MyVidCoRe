@@ -627,6 +627,7 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 
 	$scope.formats = {};
 	$scope.selectedCodec = {};
+	$scope.hwaccels = [];
 
 	$scope.supportedFormats = function() {
 		$scope.isLoading = true;
@@ -638,6 +639,37 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 			$scope.isLoading = false;
 		}, function(error) {
 			$log.error("failure loading formats", error);
+		});
+	};
+	
+	$scope.initHWAccelsSettings = function() {
+		var hwaccels = [];
+		for (var i in $scope.hwaccels) {
+			var hwaccel = $scope.hwaccels[i];
+			for (var j in $scope.settings.hwaccels) {
+				var shw = $scope.settings.hwaccels[j];
+				if (shw !== undefined && shw !== null && shw.type === hwaccel.type && shw.index === hwaccel.index) {
+					break;
+				}	
+				hwaccel = null;
+			}
+			hwaccels[i] = hwaccel;
+		}
+		$scope.settings.hwaccels = hwaccels;
+	};
+	
+	$scope.checkedHWAccel = function(i, hwaccel) {
+		var shw = $scope.settings.hwaccels[i];
+		return shw !== undefined && shw !== null && shw.type === hwaccel.type && shw.index === hwaccel.index;
+	};
+	
+	$scope.detectedHWAccels = function() {
+		$scope.hwaccels = [];
+
+		$http.get("/converter/hwaccels").then(function(result) {
+			$scope.hwaccels = result.data.hwaccels || [];
+		}, function(error) {
+			$log.error("failure loading hwaccels", error);
 		});
 	};
 
@@ -792,5 +824,6 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 
 	// init
 	$scope.load();
+	$scope.detectedHWAccels();
 	$scope.supportedFormats();
 });

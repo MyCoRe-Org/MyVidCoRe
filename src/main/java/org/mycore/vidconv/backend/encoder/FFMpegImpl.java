@@ -28,6 +28,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -49,38 +50,46 @@ import org.ehcache.CacheManager;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.CacheManagerBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
+import org.mycore.vidconv.common.config.ConfigurationDir;
 import org.mycore.vidconv.common.event.annotation.AutoExecutable;
 import org.mycore.vidconv.common.event.annotation.Startup;
 import org.mycore.vidconv.common.util.Executable;
+import org.mycore.vidconv.common.util.JsonUtils;
 import org.mycore.vidconv.frontend.entity.CodecWrapper;
 import org.mycore.vidconv.frontend.entity.CodecsWrapper;
 import org.mycore.vidconv.frontend.entity.DecoderWrapper;
 import org.mycore.vidconv.frontend.entity.DecodersWrapper;
 import org.mycore.vidconv.frontend.entity.EncoderWrapper;
 import org.mycore.vidconv.frontend.entity.EncodersWrapper;
+import org.mycore.vidconv.frontend.entity.FilterWrapper;
+import org.mycore.vidconv.frontend.entity.FiltersWrapper;
 import org.mycore.vidconv.frontend.entity.FormatWrapper;
 import org.mycore.vidconv.frontend.entity.FormatsWrapper;
+import org.mycore.vidconv.frontend.entity.HWAccelDeviceSpec;
+import org.mycore.vidconv.frontend.entity.HWAccelNvidiaSpec;
 import org.mycore.vidconv.frontend.entity.HWAccelWrapper;
 import org.mycore.vidconv.frontend.entity.HWAccelWrapper.HWAccelType;
 import org.mycore.vidconv.frontend.entity.HWAccelsWrapper;
 import org.mycore.vidconv.frontend.entity.MuxerWrapper;
 import org.mycore.vidconv.frontend.entity.ParameterWrapper;
 import org.mycore.vidconv.frontend.entity.ParameterWrapper.ParameterValue;
-import org.mycore.vidconv.frontend.entity.SettingsWrapper;
 import org.mycore.vidconv.frontend.entity.SettingsWrapper.Audio;
 import org.mycore.vidconv.frontend.entity.SettingsWrapper.Output;
 import org.mycore.vidconv.frontend.entity.SettingsWrapper.Video;
 import org.mycore.vidconv.frontend.entity.probe.ProbeWrapper;
 
 /**
- * @author Ren\u00E9 Adler (eagle)
+ * The Class FFMpegImpl.
  *
+ * @author Ren\u00E9 Adler (eagle)
  */
 @AutoExecutable(name = "FFMpeg Init", priority = 1000)
 public class FFMpegImpl {
 
+    /** The Constant LOGGER. */
     private static final Logger LOGGER = LogManager.getLogger();
 
+    /** The Constant CACHE_MGR. */
     private static final CacheManager CACHE_MGR = CacheManagerBuilder.newCacheManagerBuilder()
         .withCache("probe",
             CacheConfigurationBuilder.newCacheConfigurationBuilder(Path.class, ProbeWrapper.class,
@@ -88,20 +97,26 @@ public class FFMpegImpl {
                 .build())
         .build(true);
 
+    /**
+     * Inits the.
+     */
     @Startup
     protected static void init() {
         try {
             LOGGER.info("parse codecs...");
             LOGGER.info("...found {}.", codecs().getCodecs().size());
 
+            LOGGER.info("parse filters...");
+            LOGGER.info("...found {}.", filters().getFilters().size());
+
             LOGGER.info("parse formats...");
             LOGGER.info("...found {}.", formats().getFormats().size());
 
             LOGGER.info("detect hw accelerators...");
-            HWAccelsWrapper gpus = detectHWAccels();
-            if (gpus != null && !gpus.getHWAccels().isEmpty()) {
-                gpus.getHWAccels()
-                    .forEach(gpu -> LOGGER.info("...found {} {} ({}).", gpu.getIndex(), gpu.getName(), gpu.getType()));
+            HWAccelsWrapper hwaccels = detectHWAccels();
+            if (hwaccels != null && !hwaccels.getHWAccels().isEmpty()) {
+                hwaccels.getHWAccels()
+                    .forEach(hw -> LOGGER.info("...found {} {} ({}).", hw.getIndex(), hw.getName(), hw.getType()));
             } else {
                 LOGGER.info("...none found.");
             }
@@ -110,24 +125,28 @@ public class FFMpegImpl {
         }
     }
 
+    /** The Constant PATTERN_ENTRY_SPLIT. */
     private static final Pattern PATTERN_ENTRY_SPLIT = Pattern.compile("\\n\\n");
 
+    /** The Constant PATTERN_CODECS. */
     private static final Pattern PATTERN_CODECS = Pattern
         .compile("\\s(D|\\.|\\s)(E|\\.|\\s)(V|A|S|\\s)(I|\\.|\\s)(L|\\.|\\s)(S|\\.|\\s)\\s([^=\\s\\t]+)([^\\n]+)");
 
+    /** The Constant PATTERN_ENCODER_LIB. */
     private static final Pattern PATTERN_ENCODER_LIB = Pattern.compile("\\(encoders:\\s([^\\)]+)\\)");
 
+    /** The Constant PATTERN_DECODER_LIB. */
     private static final Pattern PATTERN_DECODER_LIB = Pattern.compile("\\(decoders:\\s([^\\)]+)\\)");
 
+    /** The supported codecs. */
     private static CodecsWrapper supportedCodecs;
 
     /**
      * Returns all supported codecs.
-     * 
+     *
      * @return the supported codecs
-     * @throws IOException
-     * @throws InterruptedException
-     * @throws ExecutionException 
+     * @throws InterruptedException the interrupted exception
+     * @throws ExecutionException the execution exception
      */
     public static CodecsWrapper codecs() throws InterruptedException, ExecutionException {
         if (supportedCodecs != null) {
@@ -189,18 +208,68 @@ public class FFMpegImpl {
         return null;
     }
 
+    /** The Constant PATTERN_FILTERS. */
+    private static final Pattern PATTERN_FILTERS = Pattern
+        .compile("\\s(T|\\.|\\s)(S|\\.|\\s)(C|\\.|\\s)\\s([^=\\s\\t]+)([^-]+->[^\\s\\t]+)([^\\n]+)");
+
+    /** The supported filters. */
+    private static FiltersWrapper supportedFilters;
+
+    /**
+     * Returns all supported filters.
+     *
+     * @return the supported formats
+     * @throws InterruptedException the interrupted exception
+     * @throws ExecutionException the execution exception
+     */
+    public static FiltersWrapper filters() throws InterruptedException, ExecutionException {
+        if (supportedFilters != null) {
+            return supportedFilters;
+        }
+
+        final Executable exec = new Executable("ffmpeg", "-filters");
+
+        if (exec.runAndWait() == 0) {
+            final String outputStream = exec.output();
+
+            if (outputStream != null && !outputStream.isEmpty()) {
+                final List<FilterWrapper> filters = new ArrayList<>();
+                final Matcher m = PATTERN_FILTERS.matcher(outputStream);
+
+                while (m.find()) {
+                    final FilterWrapper filter = new FilterWrapper();
+
+                    filter.setTimelineSupport(m.group(1).equalsIgnoreCase("T"));
+                    filter.setSliceSupport(m.group(2).equalsIgnoreCase("S"));
+                    filter.setCommandSupport(m.group(3).equalsIgnoreCase("C"));
+                    filter.setName(m.group(4).trim());
+                    filter.setIoSupport(m.group(5).trim());
+                    filter.setDescription(m.group(6).trim());
+
+                    filters.add(filter);
+                }
+
+                supportedFilters = new FiltersWrapper().setFilters(filters);
+                return supportedFilters;
+            }
+        }
+
+        return null;
+    }
+
+    /** The Constant PATTERN_FORMATS. */
     private static final Pattern PATTERN_FORMATS = Pattern
         .compile("\\s(D|\\.|\\s)(E|\\.|\\s)\\s([^=\\s\\t]+)([^\\n]+)");
 
+    /** The supported formats. */
     private static FormatsWrapper supportedFormats;
 
     /**
      * Returns all supported formats.
-     * 
+     *
      * @return the supported formats
-     * @throws IOException
-     * @throws InterruptedException
-     * @throws ExecutionException 
+     * @throws InterruptedException the interrupted exception
+     * @throws ExecutionException the execution exception
      */
     public static FormatsWrapper formats() throws InterruptedException, ExecutionException {
         if (supportedFormats != null) {
@@ -235,9 +304,11 @@ public class FFMpegImpl {
         return null;
     }
 
+    /** The Constant PATTERN_DECODER. */
     private static final Pattern PATTERN_DECODER = Pattern
         .compile("^Decoder\\s([^\\s]+)\\s\\[([^\\]]+)\\]:\\n([\\S\\s]+)$");
 
+    /** The supported decoders. */
     private static Map<String, DecodersWrapper> supportedDecoders = new ConcurrentHashMap<>();
 
     /**
@@ -323,40 +394,51 @@ public class FFMpegImpl {
         return null;
     }
 
+    /** The Constant PATTERN_ENCODER. */
     private static final Pattern PATTERN_ENCODER = Pattern
         .compile("^Encoder\\s([^\\s]+)\\s\\[([^\\]]+)\\]:\\n([\\S\\s]+)$");
 
+    /** The Constant PATTERN_PIX_FMT. */
     private static final Pattern PATTERN_PIX_FMT = Pattern.compile("pixel formats:(.*)");
 
+    /** The Constant PATTERN_FRM_RATES. */
     private static final Pattern PATTERN_FRM_RATES = Pattern.compile("framerates:(.*)");
 
+    /** The Constant PATTERN_SMP_RATES. */
     private static final Pattern PATTERN_SMP_RATES = Pattern.compile("sample rates:(.*)");
 
+    /** The Constant PATTERN_SMP_FROMATS. */
     private static final Pattern PATTERN_SMP_FROMATS = Pattern.compile("sample formats:(.*)");
 
+    /** The Constant PATTERN_CH_LAYOUTS. */
     private static final Pattern PATTERN_CH_LAYOUTS = Pattern.compile("channel layouts:(.*)");
 
+    /** The Constant PATTERN_PARAMS. */
     private static final Pattern PATTERN_PARAMS = Pattern
         .compile("\\s+-([^\\s]+)\\s+<([^>]+)>\\s+(?:[^\\s]+)\\s([^\\n]+)([\\S\\s]+?(?=\\s+-))?");
 
+    /** The Constant PATTERN_PARAM_VALUES. */
     private static final Pattern PATTERN_PARAM_VALUES = Pattern.compile("\\s+([^\\s]+)\\s+(?:[^\\s]+)([^\\n]*)");
 
+    /** The Constant PATTERN_PARAM_FROM_TO. */
     private static final Pattern PATTERN_PARAM_FROM_TO = Pattern
         .compile("\\(from\\s([^\\s]+)\\sto\\s([^\\s]+)\\)");
 
+    /** The Constant PATTERN_PARAM_DEFAULT. */
     private static final Pattern PATTERN_PARAM_DEFAULT = Pattern
         .compile("\\(default\\s([^\\)]+)\\)");
 
+    /** The supported encoders. */
     private static Map<String, EncodersWrapper> supportedEncoders = new ConcurrentHashMap<>();
 
     /**
      * Returns informations for given encoder.
-     * 
+     *
      * @param name the encoder name
-     * @throws IOException
-     * @throws InterruptedException
-     * @throws ExecutionException 
-     * @throws NumberFormatException 
+     * @return the encoders wrapper
+     * @throws InterruptedException the interrupted exception
+     * @throws NumberFormatException the number format exception
+     * @throws ExecutionException the execution exception
      */
     public static EncodersWrapper encoder(final String name)
         throws InterruptedException, NumberFormatException, ExecutionException {
@@ -462,21 +544,36 @@ public class FFMpegImpl {
         return null;
     }
 
+    /** The Constant PATTERN_MUXER. */
     private static final Pattern PATTERN_MUXER = Pattern
         .compile("^Muxer\\s([^\\s]+)\\s\\[(?:[^\\]]+)\\]:\\n([\\S\\s]+)$");
 
+    /** The Constant PATTERN_EXTENSION. */
     private static final Pattern PATTERN_EXTENSION = Pattern.compile("Common extensions:(.*)\\.");
 
+    /** The Constant PATTERN_MIME_TYPE. */
     private static final Pattern PATTERN_MIME_TYPE = Pattern.compile("Mime type:(.*)\\.");
 
+    /** The Constant PATTERN_AUDIO_CODEC. */
     private static final Pattern PATTERN_AUDIO_CODEC = Pattern.compile("audio codec:(.*)\\.");
 
+    /** The Constant PATTERN_VIDEO_CODEC. */
     private static final Pattern PATTERN_VIDEO_CODEC = Pattern.compile("video codec:(.*)\\.");
 
+    /** The Constant PATTERN_SUBTITLE_CODEC. */
     private static final Pattern PATTERN_SUBTITLE_CODEC = Pattern.compile("video codec:(.*)\\.");
 
+    /** The supported muxers. */
     private static Map<String, MuxerWrapper> supportedMuxers = new ConcurrentHashMap<>();
 
+    /**
+     * Muxer.
+     *
+     * @param name the name
+     * @return the muxer wrapper
+     * @throws InterruptedException the interrupted exception
+     * @throws ExecutionException the execution exception
+     */
     public static MuxerWrapper muxer(final String name) throws InterruptedException, ExecutionException {
         if (supportedMuxers.containsKey(name)) {
             return supportedMuxers.get(name);
@@ -510,44 +607,64 @@ public class FFMpegImpl {
         return null;
     }
 
+    /** The Constant PATTERN_NVENC_GPU. */
     private static final Pattern PATTERN_NVENC_GPU = Pattern.compile("GPU\\s#(\\d+).*<([^>]+)(?:.*has\\s([^\\]]+))?");
 
+    /** The detected HW accels. */
     private static HWAccelsWrapper detectedHWAccels;
 
-    public static HWAccelsWrapper detectHWAccels() throws InterruptedException, ExecutionException {
+    /**
+     * Detect HW accels.
+     *
+     * @return the HW accels wrapper
+     */
+    public static HWAccelsWrapper detectHWAccels() {
         if (detectedHWAccels != null) {
             return detectedHWAccels;
         }
 
         final Executable exec = new Executable("ffmpeg -f lavfi -i nullsrc -c:v h264_nvenc -gpu list -f null -");
 
-        if (exec.runAndWait() >= 0) {
-            final String outputStream = exec.error();
-            if (outputStream != null && !outputStream.isEmpty()) {
-                final List<HWAccelWrapper> gpus = new ArrayList<>();
-                final Matcher m = PATTERN_NVENC_GPU.matcher(outputStream);
+        try {
+            if (exec.runAndWait() >= 0) {
+                final String outputStream = exec.error();
+                if (outputStream != null && !outputStream.isEmpty()) {
+                    final List<HWAccelWrapper<? extends HWAccelDeviceSpec>> hwaccels = new ArrayList<>();
+                    final Matcher m = PATTERN_NVENC_GPU.matcher(outputStream);
 
-                while (m.find()) {
-                    HWAccelWrapper gpu = new HWAccelWrapper();
+                    @SuppressWarnings("unchecked")
+                    final List<HWAccelNvidiaSpec> specs = (List<HWAccelNvidiaSpec>) JsonUtils.loadJSON(
+                        ConfigurationDir.getConfigResource("nvidia-matrix.json"),
+                        HWAccelNvidiaSpec.class);
 
-                    gpu.setType(HWAccelType.NVENC);
-                    gpu.setIndex(Integer.parseInt(m.group(1)));
-                    gpu.setName(m.group(2).trim());
-                    gpu.setCapability(m.group(3).trim());
+                    while (m.find()) {
+                        HWAccelWrapper<HWAccelNvidiaSpec> hwaccel = new HWAccelWrapper<>();
 
-                    gpus.add(gpu);
+                        hwaccel.setType(HWAccelType.NVIDIA);
+                        hwaccel.setIndex(Integer.parseInt(m.group(1)));
+                        hwaccel.setName(m.group(2).trim());
+
+                        specs.stream().filter(nv -> hwaccel.getName().contains(nv.getName())).findFirst()
+                            .ifPresent(nv -> hwaccel.setDeviceSpec(nv));
+
+                        hwaccels.add(hwaccel);
+                    }
+
+                    detectedHWAccels = new HWAccelsWrapper().setHWAccels(hwaccels);
+                    return detectedHWAccels;
                 }
-
-                detectedHWAccels = new HWAccelsWrapper().setHWAccels(gpus);
-                return detectedHWAccels;
             }
+        } catch (InterruptedException | ExecutionException | JAXBException | IOException ex) {
+            LOGGER.warn(ex.getMessage(), ex);
         }
 
         return null;
     }
 
+    /** The Constant PATTERN_DURATION. */
     private static final Pattern PATTERN_DURATION = Pattern.compile("Duration: (.*), start:");
 
+    /** The Constant PATTERN_CURRENT. */
     private static final Pattern PATTERN_CURRENT = Pattern.compile("time=([\\d:\\.]+)(?!.*time=[\\d:\\.]+)");
 
     /**
@@ -577,6 +694,12 @@ public class FFMpegImpl {
         return null;
     }
 
+    /**
+     * Parses the millis.
+     *
+     * @param time the time
+     * @return the long
+     */
     private static long parseMillis(final String time) {
         long millis = 0;
         if (time != null && !time.isEmpty()) {
@@ -596,12 +719,12 @@ public class FFMpegImpl {
     /**
      * Checks if encoding supported for given input file.
      *  
+     *
      * @param inputFile the input file
      * @return <code>true</code> if supported or <code>false</code> if not
-     * @throws IOException
-     * @throws InterruptedException
-     * @throws JAXBException
-     * @throws ExecutionException 
+     * @throws InterruptedException the interrupted exception
+     * @throws JAXBException the JAXB exception
+     * @throws ExecutionException the execution exception
      */
     public static boolean isEncodingSupported(final Path inputFile)
         throws InterruptedException, JAXBException, ExecutionException {
@@ -624,13 +747,13 @@ public class FFMpegImpl {
 
     /**
      * Checks if given scale factor against media files width and height if upscaling.
-     * 
+     *
      * @param inputFile the input file
      * @param scale the scale factor, in format <code>-1:720</code>
      * @return <code>true</code> if media file less than scale factor or <code>false</code> if not
-     * @throws InterruptedException
-     * @throws JAXBException
-     * @throws ExecutionException
+     * @throws InterruptedException the interrupted exception
+     * @throws JAXBException the JAXB exception
+     * @throws ExecutionException the execution exception
      */
     public static boolean isUpscaling(final Path inputFile, final String scale)
         throws InterruptedException, JAXBException, ExecutionException {
@@ -652,79 +775,171 @@ public class FFMpegImpl {
     }
 
     /**
-     * Build the command line for given {@link SettingsWrapper}.
-     * 
-     * @param input the inut file
-     * @param output the settings
-     * @return the command
-     * @throws IOException
-     * @throws InterruptedException
+     * Can HW accelerate.
+     *
+     * @param outputs the outputs
+     * @param hwAccel the hw accel
+     * @return true, if successful
      */
-    public static String command(final Path input, final List<Output> outputs)
-        throws InterruptedException {
+    public static boolean canHWAccelerate(final List<Output> outputs,
+        final HWAccelWrapper<? extends HWAccelDeviceSpec> hwAccel) {
+        return hwAccel.getType() == HWAccelType.NVIDIA && ((HWAccelNvidiaSpec) hwAccel.getDeviceSpec()).canUseEncoder()
+            && outputs.stream().allMatch(o -> o.getVideo().getCodec().toLowerCase(Locale.ROOT)
+                .contains("nvenc"));
+    }
+
+    /**
+     * Build the command line for given input path, a list of {@link Output} and a optional hw accelerator.
+     *
+     * @param processId the process Id
+     * @param input the inut file
+     * @param outputs the outputs
+     * @param hwAccel the optional hw accelerator
+     * @return the command
+     */
+    public static String command(final String processId, final Path input, final List<Output> outputs,
+        final Optional<HWAccelWrapper<? extends HWAccelDeviceSpec>> hwAccel) {
         final StringBuffer cmd = new StringBuffer();
 
-        cmd.append("ffmpeg -i \"" + input.toFile().getAbsolutePath() + "\" -stats -y");
+        cmd.append("ffmpeg");
+
+        buildInputStreamCommand(cmd, processId, input, hwAccel);
+
+        cmd.append(" -i \"" + input.toFile().getAbsolutePath() + "\" -stats -y");
 
         outputs.forEach(output -> {
-            cmd.append(" ");
-            Video video = output.getVideo();
-
-            Optional.ofNullable(video.getScale()).ifPresent(v -> cmd.append("-vf 'scale=" + v + "'"));
-
-            cmd.append(" -codec:v " + video.getCodec());
-
-            cmd.append(buildParameters(video.getParameters(), video.getCodec()));
-
-            Optional.ofNullable(video.getPixelFormat())
-                .ifPresent(v -> cmd.append(" -pix_fmt " + (!v.isEmpty() ? v : "yuv420p")));
-
-            Optional.ofNullable(video.getFramerate()).ifPresent(v -> {
-                cmd.append(" -r " + v);
-                Optional.ofNullable(video.getFramerateType())
-                    .ifPresent(t -> cmd.append(" -vsync " + ("CFR".equals(t) ? "1"
-                        : "VFR".equals(t) ? "2" : "0")));
-            });
-
-            Optional.ofNullable(video.getForceKeyFrames())
-                .ifPresent(v -> cmd.append(" -force_key_frames 'expr:gte(t,n_forced*" + v + ")'"));
-
-            Optional.ofNullable(video.getQuality()).ifPresent(quality -> {
-                switch (quality.getType()) {
-                    case "CRF":
-                        Optional.ofNullable(quality.getRateFactor()).ifPresent(v -> cmd.append(" -crf " + v));
-                        break;
-                    case "CQ":
-                        Optional.ofNullable(quality.getScale()).ifPresent(v -> cmd.append(" -qscale:v " + v));
-                        break;
-                    case "ABR":
-                        Optional.ofNullable(quality.getBitrate()).ifPresent(v -> cmd.append(" -b:v " + v + "k"));
-                        break;
-                    default:
-                        break;
-                }
-
-                Optional.ofNullable(quality.getMinrate()).ifPresent(v -> cmd.append(" -minrate " + v + "k"));
-                Optional.ofNullable(quality.getMaxrate()).ifPresent(v -> cmd.append(" -maxrate " + v + "k"));
-                Optional.ofNullable(quality.getBufsize()).ifPresent(v -> cmd.append(" -bufsize " + v + "k"));
-            });
-
-            Audio audio = output.getAudio();
-
-            cmd.append(" -codec:a " + audio.getCodec());
-
-            cmd.append(buildParameters(audio.getParameters(), audio.getCodec()));
-
-            Optional.ofNullable(audio.getBitrate()).ifPresent(v -> cmd.append(" -b:a " + v + "k"));
-            Optional.ofNullable(audio.getSamplerate()).ifPresent(v -> cmd.append(" -ar " + v));
-            cmd.append(" -ac 2");
-
-            cmd.append(" \"" + output.getOutputPath().toFile().getAbsolutePath() + "\"");
+            buildVideoStreamCommand(cmd, processId, output, hwAccel);
+            buildAudioStreamCommand(cmd, output);
         });
 
         return cmd.toString();
     }
 
+    private static void buildInputStreamCommand(StringBuffer cmd, final String processId, final Path input,
+        final Optional<HWAccelWrapper<? extends HWAccelDeviceSpec>> hwAccel) {
+        hwAccel.ifPresent(hw -> {
+            try {
+                ProbeWrapper inInfo = probe(input);
+                CodecWrapper videoCodec = inInfo.getStreams().stream()
+                    .filter(s -> s.getCodecType().equalsIgnoreCase("video"))
+                    .findFirst()
+                    .map(s -> {
+                        try {
+                            return codecs().getByName(s.getCodecName()).stream().findFirst().orElse(null);
+                        } catch (InterruptedException | ExecutionException e) {
+                            return null;
+                        }
+                    }).orElse(null);
+
+                if (HWAccelType.NVIDIA == hw.getType()) {
+                    HWAccelNvidiaSpec devSpec = (HWAccelNvidiaSpec) hw.getDeviceSpec();
+                    if (videoCodec != null && devSpec.canUseDecoder(processId)
+                        && devSpec.getDecoders().entrySet().stream()
+                            .anyMatch(e -> e.getKey().equalsIgnoreCase(videoCodec.getName()) && e.getValue())) {
+                        videoCodec.getDecoderLib().stream().filter(s -> s.contains("cuvid")).findFirst().ifPresent(
+                            dec -> cmd.append(" -hwaccel_device " + hw.getIndex() + " -hwaccel cuvid -c:v " + dec));
+                    }
+                }
+            } catch (InterruptedException | JAXBException | ExecutionException e) {
+                LOGGER.warn("Couldn't get media informations for file {}", input);
+            }
+        });
+    }
+
+    private static void buildVideoStreamCommand(StringBuffer cmd, final String processId, final Output output,
+        final Optional<HWAccelWrapper<? extends HWAccelDeviceSpec>> hwAccel) {
+        Video video = output.getVideo();
+
+        if (hwAccel.isPresent()) {
+            buildHWAccelVideoStreamCommand(cmd, processId, output, hwAccel);
+        } else {
+            Optional.ofNullable(video.getScale()).ifPresent(v -> cmd.append(" -vf 'scale=" + v + "'"));
+        }
+
+        cmd.append(" -codec:v " + video.getCodec());
+
+        cmd.append(buildParameters(video.getParameters(), video.getCodec()));
+
+        Optional.ofNullable(video.getPixelFormat())
+            .ifPresent(v -> cmd.append(" -pix_fmt " + (!v.isEmpty() ? v : "yuv420p")));
+
+        Optional.ofNullable(video.getFramerate()).ifPresent(v -> {
+            cmd.append(" -r " + v);
+            Optional.ofNullable(video.getFramerateType())
+                .ifPresent(t -> cmd.append(" -vsync " + ("CFR".equals(t) ? "1"
+                    : "VFR".equals(t) ? "2" : "0")));
+        });
+
+        Optional.ofNullable(video.getForceKeyFrames())
+            .ifPresent(v -> cmd.append(" -force_key_frames 'expr:gte(t,n_forced*" + v + ")'"));
+
+        Optional.ofNullable(video.getQuality()).ifPresent(quality -> {
+            switch (quality.getType()) {
+                case "CRF":
+                    Optional.ofNullable(quality.getRateFactor()).ifPresent(v -> cmd.append(" -crf " + v));
+                    break;
+                case "CQ":
+                    Optional.ofNullable(quality.getScale()).ifPresent(v -> cmd.append(" -qscale:v " + v));
+                    break;
+                case "ABR":
+                    Optional.ofNullable(quality.getBitrate()).ifPresent(v -> cmd.append(" -b:v " + v + "k"));
+                    break;
+                default:
+                    break;
+            }
+
+            Optional.ofNullable(quality.getMinrate()).ifPresent(v -> cmd.append(" -minrate " + v + "k"));
+            Optional.ofNullable(quality.getMaxrate()).ifPresent(v -> cmd.append(" -maxrate " + v + "k"));
+            Optional.ofNullable(quality.getBufsize()).ifPresent(v -> cmd.append(" -bufsize " + v + "k"));
+        });
+    }
+
+    private static void buildHWAccelVideoStreamCommand(StringBuffer cmd, final String processId, final Output output,
+        final Optional<HWAccelWrapper<? extends HWAccelDeviceSpec>> hwAccel) {
+        Video video = output.getVideo();
+
+        HWAccelWrapper<? extends HWAccelDeviceSpec> hw = hwAccel.get();
+        if (HWAccelType.NVIDIA == hw.getType()) {
+            HWAccelNvidiaSpec devSpec = (HWAccelNvidiaSpec) hw.getDeviceSpec();
+            if (devSpec.canUseEncoder(processId)) {
+                cmd.append(" -gpu " + hw.getIndex());
+
+                if (devSpec.canUseDecoder(processId)) {
+                    if (supportedFilters.getFilters().stream()
+                        .anyMatch(f -> "scale_npp".equalsIgnoreCase(f.getName()))) {
+                        Optional.ofNullable(video.getScale()).ifPresent(v -> cmd.append(" -vf 'scale_npp=" + v + "'"));
+                    } else {
+                        LOGGER.warn(
+                            "Couldn't use \"scale_npp\", ignore scale settings now. Compile FFMpeg with --enable-libnpp.");
+                    }
+                } else {
+                    Optional.ofNullable(video.getScale()).ifPresent(v -> cmd.append(" -vf 'scale=" + v + "'"));
+                }
+            }
+        }
+    }
+
+    private static void buildAudioStreamCommand(StringBuffer cmd, final Output output) {
+        Audio audio = output.getAudio();
+
+        cmd.append(" -codec:a " + audio.getCodec());
+
+        cmd.append(buildParameters(audio.getParameters(), audio.getCodec()));
+
+        Optional.ofNullable(audio.getBitrate()).ifPresent(v -> cmd.append(" -b:a " + v + "k"));
+        Optional.ofNullable(audio.getSamplerate()).ifPresent(v -> cmd.append(" -ar " + v));
+        cmd.append(" -ac 2");
+
+        cmd.append(" \"" + output.getOutputPath().toFile().getAbsolutePath() + "\"");
+    }
+
+    /**
+     * Builds the parameters.
+     *
+     * @param parameters the parameters
+     * @param codec the codec
+     * @return the string
+     */
     private static String buildParameters(Map<String, String> parameters, String codec) {
         StringBuffer cmd = new StringBuffer();
 
@@ -755,12 +970,12 @@ public class FFMpegImpl {
 
     /**
      * Builds filename for given format.
-     * 
+     *
      * @param format the output format
      * @param fileName the input file name
      * @param appendix the filename appendix
-     * @return
-     * @throws ExecutionException 
+     * @return the string
+     * @throws ExecutionException the execution exception
      */
     public static String filename(final String format, final String fileName, final String appendix)
         throws ExecutionException {
@@ -775,13 +990,12 @@ public class FFMpegImpl {
 
     /**
      * Returns file informations.
-     * 
+     *
      * @param inputFile the input file
      * @return the informations as {@link ProbeWrapper}
-     * @throws IOException
-     * @throws InterruptedException
-     * @throws JAXBException
-     * @throws ExecutionException 
+     * @throws InterruptedException the interrupted exception
+     * @throws JAXBException the JAXB exception
+     * @throws ExecutionException the execution exception
      */
     public static ProbeWrapper probe(final Path inputFile)
         throws InterruptedException, JAXBException, ExecutionException {
@@ -815,10 +1029,24 @@ public class FFMpegImpl {
         return null;
     }
 
+    /**
+     * Split string.
+     *
+     * @param str the str
+     * @return the stream
+     */
     private static Stream<String> splitString(final String str) {
         return Arrays.stream(str.split("\\s")).filter(s -> !s.isEmpty());
     }
 
+    /**
+     * Gets the pattern group.
+     *
+     * @param pattern the pattern
+     * @param str the str
+     * @param group the group
+     * @return the pattern group
+     */
     private static String getPatternGroup(final Pattern pattern, final String str, int group) {
         final Matcher m = pattern.matcher(str);
         if (m.find()) {

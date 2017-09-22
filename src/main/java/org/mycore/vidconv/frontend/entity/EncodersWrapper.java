@@ -39,7 +39,7 @@ public class EncodersWrapper {
     /**
      * @return the encoders
      */
-    public List<EncoderWrapper> getEncoders() {
+    public synchronized List<EncoderWrapper> getEncoders() {
         return encoders;
     }
 

@@ -65,7 +65,7 @@ public class CodecsWrapper {
      * @return the codecs
      */
     @XmlElement
-    public List<CodecWrapper> getCodecs() {
+    public synchronized List<CodecWrapper> getCodecs() {
         return codecs;
     }
 
@@ -77,35 +77,35 @@ public class CodecsWrapper {
         return this;
     }
 
-    public List<CodecWrapper> getByType(Type type) {
+    public synchronized List<CodecWrapper> getByType(Type type) {
         return codecs.stream().filter(c -> c.getType() == type).collect(Collectors.toList());
     }
 
-    public List<CodecWrapper> getByName(String name) {
+    public synchronized List<CodecWrapper> getByName(String name) {
         return codecs.stream().filter(c -> StringUtils.filter(c.getName(), name))
-                .collect(Collectors.toList());
+            .collect(Collectors.toList());
     }
 
-    public List<CodecWrapper> getByDescription(String search) {
+    public synchronized List<CodecWrapper> getByDescription(String search) {
         return codecs.stream()
-                .filter(c -> StringUtils.containsIgnoreCase(c.getDescription(), search))
-                .collect(Collectors.toList());
+            .filter(c -> StringUtils.containsIgnoreCase(c.getDescription(), search))
+            .collect(Collectors.toList());
     }
 
-    public List<CodecWrapper> getByEncoder(String encoder) {
+    public synchronized List<CodecWrapper> getByEncoder(String encoder) {
         return codecs.stream()
-                .filter(c -> c.getEncoderLib() != null
-                        && c.getEncoderLib().stream().filter(e -> StringUtils.filter(e, encoder))
-                                .count() != 0)
-                .collect(Collectors.toList());
+            .filter(c -> c.getEncoderLib() != null
+                && c.getEncoderLib().stream().filter(e -> StringUtils.filter(e, encoder))
+                    .count() != 0)
+            .collect(Collectors.toList());
     }
 
-    public List<CodecWrapper> getByDecoder(String decoder) {
+    public synchronized List<CodecWrapper> getByDecoder(String decoder) {
         return codecs.stream()
-                .filter(c -> c.getDecoderLib() != null
-                        && c.getDecoderLib().stream().filter(e -> StringUtils.filter(e, decoder))
-                                .count() != 0)
-                .collect(Collectors.toList());
+            .filter(c -> c.getDecoderLib() != null
+                && c.getDecoderLib().stream().filter(e -> StringUtils.filter(e, decoder))
+                    .count() != 0)
+            .collect(Collectors.toList());
     }
 
 }

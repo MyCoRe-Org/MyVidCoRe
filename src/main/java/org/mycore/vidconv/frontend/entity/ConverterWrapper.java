@@ -266,7 +266,7 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
 
         private String scale;
 
-        private File() {
+        protected File() {
         }
 
         /**

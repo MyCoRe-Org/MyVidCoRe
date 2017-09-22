@@ -32,20 +32,20 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "hwaccels")
 public class HWAccelsWrapper {
 
-    private List<HWAccelWrapper> hwaccels;
+    private List<HWAccelWrapper<? extends HWAccelDeviceSpec>> hwaccels;
 
     /**
      * @return the hwaccels
      */
     @XmlElement(name = "hwaccels")
-    public List<HWAccelWrapper> getHWAccels() {
+    public synchronized List<HWAccelWrapper<? extends HWAccelDeviceSpec>> getHWAccels() {
         return hwaccels;
     }
 
     /**
      * @param hwaccels the hwaccels to set
      */
-    public HWAccelsWrapper setHWAccels(List<HWAccelWrapper> hwaccels) {
+    public HWAccelsWrapper setHWAccels(List<HWAccelWrapper<? extends HWAccelDeviceSpec>> hwaccels) {
         this.hwaccels = Collections.synchronizedList(hwaccels);
         return this;
     }

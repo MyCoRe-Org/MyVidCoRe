@@ -21,30 +21,39 @@ package org.mycore.vidconv.frontend.entity;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlRootElement;
+
+import org.mycore.vidconv.common.util.StringUtils;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
  *
  */
-@XmlRootElement(name = "decoders")
-public class DecodersWrapper {
+@XmlRootElement(name = "filter")
+public class FiltersWrapper {
 
-    private List<DecoderWrapper> decoders;
+    private List<FilterWrapper> filters;
 
-    /**
-     * @return the decoders
-     */
-    public synchronized List<DecoderWrapper> getDecoders() {
-        return decoders;
+    public static FiltersWrapper getByName(FiltersWrapper filters, String name) {
+        return new FiltersWrapper()
+            .setFilters(filters.getFilters().stream().filter(c -> StringUtils.filter(c.getName(), name))
+                .collect(Collectors.toList()));
     }
 
     /**
-     * @param decoders the decoders to set
+     * @return the filters
      */
-    public DecodersWrapper setDecoders(List<DecoderWrapper> decoders) {
-        this.decoders = Collections.synchronizedList(decoders);
+    public synchronized List<FilterWrapper> getFilters() {
+        return filters;
+    }
+
+    /**
+     * @param filters the filters to set
+     */
+    public FiltersWrapper setFilters(List<FilterWrapper> filters) {
+        this.filters = Collections.synchronizedList(filters);
         return this;
     }
 

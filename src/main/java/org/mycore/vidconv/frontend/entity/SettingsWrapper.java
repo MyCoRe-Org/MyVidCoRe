@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlElement;
@@ -44,9 +45,26 @@ import org.mycore.vidconv.frontend.entity.adapter.ParametersAdapter;
 @XmlRootElement(name = "settings")
 public class SettingsWrapper {
 
+    private List<HWAccelWrapper<? extends HWAccelDeviceSpec>> hwaccels = new ArrayList<>();
+
     private List<Output> output = new ArrayList<>();
 
     private List<Plugin> plugins = new ArrayList<>();
+
+    /**
+     * @return the hwaccels
+     */
+    public List<HWAccelWrapper<? extends HWAccelDeviceSpec>> getHwaccels() {
+        return hwaccels;
+    }
+
+    /**
+     * @param hwaccels the hwaccels to set
+     */
+    public void setHwaccels(List<HWAccelWrapper<? extends HWAccelDeviceSpec>> hwaccels) {
+        this.hwaccels = Optional.ofNullable(hwaccels).orElse(null).stream().filter(ha -> ha != null)
+            .collect(Collectors.toList());
+    }
 
     /**
      * @return the output

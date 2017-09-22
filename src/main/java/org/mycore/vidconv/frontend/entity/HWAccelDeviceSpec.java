@@ -19,33 +19,35 @@
  */
 package org.mycore.vidconv.frontend.entity;
 
-import java.util.Collections;
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSeeAlso;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
  *
  */
-@XmlRootElement(name = "decoders")
-public class DecodersWrapper {
+@XmlRootElement(name = "deviceSpec")
+@XmlSeeAlso(HWAccelNvidiaSpec.class)
+public abstract class HWAccelDeviceSpec implements Comparable<HWAccelDeviceSpec>, Cloneable {
 
-    private List<DecoderWrapper> decoders;
-
-    /**
-     * @return the decoders
-     */
-    public synchronized List<DecoderWrapper> getDecoders() {
-        return decoders;
+    public int numConcurrentProcesses() {
+        return 0;
     }
 
-    /**
-     * @param decoders the decoders to set
+    public synchronized void registerProcessId(final String processId) {
+        throw new UnsupportedOperationException();
+    }
+
+    public synchronized void unregisterProcessId(final String processId) {
+        throw new UnsupportedOperationException();
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#clone()
      */
-    public DecodersWrapper setDecoders(List<DecoderWrapper> decoders) {
-        this.decoders = Collections.synchronizedList(decoders);
-        return this;
+    @Override
+    protected HWAccelDeviceSpec clone() {
+        throw new UnsupportedOperationException();
     }
 
 }

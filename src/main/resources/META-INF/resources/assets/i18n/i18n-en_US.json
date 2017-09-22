@@ -45,5 +45,7 @@
     "settings.maxrate": "max. Bitrate",
     "settings.bufsize": "Buffer Size",
     "settings.seconds" : "sec.",
-    "settings.forceKeyFrames" : "erzwinge Key Frames"
+    "settings.forceKeyFrames" : "erzwinge Key Frames",
+    "settings.hwaccel" : "Hardware Acceleration",
+    "settings.hwBalancing" : "Auto-Balancing"
 }

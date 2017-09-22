@@ -55,7 +55,7 @@ public class FormatsWrapper {
     /**
      * @return the formats
      */
-    public List<FormatWrapper> getFormats() {
+    public synchronized List<FormatWrapper> getFormats() {
         return formats;
     }
 
