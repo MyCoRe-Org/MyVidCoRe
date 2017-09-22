@@ -311,6 +311,7 @@ public class ConverterService extends Widget implements Listener {
             this.outputs = outputs;
             this.inputPath = inputPath;
             this.outputPath = outputPath;
+            this.hwAccel = Optional.empty();
             this.addTime = Instant.now();
             this.done = false;
             this.running = false;
@@ -384,6 +385,10 @@ public class ConverterService extends Widget implements Listener {
 
         public Path outputPath() {
             return outputPath;
+        }
+
+        public HWAccelWrapper<? extends HWAccelDeviceSpec> hwAccel() {
+            return hwAccel.orElse(null);
         }
 
         public boolean isRunning() {

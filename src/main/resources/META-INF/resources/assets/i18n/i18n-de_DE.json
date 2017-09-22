@@ -10,6 +10,7 @@
     "converter.done.headline" : "Fetiggestellte Aufträge",
     "converter.noDoneJobs" : "Keine fertiggestellte Aufträge vorhanden.",
     "converter.queued" : "eingereiht",
+    "converter.via" : "via",
     
     "settings.advancedOptions": "Erweiterte Optionen",
     "settings.auto" : "automatisch",

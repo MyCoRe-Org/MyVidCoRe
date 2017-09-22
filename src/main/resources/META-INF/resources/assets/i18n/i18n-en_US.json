@@ -10,6 +10,7 @@
     "converter.done.headline" : "Done Jobs",
     "converter.noDoneJobs" : "No done jobs found.",
     "converter.queued" : "queued",
+    "converter.via" : "via",
     
     "settings.advancedOptions": "Advanced Options",
     "settings.auto" : "Auto",

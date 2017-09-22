@@ -61,7 +61,8 @@
 						data-ng-repeat="converter in filteredActive | limitTo: 10 track by converter.id"
 					>
 						<div class="col-sm-12">
-							<strong>{{converter.file}}</strong>
+							<strong>{{converter.file}}</strong> <span data-ng-if="converter.hwAccel">{{ ('converter.via' | translate) }} #{{ converter.hwAccel.index }} - {{
+								converter.hwAccel.name }}</span>
 						</div>
 						<div data-ng-if="converter.running || converter.done">
 							<div class="col-sm-12 col-md-10">

@@ -53,6 +53,8 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
 
     private List<Output> outputs;
 
+    private HWAccelWrapper<? extends HWAccelDeviceSpec> hwAccel;
+
     private boolean running;
 
     private boolean done;
@@ -81,6 +83,7 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
         this.command = converter.command();
         this.fileName = converter.inputPath().getFileName().toString();
         this.outputs = converter.outputs();
+        this.hwAccel = converter.hwAccel();
         this.running = converter.isRunning();
         this.done = converter.isDone();
         this.addTime = converter.addTime();
@@ -113,6 +116,15 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
                 .map(o -> new File(o.getOutputPath().getFileName().toString(), o.getFormat(), o.getVideo().getScale()))
                 .collect(Collectors.toList()))
             .orElse(null);
+    }
+
+    @XmlElement(name = "hwAccel")
+    public HWAccelWrapper<? extends HWAccelDeviceSpec> getHwAccel() {
+        return hwAccel;
+    }
+
+    public void setHwAccel(HWAccelWrapper<? extends HWAccelDeviceSpec> hwAccel) {
+        this.hwAccel = hwAccel;
     }
 
     @XmlAttribute(name = "running")
@@ -169,6 +181,7 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
         copy.id = this.id;
         copy.fileName = this.fileName;
         copy.outputs = this.outputs;
+        copy.hwAccel = this.hwAccel;
         copy.running = this.running;
         copy.done = this.done;
         copy.addTime = this.addTime;
