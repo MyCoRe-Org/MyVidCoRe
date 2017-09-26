@@ -17,6 +17,7 @@ app.config(function($translateProvider) {
 
 	$translateProvider.preferredLanguage("de_DE");
 	$translateProvider.determinePreferredLanguage();
+	$("html").attr("lang", $translateProvider.resolveClientLocale())
 });
 
 app.filter("endsWith", function() {
