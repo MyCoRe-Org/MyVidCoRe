@@ -5,7 +5,7 @@
     "author": "René Adler (eagle)",
   	"homepage": "${project.url}",
   	"repository": {
-    	"type": "svn",
+    	"type": "git",
     	"url": "${project.scm.url}"
   	},
   	"license": "GPLv3",
