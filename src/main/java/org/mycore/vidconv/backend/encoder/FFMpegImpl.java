@@ -104,13 +104,13 @@ public class FFMpegImpl {
     protected static void init() {
         try {
             LOGGER.info("parse codecs...");
-            LOGGER.info("...found {}.", codecs().getCodecs().size());
+            LOGGER.info("...found {}.", Optional.ofNullable(codecs()).map(c -> c.getCodecs().size()).orElse(0));
 
             LOGGER.info("parse filters...");
-            LOGGER.info("...found {}.", filters().getFilters().size());
+            LOGGER.info("...found {}.", Optional.ofNullable(filters()).map(f -> f.getFilters().size()).orElse(0));
 
             LOGGER.info("parse formats...");
-            LOGGER.info("...found {}.", formats().getFormats().size());
+            LOGGER.info("...found {}.", Optional.ofNullable(formats()).map(f -> f.getFormats().size()).orElse(0));
 
             LOGGER.info("detect hw accelerators...");
             HWAccelsWrapper hwaccels = detectHWAccels();
