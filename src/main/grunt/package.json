@@ -9,19 +9,18 @@
     	"url": "${project.scm.url}"
   	},
   	"license": "GPLv3",
-    "description": "${project.description}",
     "engines": {
     	"node": ">= 0.8.11"
   	},
     "devDependencies": {
-        "bower": "~1.6.5",
-        "grunt": "~0.4.5",
+        "bower": "~1.8.2",
+        "grunt": "~1.0.1",
         "grunt-bowercopy": "^1.2.3",
-        "grunt-cli": "~0.1.13",
-        "grunt-contrib-concat": "^0.5.1",
+        "grunt-cli": "~1.2.0",
+        "grunt-contrib-concat": "^1.0.1",
         "grunt-contrib-less": "^1.0.0",
-        "grunt-contrib-jshint": "^0.10.0",
-        "grunt-google-fonts": "^0.3.5",
-        "grunt-replace": "^0.8.0"
+        "grunt-contrib-jshint": "^1.1.0",
+        "grunt-google-fonts": "^0.5.0",
+        "grunt-replace": "^1.0.1"
     }
 }
