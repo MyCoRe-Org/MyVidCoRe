@@ -4,14 +4,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 <meta name="description" content="MyVidCoRe - Video Converter WebService">
 <meta name="author" content="René Adler">
 <link rel="icon" href="/web/assets/images/favicon.ico">
 
 <title>MyVidCoRe - Video Converter WebService</title>
 
-<!-- Custom styles for this template -->
 <link href="/web/assets/css/fonts.css" rel="stylesheet">
 
 </head>
@@ -24,14 +22,14 @@
 				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
 					<span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand" href="/web"><span class="glyphicon glyphicon-film" aria-hidden="true"></span> MyVidCoRe</a>
+				<a class="navbar-brand" href="/web"><span class="fa fa-film" aria-hidden="true"></span> MyVidCoRe</a>
 			</div>
 			<div id="navbar" class="collapse navbar-collapse">
 				<ul class="nav navbar-nav">
-					<li class="nav-item"><a class="nav-link" href="/web"><span class="glyphicon
-              glyphicon-dashboard" aria-hidden="true"></span> {{
+					<li class="nav-item"><a class="nav-link" href="/web"><span class="fa
+              fa-dashboard" aria-hidden="true"></span> {{
 							'nav.dashboard' | translate}}</a></li>
-					<li class="nav-item active"><a class="nav-link" href="/web/settings.html"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> {{
+					<li class="nav-item active"><a class="nav-link" href="/web/settings.html"><span class="fa fa-wrench" aria-hidden="true"></span> {{
 							'nav.settings' | translate}}<span class="sr-only">(current)</span></a></li>
 				</ul>
 				<div class="nav navbar-nav navbar-right">
@@ -71,10 +69,10 @@
 					<ul class="nav nav-tabs" role="tablist">
 						<li role="presentation" data-ng-repeat="output in settings.output" data-ng-class="{active:$index == 0, 'remove-btn':$index != 0}"><a
 							href="#output{{$index}}" aria-controls="output{{$index}}" data-toggle="tab"
-						>{{'settings.output' | translate}} {{$index + 1}}</a> <span class="glyphicon glyphicon-remove text-danger" aria-hidden="true" data-ng-if="$index > 0"
+						>{{'settings.output' | translate}} {{$index + 1}}</a> <span class="fa fa-remove text-danger" aria-hidden="true" data-ng-if="$index > 0"
 							data-ng-click="removeOutput($index)"
 						></span></li>
-						<li role="presentation"><a href="#settings" data-ng-click="addOutput()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></a></li>
+						<li role="presentation"><a href="#settings" data-ng-click="addOutput()"><span class="fa fa-plus" aria-hidden="true"></span></a></li>
 					</ul>
 					<div class="tab-content animate">
 						<div role="tabpanel" class="tab-pane fade in" data-ng-class="{active:$index == 0}" id="output{{$index}}" data-ng-repeat="output in settings.output">
