@@ -109,7 +109,7 @@
 								<button class="btn btn-xs btn-default" data-toggle="collapse" data-target="#details-{{converter.id}}" aria-expanded="false"
 									aria-controls="details-{{converter.id}}" data-ng-click="loadDetailData(converter.id)"
 								>
-									<span class="fa fa-console" aria-hidden="true"></span>
+									<span class="fa fa-terminal" aria-hidden="true"></span>
 								</button>
 								<div class="btn-group" role="group">
 									<button class="btn btn-xs btn-default hidden-xs dropdown-toggle" aria-expanded="false" aria-controls="preview-{{converter.id}}"
@@ -117,7 +117,7 @@
 										data-ng-disabled="!((converter.files | endsWith:'.mp4':'name') || (converter.files | endsWith:'.webm':'name'))"
 										data-ng-click="initPreview(converter.id)"
 									>
-										<span class="fa fa-eye-open" aria-hidden="true"></span>
+										<span class="fa fa-eye" aria-hidden="true"></span>
 									</button>
 								</div>
 								<div class="btn-group pull-right" role="group">
