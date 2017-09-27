@@ -23,7 +23,7 @@ app.config(function($translateProvider) {
 
 app.filter("endsWith", function() {
 	return function(input, search, prop) {
-		if (typeof input === "array" || typeof input === "object") {
+		if (input instanceof Array || typeof input === "object") {
 			for (var i in input) {
 				if (prop && input[i][prop].endsWith(search)|| input[i].endsWith(search)) {
 					return true;
