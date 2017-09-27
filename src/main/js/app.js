@@ -1,9 +1,10 @@
 /*global angular */
 /*global videojs */
-"use strict";
+require("layout.less");
 
-var appName = "MyVidCoRe";
-var app = angular.module(appName, [ "ngAnimate", "ngSanitize", "pascalprecht.translate" ]);
+const appName = "MyVidCoRe";
+
+var app = module.export = angular.module(appName, [ "ngAnimate", "ngSanitize", "pascalprecht.translate" ]);
 
 app.run(function($animate) {
 	$animate.enabled(true);

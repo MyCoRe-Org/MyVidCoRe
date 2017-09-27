@@ -5,7 +5,10 @@
   <artifactId>myvidcore</artifactId>
   <version>0.1.1-SNAPSHOT</version>
   <packaging>jar</packaging>
+
   <name>My Video (Converter) Core</name>
+  <url>https://github.com/MyCoRe-Org/MyVidCoRe</url>
+  <description>Converts Videos from hotfolder to output directory with given settings.</description>
 
   <organization>
     <name>MyCoRe</name>
@@ -56,11 +59,13 @@
   <properties>
     <jersey.version>2.26</jersey.version>
     <log4j.version>2.9.1</log4j.version>
-    <grunt.projectBase>${project.build.directory}/grunt</grunt.projectBase>
-    <template.assetsdir>${project.build.directory}/classes/META-INF/resources/assets</template.assetsdir>
     <encoding>UTF-8</encoding>
     <java.version>1.8</java.version>
     <maven.compiler.target>${java.version}</maven.compiler.target>
+    <webpack.assetsDir>${project.build.directory}/classes/META-INF/resources/assets</webpack.assetsDir>
+    <webpack.baseDir>${project.build.directory}/webpack</webpack.baseDir>
+    <webpack.mainFile>${basedir}/src/main/js/app.js</webpack.mainFile>
+    <webpack.lessDir>${basedir}/src/main/less/</webpack.lessDir>
   </properties>
 
   <build>
@@ -90,11 +95,11 @@
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${grunt.projectBase}</outputDirectory>
+              <outputDirectory>${webpack.baseDir}</outputDirectory>
               <resources>
                 <resource>
                   <filtering>true</filtering>
-                  <directory>${basedir}/src/main/grunt</directory>
+                  <directory>${basedir}/src/main/webpack</directory>
                 </resource>
               </resources>
             </configuration>
@@ -127,22 +132,20 @@
             <phase>process-resources</phase>
             <goals>
               <goal>yarn</goal>
-              <goal>bower</goal>
             </goals>
             <configuration>
-              <workingDirectory>${grunt.projectBase}</workingDirectory>
+              <workingDirectory>${webpack.baseDir}</workingDirectory>
               <arguments>install</arguments>
             </configuration>
           </execution>
           <execution>
-            <id>webapp-build</id>
+            <id>webpack</id>
             <phase>process-resources</phase>
             <goals>
-              <goal>grunt</goal>
+              <goal>webpack</goal>
             </goals>
             <configuration>
-              <workingDirectory>${grunt.projectBase}</workingDirectory>
-              <arguments>--verbose --assetsDirectory=${template.assetsdir} --lessDirectory=${basedir}/src/main/less</arguments>
+              <workingDirectory>${webpack.baseDir}</workingDirectory>
             </configuration>
           </execution>
         </executions>
@@ -275,7 +278,7 @@
       <plugins>
         <plugin>
           <artifactId>maven-dependency-plugin</artifactId>
-          <version>2.9</version>
+          <version>2.10</version>
           <executions>
             <execution>
               <inherited>true</inherited>
@@ -350,6 +353,7 @@
                     <versionRange>[1.2,)</versionRange>
                     <goals>
                       <goal>yarn</goal>
+                      <goal>install-node-and-yarn</goal>
                     </goals>
                   </pluginExecutionFilter>
                   <action>
