@@ -22,14 +22,18 @@
  */
 package org.mycore.vidconv.common.util;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
  *
  */
 public class StringUtils {
+
+    private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
 
     public static boolean containsIgnoreCase(String haystack, String needle) {
         return haystack.toLowerCase(Locale.getDefault()).contains(needle.toLowerCase(Locale.getDefault()));
@@ -41,9 +45,29 @@ public class StringUtils {
 
         if (needle.contains("*")) {
             return Pattern.compile("^" + needle.replaceAll("\\*", ".*") + "$", Pattern.CASE_INSENSITIVE)
-                    .matcher(haystack).find();
+                .matcher(haystack).find();
         }
 
         return haystack.equalsIgnoreCase(needle);
+    }
+
+    public static String hexDump(byte[] bytes, int lineLen) {
+        StringBuffer sb = new StringBuffer();
+
+        IntStream.range(0, bytes.length / lineLen).forEach(l -> {
+            int sOff = l * lineLen;
+            int eOff = Integer.min((l + 1) * lineLen, bytes.length);
+            sb.append(String.format(Locale.ROOT, "\n%08X  ", sOff));
+            IntStream.range(sOff, eOff).forEach(j -> {
+                int v = bytes[j] & 0xFF;
+                sb.append(hexArray[v >>> 4]);
+                sb.append(hexArray[v & 0x0F]);
+                sb.append(" ");
+            });
+            sb.append(" ");
+            sb.append(new String(bytes, sOff, lineLen, StandardCharsets.UTF_8).replaceAll("\n|\r|\t|\0", "."));
+        });
+        
+        return sb.toString();
     }
 }
