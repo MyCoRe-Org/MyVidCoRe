@@ -456,176 +456,18 @@ app.controller("settings", function($scope, $http, $translate, $log, $timeout, f
 	$scope.status = {};
 	$scope.isLoading = true;
 
-	// configured formats
-	$scope.converterFormats = {
-		"avi" : {
-			"audio" : [ "aac", "mp3" ],
-			"video" : [ "h264", "mpeg4", "msmpeg4v2", "mpeg1video", "mpeg2video", "vp8" ]
-		},
-		"mp4" : {
-			"audio" : [ "aac", "mp3" ],
-			"video" : [ "h264", "h265", "mpeg4", "msmpeg4v2", "mpeg1video", "mpeg2video" ]
-		},
-		"matroska" : {
-			"audio" : [ "aac", "mp3", "vorbis", "opus", "flac" ],
-			"video" : [ "h264", "h265", "mpeg4", "msmpeg4v2", "mpeg2video", "vp8", "vp9", "theora" ]
-		},
-		"webm" : {
-			"audio" : [ "vorbis", "opus" ],
-			"video" : [ "vp8", "vp9" ]
-		}
-	};
-
-	$scope.defaultPresets = {
-		"libx264" : [ {
-			"name" : "ultrafast"
-		}, {
-			"name" : "superfast"
-		}, {
-			"name" : "veryfast"
-		}, {
-			"name" : "faster"
-		}, {
-			"name" : "fast"
-		}, {
-			"name" : "medium"
-		}, {
-			"name" : "slow"
-		}, {
-			"name" : "slower"
-		}, {
-			"name" : "veryslow"
-		}, {
-			"name" : "placebo"
-		} ]
-	};
-
-	$scope.defaultTunes = {
-		"libx264" : [ {
-			"name" : "film"
-		}, {
-			"name" : "animation"
-		}, {
-			"name" : "grain"
-		}, {
-			"name" : "stillimage"
-		}, {
-			"name" : "psnr"
-		}, {
-			"name" : "ssim"
-		}, {
-			"name" : "zerolatency"
-		} ]
-	};
-
-	$scope.defaultScales = [ {
-		"name" : "2160p",
-		"value" : "-2:2160"
-	}, {
-		"name" : "1440p",
-		"value" : "-2:1440"
-	}, {
-		"name" : "1080p",
-		"value" : "-2:1080"
-	}, {
-		"name" : "720p",
-		"value" : "-2:720"
-	}, {
-		"name" : "540p",
-		"value" : "-2:540"
-	}, {
-		"name" : "480p",
-		"value" : "-2:480"
-	}, {
-		"name" : "360p",
-		"value" : "-2:360"
-	} ];
-
-	$scope.defaultFrameRates = [ "5", "10", "12", "15", "23.976", "24", "25", "29.97", "30", "50", "59.94", "60" ];
-
-	$scope.defaultProfiles = [ {
-		"name" : "baseline"
-	}, {
-		"name" : "main"
-	}, {
-		"name" : "high"
-	}, {
-		"name" : "high10"
-	}, {
-		"name" : "high442"
-	}, {
-		"name" : "high444"
-	} ];
-
-	$scope.defaultLevels = [ {
-		"name" : "1.0"
-	}, {
-		"name" : "1b"
-	}, {
-		"name" : "1.0b"
-	}, {
-		"name" : "1.1"
-	}, {
-		"name" : "1.2"
-	}, {
-		"name" : "1.3"
-	}, {
-		"name" : "2"
-	}, {
-		"name" : "2.0"
-	}, {
-		"name" : "2.1"
-	}, {
-		"name" : "2.2"
-	}, {
-		"name" : "3"
-	}, {
-		"name" : "3.0"
-	}, {
-		"name" : "3.1"
-	}, {
-		"name" : "3.2"
-	}, {
-		"name" : "4"
-	}, {
-		"name" : "4.0"
-	}, {
-		"name" : "4.1"
-	}, {
-		"name" : "4.2"
-	}, {
-		"name" : "5"
-	}, {
-		"name" : "5.0"
-	}, {
-		"name" : "5.1"
-	} ];
-	
-	$scope.defaultBitrates = [ 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384, 448, 512 ];
+	// configured defaults
+	$scope.converterFormats = require("./defaults/converter-formats.js");
+	$scope.defaultPresets = require("./defaults/presets.js");
+	$scope.defaultTunes = require("./defaults/tunes.js");
+	$scope.defaultScales = require("./defaults/scales.js");
+	$scope.defaultFrameRates = require("./defaults/framerates.js");
+	$scope.defaultProfiles = require("./defaults/profiles.js");
+	$scope.defaultLevels = require("./defaults/levels.js");
+	$scope.defaultBitrates = require("./defaults/bitrates.js");
 
 	// default settings
-	$scope.settings = {
-		"output" : [ {
-			"format" : "mp4",
-			"video" : {
-				"codec" : "libx264",
-				"framerateType" : "VFR",
-				"profile" : "main",
-				"level" : "4.0",
-				"pixelFormat" : "yuv420p",
-				"quality" : {
-					"type" : "CRF",
-					"rateFactor" : 23,
-					"bitrate" : 2500
-				}
-			},
-			"audio" : {
-				"codec" : "libfdk_aac",
-				"samplerate" : 44100,
-				"bitrate" : 128
-			}
-		} ]
-	};
+	$scope.settings = require("./defaults/settings.js");
 
 	$scope.formats = {};
 	$scope.selectedCodec = {};
