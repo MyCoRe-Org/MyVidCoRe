@@ -2,7 +2,6 @@ const pkg = require("./package.json");
 const path = require("path");
 const webpack = require("webpack");
 const GoogleFontsPlugin = require("google-fonts-webpack-plugin");
-const UglifyJSPlugin = require("uglifyjs-webpack-plugin");
 
 module.exports = {
 	plugins : [ new webpack.ProvidePlugin({
@@ -13,10 +12,13 @@ module.exports = {
 	}), new webpack.optimize.CommonsChunkPlugin({
 		name : "vendor",
 		filename : "js/vendor.bundle.js",
-		minChunks : function(module, count) {
-			var context = module.context;
-			return context && context.indexOf("node_modules") >= 0;
-		}
+	}), new webpack.optimize.LimitChunkCountPlugin({
+		maxChunks : 15
+	}), new webpack.optimize.MinChunkSizePlugin({
+		minChunkSize : 10000
+	}), new webpack.optimize.OccurrenceOrderPlugin(), new webpack.optimize.UglifyJsPlugin({
+		mangle : false,
+		sourceMap : true,
 	}), new GoogleFontsPlugin({
 		filename : "css/fonts.css",
 		path : "fonts/",
@@ -27,23 +29,11 @@ module.exports = {
 			family : "Source Code Pro",
 			variants : [ "400", "300", "500" ]
 		} ]
-	}), new UglifyJSPlugin({
-		uglifyOptions : {
-			mangle : false,
-			output : {
-				comments : /^!/,
-				beautify : false,
-			},
-		},
-		sourceMap : true,
-		parallel : {
-			workers : 2
-		}
 	}) ],
 	entry : {
 		app : pkg.main,
 		vendor : Object.keys(pkg.dependencies).filter(function(name) {
-			return [ "font-awesome", "respond.js" ].join("|").indexOf(name) === -1;
+			return [ "font-awesome" ].join("|").indexOf(name) === -1;
 		})
 	},
 	output : {
