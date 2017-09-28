@@ -1,20 +1,22 @@
 {
-  "node": true,
-  "bitwise": true,
-  "undef": true,
-  "eqeqeq": true,
-  "noarg": true,
-  "mocha": true,
-  "unused": true,
-  "asi": true,
-  "esnext": true,
-  "browser": true,
-  "jquery": true,
-  "laxbreak": true,
-  "-W004": true,
-  "-W084": true,
-  "globals": {
-    "$": true,
-    "angular": true
-  }
+	"node": true,
+	"bitwise": true,
+	"undef": true,
+	"eqeqeq": true,
+	"noarg": true,
+	"mocha": true,
+	"unused": true,
+	"asi": true,
+	"esnext": true,
+	"browser": true,
+	"jquery": true,
+	"laxbreak": true,
+	"-W004": true,
+	"-W084": true,
+	"globals": {
+		"$": true,
+		"angular": true,
+		"jquery": true,
+		"videojs": true
+	}
 }

@@ -1,0 +1,6 @@
+"globals" : {
+  "$" : true,
+  "angular" : true,
+  "jquery" : true,
+  "videojs" : true
+}
