@@ -308,6 +308,63 @@ public class FFMpegImpl {
     private static final Pattern PATTERN_DECODER = Pattern
         .compile("^Decoder\\s([^\\s]+)\\s\\[([^\\]]+)\\]:\\n([\\S\\s]+)$");
 
+    /** The Constant PATTERN_PARAMS. */
+    private static final Pattern PATTERN_PARAMS = Pattern
+        .compile("\\s+-([^\\s]+)\\s+<([^>]+)>\\s+(?:[^\\s]+)\\s([^\\n]+)([\\S\\s]+?(?=\\s+-))?");
+
+    /** The Constant PATTERN_PARAM_VALUES. */
+    private static final Pattern PATTERN_PARAM_VALUES = Pattern.compile("\\s+([^\\s]+)\\s+(?:[^\\s]+)([^\\n]*)");
+
+    /** The Constant PATTERN_PARAM_FROM_TO. */
+    private static final Pattern PATTERN_PARAM_FROM_TO = Pattern
+        .compile("\\(from\\s([^\\s]+)\\sto\\s([^\\s]+)\\)");
+
+    /** The Constant PATTERN_PARAM_DEFAULT. */
+    private static final Pattern PATTERN_PARAM_DEFAULT = Pattern
+        .compile("\\(default\\s([^\\)]+)\\)");
+
+    private static List<ParameterWrapper> parseParameters(final String output) {
+        final List<ParameterWrapper> parameters = new ArrayList<>();
+
+        final Matcher pm = PATTERN_PARAMS.matcher(output);
+        while (pm.find()) {
+            final ParameterWrapper param = new ParameterWrapper();
+            param.setName(pm.group(1));
+            param.setType(pm.group(2));
+            param.setDescription(pm.group(3));
+
+            Optional.ofNullable(getPatternGroup(PATTERN_PARAM_FROM_TO, pm.group(3), 1))
+                .ifPresent(v -> param.setFromValue(v));
+            Optional.ofNullable(getPatternGroup(PATTERN_PARAM_FROM_TO, pm.group(3), 2))
+                .ifPresent(v -> param.setToValue(v));
+            Optional.ofNullable(getPatternGroup(PATTERN_PARAM_DEFAULT, pm.group(3), 1))
+                .ifPresent(v -> param.setDefaultValue(v));
+
+            Optional.ofNullable(pm.group(4)).ifPresent(vs -> {
+                if (!vs.isEmpty()) {
+                    final List<ParameterValue> values = new ArrayList<>();
+                    final Matcher pv = PATTERN_PARAM_VALUES.matcher(vs);
+                    while (pv.find()) {
+                        final ParameterValue value = new ParameterValue();
+                        value.setName(pv.group(1));
+                        Optional.ofNullable(pv.group(2)).ifPresent(v -> {
+                            v = v.trim();
+                            if (!v.isEmpty())
+                                value.setDescription(v);
+                        });
+                        values.add(value);
+                    }
+                    if (!values.isEmpty())
+                        param.setValues(values);
+                }
+            });
+
+            parameters.add(param);
+        }
+
+        return parameters;
+    }
+
     /** The supported decoders. */
     private static Map<String, DecodersWrapper> supportedDecoders = new ConcurrentHashMap<>();
 
@@ -341,44 +398,7 @@ public class FFMpegImpl {
 
                             decoder.setName(m.group(1));
                             decoder.setDescription(m.group(2));
-
-                            final List<ParameterWrapper> parameters = new ArrayList<>();
-                            final Matcher pm = PATTERN_PARAMS.matcher(m.group(3));
-                            while (pm.find()) {
-                                final ParameterWrapper param = new ParameterWrapper();
-                                param.setName(pm.group(1));
-                                param.setType(pm.group(2));
-                                param.setDescription(pm.group(3));
-
-                                Optional.ofNullable(getPatternGroup(PATTERN_PARAM_FROM_TO, pm.group(3), 1))
-                                    .ifPresent(v -> param.setFromValue(v));
-                                Optional.ofNullable(getPatternGroup(PATTERN_PARAM_FROM_TO, pm.group(3), 2))
-                                    .ifPresent(v -> param.setToValue(v));
-                                Optional.ofNullable(getPatternGroup(PATTERN_PARAM_DEFAULT, pm.group(3), 1))
-                                    .ifPresent(v -> param.setDefaultValue(v));
-
-                                Optional.ofNullable(pm.group(4)).ifPresent(vs -> {
-                                    if (!vs.isEmpty()) {
-                                        final List<ParameterValue> values = new ArrayList<>();
-                                        final Matcher pv = PATTERN_PARAM_VALUES.matcher(vs);
-                                        while (pv.find()) {
-                                            final ParameterValue value = new ParameterValue();
-                                            value.setName(pv.group(1));
-                                            Optional.ofNullable(pv.group(2)).ifPresent(v -> {
-                                                v = v.trim();
-                                                if (!v.isEmpty())
-                                                    value.setDescription(v);
-                                            });
-                                            values.add(value);
-                                        }
-                                        if (!values.isEmpty())
-                                            param.setValues(values);
-                                    }
-                                });
-
-                                parameters.add(param);
-                            }
-                            decoder.setParameters(parameters);
+                            decoder.setParameters(parseParameters(m.group(3)));
 
                             return decoder;
                         }
@@ -412,21 +432,6 @@ public class FFMpegImpl {
 
     /** The Constant PATTERN_CH_LAYOUTS. */
     private static final Pattern PATTERN_CH_LAYOUTS = Pattern.compile("channel layouts:(.*)");
-
-    /** The Constant PATTERN_PARAMS. */
-    private static final Pattern PATTERN_PARAMS = Pattern
-        .compile("\\s+-([^\\s]+)\\s+<([^>]+)>\\s+(?:[^\\s]+)\\s([^\\n]+)([\\S\\s]+?(?=\\s+-))?");
-
-    /** The Constant PATTERN_PARAM_VALUES. */
-    private static final Pattern PATTERN_PARAM_VALUES = Pattern.compile("\\s+([^\\s]+)\\s+(?:[^\\s]+)([^\\n]*)");
-
-    /** The Constant PATTERN_PARAM_FROM_TO. */
-    private static final Pattern PATTERN_PARAM_FROM_TO = Pattern
-        .compile("\\(from\\s([^\\s]+)\\sto\\s([^\\s]+)\\)");
-
-    /** The Constant PATTERN_PARAM_DEFAULT. */
-    private static final Pattern PATTERN_PARAM_DEFAULT = Pattern
-        .compile("\\(default\\s([^\\)]+)\\)");
 
     /** The supported encoders. */
     private static Map<String, EncodersWrapper> supportedEncoders = new ConcurrentHashMap<>();
@@ -492,43 +497,7 @@ public class FFMpegImpl {
                                     .flatMap(ma -> splitString(ma.group(1)))
                                     .collect(Collectors.toList()));
 
-                            final List<ParameterWrapper> parameters = new ArrayList<>();
-                            final Matcher pm = PATTERN_PARAMS.matcher(m.group(3));
-                            while (pm.find()) {
-                                final ParameterWrapper param = new ParameterWrapper();
-                                param.setName(pm.group(1));
-                                param.setType(pm.group(2));
-                                param.setDescription(pm.group(3));
-
-                                Optional.ofNullable(getPatternGroup(PATTERN_PARAM_FROM_TO, pm.group(3), 1))
-                                    .ifPresent(v -> param.setFromValue(v));
-                                Optional.ofNullable(getPatternGroup(PATTERN_PARAM_FROM_TO, pm.group(3), 2))
-                                    .ifPresent(v -> param.setToValue(v));
-                                Optional.ofNullable(getPatternGroup(PATTERN_PARAM_DEFAULT, pm.group(3), 1))
-                                    .ifPresent(v -> param.setDefaultValue(v));
-
-                                Optional.ofNullable(pm.group(4)).ifPresent(vs -> {
-                                    if (!vs.isEmpty()) {
-                                        final List<ParameterValue> values = new ArrayList<>();
-                                        final Matcher pv = PATTERN_PARAM_VALUES.matcher(vs);
-                                        while (pv.find()) {
-                                            final ParameterValue value = new ParameterValue();
-                                            value.setName(pv.group(1));
-                                            Optional.ofNullable(pv.group(2)).ifPresent(v -> {
-                                                v = v.trim();
-                                                if (!v.isEmpty())
-                                                    value.setDescription(v);
-                                            });
-                                            values.add(value);
-                                        }
-                                        if (!values.isEmpty())
-                                            param.setValues(values);
-                                    }
-                                });
-
-                                parameters.add(param);
-                            }
-                            encoder.setParameters(parameters);
+                            encoder.setParameters(parseParameters(m.group(3)));
 
                             return encoder;
                         }
