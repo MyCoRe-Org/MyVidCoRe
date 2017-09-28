@@ -6,6 +6,8 @@ module.exports = function($translateProvider, $routeProvider, $provide) {
 
 	$translateProvider.preferredLanguage("de_DE");
 	$translateProvider.determinePreferredLanguage();
+	$translateProvider.useSanitizeValueStrategy("sanitizeParameters");
+
 	$("html").attr("lang", $translateProvider.resolveClientLocale());
 
 	$provide.factory("$routeProvider", function() {
