@@ -1,0 +1,15 @@
+{
+	"default": {
+		"redirectTo": "/converter"
+	},
+	"/converter": {
+		"templateUrl": "/assets/templates/converter-status.html",
+		"name": "dashboard",
+		"icon": "fa fa-dashboard"
+	},
+	"/settings": {
+		"templateUrl": "/assets/templates/settings.html",
+		"name": "settings",
+		"icon": "fa fa-wrench"
+	}
+}

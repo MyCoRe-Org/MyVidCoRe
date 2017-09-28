@@ -38,7 +38,7 @@ module.exports = {
 	},
 	output : {
 		path : pkg.config.assetDir,
-		publicPath : "/web/assets/",
+		publicPath : "/assets/",
 		filename : "js/app.bundle.js"
 	},
 	resolve : {
@@ -54,8 +54,8 @@ module.exports = {
 			}, {
 				loader : "less-loader",
 				options : {
-					strictMath : true,
-					noIeCompat : true,
+					strictMath : false,
+					noIeCompat : false,
 					modifyVars : {
 						// font-awesome
 						"fa-font-path" : "\"../fonts\"",

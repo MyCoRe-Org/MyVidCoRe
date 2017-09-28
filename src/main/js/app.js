@@ -1,8 +1,9 @@
 require("layout.less");
+var routing = require("./utils/routing.js");
 
 var appName = "MyVidCoRe";
 
-var app = module.export = angular.module(appName, [ "ngAnimate", "ngSanitize", "pascalprecht.translate" ]);
+var app = module.export = angular.module(appName, [ "ngAnimate", "ngSanitize", "ngRoute", "pascalprecht.translate" ]);
 
 /**
  * Configure App
@@ -31,23 +32,35 @@ angular.forEach(require("./utils/services.js"), function(func, name) {
 });
 
 /**
- * Register Directory Watcher Status controller
+ * Register routing dependencies
  */
-app.controller("directoryWatcherStatus", require("./controller/directory-watcher-status.js"));
+app.service("access", routing.access);
+app.directive("navigation", routing.navigation);
+app.factory("routeNavigation", routing.routeNavigation);
 
 /**
- * Register Converter Status controller
+ * Register Controllers
  */
-app.controller("converterStatus", require("./controller/converter-status.js"));
-
-/**
- * Register Settings controller
- */
-app.controller("settings", require("./controller/settings.js"));
+app.controller("alertCtrl", require("./controller/alert.js"));
+app.controller("loadingCtrl", require("./controller/loading.js"));
+app.controller("directoryWatcherStatusCtrl", require("./controller/directory-watcher-status.js"));
+app.controller("converterStatusCtrl", require("./controller/converter-status.js"));
+app.controller("settingsCtrl", require("./controller/settings.js"));
 
 /**
  * Start App
  */
-app.run(function($animate) {
+app.run(function($animate, $route, $routeProvider, $http, $q, access, routeNavigation) {
 	$animate.enabled(true);
+	
+	routing.initRoutes($route, $routeProvider, $http, $q, access, routeNavigation);
+});
+
+jQuery(document).ready(function() {
+	jQuery(this).click(function(ev) {
+		var $this = jQuery(ev.target);
+		if ($this.data("collapse-hide") !== undefined) {
+			jQuery($this.data("collapse-hide")).collapse("hide");
+		}
+	});
 });

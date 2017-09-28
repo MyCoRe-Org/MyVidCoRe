@@ -1,7 +1,6 @@
-module.exports = function($scope, $http, $translate, $log, $timeout, formatService) {
+module.exports = function($rootScope, $scope, $http, $translate, $log, $timeout, formatService, asyncQueue) {
 	var removeTimeout = 30000;
 	$scope.status = {};
-	$scope.isLoading = true;
 
 	// configured defaults
 	$scope.converterFormats = require("../defaults/converter-formats.js");
@@ -21,15 +20,52 @@ module.exports = function($scope, $http, $translate, $log, $timeout, formatServi
 	$scope.hwaccels = [];
 
 	$scope.supportedFormats = function() {
-		$scope.isLoading = true;
 		var formats = {};
 		angular.copy($scope.converterFormats, formats);
 
 		formatService.getSupportedFormats(formats).then(function(formats) {
 			$scope.formats = formats;
-			$scope.isLoading = false;
+			$rootScope.$emit("loadingDone");
 		}, function(error) {
 			$log.error("failure loading formats", error);
+		});
+	};
+
+	$scope.load = function() {
+		$rootScope.$emit("loading");
+
+		asyncQueue.load([ "/settings", "/converter/hwaccels" ]).then(function(results) {
+			results.forEach(function(result) {
+				if (result.config.url == "/settings") {
+					if (result.status === 200) {
+						if (result.data.output.length > 0) {
+							$scope.settings = result.data;
+						}
+					}
+				} else if (result.config.url == "/converter/hwaccels") {
+					$scope.hwaccels = result.data.hwaccels || [];
+				}
+			});
+
+			$scope.supportedFormats();
+		}, function(error) {
+			$rootScope.$emit("alertEvent", "error", error);
+			$log.error("failure loading settings", error);
+			$rootScope.$emit("loadingDone");
+		});
+	};
+
+	$scope.save = function(settings) {
+		$http.post("/settings", settings).then(function() {
+			$rootScope.$emit("alertEvent", "success", {
+				localizedMessage : "settings.saved.success",
+				closeable : true
+			});
+		}, function() {
+			$rootScope.$emit("alertEvent", "success", {
+				localizedMessage : "settings.saved.error",
+				closeable : false
+			});
 		});
 	};
 
@@ -52,36 +88,6 @@ module.exports = function($scope, $http, $translate, $log, $timeout, formatServi
 	$scope.checkedHWAccel = function(i, hwaccel) {
 		var shw = $scope.settings.hwaccels[i];
 		return shw !== undefined && shw !== null && shw.type === hwaccel.type && shw.index === hwaccel.index;
-	};
-
-	$scope.detectedHWAccels = function() {
-		$scope.hwaccels = [];
-
-		$http.get("/converter/hwaccels").then(function(result) {
-			$scope.hwaccels = result.data.hwaccels || [];
-		}, function(error) {
-			$log.error("failure loading hwaccels", error);
-		});
-	};
-
-	$scope.load = function() {
-		$http.get("/settings").then(function(response) {
-			if (response.status === 200) {
-				if (response.data.output.length > 0) {
-					$scope.settings = response.data;
-				}
-			}
-		}, function(error) {
-			$log.error("failure loading settings", error);
-		});
-	};
-
-	$scope.save = function(settings) {
-		$http.post("/settings", settings).then(function() {
-			$scope.showStatusMessage("success", $translate.instant("settings.saved.success"));
-		}, function() {
-			$scope.showStatusMessage("error", $translate.instant("settings.saved.error"));
-		});
 	};
 
 	$scope.filterCodecs = function(format, type) {
@@ -178,43 +184,6 @@ module.exports = function($scope, $http, $translate, $log, $timeout, formatServi
 		$scope.settings.output.splice(index, 1);
 	};
 
-	$scope.showStatusMessage = function(type, msg) {
-		var style = "primary";
-
-		switch (type) {
-		case "info":
-			style = "info";
-			break;
-		case "success":
-			style = "success";
-			break;
-		case "error":
-			style = "danger";
-			break;
-		case "warning":
-			style = "warning";
-			break;
-		}
-
-		$scope.status = {
-			style : style,
-			msg : msg
-		};
-
-		$timeout(function() {
-			var $elm = $("#status-message");
-			$elm.animate({
-				opacity : 0,
-				height : 0
-			}, "slow", function() {
-				$scope.status = {};
-				$elm.remove();
-			});
-		}, removeTimeout);
-	};
-
 	// init
 	$scope.load();
-	$scope.detectedHWAccels();
-	$scope.supportedFormats();
 };
