@@ -23,7 +23,7 @@ Run Server with:
     # run with custom settings
     $ java -jar myvidcore.jar --watchDir convert/input --outputDir convert/output
 
-Now you should be able to access the WEB-Interface on [http://localhost:8085/web](http://localhost:8085/web).
+Now you should be able to access the WEB-Interface on [http://localhost:8085/](http://localhost:8085/).
  
 **Access Server**
 
@@ -34,7 +34,7 @@ REST-API:
 
 WEB-Interface:
 
-    http://localhost:8085/web
+    http://localhost:8085/
 
 ## Commandline Options
 
