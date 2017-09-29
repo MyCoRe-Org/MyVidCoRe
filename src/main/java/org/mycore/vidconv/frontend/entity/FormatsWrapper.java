@@ -63,7 +63,7 @@ public class FormatsWrapper {
      * @param formats the formats to set
      */
     public FormatsWrapper setFormats(List<FormatWrapper> formats) {
-        this.formats = Collections.synchronizedList(formats);
+        this.formats = Collections.synchronizedList(Collections.unmodifiableList(formats));
         return this;
     }
 

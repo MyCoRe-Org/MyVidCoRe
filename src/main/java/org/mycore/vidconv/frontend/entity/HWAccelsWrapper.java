@@ -46,7 +46,7 @@ public class HWAccelsWrapper {
      * @param hwaccels the hwaccels to set
      */
     public HWAccelsWrapper setHWAccels(List<HWAccelWrapper<? extends HWAccelDeviceSpec>> hwaccels) {
-        this.hwaccels = Collections.synchronizedList(hwaccels);
+        this.hwaccels = Collections.synchronizedList(Collections.unmodifiableList(hwaccels));
         return this;
     }
 

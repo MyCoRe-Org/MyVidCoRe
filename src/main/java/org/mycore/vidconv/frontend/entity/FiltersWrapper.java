@@ -53,7 +53,7 @@ public class FiltersWrapper {
      * @param filters the filters to set
      */
     public FiltersWrapper setFilters(List<FilterWrapper> filters) {
-        this.filters = Collections.synchronizedList(filters);
+        this.filters = Collections.synchronizedList(Collections.unmodifiableList(filters));
         return this;
     }
 

@@ -73,7 +73,7 @@ public class CodecsWrapper {
      * @param codecs the codecs to set
      */
     public CodecsWrapper setCodecs(List<CodecWrapper> codecs) {
-        this.codecs = Collections.synchronizedList(codecs);
+        this.codecs = Collections.synchronizedList(Collections.unmodifiableList(codecs));
         return this;
     }
 
