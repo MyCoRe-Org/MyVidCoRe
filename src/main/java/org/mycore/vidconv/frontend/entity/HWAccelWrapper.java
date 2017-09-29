@@ -96,6 +96,17 @@ public class HWAccelWrapper<T extends HWAccelDeviceSpec>
         this.deviceSpec = (T) deviceSpech.clone();
     }
 
+    public HWAccelWrapper<T> basicCopy() {
+        HWAccelWrapper<T> copy = new HWAccelWrapper<>();
+
+        copy.setIndex(getIndex());
+        copy.setName(getName());
+        copy.setType(getType());
+        copy.setDeviceSpec(getDeviceSpec().basicCopy());
+
+        return copy;
+    }
+
     /* (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */

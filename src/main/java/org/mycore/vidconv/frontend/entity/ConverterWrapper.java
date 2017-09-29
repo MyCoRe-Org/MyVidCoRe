@@ -175,13 +175,13 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
         return errorStream;
     }
 
-    public ConverterWrapper getBasicCopy() {
+    public ConverterWrapper basicCopy() {
         final ConverterWrapper copy = new ConverterWrapper();
 
         copy.id = this.id;
         copy.fileName = this.fileName;
         copy.outputs = this.outputs;
-        copy.hwAccel = this.hwAccel;
+        copy.hwAccel = Optional.ofNullable(this.hwAccel).map(HWAccelWrapper::basicCopy).orElse(null);
         copy.running = this.running;
         copy.done = this.done;
         copy.addTime = this.addTime;

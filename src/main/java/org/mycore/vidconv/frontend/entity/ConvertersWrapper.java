@@ -69,7 +69,7 @@ public class ConvertersWrapper {
 
     @XmlElement(name = "converter")
     public List<ConverterWrapper> getConverters() {
-        return converters.stream().map(c -> c.getBasicCopy())
+        return converters.stream().map(c -> c.basicCopy())
                 .collect(Collectors.toCollection(ArrayList<ConverterWrapper>::new));
     }
 

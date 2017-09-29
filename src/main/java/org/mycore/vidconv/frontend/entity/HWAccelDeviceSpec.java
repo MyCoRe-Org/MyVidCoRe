@@ -48,4 +48,6 @@ public abstract class HWAccelDeviceSpec implements Comparable<HWAccelDeviceSpec>
     @Override
     protected abstract HWAccelDeviceSpec clone();
 
+    public abstract <T extends HWAccelDeviceSpec> T basicCopy();
+
 }

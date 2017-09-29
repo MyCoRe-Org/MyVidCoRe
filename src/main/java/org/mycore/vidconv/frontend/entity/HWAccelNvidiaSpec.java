@@ -346,4 +346,21 @@ public class HWAccelNvidiaSpec extends HWAccelDeviceSpec {
         return copy;
     }
 
+    /* (non-Javadoc)
+     * @see org.mycore.vidconv.frontend.entity.HWAccelDeviceSpec#basicCopy()
+     */
+    @Override
+    public HWAccelNvidiaSpec basicCopy() {
+        HWAccelNvidiaSpec copy = new HWAccelNvidiaSpec();
+
+        copy.setName(getName());
+        copy.setFamily(getFamily());
+        copy.setChip(getChip());
+        copy.setNumChips(getNumChips());
+        copy.setNumEncoder(getNumEncoder());
+        copy.setNumDecoder(getNumDecoder());
+
+        return copy;
+    }
+
 }
