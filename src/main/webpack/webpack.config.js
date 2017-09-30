@@ -12,10 +12,6 @@ module.exports = {
 	}), new webpack.optimize.CommonsChunkPlugin({
 		name : "vendor",
 		filename : "js/vendor.bundle.js",
-	}), new webpack.optimize.LimitChunkCountPlugin({
-		maxChunks : 15
-	}), new webpack.optimize.MinChunkSizePlugin({
-		minChunkSize : 10000
 	}), new webpack.optimize.OccurrenceOrderPlugin(), new webpack.optimize.UglifyJsPlugin({
 		mangle : false,
 		sourceMap : true,
