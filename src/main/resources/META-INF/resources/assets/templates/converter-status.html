@@ -68,7 +68,7 @@
 							<span class="fa fa-terminal" aria-hidden="true"></span>
 						</button>
 						<div class="btn-group" role="group">
-							<button class="btn btn-xs btn-default hidden-xs dropdown-toggle" aria-expanded="false" aria-controls="preview-{{converter.id}}"
+							<button class="btn btn-xs btn-default dropdown-toggle" aria-expanded="false" aria-controls="preview-{{converter.id}}"
 								data-target="#preview-{{converter.id}}" data-toggle="collapse"
 								data-ng-disabled="!((converter.files | endsWith:'.mp4':'name') || (converter.files | endsWith:'.webm':'name'))"
 								data-ng-click="initPreview(converter.id)"
@@ -89,7 +89,7 @@
 				<div class="col-xs-12 collapse" id="details-{{converter.id}}">
 					<pre class="pre-scrollable console">{{formatStream(details[converter.id].errorStream)}}</pre>
 				</div>
-				<div class="col-xs-12 hidden-xs collapse" id="preview-{{converter.id}}"
+				<div class="col-xs-12 collapse" id="preview-{{converter.id}}"
 					data-ng-if="((converter.files | endsWith:'.mp4':'name') || (converter.files | endsWith:'.webm':'name'))"
 				>
 					<video id="video-{{converter.id}}" class="video-preview video-js vjs-default-skin vjs-big-play-centered" controls preload="none">
