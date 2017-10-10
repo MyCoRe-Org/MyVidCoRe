@@ -27,6 +27,7 @@ import java.time.Instant;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -214,7 +215,7 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
 
     @XmlRootElement
     static class Progress implements Comparable<Progress> {
-        private static final DateTimeFormatter DURATION_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss");
+        private static final DateTimeFormatter DURATION_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss", Locale.ROOT);
 
         @XmlAttribute(name = "percent")
         private Integer percent;

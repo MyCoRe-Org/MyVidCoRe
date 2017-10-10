@@ -25,6 +25,7 @@ import java.lang.reflect.Modifier;
 import java.text.MessageFormat;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -147,8 +148,9 @@ public class AutoExecutableHandler {
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info(msg);
         } else {
-            System.out.println(MessageFormat.format("{0} INFO\t{1}: {2}", Instant.now().toString(),
-                AutoExecutableHandler.class.getSimpleName(), msg));
+            System.out.println(
+                (new MessageFormat("{0} INFO\t{1}: {2}", Locale.ROOT)).format(new Object[] { Instant.now().toString(),
+                    AutoExecutableHandler.class.getSimpleName(), msg }, new StringBuffer(), null).toString());
         }
     }
 }
