@@ -26,9 +26,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -58,6 +61,7 @@ import org.mycore.vidconv.common.event.Event;
 import org.mycore.vidconv.common.event.EventManager;
 import org.mycore.vidconv.common.event.Listener;
 import org.mycore.vidconv.common.util.Executable;
+import org.mycore.vidconv.common.util.JsonUtils;
 import org.mycore.vidconv.common.util.StreamConsumer;
 import org.mycore.vidconv.frontend.entity.ConverterWrapper;
 import org.mycore.vidconv.frontend.entity.ConvertersWrapper;
@@ -111,6 +115,8 @@ public class ConverterService extends Widget implements Listener {
         converterThreadPool = Executors.newFixedThreadPool(
             hwAccelConverterThreads > 0 ? Integer.min(hwAccelConverterThreads, converterThreads)
                 : converterThreads);
+
+        addIncompleteJobs();
     }
 
     /**
@@ -218,7 +224,7 @@ public class ConverterService extends Widget implements Listener {
         if (DirectoryWatchService.EVENT_ENTRY_CREATE.equals(event.getType())
             && event.getSource().equals(DirectoryWatchService.class)) {
             Path inputPath = event.getParameter("path");
-            addConverter(inputPath);
+            addConverter(inputPath, null);
         }
 
         if (ConverterJob.DONE.equals(event.getType())
@@ -230,13 +236,13 @@ public class ConverterService extends Widget implements Listener {
         }
     }
 
-    private void addConverter(final Path inputPath)
+    private void addConverter(final Path inputPath, final String jobId)
         throws InterruptedException, JAXBException, ExecutionException, IOException {
         final SettingsWrapper settings = SETTINGS.getSettings();
 
         if (settings != null && !settings.getOutput().isEmpty() && !Files.isDirectory(inputPath)) {
             if (FFMpegImpl.isEncodingSupported(inputPath)) {
-                final String id = Long.toHexString(new Random().nextLong());
+                final String id = Optional.ofNullable(jobId).orElse(Long.toHexString(new Random().nextLong()));
                 final String fileName = inputPath.getFileName().toString();
                 final Path outputPath = Paths.get(outputDir, id);
 
@@ -270,6 +276,32 @@ public class ConverterService extends Widget implements Listener {
             } else {
                 LOGGER.warn("encoding of file \"" + inputPath.toFile().getAbsolutePath() + "\" isn't supported.");
             }
+        }
+    }
+
+    private void addIncompleteJobs() {
+        try {
+            LOGGER.info("search for incomplete jobs...");
+            Files.walkFileTree(Paths.get(outputDir), new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    if (file.getFileName().equals(Paths.get(".convert"))) {
+                        try {
+                            ConverterWrapper cw = JsonUtils.loadJSON(file.toFile(), ConverterWrapper.class);
+                            if (!cw.isDone()) {
+                                LOGGER.info("...restart \"{}\" with id \"{}\".", cw.getFileName(), cw.getId());
+                                addConverter(Paths.get(cw.getInputPath(), cw.getFileName()), cw.getId());
+                            }
+                        } catch (JAXBException | InterruptedException | ExecutionException e) {
+                            LOGGER.error("Couldn't add incomplete jobs.", e);
+                        }
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+            LOGGER.info("...done.");
+        } catch (IOException e) {
+            LOGGER.error("Couldn't read incomplete jobs.", e);
         }
     }
 

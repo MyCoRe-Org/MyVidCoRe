@@ -50,6 +50,8 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
 
     private String command;
 
+    private String inputPath;
+
     private String fileName;
 
     private List<Output> outputs;
@@ -82,6 +84,7 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
 
         this.id = id;
         this.command = converter.command();
+        this.inputPath = converter.inputPath().getParent().toString();
         this.fileName = converter.inputPath().getFileName().toString();
         this.outputs = converter.outputs();
         this.hwAccel = converter.hwAccel();
@@ -103,6 +106,11 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
     @XmlElement(name = "command")
     public String getCommand() {
         return command;
+    }
+
+    @XmlAttribute(name = "inputPath")
+    public String getInputPath() {
+        return inputPath;
     }
 
     @XmlAttribute(name = "file")
@@ -174,6 +182,104 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
     @XmlElement(name = "errorStream")
     public String getErrorStream() {
         return errorStream;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    /**
+     * @param command the command to set
+     */
+    public void setCommand(String command) {
+        this.command = command;
+    }
+
+    /**
+     * @param inputPath the inputPath to set
+     */
+    public void setInputPath(String inputPath) {
+        this.inputPath = inputPath;
+    }
+
+    /**
+     * @param fileName the fileName to set
+     */
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    /**
+     * @param outputs the outputs to set
+     */
+    public void setOutputs(List<Output> outputs) {
+        this.outputs = outputs;
+    }
+
+    /**
+     * @param running the running to set
+     */
+    public void setRunning(boolean running) {
+        this.running = running;
+    }
+
+    /**
+     * @param done the done to set
+     */
+    public void setDone(boolean done) {
+        this.done = done;
+    }
+
+    /**
+     * @param addTime the addTime to set
+     */
+    public void setAddTime(String addTime) {
+        this.addTime = Instant.parse(addTime);
+    }
+
+    /**
+     * @param startTime the startTime to set
+     */
+    public void setStartTime(String startTime) {
+        this.startTime = Instant.parse(startTime);
+    }
+
+    /**
+     * @param endTime the endTime to set
+     */
+    public void setEndTime(String endTime) {
+        this.endTime = Instant.parse(endTime);
+    }
+
+    /**
+     * @param exitValue the exitValue to set
+     */
+    public void setExitValue(Integer exitValue) {
+        this.exitValue = exitValue;
+    }
+
+    /**
+     * @param progress the progress to set
+     */
+    public void setProgress(Progress progress) {
+        this.progress = progress;
+    }
+
+    /**
+     * @param outputStream the outputStream to set
+     */
+    public void setOutputStream(String outputStream) {
+        this.outputStream = outputStream;
+    }
+
+    /**
+     * @param errorStream the errorStream to set
+     */
+    public void setErrorStream(String errorStream) {
+        this.errorStream = errorStream;
     }
 
     public ConverterWrapper basicCopy() {
