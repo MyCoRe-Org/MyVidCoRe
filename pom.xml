@@ -126,7 +126,7 @@
               <goal>install-node-and-yarn</goal>
             </goals>
             <configuration>
-              <nodeVersion>v6.9.1</nodeVersion>
+              <nodeVersion>v8.6.0</nodeVersion>
               <yarnVersion>v1.1.0</yarnVersion>
             </configuration>
           </execution>
