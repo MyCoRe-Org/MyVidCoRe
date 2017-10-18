@@ -102,10 +102,16 @@ public class ConverterService extends Widget implements Listener {
                 .forEach(hw -> hwAccels.add(hw)));
     }
 
-    public ConverterService(final String outputDir, int converterThreads) {
+    public ConverterService(final String outputDir, int converterThreads) throws IOException {
         super(WIDGET_NAME);
 
         this.outputDir = outputDir;
+
+        Path outputPath = Paths.get(outputDir);
+        if (!Files.exists(outputPath)) {
+            Files.createDirectories(outputPath);
+        }
+
         EVENT_MANAGER.addListener(this);
 
         int hwAccelConverterThreads = hwAccels.stream()
