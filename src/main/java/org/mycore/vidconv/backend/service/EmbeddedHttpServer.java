@@ -34,7 +34,9 @@ import javax.ws.rs.core.UriBuilderException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
+import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.grizzly.websockets.WebSocketAddOn;
+import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.message.GZipEncoder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.EncodingFilter;
@@ -42,13 +44,10 @@ import org.mycore.vidconv.common.config.Configuration;
 import org.mycore.vidconv.frontend.FrontendFeature;
 import org.mycore.vidconv.frontend.widget.Widget;
 
-import com.sun.net.httpserver.HttpServer;
-
 /**
  * @author Ren\u00E9 Adler (eagle)
  *
  */
-@SuppressWarnings("restriction")
 public class EmbeddedHttpServer extends Widget {
 
     public static final String WIDGET_NAME = "embeddedHttpServer";
@@ -82,6 +81,9 @@ public class EmbeddedHttpServer extends Widget {
                 String.format(Locale.ROOT,
                     "Jersey Application Server started with WADL available at " + "%sapplication.wadl",
                     getURI()));
+
+            WebSocketAddOn addon = new WebSocketAddOn();
+            httpServer.getListeners().forEach(listener -> listener.registerAddOn(addon));
         }
         httpServer.start();
     }
@@ -89,7 +91,7 @@ public class EmbeddedHttpServer extends Widget {
     @Override
     public void stop() throws Exception {
         LOGGER.info("Stopping Embedded HTTP Server...");
-        httpServer.stop(0);
+        httpServer.shutdown();
     }
 
     private HttpServer createHttpServer()
@@ -98,7 +100,7 @@ public class EmbeddedHttpServer extends Widget {
             .packages(true, Configuration.instance().getStrings("APP.Jersey.Resources").toArray(new String[0]))
             .register(FrontendFeature.class);
         EncodingFilter.enableFor(resourceConfig, GZipEncoder.class);
-        return JdkHttpServerFactory.createHttpServer(getURI(), resourceConfig, false);
+        return GrizzlyHttpServerFactory.createHttpServer(getURI(), resourceConfig, false);
     }
 
     private URI getURI() throws IllegalArgumentException, UriBuilderException, URISyntaxException {
@@ -111,7 +113,7 @@ public class EmbeddedHttpServer extends Widget {
 
         String hostName = "localhost";
         try {
-            hostName = InetAddress.getLocalHost().getCanonicalHostName();
+            hostName = InetAddress.getByName(hostName).getCanonicalHostName();
         } catch (UnknownHostException e) {
             LOGGER.error(e.getMessage(), e);
         }
