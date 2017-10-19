@@ -68,7 +68,7 @@ public class EventManager {
         listeners.remove(listener.getClass().getName());
     }
 
-    public void fireEvent(final Event event) {
+    public void fireEvent(final Event<?> event) {
         listeners.values().forEach(d -> {
             try {
                 d.handleEvent(event);
@@ -79,7 +79,7 @@ public class EventManager {
         });
     }
 
-    public void fireEvent(final Class<? extends Listener> delegate, final Event event) {
+    public void fireEvent(final Class<? extends Listener> delegate, final Event<?> event) {
         listeners.entrySet().stream().filter(e -> e.getKey().equals(delegate.getName())).findFirst().ifPresent(e -> {
             try {
                 e.getValue().handleEvent(event);

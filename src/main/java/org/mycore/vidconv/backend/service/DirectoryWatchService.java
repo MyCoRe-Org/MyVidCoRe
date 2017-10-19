@@ -42,7 +42,6 @@ import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -124,7 +123,6 @@ public class DirectoryWatchService extends Widget implements Listener {
         ws = fs.newWatchService();
 
         service.submit(new Runnable() {
-            @SuppressWarnings("serial")
             @Override
             public void run() {
                 while (!Thread.interrupted()) {
@@ -171,11 +169,7 @@ public class DirectoryWatchService extends Widget implements Listener {
                     // fire event after a given time without changes
                     events.forEach((p, ie) -> {
                         if (Duration.between(ie.lastModified, Instant.now()).toMillis() > EVENT_DELAY) {
-                            EVENT_MANAGER.fireEvent(new Event(ie.kind.name(), new HashMap<String, Object>() {
-                                {
-                                    put("path", p);
-                                }
-                            }, that.getClass()));
+                            EVENT_MANAGER.fireEvent(new Event<Path>(ie.kind.name(), p, that.getClass()));
                             events.remove(p);
                         }
                     });
@@ -188,9 +182,9 @@ public class DirectoryWatchService extends Widget implements Listener {
      * @see org.mycore.vidconv.common.event.Listener#handleEvent(org.mycore.vidconv.common.event.Event)
      */
     @Override
-    public void handleEvent(Event event) throws Exception {
+    public void handleEvent(Event<?> event) throws Exception {
         if (EVENT_REGISTER_PATH.equals(event.getType())) {
-            registerDirectory(event.getParameter("path"));
+            registerDirectory((Path) event.getObject());
         }
     }
 

@@ -22,77 +22,71 @@
  */
 package org.mycore.vidconv.common.event;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
  *
  */
-public class Event {
+@XmlRootElement(name = "event")
+public class Event<T> {
 
     private String type;
 
-    private Map<String, Object> params;
+    private T object;
 
     private Class<?> source;
 
+    protected Event() {
+    }
+
     public Event(final String type) {
-        this(type, Collections.emptyMap(), null);
+        this(type, null, null);
     }
 
     public Event(final String type, Class<?> source) {
-        this(type, Collections.emptyMap(), source);
+        this(type, null, source);
     }
 
-    public Event(final String type, Map<String, ?> params) {
-        this(type, params, null);
+    public Event(final String type, T object) {
+        this(type, object, null);
     }
 
-    public Event(final String type, Map<String, ?> params, Class<?> source) {
+    public Event(final String type, T object, Class<?> source) {
         this.type = type;
-        this.params = new ConcurrentHashMap<>(params);
+        this.object = object;
         this.source = source;
     }
 
     /**
      * @return the type
      */
+    @XmlAttribute(name = "type")
     public String getType() {
         return type;
     }
 
     /**
-     * @return the params
+     * @return the object
      */
-    public Map<String, Object> getParams() {
-        return params;
+    @XmlElement
+    public T getObject() {
+        return object;
     }
 
     /**
-     * @param name the parameter name
-     * @param clazz the parameter type
-     * @return
+     * @param object the object to set
      */
-    @SuppressWarnings("unchecked")
-    public <T> T getParameter(final String name) {
-        return (T) this.params.get(name);
-    }
-
-    /**
-     * @param name the parameter name
-     * @param value the parameter value
-     */
-    public void setParameter(final String name, Object value) {
-        this.params.put(name, value);
+    public void setObject(T object) {
+        this.object = object;
     }
 
     /**
      * @return the source
      */
+    @XmlAttribute(name = "source")
     public Class<?> getSource() {
         return source;
     }
@@ -102,7 +96,6 @@ public class Event {
      */
     @Override
     public String toString() {
-        final int maxLen = 10;
         StringBuilder builder = new StringBuilder();
         builder.append("Event [");
         if (type != null) {
@@ -110,9 +103,9 @@ public class Event {
             builder.append(type);
             builder.append(", ");
         }
-        if (params != null) {
-            builder.append("params=");
-            builder.append(toString(params.entrySet(), maxLen));
+        if (object != null) {
+            builder.append("object=");
+            builder.append(object);
             builder.append(", ");
         }
         if (source != null) {
@@ -123,16 +116,4 @@ public class Event {
         return builder.toString();
     }
 
-    private String toString(Collection<?> collection, int maxLen) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("[");
-        int i = 0;
-        for (Iterator<?> iterator = collection.iterator(); iterator.hasNext() && i < maxLen; i++) {
-            if (i > 0)
-                builder.append(", ");
-            builder.append(iterator.next());
-        }
-        builder.append("]");
-        return builder.toString();
-    }
 }

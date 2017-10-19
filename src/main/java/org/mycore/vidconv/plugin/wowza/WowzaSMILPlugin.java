@@ -44,11 +44,11 @@ public class WowzaSMILPlugin implements Listener {
      * @see org.mycore.vidconv.common.event.Listener#handleEvent(org.mycore.vidconv.common.event.Event)
      */
     @Override
-    public void handleEvent(Event event) throws Exception {
+    public void handleEvent(Event<?> event) throws Exception {
         if (ConverterService.EVENT_CONVERT_DONE.equals(event.getType())
             && event.getSource().equals(ConverterService.class)) {
 
-            final ConverterJob job = event.getParameter("job");
+            final ConverterJob job = (ConverterJob) event.getObject();
             final String fileName = job.inputPath().getFileName().toString();
             final Path file = job.outputPath()
                 .resolve(fileName.substring(0, fileName.lastIndexOf(".")) + ".smil");

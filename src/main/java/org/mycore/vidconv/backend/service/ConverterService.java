@@ -35,7 +35,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -78,6 +77,8 @@ import org.mycore.vidconv.frontend.widget.Widget;
 public class ConverterService extends Widget implements Listener {
 
     public static final String WIDGET_NAME = "converter";
+
+    public static final String EVENT_CONVERT_START = "converter_start";
 
     public static final String EVENT_CONVERT_DONE = "converter_done";
 
@@ -226,19 +227,18 @@ public class ConverterService extends Widget implements Listener {
      * @see org.mycore.vidconv.common.event.Listener#handleEvent(org.mycore.vidconv.common.event.Event)
      */
     @Override
-    public void handleEvent(Event event) throws Exception {
+    public void handleEvent(Event<?> event) throws Exception {
         if (DirectoryWatchService.EVENT_ENTRY_CREATE.equals(event.getType())
             && event.getSource().equals(DirectoryWatchService.class)) {
-            Path inputPath = event.getParameter("path");
+            Path inputPath = (Path) event.getObject();
             addConverter(inputPath, null);
         }
 
-        if (ConverterJob.DONE.equals(event.getType())
+        if ((ConverterJob.START.equals(event.getType()) || ConverterJob.DONE.equals(event.getType()))
             && event.getSource().equals(ConverterJob.class)) {
-
-            Event ev = new Event(EVENT_CONVERT_DONE, this.getClass());
-            ev.setParameter("job", converters.get(event.getParameter("id")));
-            EVENT_MANAGER.fireEvent(ev);
+            String type = ConverterJob.START.equals(event.getType()) ? EVENT_CONVERT_START : EVENT_CONVERT_DONE;
+            EVENT_MANAGER
+                .fireEvent(new Event<ConverterJob>(type, converters.get((String) event.getObject()), this.getClass()));
         }
     }
 
@@ -313,6 +313,8 @@ public class ConverterService extends Widget implements Listener {
 
     public static class ConverterJob implements Runnable {
 
+        public static final String START = "start";
+
         public static final String DONE = "done";
 
         private final String id;
@@ -358,7 +360,6 @@ public class ConverterService extends Widget implements Listener {
                 Files.createDirectories(outputPath);
         }
 
-        @SuppressWarnings("serial")
         @Override
         public void run() {
             try {
@@ -376,6 +377,8 @@ public class ConverterService extends Widget implements Listener {
 
                 command = FFMpegImpl.command(id, inputPath, outputs, hwAccel);
                 final Executable exec = new Executable(command);
+
+                EVENT_MANAGER.fireEvent(new Event<String>(START, id, this.getClass()));
 
                 final Process p = exec.run();
 
@@ -395,11 +398,7 @@ public class ConverterService extends Widget implements Listener {
 
                 LOGGER.info("Converting of " + inputPath.toString() + " done.");
 
-                EVENT_MANAGER.fireEvent(new Event(DONE, new HashMap<String, String>() {
-                    {
-                        put("id", id);
-                    }
-                }, this.getClass()));
+                EVENT_MANAGER.fireEvent(new Event<String>(DONE, id, this.getClass()));
             } catch (InterruptedException | JAXBException | ExecutionException | IOException e) {
                 LOGGER.error(e.getMessage(), e);
             }

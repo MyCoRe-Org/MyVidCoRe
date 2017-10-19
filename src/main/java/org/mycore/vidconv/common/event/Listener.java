@@ -28,6 +28,6 @@ package org.mycore.vidconv.common.event;
  */
 public abstract interface Listener {
 
-    public abstract void handleEvent(final Event event) throws Exception;
+    public abstract void handleEvent(final Event<?> event) throws Exception;
 
 }
