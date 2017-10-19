@@ -16,15 +16,8 @@
  */
 package org.mycore.vidconv.frontend;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
-import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,7 +28,6 @@ import org.mycore.vidconv.frontend.filter.CacheFilter;
 import org.mycore.vidconv.frontend.provider.GenericExceptionMapper;
 import org.mycore.vidconv.frontend.provider.XmlMessageBodyReader;
 import org.mycore.vidconv.frontend.provider.XmlMessageBodyWriter;
-import org.reflections.Reflections;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
@@ -44,19 +36,6 @@ import org.reflections.Reflections;
 public class FrontendFeature implements Feature {
 
     private static final Logger LOGGER = LogManager.getLogger();
-
-    private static final List<Class<?>> CACHED_ENTITIES = Collections.synchronizedList(new ArrayList<>());
-
-    public static List<Class<?>> populateEntities(List<String> pkgs) throws IOException {
-        synchronized (CACHED_ENTITIES) {
-            if (CACHED_ENTITIES.isEmpty()) {
-                CACHED_ENTITIES.addAll(
-                    pkgs.stream().map(pkg -> new Reflections(pkg).getTypesAnnotatedWith(XmlRootElement.class))
-                        .flatMap(ts -> ts.stream()).collect(Collectors.toList()));
-            }
-            return CACHED_ENTITIES;
-        }
-    }
 
     /*
      * (non-Javadoc)

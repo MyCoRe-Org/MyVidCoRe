@@ -31,7 +31,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.mycore.vidconv.common.config.Configuration;
-import org.mycore.vidconv.frontend.FrontendFeature;
+import org.mycore.vidconv.common.util.EntityUtils;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
@@ -69,7 +69,7 @@ public class XmlMessageBodyReader<T> implements MessageBodyReader<T> {
 			throws IOException, WebApplicationException {
 		try {
 			JAXBContext jc = JAXBContext
-					.newInstance(FrontendFeature.populateEntities(CONFIG.getStrings("APP.Jersey.DynamicEntities"))
+					.newInstance(EntityUtils.populateEntities(CONFIG.getStrings("APP.Jersey.DynamicEntities"))
 							.stream().toArray(Class<?>[]::new));
 			final Unmarshaller unmarshaller = jc.createUnmarshaller();
 			return (T) unmarshaller.unmarshal(entityStream);

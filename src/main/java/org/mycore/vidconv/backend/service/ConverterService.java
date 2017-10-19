@@ -47,13 +47,10 @@ import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.persistence.jaxb.MarshallerProperties;
 import org.mycore.vidconv.backend.encoder.FFMpegImpl;
 import org.mycore.vidconv.common.config.Settings;
 import org.mycore.vidconv.common.event.Event;
@@ -460,15 +457,8 @@ public class ConverterService extends Widget implements Listener {
             return errorConsumer != null ? errorConsumer.getStreamOutput() : null;
         }
 
-        private void save() throws JAXBException {
-            final JAXBContext jc = JAXBContext.newInstance(ConverterWrapper.class);
-            final Marshaller marshaller = jc.createMarshaller();
-            marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, "application/json");
-            marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-
-            marshaller.marshal(new ConverterWrapper(id, this),
-                outputPath.resolve(".convert").toFile());
+        private void save() throws JAXBException, IOException {
+            JsonUtils.saveJSON(outputPath.resolve(".convert").toFile(), new ConverterWrapper(id, this));
         }
     }
 }

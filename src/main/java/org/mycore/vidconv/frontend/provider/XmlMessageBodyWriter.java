@@ -33,7 +33,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.mycore.vidconv.common.config.Configuration;
-import org.mycore.vidconv.frontend.FrontendFeature;
+import org.mycore.vidconv.common.util.EntityUtils;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
@@ -84,7 +84,7 @@ public class XmlMessageBodyWriter<T> implements MessageBodyWriter<T> {
 			throws IOException, WebApplicationException {
 		try {
 			JAXBContext jc = JAXBContext
-					.newInstance(FrontendFeature.populateEntities(CONFIG.getStrings("APP.Jersey.DynamicEntities"))
+					.newInstance(EntityUtils.populateEntities(CONFIG.getStrings("APP.Jersey.DynamicEntities"))
 							.stream().toArray(Class<?>[]::new));
 			final Marshaller marshaller = jc.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);

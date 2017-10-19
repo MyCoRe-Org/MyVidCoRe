@@ -23,23 +23,16 @@
 package org.mycore.vidconv.common.config;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.stream.StreamSource;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.persistence.jaxb.MarshallerProperties;
-import org.eclipse.persistence.jaxb.UnmarshallerProperties;
+import org.mycore.vidconv.common.util.JsonUtils;
 import org.mycore.vidconv.frontend.entity.SettingsWrapper;
 import org.mycore.vidconv.frontend.entity.SettingsWrapper.Output;
 
@@ -103,8 +96,9 @@ public class Settings {
     /**
      * @param settings the settings to set
      * @throws JAXBException 
+     * @throws IOException 
      */
-    public void setSettings(SettingsWrapper settings) throws JAXBException {
+    public void setSettings(SettingsWrapper settings) throws JAXBException, IOException {
         settings.setOutput(settings.getOutput().stream()
             .sorted(sortOutputs).collect(Collectors.toList()));
         this.settings = settings;
@@ -114,35 +108,12 @@ public class Settings {
     private void loadSettings() throws JAXBException, IOException {
         final File sFile = ConfigurationDir.getConfigFile("settings.json");
         if (sFile.exists()) {
-            final JAXBContext jc = JAXBContext.newInstance(SettingsWrapper.class);
-            final Unmarshaller unmarshaller = jc.createUnmarshaller();
-            unmarshaller.setProperty(UnmarshallerProperties.MEDIA_TYPE, "application/json");
-            unmarshaller.setProperty(UnmarshallerProperties.JSON_INCLUDE_ROOT, true);
-
-            FileInputStream fis = null;
-            try {
-                fis = new FileInputStream(sFile);
-                final StreamSource json = new StreamSource(fis);
-                setSettings(unmarshaller.unmarshal(json, SettingsWrapper.class).getValue());
-            } catch (FileNotFoundException e) {
-                LOGGER.error("No settings file (" + sFile.getAbsolutePath() + ") found.");
-            } finally {
-                if (fis != null) {
-                    fis.close();
-                }
-            }
+            setSettings(JsonUtils.loadJSON(sFile, SettingsWrapper.class, true));
         }
-
     }
 
-    private void saveSettings(final SettingsWrapper settings) throws JAXBException {
-        final JAXBContext jc = JAXBContext.newInstance(SettingsWrapper.class);
-        final Marshaller marshaller = jc.createMarshaller();
-        marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, "application/json");
-        marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, true);
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-
+    private void saveSettings(final SettingsWrapper settings) throws JAXBException, IOException {
         final File sFile = ConfigurationDir.getConfigFile("settings.json");
-        marshaller.marshal(settings, sFile);
+        JsonUtils.saveJSON(sFile, settings, true, true);
     }
 }
