@@ -25,6 +25,7 @@ package org.mycore.vidconv.common.event;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
@@ -38,6 +39,8 @@ public class Event<T> {
     private T object;
 
     private Class<?> source;
+
+    private boolean internal;
 
     protected Event() {
     }
@@ -56,6 +59,7 @@ public class Event<T> {
 
     public Event(final String type, T object, Class<?> source) {
         this.type = type;
+        this.internal = true;
         this.object = object;
         this.source = source;
     }
@@ -66,6 +70,13 @@ public class Event<T> {
     @XmlAttribute(name = "type")
     public String getType() {
         return type;
+    }
+
+    /**
+     * @param type the type to set
+     */
+    protected void setType(String type) {
+        this.type = type;
     }
 
     /**
@@ -89,6 +100,29 @@ public class Event<T> {
     @XmlAttribute(name = "source")
     public Class<?> getSource() {
         return source;
+    }
+
+    /**
+     * @param source the source to set
+     */
+    protected void setSource(Class<?> source) {
+        this.source = source;
+    }
+
+    /**
+     * @return the internal
+     */
+    @XmlTransient
+    public boolean isInternal() {
+        return internal;
+    }
+
+    /**
+     * @param internal the internal to set
+     */
+    public Event<T> setInternal(boolean internal) {
+        this.internal = internal;
+        return this;
     }
 
     /* (non-Javadoc)
