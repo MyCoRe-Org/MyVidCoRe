@@ -1,11 +1,41 @@
-module.exports = function($scope, $http, $interval, asyncQueue) {
+module.exports = function($scope, $http, $interval, $websocket, asyncQueue) {
 	var refresh;
 	var removeTimeout = 30000;
+	
+	function wsURL(context) {
+	    var l = window.location;
+	    return ((l.protocol === "https:") ? "wss://" : "ws://") + l.hostname + (((l.port != 80) && (l.port != 443)) ? ":" + l.port : "") + context;
+	}
+	
 	$scope.converters = {
 		"active" : {},
 		"done" : {}
 	};
 	$scope.details = [];
+	
+	$scope.ws = $websocket(wsURL("/converter"));
+	$scope.ws.reconnectIfNotNormalClose = true;
+	
+	$scope.ws.onMessage(function(message) {
+        if (message && message.data) {
+        	var obj = angular.fromJson(message.data);
+        	if (obj.event && obj.event.type.indexOf("converter") === 0) {
+        		var converters = $scope.converters["active"].converter;
+        		var ec = obj.event.object;
+        		var found = false;
+        		for ( var i in converters) {
+        			if (converters[i].id === ec.id) {
+        				converters[i] = ec;
+        				found = true;
+        				break;
+        			}
+        		}
+        		if (!found) {
+        			converters.push(ec);
+        		}
+        	}
+        }
+	});
 
 	$scope.loadData = function() {
 		var urls = [];
@@ -130,11 +160,14 @@ module.exports = function($scope, $http, $interval, asyncQueue) {
 		if (refresh) {
 			$interval.cancel(refresh);
 		}
+		if ($scope.ws) {
+			$scope.ws.close();
+		}
 	});
 
 	$scope.loadData();
 
 	refresh = $interval(function() {
 		$scope.loadData();
-	}, 3000);
+	}, 10000);
 };

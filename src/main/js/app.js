@@ -3,7 +3,7 @@ var routing = require("./utils/routing.js");
 
 var appName = "MyVidCoRe";
 
-var app = module.export = angular.module(appName, [ "ngAnimate", "ngSanitize", "ngRoute", "pascalprecht.translate" ]);
+var app = module.export = angular.module(appName, [ "ngAnimate", "ngSanitize", "ngRoute", "ngWebSocket", "pascalprecht.translate" ]);
 
 /**
  * Configure App

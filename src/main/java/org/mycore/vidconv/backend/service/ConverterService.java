@@ -40,6 +40,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -76,6 +78,8 @@ public class ConverterService extends Widget implements Listener {
     public static final String WIDGET_NAME = "converter";
 
     public static final String EVENT_CONVERT_START = "converter_start";
+
+    public static final String EVENT_CONVERT_PROGRESS = "converter_progress";
 
     public static final String EVENT_CONVERT_DONE = "converter_done";
 
@@ -231,11 +235,15 @@ public class ConverterService extends Widget implements Listener {
             addConverter(inputPath, null);
         }
 
-        if ((ConverterJob.START.equals(event.getType()) || ConverterJob.DONE.equals(event.getType()))
+        if ((ConverterJob.START.equals(event.getType()) || ConverterJob.PROGRESS.equals(event.getType())
+            || ConverterJob.DONE.equals(event.getType()))
             && event.getSource().equals(ConverterJob.class)) {
-            String type = ConverterJob.START.equals(event.getType()) ? EVENT_CONVERT_START : EVENT_CONVERT_DONE;
+            String type = ConverterJob.START.equals(event.getType()) ? EVENT_CONVERT_START
+                : ConverterJob.PROGRESS.equals(event.getType()) ? EVENT_CONVERT_PROGRESS : EVENT_CONVERT_DONE;
             EVENT_MANAGER
-                .fireEvent(new Event<ConverterJob>(type, converters.get((String) event.getObject()), this.getClass()));
+                .fireEvent(
+                    new Event<ConverterJob>(type, converters.get((String) event.getObject()), this.getClass())
+                        .setInternal(false));
         }
     }
 
@@ -312,6 +320,8 @@ public class ConverterService extends Widget implements Listener {
 
         public static final String START = "start";
 
+        public static final String PROGRESS = "progress";
+
         public static final String DONE = "done";
 
         private final String id;
@@ -341,6 +351,8 @@ public class ConverterService extends Widget implements Listener {
         private StreamConsumer outputConsumer;
 
         private StreamConsumer errorConsumer;
+
+        private Timer timer;
 
         public ConverterJob(final String id, final List<Output> outputs, final Path inputPath, final Path outputPath)
             throws InterruptedException, IOException {
@@ -377,12 +389,17 @@ public class ConverterService extends Widget implements Listener {
 
                 EVENT_MANAGER.fireEvent(new Event<String>(START, id, this.getClass()));
 
+                timer = new Timer();
+                timer.scheduleAtFixedRate(new ConverterJobProgress(this), 0, 1000);
+
                 final Process p = exec.run();
 
                 outputConsumer = exec.outputConsumer();
                 errorConsumer = exec.errorConsumer();
 
                 p.waitFor();
+
+                timer.cancel();
 
                 exitValue = p.exitValue();
                 running = false;
@@ -460,5 +477,24 @@ public class ConverterService extends Widget implements Listener {
         private void save() throws JAXBException, IOException {
             JsonUtils.saveJSON(outputPath.resolve(".convert").toFile(), new ConverterWrapper(id, this));
         }
+    }
+
+    private static class ConverterJobProgress extends TimerTask {
+
+        private final ConverterJob job;
+
+        public ConverterJobProgress(ConverterJob job) {
+            this.job = job;
+        }
+
+        /* (non-Javadoc)
+         * @see java.util.TimerTask#run()
+         */
+        @Override
+        public void run() {
+            EVENT_MANAGER
+                .fireEvent(new Event<String>(ConverterJob.PROGRESS, job.id(), job.getClass()));
+        }
+
     }
 }

@@ -82,5 +82,9 @@ module.exports = {
 			test : /\.css$/,
 			loader : "style-loader/useable?name=css/[name].[ext]!css-loader!postcss-loader"
 		} ]
+	},
+	node : {
+		fs : "empty",
+		tls : "empty"
 	}
 };
