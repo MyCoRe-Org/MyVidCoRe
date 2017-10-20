@@ -51,6 +51,12 @@ body {
     .converter {
       border-bottom: 1px solid @panel-default-border;
       padding: 5px 0 0;
+      .progress {
+        @media (max-width: @container-sm) {
+          margin-bottom: 0;
+        }
+      }
+
       &:last-child {
         border-bottom: none;
       }
