@@ -81,22 +81,18 @@ public class ConverterApplication extends WebSocketApplication implements Listen
      */
     @Override
     public void handleEvent(Event<?> event) throws Exception {
-        if (!event.isInternal()) {
-            this.getWebSockets().parallelStream().filter(WebSocket::isConnected)
-                .forEach(ws -> {
-                    try {
-                        Event<?> ev = event;
-                        if (event.getObject().getClass().equals(ConverterJob.class)) {
-                            ConverterJob job = (ConverterJob) event.getObject();
-                            ev = new Event<ConverterWrapper>(event.getType(),
-                                new ConverterWrapper(job.id(), job).basicCopy(), event.getSource()).setInternal(false);
-                        }
+        if (!event.isInternal() && event.getObject().getClass().equals(ConverterJob.class)) {
+            ConverterJob job = (ConverterJob) event.getObject();
+            Event<?> ev = new Event<ConverterWrapper>(event.getType(),
+                new ConverterWrapper(job.id(), job).basicCopy(), event.getSource()).setInternal(false);
 
-                        ws.send(JsonUtils.toJSON(ev, true));
-                    } catch (JAXBException | IOException e) {
-                        LOGGER.error(e.getMessage(), e);
-                    }
-                });
+            try {
+                String json = JsonUtils.toJSON(ev, true);
+                this.getWebSockets().parallelStream().filter(WebSocket::isConnected)
+                    .forEach(ws -> ws.send(json));
+            } catch (JAXBException | IOException e) {
+                LOGGER.error(e.getMessage(), e);
+            }
         }
     }
 
