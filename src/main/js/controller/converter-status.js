@@ -20,7 +20,7 @@ module.exports = function($scope, $http, $interval, $websocket, asyncQueue) {
         if (message && message.data) {
         	var obj = angular.fromJson(message.data);
         	if (obj.event && obj.event.type.indexOf("converter") === 0) {
-        		var converters = $scope.converters["active"].converter;
+        		var converters = $scope.converters.active.converter;
         		var ec = obj.event.object;
         		var found = false;
         		for ( var i in converters) {

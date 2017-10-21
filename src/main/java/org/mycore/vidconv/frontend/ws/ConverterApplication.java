@@ -53,13 +53,13 @@ public class ConverterApplication extends WebSocketApplication implements Listen
     private static ConverterApplication app;
 
     @Startup
-    private static void register() {
+    protected static void register() {
         app = new ConverterApplication();
         WebSocketEngine.getEngine().register("", "/converter", app);
     }
 
     @Shutdown
-    private static void unregister() {
+    protected static void unregister() {
         WebSocketEngine.getEngine().unregister(app);
     }
 
