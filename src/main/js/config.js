@@ -7,7 +7,6 @@ module.exports = function($compileProvider, $translateProvider, $routeProvider, 
 	});
 
 	$translateProvider.preferredLanguage("de_DE");
-	$translateProvider.determinePreferredLanguage();
 	$translateProvider.useSanitizeValueStrategy("sanitizeParameters");
 
 	$("html").attr("lang", $translateProvider.resolveClientLocale());
