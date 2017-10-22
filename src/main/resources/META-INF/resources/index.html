@@ -15,40 +15,11 @@
 </head>
 
 <body>
-	<div id="loading" data-ng-class="{'loading-done': loading === false}" data-ng-controller="loadingCtrl">
-		<div id="loading-center">
-			<div id="loading-center-absolute">
-				<div class="object"></div>
-				<div class="object"></div>
-				<div class="object"></div>
-				<div class="object"></div>
-				<div class="object"></div>
-				<div class="object"></div>
-				<div class="object"></div>
-				<div class="object"></div>
-				<div class="object"></div>
-				<div class="object"></div>
-			</div>
-		</div>
-	</div>
+	<loader></loader>
 	<navigation></navigation>
 
 	<div class="container">
-		<div class="alert" role="alert" data-ng-controller="alertCtrl" data-ng-show="alertObj.show"
-			data-ng-class="{'alert-danger': alertObj.type == 'error', 'alert-info': alertObj.type == 'info', 'alert-warning': alertObj.type == 'warning', 'alert-success': alertObj.type == 'success', 'alert-dismissible': alertObj.closeable}"
-		>
-			<button type="button" class="close" aria-label="Close" data-ng-click="clear()" data-ng-show="alertObj.closeable">
-				<span aria-hidden="true">&times;</span>
-			</button>
-			<h4>{{alertObj.headline}}</h4>
-			<p data-ng-if="!alertObj.stackTrace">{{alertObj.message}}</p>
-			<p data-ng-if="alertObj.stackTrace" data-toggle="collapse" data-target="#collapseStackTrace" aria-expanded="false" aria-controls="collapseStackTrace">
-				<span class="caret" aria-hidden="true"></span> {{alertObj.message}}
-			</p>
-			<div class="collapse" id="collapseStackTrace" data-ng-if="alertObj.stackTrace">
-				<pre class="pre-scrollable">{{alertObj.stackTrace}}</pre>
-			</div>
-		</div>
+		<alert></alert>
 
 		<div class="content-container" data-ng-view></div>
 	</div>

@@ -1,5 +1,5 @@
-module.exports = {
-	templateUrl : "/assets/templates/directory-watcher-status.html",
+module.exports = [ "directoryWatcher", {
+	templateUrl : "/assets/templates/dirwatcher.component.html",
 
 	controller : function($scope, $http, $interval) {
 		var refresh;
@@ -30,4 +30,4 @@ module.exports = {
 			$scope.loadData();
 		}, 60000);
 	}
-};
+} ];

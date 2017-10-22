@@ -1,5 +1,5 @@
-module.exports = {
-	templateUrl : "/assets/templates/nvmonitor.plugin.html",
+module.exports = [ "nvMonitorPlugin", {
+	templateUrl : "/assets/templates/nvmonitor.component.html",
 
 	controller : function($scope, $websocket, $document, buildWSURL) {
 		$scope.gauges = [];
@@ -64,4 +64,4 @@ module.exports = {
 		};
 
 	}
-};
+} ];

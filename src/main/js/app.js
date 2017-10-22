@@ -39,18 +39,13 @@ app.directive("navigation", routing.navigation);
 app.factory("routeNavigation", routing.routeNavigation);
 
 /**
- * Register Controllers
- */
-app.controller("alertCtrl", require("./controller/alert.js"));
-app.controller("loadingCtrl", require("./controller/loading.js"));
-app.controller("converterStatusCtrl", require("./controller/converter-status.js"));
-app.controller("settingsCtrl", require("./controller/settings.js"));
-
-/**
  * Register Components
  */
-app.component("directoryWatcher", require("./controller/directory-watcher-status.js"));
-app.component("nvMonitorPlugin", require("./controller/nvmonitor.plugin.js"));
+angular.forEach([ require("./component/loader.component.js"), require("./component/alert.component.js"), 
+	require("./component/dirwatcher.component.js"), require("./component/nvmonitor.component.js"), 
+	require("./component/converter.component.js"), require("./component/settings.component.js") ], function(comp) {
+	app.component.apply(app, comp);
+});
 
 /**
  * Start App
