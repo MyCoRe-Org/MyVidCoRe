@@ -55,7 +55,7 @@
 				data-ng-repeat="converter in converters.done.converter track by converter.id"
 			>
 				<div class="col-xs-7 col-sm-7 text-ellipsis">
-					<span class="fa" aria-hidden="true" data-ng-class="converter.exitValue == 0 ? 'fa-ok text-success' : 'fa-remove text-danger'"></span> <strong>{{converter.file}}</strong>
+					<span class="fa" aria-hidden="true" data-ng-class="converter.exitValue == 0 ? 'fa-check text-success' : 'fa-remove text-danger'"></span> <strong>{{converter.file}}</strong>
 				</div>
 				<div class="col-sm-3 hidden-xs text-right">
 					<i class="fa fa-hourglass-end" aria-hidden="true"></i> {{converter.progress.elapsed}}
