@@ -110,16 +110,15 @@
 				<div class="col-xs-12">
 					<nav class="pull-right">
 						<ul class="pagination pagination-sm no-margin">
-							<li data-ng-class="{disabled:paginationDisabled(converters.done, '-1')}"><a href="#" aria-label="Previous"
+							<li data-ng-class="{disabled:paginationDisabled(converters.done, '-1')}"><a aria-label="Previous"
 								data-ng-click="paginationPage(converters.done, '-1')"
 							> <span aria-hidden="true">&laquo;</span>
 							</a></li>
-							<li data-ng-repeat="p in pagination(converters.done)" data-ng-class="{active:paginationActive(converters.done, p)}"><a href="#"
+							<li data-ng-repeat="p in pagination(converters.done)" data-ng-class="{active:paginationActive(converters.done, p)}"><a
 								data-ng-click="paginationPage(converters.done, p)"
 							>{{p}}</a></li>
-							<li data-ng-class="{disabled:paginationDisabled(converters.done, '+1')}"><a href="#" aria-label="Next"
-								data-ng-click="paginationPage(converters.done, '+1')"
-							> <span aria-hidden="true">&raquo;</span>
+							<li data-ng-class="{disabled:paginationDisabled(converters.done, '+1')}"><a aria-label="Next" data-ng-click="paginationPage(converters.done, '+1')">
+									<span aria-hidden="true">&raquo;</span>
 							</a></li>
 						</ul>
 					</nav>
