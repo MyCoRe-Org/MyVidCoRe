@@ -43,9 +43,13 @@ app.factory("routeNavigation", routing.routeNavigation);
  */
 app.controller("alertCtrl", require("./controller/alert.js"));
 app.controller("loadingCtrl", require("./controller/loading.js"));
-app.controller("directoryWatcherStatusCtrl", require("./controller/directory-watcher-status.js"));
 app.controller("converterStatusCtrl", require("./controller/converter-status.js"));
 app.controller("settingsCtrl", require("./controller/settings.js"));
+
+/**
+ * Register Components
+ */
+app.component("directoryWatcher", require("./controller/directory-watcher-status.js"));
 app.component("nvMonitorPlugin", require("./controller/nvmonitor.plugin.js"));
 
 /**
