@@ -10,10 +10,20 @@ nav.navbar {
   }
 
   .navbar-right {
+    #nvMonitorPlugin {
+      float: right;
+      margin-top: -10px;
+      margin-right: 10px;
+      .gauges {
+        display: inline;
+      }
+    }
+
     #directoryWatcherStatus {
+      float: right;
+      margin-left: 10px;
       @media (max-width: @screen-xs-max) {
-        margin: 0 15px;
-        float: right;
+        margin: 0 15px 0 5px;
       }
     }
 

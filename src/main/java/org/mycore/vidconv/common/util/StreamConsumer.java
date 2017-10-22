@@ -63,4 +63,12 @@ public class StreamConsumer implements Runnable {
         return sb.toString();
     }
 
+    public synchronized void clear() {
+        sb.delete(0, sb.length());
+    }
+
+    public synchronized void clear(int length) {
+        sb.delete(0, length);
+    }
+
 }

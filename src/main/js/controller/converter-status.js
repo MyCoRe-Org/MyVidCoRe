@@ -1,11 +1,6 @@
-module.exports = function($scope, $http, $interval, $websocket, asyncQueue) {
+module.exports = function($scope, $http, $interval, $websocket, asyncQueue, buildWSURL) {
 	var refresh;
 	var removeTimeout = 30000;
-	
-	function wsURL(context) {
-	    var l = window.location;
-	    return ((l.protocol === "https:") ? "wss://" : "ws://") + l.hostname + (((l.port != 80) && (l.port != 443)) ? ":" + l.port : "") + context;
-	}
 	
 	$scope.converters = {
 		"active" : {},
@@ -13,7 +8,7 @@ module.exports = function($scope, $http, $interval, $websocket, asyncQueue) {
 	};
 	$scope.details = [];
 	
-	$scope.ws = $websocket(wsURL("/converter"));
+	$scope.ws = $websocket(buildWSURL("/converter"));
 	$scope.ws.reconnectIfNotNormalClose = true;
 	
 	$scope.ws.onMessage(function(message) {

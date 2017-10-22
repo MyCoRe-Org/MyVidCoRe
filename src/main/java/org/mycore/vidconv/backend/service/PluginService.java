@@ -32,7 +32,9 @@ import org.mycore.vidconv.common.event.Listener;
 import org.mycore.vidconv.common.event.annotation.AutoExecutable;
 import org.mycore.vidconv.common.event.annotation.Startup;
 import org.mycore.vidconv.frontend.entity.SettingsWrapper;
+import org.mycore.vidconv.plugin.SimplePlugin;
 import org.mycore.vidconv.plugin.annotation.Plugin;
+import org.mycore.vidconv.plugin.annotation.Plugin.Type;
 import org.reflections.Reflections;
 
 /**
@@ -50,7 +52,7 @@ public class PluginService {
 
     private static final Set<Class<?>> PLUGIN_CACHE;
 
-    private static Map<String, Listener> plugins;
+    private static Map<String, Object> plugins;
 
     static {
         final Reflections reflections = new Reflections("org.mycore.vidconv.plugin");
@@ -68,7 +70,7 @@ public class PluginService {
         Plugin pa = p.getAnnotation(Plugin.class);
         LOGGER.info("load plugin " + pa.name() + "...");
         try {
-            plugins.put(pa.name(), (Listener) p.newInstance());
+            plugins.put(pa.name(), p.newInstance());
 
             boolean enabled = Optional.ofNullable(isPluginEnabled(pa.name())).orElse(pa.enabled());
             if (enabled) {
@@ -90,17 +92,27 @@ public class PluginService {
         return pn.isPresent() ? pn.get().isEnabled() : null;
     }
 
-    public static void enablePlugin(String name) {
-        Listener plugin = plugins.get(name);
+    public static void enablePlugin(String name) throws InstantiationException, IllegalAccessException {
+        Object plugin = plugins.get(name);
         if (plugin != null) {
-            EVENT_MANGER.addListener(plugin);
+            Plugin pa = plugin.getClass().getAnnotation(Plugin.class);
+            if (pa.type() == Type.LISTENER) {
+                EVENT_MANGER.addListener((Listener) plugin);
+            } else if (pa.type() == Type.SIMPLE) {
+                ((SimplePlugin) plugin).enable();
+            }
         }
     }
 
     public static void disablePlugin(String name) {
-        Listener plugin = plugins.get(name);
+        Object plugin = plugins.get(name);
         if (plugin != null) {
-            EVENT_MANGER.removeListner(plugin);
+            Plugin pa = plugin.getClass().getAnnotation(Plugin.class);
+            if (pa.type() == Type.LISTENER) {
+                EVENT_MANGER.removeListner((Listener) plugin);
+            } else if (pa.type() == Type.SIMPLE) {
+                ((SimplePlugin) plugin).disable();
+            }
         }
     }
 }

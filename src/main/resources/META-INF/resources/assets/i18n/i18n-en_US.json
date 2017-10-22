@@ -52,5 +52,9 @@
 	"settings.seconds": "sec.",
 	"settings.forceKeyFrames": "Force Key Frames",
 	"settings.hwaccel": "Hardware Acceleration",
-	"settings.hwBalancing": "Auto-Balancing"
+	"settings.hwBalancing": "Auto-Balancing",
+	"nvmonitor.encoder": "Encoder",
+	"nvmonitor.decoder": "Decoder",
+	"nvmonitor.memory": "Memory",
+	"nvmonitor.temperature": "Temperature"
 }

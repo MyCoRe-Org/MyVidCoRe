@@ -46,6 +46,7 @@ app.controller("loadingCtrl", require("./controller/loading.js"));
 app.controller("directoryWatcherStatusCtrl", require("./controller/directory-watcher-status.js"));
 app.controller("converterStatusCtrl", require("./controller/converter-status.js"));
 app.controller("settingsCtrl", require("./controller/settings.js"));
+app.component("nvMonitorPlugin", require("./controller/nvmonitor.plugin.js"));
 
 /**
  * Start App

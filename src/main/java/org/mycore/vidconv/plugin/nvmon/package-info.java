@@ -17,47 +17,8 @@
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
-package org.mycore.vidconv.plugin.annotation;
-
-import static java.lang.annotation.ElementType.TYPE;
-
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target(TYPE)
 /**
- * Marks a class as plugin.
- * 
  * @author Ren\u00E9 Adler (eagle)
  *
  */
-public @interface Plugin {
-
-    /**
-     * The plugin <code>name</code>.
-     */
-    String name();
-
-    /**
-     * The plugin <code>description</code>. Default is an empty String.
-     */
-    String description() default "";
-
-    /**
-     * Defines is plugin enabled by default. Default is <code>true</code>.
-     */
-    boolean enabled() default true;
-
-    /**
-     * Defines the plugin type. Default is <code>{@link Type.LISTENER}</code>.
-     */
-    Type type() default Type.LISTENER;
-
-    enum Type {
-        LISTENER, SIMPLE
-    }
-}
+package org.mycore.vidconv.plugin.nvmon;

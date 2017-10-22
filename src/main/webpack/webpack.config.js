@@ -8,7 +8,9 @@ module.exports = {
 		$ : "jquery",
 		jQuery : "jquery",
 		videojs : "video.js",
-		"window.videojs" : "video.js"
+		"window.videojs" : "video.js",
+		Gauge : "svg-gauge",
+		"window.Gauge" : "svg-gauge"
 	}), new webpack.optimize.CommonsChunkPlugin({
 		name : "vendor",
 		filename : "js/vendor.bundle.js",
