@@ -16,7 +16,13 @@ module.exports = {
 				if ($scope.monitor === undefined) {
 					$scope.monitor = mon;
 				} else {
-					angular.merge($scope.monitor, mon);
+					$scope.monitor.entries.forEach(function(e) {
+						mon.entries.forEach(function(ne) {
+							if ($scope.getAttrib(e, "gpu").value === $scope.getAttrib(ne, "gpu").value) {
+								angular.merge(e, ne);
+							}
+						});
+					});
 				}
 
 				mon.entries.forEach(function(entry) {
