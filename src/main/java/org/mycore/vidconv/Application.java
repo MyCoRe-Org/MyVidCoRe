@@ -67,7 +67,7 @@ public class Application {
 
     public static void main(String[] args) {
         Application app = new Application();
-        JCommander jcmd = new JCommander(app, args);
+        JCommander jcmd = new JCommander(app, null, args);
 
         if (app.help) {
             jcmd.usage();
