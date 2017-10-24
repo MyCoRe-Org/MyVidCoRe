@@ -27,14 +27,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.vidconv.common.config.Settings;
-import org.mycore.vidconv.common.event.EventManager;
-import org.mycore.vidconv.common.event.Listener;
 import org.mycore.vidconv.common.event.annotation.AutoExecutable;
 import org.mycore.vidconv.common.event.annotation.Startup;
 import org.mycore.vidconv.frontend.entity.SettingsWrapper;
-import org.mycore.vidconv.plugin.SimplePlugin;
+import org.mycore.vidconv.plugin.GenericPlugin;
 import org.mycore.vidconv.plugin.annotation.Plugin;
-import org.mycore.vidconv.plugin.annotation.Plugin.Type;
 import org.reflections.Reflections;
 
 /**
@@ -46,27 +43,26 @@ public class PluginService {
 
     private static final Logger LOGGER = LogManager.getLogger(PluginService.class);
 
-    private static final EventManager EVENT_MANGER = EventManager.instance();
-
     private static final Settings SETTINGS = Settings.instance();
 
     private static final Set<Class<?>> PLUGIN_CACHE;
 
-    private static Map<String, Object> plugins;
+    private static Map<String, GenericPlugin> plugins;
 
     static {
         final Reflections reflections = new Reflections("org.mycore.vidconv.plugin");
         PLUGIN_CACHE = reflections.getTypesAnnotatedWith(Plugin.class);
     }
 
+    @SuppressWarnings("unchecked")
     @Startup
     protected static void loadPlugins() {
         plugins = new ConcurrentHashMap<>();
 
-        PLUGIN_CACHE.stream().forEach(p -> loadPlugin(p));
+        PLUGIN_CACHE.stream().forEach(p -> loadPlugin((Class<? extends GenericPlugin>) p));
     }
 
-    private static void loadPlugin(Class<?> p) {
+    private static void loadPlugin(Class<? extends GenericPlugin> p) {
         Plugin pa = p.getAnnotation(Plugin.class);
         LOGGER.info("load plugin " + pa.name() + "...");
         try {
@@ -74,7 +70,6 @@ public class PluginService {
 
             boolean enabled = Optional.ofNullable(isPluginEnabled(pa.name())).orElse(pa.enabled());
             if (enabled) {
-                LOGGER.info("...enabled.");
                 enablePlugin(pa.name());
             } else {
                 LOGGER.info("...disabled.");
@@ -92,27 +87,26 @@ public class PluginService {
         return pn.isPresent() ? pn.get().isEnabled() : null;
     }
 
+    public static Map<String, GenericPlugin> plugins() {
+        return plugins;
+    }
+
     public static void enablePlugin(String name) throws InstantiationException, IllegalAccessException {
-        Object plugin = plugins.get(name);
+        GenericPlugin plugin = plugins.get(name);
         if (plugin != null) {
-            Plugin pa = plugin.getClass().getAnnotation(Plugin.class);
-            if (pa.type() == Type.LISTENER) {
-                EVENT_MANGER.addListener((Listener) plugin);
-            } else if (pa.type() == Type.SIMPLE) {
-                ((SimplePlugin) plugin).enable();
+            plugin.enable();
+            if (plugin.isEnabled()) {
+                LOGGER.info("...enabled.");
+            } else {
+                LOGGER.info("...disabled.");
             }
         }
     }
 
     public static void disablePlugin(String name) {
-        Object plugin = plugins.get(name);
+        GenericPlugin plugin = plugins.get(name);
         if (plugin != null) {
-            Plugin pa = plugin.getClass().getAnnotation(Plugin.class);
-            if (pa.type() == Type.LISTENER) {
-                EVENT_MANGER.removeListner((Listener) plugin);
-            } else if (pa.type() == Type.SIMPLE) {
-                ((SimplePlugin) plugin).disable();
-            }
+            plugin.disable();
         }
     }
 }

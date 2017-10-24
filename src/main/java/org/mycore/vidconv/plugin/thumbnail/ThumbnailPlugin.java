@@ -27,9 +27,9 @@ import org.mycore.vidconv.backend.encoder.FFMpegImpl;
 import org.mycore.vidconv.backend.service.ConverterService;
 import org.mycore.vidconv.backend.service.ConverterService.ConverterJob;
 import org.mycore.vidconv.common.event.Event;
-import org.mycore.vidconv.common.event.Listener;
 import org.mycore.vidconv.common.util.Executable;
 import org.mycore.vidconv.frontend.entity.probe.ProbeWrapper;
+import org.mycore.vidconv.plugin.ListenerPlugin;
 import org.mycore.vidconv.plugin.annotation.Plugin;
 
 /**
@@ -37,7 +37,7 @@ import org.mycore.vidconv.plugin.annotation.Plugin;
  *
  */
 @Plugin(name = "Thumbnail Plugin", description = "Generates Thumbnails from Videos.")
-public class ThumbnailPlugin implements Listener {
+public class ThumbnailPlugin extends ListenerPlugin {
 
     private static final Logger LOGGER = LogManager.getLogger();
 

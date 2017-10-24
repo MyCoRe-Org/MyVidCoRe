@@ -17,16 +17,33 @@
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
-package org.mycore.vidconv.plugin;
+package org.mycore.vidconv.frontend.resource;
+
+import java.util.concurrent.TimeUnit;
+
+import javax.inject.Singleton;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
+import org.mycore.vidconv.backend.service.PluginService;
+import org.mycore.vidconv.frontend.annotation.CacheMaxAge;
+import org.mycore.vidconv.frontend.entity.PluginsWrapper;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
  *
  */
-public interface SimplePlugin {
+@Path("plugins")
+@Singleton
+public class PluginResource {
 
-    public void enable();
-
-    public void disable();
-    
+    @GET
+    @CacheMaxAge(time = 1, unit = TimeUnit.HOURS)
+    @Path("/")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    public PluginsWrapper plugins() {
+        return PluginsWrapper.build(PluginService.plugins());
+    }
 }

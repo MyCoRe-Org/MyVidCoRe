@@ -17,47 +17,28 @@
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
-package org.mycore.vidconv.plugin.annotation;
+package org.mycore.vidconv.plugin;
 
-import static java.lang.annotation.ElementType.TYPE;
-
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target(TYPE)
 /**
- * Marks a class as plugin.
- * 
  * @author Ren\u00E9 Adler (eagle)
  *
  */
-public @interface Plugin {
+public abstract class GenericPlugin {
 
     /**
-     * The plugin <code>name</code>.
+     * Returns if GenericPlugin is enabled.
+     * @return
      */
-    String name();
+    public abstract boolean isEnabled();
 
     /**
-     * The plugin <code>description</code>. Default is an empty String.
+     * Enables the GenericPlugin. 
      */
-    String description() default "";
+    public abstract void enable();
 
     /**
-     * Defines is plugin enabled by default. Default is <code>true</code>.
+     * Disables the GenericPlugin.
      */
-    boolean enabled() default true;
+    public abstract void disable();
 
-    /**
-     * Defines the plugin type. Default is <code>{@link Type.LISTENER}</code>.
-     */
-    Type type() default Type.LISTENER;
-
-    enum Type {
-        LISTENER, GENERIC
-    }
 }

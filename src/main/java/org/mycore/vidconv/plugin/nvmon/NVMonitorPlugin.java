@@ -49,7 +49,7 @@ import org.mycore.vidconv.common.event.Listener;
 import org.mycore.vidconv.common.util.Executable;
 import org.mycore.vidconv.common.util.JsonUtils;
 import org.mycore.vidconv.common.util.StreamConsumer;
-import org.mycore.vidconv.plugin.SimplePlugin;
+import org.mycore.vidconv.plugin.GenericPlugin;
 import org.mycore.vidconv.plugin.annotation.Plugin;
 import org.mycore.vidconv.plugin.annotation.Plugin.Type;
 
@@ -57,8 +57,8 @@ import org.mycore.vidconv.plugin.annotation.Plugin.Type;
  * @author Ren\u00E9 Adler (eagle)
  *
  */
-@Plugin(name = "Nvidia Monitor Plugin", description = "Monitors Nvidia GPU Cards.", type = Type.SIMPLE)
-public class NVMonitorPlugin implements SimplePlugin, Runnable {
+@Plugin(name = "Nvidia Monitor Plugin", description = "Monitors Nvidia GPU Cards.", type = Type.GENERIC)
+public class NVMonitorPlugin extends GenericPlugin implements Runnable {
 
     public static final String EVENT_DATA = "nvmontor-data";
 
@@ -67,6 +67,8 @@ public class NVMonitorPlugin implements SimplePlugin, Runnable {
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String NV_EXECUTABLE = "nvidia-smi";
+
+    private boolean enabled = false;
 
     private NVMonitorApplication wsApp;
 
@@ -83,6 +85,14 @@ public class NVMonitorPlugin implements SimplePlugin, Runnable {
     private List<String> units;
 
     /* (non-Javadoc)
+     * @see org.mycore.vidconv.plugin.SimplePlugin#isEnabled()
+     */
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    /* (non-Javadoc)
      * @see org.mycore.vidconv.plugin.SimplePlugin#enable()
      */
     @Override
@@ -94,6 +104,7 @@ public class NVMonitorPlugin implements SimplePlugin, Runnable {
             LOGGER.info("register WebSocket on context \"" + WS_CONTEXT + "\"...");
             wsApp = new NVMonitorApplication();
             WebSocketEngine.getEngine().register("", WS_CONTEXT, wsApp);
+            enabled = true;
         }
     }
 
@@ -111,6 +122,7 @@ public class NVMonitorPlugin implements SimplePlugin, Runnable {
             timer.cancel();
             thread.interrupt();
         }
+        enabled = false;
     }
 
     /* (non-Javadoc)
@@ -141,7 +153,7 @@ public class NVMonitorPlugin implements SimplePlugin, Runnable {
                 return file.getAbsolutePath();
             }
         }
-        throw new AssertionError("should have found the executable");
+        return null;
     }
 
     private static class NVMonitorTask extends TimerTask {

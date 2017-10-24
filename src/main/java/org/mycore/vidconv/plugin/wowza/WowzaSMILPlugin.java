@@ -28,7 +28,7 @@ import org.mycore.vidconv.backend.encoder.FFMpegImpl;
 import org.mycore.vidconv.backend.service.ConverterService;
 import org.mycore.vidconv.backend.service.ConverterService.ConverterJob;
 import org.mycore.vidconv.common.event.Event;
-import org.mycore.vidconv.common.event.Listener;
+import org.mycore.vidconv.plugin.ListenerPlugin;
 import org.mycore.vidconv.plugin.annotation.Plugin;
 
 /**
@@ -36,7 +36,7 @@ import org.mycore.vidconv.plugin.annotation.Plugin;
  *
  */
 @Plugin(name = "Wowza SMIL Plugin", description = "Generates SMIL-Files for Wowza.")
-public class WowzaSMILPlugin implements Listener {
+public class WowzaSMILPlugin extends ListenerPlugin {
 
     private static final Logger LOGGER = LogManager.getLogger();
 

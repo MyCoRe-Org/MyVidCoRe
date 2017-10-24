@@ -17,47 +17,46 @@
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
-package org.mycore.vidconv.plugin.annotation;
+package org.mycore.vidconv.frontend.entity;
 
-import static java.lang.annotation.ElementType.TYPE;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target(TYPE)
+import org.mycore.vidconv.plugin.GenericPlugin;
+
 /**
- * Marks a class as plugin.
- * 
  * @author Ren\u00E9 Adler (eagle)
  *
  */
-public @interface Plugin {
+@XmlRootElement(name = "plugins")
+public class PluginsWrapper {
 
-    /**
-     * The plugin <code>name</code>.
-     */
-    String name();
+    private List<PluginWrapper> plugins;
 
-    /**
-     * The plugin <code>description</code>. Default is an empty String.
-     */
-    String description() default "";
-
-    /**
-     * Defines is plugin enabled by default. Default is <code>true</code>.
-     */
-    boolean enabled() default true;
-
-    /**
-     * Defines the plugin type. Default is <code>{@link Type.LISTENER}</code>.
-     */
-    Type type() default Type.LISTENER;
-
-    enum Type {
-        LISTENER, GENERIC
+    public static PluginsWrapper build(Map<String, GenericPlugin> plugins) {
+        PluginsWrapper pw = new PluginsWrapper();
+        pw.setPlugins(plugins.entrySet().stream().map(e -> new PluginWrapper(e.getKey(), e.getValue().isEnabled()))
+            .collect(Collectors.toList()));
+        return pw;
     }
+
+    /**
+     * @return the plugins
+     */
+    @XmlElement
+    public List<PluginWrapper> getPlugins() {
+        return plugins;
+    }
+
+    /**
+     * @param plugins the plugins to set
+     */
+    public void setPlugins(List<PluginWrapper> plugins) {
+        this.plugins = plugins;
+    }
+
 }

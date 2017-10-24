@@ -17,47 +17,63 @@
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
-package org.mycore.vidconv.plugin.annotation;
+package org.mycore.vidconv.frontend.entity;
 
-import static java.lang.annotation.ElementType.TYPE;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-@Documented
-@Retention(RetentionPolicy.RUNTIME)
-@Target(TYPE)
 /**
- * Marks a class as plugin.
- * 
  * @author Ren\u00E9 Adler (eagle)
  *
  */
-public @interface Plugin {
+@XmlRootElement(name = "plugin")
+public class PluginWrapper {
 
-    /**
-     * The plugin <code>name</code>.
-     */
-    String name();
+    private String name;
 
-    /**
-     * The plugin <code>description</code>. Default is an empty String.
-     */
-    String description() default "";
+    private boolean enabled;
 
-    /**
-     * Defines is plugin enabled by default. Default is <code>true</code>.
-     */
-    boolean enabled() default true;
-
-    /**
-     * Defines the plugin type. Default is <code>{@link Type.LISTENER}</code>.
-     */
-    Type type() default Type.LISTENER;
-
-    enum Type {
-        LISTENER, GENERIC
+    private PluginWrapper() {
     }
+
+    /**
+     * @param name
+     * @param enabled
+     */
+    public PluginWrapper(String name, boolean enabled) {
+        this();
+        this.name = name;
+        this.enabled = enabled;
+    }
+
+    /**
+     * @return the name
+     */
+    @XmlAttribute
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * @return the enabled
+     */
+    @XmlAttribute
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    /**
+     * @param enabled the enabled to set
+     */
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
 }

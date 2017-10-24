@@ -166,5 +166,42 @@ module.exports = {
 
 			return deferred.promise;
 		};
+	},
+	"plugins" : function($http, $q) {
+		var that = this;
+		var plugins = [];
+
+		this.get = function() {
+			var deferred = $q.defer();
+			if (plugins.length === 0) {
+				$http.get("/plugins").then(function(result) {
+					if (result.data) {
+						plugins = result.data.plugins;
+					}
+					deferred.resolve(plugins);
+				});
+			} else {
+				deferred.resolve(plugins);
+			}
+
+			return deferred.promise;
+		};
+
+		this.isEnabled = function(name) {
+			var deferred = $q.defer();
+
+			that.get().then(function(plugins) {
+				var enabled = false;
+				plugins.forEach(function(plugin) {
+					if (name === plugin.name) {
+						enabled = plugin.enabled;
+						return;
+					}
+				});
+				deferred.resolve(enabled);
+			});
+
+			return deferred.promise;
+		};
 	}
 };
