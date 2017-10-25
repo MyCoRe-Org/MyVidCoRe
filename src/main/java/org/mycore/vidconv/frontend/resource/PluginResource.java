@@ -41,7 +41,6 @@ public class PluginResource {
 
     @GET
     @CacheMaxAge(time = 1, unit = TimeUnit.HOURS)
-    @Path("/")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public PluginsWrapper plugins() {
         return PluginsWrapper.build(PluginService.plugins());
