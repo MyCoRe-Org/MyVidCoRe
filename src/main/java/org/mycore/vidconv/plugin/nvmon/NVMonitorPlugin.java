@@ -62,7 +62,7 @@ public class NVMonitorPlugin extends GenericPlugin implements Runnable {
 
     public static final String EVENT_DATA = "nvmontor-data";
 
-    public static final String WS_CONTEXT = "/nvmonitor";
+    public static final String WS_PATH = "/ws/nvmonitor";
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -101,9 +101,9 @@ public class NVMonitorPlugin extends GenericPlugin implements Runnable {
         if (exePath != null) {
             thread = new Thread(this);
             thread.start();
-            LOGGER.info("register WebSocket on context \"" + WS_CONTEXT + "\"...");
+            LOGGER.info("register WebSocket on path \"" + WS_PATH + "\"...");
             wsApp = new NVMonitorApplication();
-            WebSocketEngine.getEngine().register("", WS_CONTEXT, wsApp);
+            WebSocketEngine.getEngine().register("", WS_PATH, wsApp);
             enabled = true;
         }
     }
@@ -114,7 +114,7 @@ public class NVMonitorPlugin extends GenericPlugin implements Runnable {
     @Override
     public void disable() {
         if (wsApp != null) {
-            LOGGER.info("unregister WebSocket on context \"" + WS_CONTEXT + "\"...");
+            LOGGER.info("unregister WebSocket on path \"" + WS_PATH + "\"...");
             WebSocketEngine.getEngine().unregister(wsApp);
         }
 

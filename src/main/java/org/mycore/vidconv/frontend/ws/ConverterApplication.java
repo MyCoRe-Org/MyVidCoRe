@@ -55,7 +55,7 @@ public class ConverterApplication extends WebSocketApplication implements Listen
     @Startup
     protected static void register() {
         app = new ConverterApplication();
-        WebSocketEngine.getEngine().register("", "/converter", app);
+        WebSocketEngine.getEngine().register("", "/ws/converter", app);
     }
 
     @Shutdown
