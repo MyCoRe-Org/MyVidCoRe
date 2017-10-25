@@ -78,7 +78,11 @@
 							<span class="fa fa-save" aria-hidden="true"></span> <span class="caret"></span>
 						</button>
 						<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="donwload-menu">
-							<li data-ng-repeat="file in converter.files"><a href="/widget/converter/{{converter.id}}/{{file.name}}/download"> {{ file.name }}</a></li>
+							<li data-ng-repeat="file in converter.files"><a href="/widget/converter/{{converter.id}}/{{file.name}}/download"><i class="fa fa-file-video-o"
+									aria-hidden="true"
+								></i> {{ file.name }}</a></li>
+							<li role="separator" class="divider"></li>
+							<li><a href="/widget/converter/{{converter.id}}/download"><i class="fa fa-file-archive-o" aria-hidden="true"></i> {{ converter.id + ".zip" }}</a></li>
 						</ul>
 					</div>
 				</div>
