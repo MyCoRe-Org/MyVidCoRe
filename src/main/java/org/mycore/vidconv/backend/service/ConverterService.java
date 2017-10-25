@@ -31,13 +31,10 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -332,23 +329,19 @@ public class ConverterService extends Widget implements Listener {
     private void addIncompleteJobs() {
         try {
             LOGGER.info("search for incomplete jobs...");
-            Files.walkFileTree(Paths.get(outputDir), new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    if (file.getFileName().equals(Paths.get(".convert"))) {
-                        try {
-                            ConverterWrapper cw = JsonUtils.loadJSON(file.toFile(), ConverterWrapper.class);
-                            if (!cw.isDone()) {
-                                LOGGER.info("...restart \"{}\" with id \"{}\".", cw.getFileName(), cw.getId());
-                                addConverter(Paths.get(cw.getInputPath(), cw.getFileName()), cw.getId());
-                            }
-                        } catch (JAXBException | InterruptedException | ExecutionException e) {
-                            LOGGER.error("Couldn't add incomplete jobs.", e);
+            try (Stream<Path> stream = Files.walk(Paths.get(outputDir))) {
+                stream.filter(f -> f.getFileName().equals(Paths.get(".convert"))).forEach(file -> {
+                    try {
+                        ConverterWrapper cw = JsonUtils.loadJSON(file.toFile(), ConverterWrapper.class);
+                        if (!cw.isDone()) {
+                            LOGGER.info("...restart \"{}\" with id \"{}\".", cw.getFileName(), cw.getId());
+                            addConverter(Paths.get(cw.getInputPath(), cw.getFileName()), cw.getId());
                         }
+                    } catch (JAXBException | InterruptedException | ExecutionException | IOException e) {
+                        LOGGER.error("Couldn't add incomplete jobs.", e);
                     }
-                    return FileVisitResult.CONTINUE;
-                }
-            });
+                });
+            }
             LOGGER.info("...done.");
         } catch (IOException e) {
             LOGGER.error("Couldn't read incomplete jobs.", e);
