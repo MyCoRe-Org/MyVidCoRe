@@ -394,7 +394,7 @@ public class ConverterService extends Widget implements Listener {
         private Timer timer;
 
         public ConverterJob(final String id, final List<Output> outputs, final Path inputPath, final Path outputPath)
-            throws InterruptedException, IOException {
+            throws InterruptedException, IOException, JAXBException {
             this.id = id;
             this.outputs = outputs;
             this.inputPath = inputPath;
@@ -406,14 +406,14 @@ public class ConverterService extends Widget implements Listener {
 
             if (!Files.exists(outputPath))
                 Files.createDirectories(outputPath);
+
+            save();
         }
 
         @Override
         public void run() {
             try {
                 LOGGER.info("Start converting of " + inputPath.toString() + " to " + outputPath.toString() + "...");
-
-                save();
 
                 done = false;
                 running = true;
