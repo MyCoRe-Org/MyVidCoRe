@@ -25,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.List;
@@ -149,6 +150,21 @@ public class JsonUtils {
         final StringWriter sw = new StringWriter();
         marshaller.marshal(entity, sw);
         return sw.toString();
+    }
+
+    public static <T> T fromJSON(String json, Class<T> entityClass) throws JAXBException, IOException {
+        return fromJSON(json, entityClass, false);
+    }
+
+    public static <T> T fromJSON(String json, Class<T> entityClass, boolean includeRoot)
+        throws JAXBException, IOException {
+        final JAXBContext jc = JAXBContext.newInstance(populateEntities(entityClass));
+        final Unmarshaller unmarshaller = jc.createUnmarshaller();
+        unmarshaller.setProperty(UnmarshallerProperties.MEDIA_TYPE, "application/json");
+        unmarshaller.setProperty(UnmarshallerProperties.JSON_INCLUDE_ROOT, includeRoot);
+
+        final StreamSource ss = new StreamSource(new StringReader(json));
+        return unmarshaller.unmarshal(ss, entityClass).getValue();
     }
 
     private static Class<?>[] populateEntities(Class<?> entityClass) {
