@@ -24,17 +24,24 @@ package org.mycore.vidconv.backend.service;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -48,6 +55,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.bind.JAXBException;
 
@@ -209,15 +217,19 @@ public class ConverterService extends Widget implements Listener {
     public Path download(List<String> params) throws Exception {
         if (!params.isEmpty()) {
             final String converterId = params.get(0);
-            final String fileName = URLDecoder.decode(params.get(1), StandardCharsets.UTF_8.toString());
             final ConverterJob converter = converters.get(converterId);
 
-            if (converter != null) {
-                return converter.outputs.stream()
-                    .filter(o -> o.getOutputPath().getFileName().toString().equals(fileName))
-                    .findFirst()
-                    .map(o -> o.getOutputPath())
-                    .orElseThrow(() -> new FileNotFoundException("File \"" + fileName + "\" not found."));
+            if (converter != null && converter.isDone()) {
+                if (params.size() == 1) {
+                    return compressOutput(converter.outputPath);
+                } else {
+                    final String fileName = URLDecoder.decode(params.get(1), StandardCharsets.UTF_8.toString());
+                    return converter.outputs.stream()
+                        .filter(o -> o.getOutputPath().getFileName().toString().equals(fileName))
+                        .findFirst()
+                        .map(o -> o.getOutputPath())
+                        .orElseThrow(() -> new FileNotFoundException("File \"" + fileName + "\" not found."));
+                }
             }
         }
 
@@ -245,6 +257,33 @@ public class ConverterService extends Widget implements Listener {
                     new Event<ConverterJob>(type, converters.get((String) event.getObject()), this.getClass())
                         .setInternal(false));
         }
+    }
+
+    private Path compressOutput(Path path) throws IOException, URISyntaxException {
+        Path zip = Paths.get(path.getParent().toString(), path.getFileName() + ".zip");
+
+        if (Files.notExists(zip)) {
+            Map<String, String> env = new HashMap<>();
+            env.put("create", "true");
+
+            URI zipUri = new URI("jar:file:" + zip.toUri().getPath());
+            try (FileSystem fs = FileSystems.newFileSystem(zipUri, env)) {
+                Path root = fs.getPath(".");
+                try (Stream<Path> stream = Files.walk(path)) {
+                    stream.forEach(sourcePath -> {
+                        try {
+                            Files.copy(sourcePath,
+                                root.resolve(path.relativize(sourcePath).toString()),
+                                StandardCopyOption.REPLACE_EXISTING);
+                        } catch (IOException e) {
+                            throw new UncheckedIOException(e.getMessage(), e);
+                        }
+                    });
+                }
+            }
+        }
+
+        return zip;
     }
 
     private void addConverter(final Path inputPath, final String jobId)
