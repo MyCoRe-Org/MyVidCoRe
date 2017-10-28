@@ -66,6 +66,10 @@ For a help and/or overview about default settings run:
 * **--outputDir**
 
   Set directory to output converted videos
+  
+* **--tempDir**
+
+  Set directory for temporary files
 
 * **-cd, --configDir**
 

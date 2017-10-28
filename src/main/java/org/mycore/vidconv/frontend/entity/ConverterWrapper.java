@@ -22,6 +22,7 @@
  */
 package org.mycore.vidconv.frontend.entity;
 
+import java.net.URL;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalTime;
@@ -53,6 +54,8 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
     private String inputPath;
 
     private String fileName;
+
+    private String completeCallBack;
 
     private List<Output> outputs;
 
@@ -86,6 +89,7 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
         this.command = converter.command();
         this.inputPath = converter.inputPath().getParent().toString();
         this.fileName = converter.inputPath().getFileName().toString();
+        this.setCompleteCallBack(converter.completeCallBack());
         this.outputs = converter.outputs();
         this.hwAccel = converter.hwAccel();
         this.running = converter.isRunning();
@@ -116,6 +120,11 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
     @XmlAttribute(name = "file")
     public String getFileName() {
         return fileName;
+    }
+
+    @XmlElement(name = "completeCallBack")
+    public String completeCallBack() {
+        return completeCallBack;
     }
 
     @XmlElement(name = "files")
@@ -210,6 +219,20 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
      */
     public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    /**
+     * @param completeCallBack the completeCallBack to set
+     */
+    public void setCompleteCallBack(String completeCallBack) {
+        this.completeCallBack = completeCallBack;
+    }
+
+    /**
+     * @param completeCallBack the completeCallBack to set
+     */
+    public void setCompleteCallBack(URL completeCallBack) {
+        this.completeCallBack = Optional.ofNullable(completeCallBack).map(cb -> cb.toExternalForm()).orElse(null);
     }
 
     /**

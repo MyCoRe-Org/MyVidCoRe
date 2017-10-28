@@ -21,6 +21,7 @@ import javax.ws.rs.core.FeatureContext;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.moxy.json.MoxyJsonFeature;
 import org.glassfish.jersey.moxy.xml.MoxyXmlFeature;
 import org.mycore.vidconv.common.config.Configuration;
@@ -46,6 +47,7 @@ public class FrontendFeature implements Feature {
     public boolean configure(FeatureContext context) {
         context.register(MoxyJsonFeature.class);
         context.register(MoxyXmlFeature.class);
+        context.register(MultiPartFeature.class);
 
         // internal features
         context.register(CacheFilter.class);

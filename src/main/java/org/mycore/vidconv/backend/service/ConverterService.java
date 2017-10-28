@@ -103,16 +103,19 @@ public class ConverterService extends Widget implements Listener {
 
     private String outputDir;
 
+    private String tempDir;
+
     static {
         Optional.ofNullable(FFMpegImpl.detectHWAccels())
             .ifPresent(dhw -> dhw.getHWAccels().stream().filter(hw -> SETTINGS.getSettings().getHwaccels().contains(hw))
                 .forEach(hw -> hwAccels.add(hw)));
     }
 
-    public ConverterService(final String outputDir, int converterThreads) throws IOException {
+    public ConverterService(final String outputDir, final String tempDir, int converterThreads) throws IOException {
         super(WIDGET_NAME);
 
         this.outputDir = outputDir;
+        this.setTempDir(tempDir);
 
         Path outputPath = Paths.get(outputDir);
         if (!Files.exists(outputPath)) {
@@ -144,6 +147,20 @@ public class ConverterService extends Widget implements Listener {
      */
     public void setOutputDir(String outputDir) {
         this.outputDir = outputDir;
+    }
+
+    /**
+     * @return the tempDir
+     */
+    public String getTempDir() {
+        return tempDir;
+    }
+
+    /**
+     * @param tempDir the tempDir to set
+     */
+    public void setTempDir(String tempDir) {
+        this.tempDir = tempDir;
     }
 
     /* (non-Javadoc)
@@ -241,7 +258,7 @@ public class ConverterService extends Widget implements Listener {
         if (DirectoryWatchService.EVENT_ENTRY_CREATE.equals(event.getType())
             && event.getSource().equals(DirectoryWatchService.class)) {
             Path inputPath = (Path) event.getObject();
-            addConverter(inputPath, null);
+            addJob(inputPath, null, null);
         }
 
         if ((ConverterJob.START.equals(event.getType()) || ConverterJob.PROGRESS.equals(event.getType())
@@ -256,34 +273,7 @@ public class ConverterService extends Widget implements Listener {
         }
     }
 
-    private Path compressOutput(Path path) throws IOException, URISyntaxException {
-        Path zip = Paths.get(path.getParent().toString(), path.getFileName() + ".zip");
-
-        if (Files.notExists(zip)) {
-            Map<String, String> env = new HashMap<>();
-            env.put("create", "true");
-
-            URI zipUri = new URI("jar:file:" + zip.toUri().getPath());
-            try (FileSystem fs = FileSystems.newFileSystem(zipUri, env)) {
-                Path root = fs.getPath(".");
-                try (Stream<Path> stream = Files.walk(path)) {
-                    stream.forEach(sourcePath -> {
-                        try {
-                            Files.copy(sourcePath,
-                                root.resolve(path.relativize(sourcePath).toString()),
-                                StandardCopyOption.REPLACE_EXISTING);
-                        } catch (IOException e) {
-                            throw new UncheckedIOException(e.getMessage(), e);
-                        }
-                    });
-                }
-            }
-        }
-
-        return zip;
-    }
-
-    private void addConverter(final Path inputPath, final String jobId)
+    public String addJob(final Path inputPath, final String jobId, final String completeCallBack)
         throws InterruptedException, JAXBException, ExecutionException, IOException {
         final SettingsWrapper settings = SETTINGS.getSettings();
 
@@ -316,14 +306,18 @@ public class ConverterService extends Widget implements Listener {
                         }
                     }).collect(Collectors.toList());
 
-                final ConverterJob converter = new ConverterJob(id, outputs, inputPath, outputPath);
+                final ConverterJob converter = new ConverterJob(id, outputs, inputPath, outputPath, completeCallBack);
 
                 converters.put(id, converter);
                 converterThreadPool.submit(converter);
+
+                return id;
             } else {
                 LOGGER.warn("encoding of file \"" + inputPath.toFile().getAbsolutePath() + "\" isn't supported.");
             }
         }
+
+        return null;
     }
 
     private void addIncompleteJobs() {
@@ -335,7 +329,7 @@ public class ConverterService extends Widget implements Listener {
                         ConverterWrapper cw = JsonUtils.loadJSON(file.toFile(), ConverterWrapper.class);
                         if (!cw.isDone()) {
                             LOGGER.info("...restart \"{}\" with id \"{}\".", cw.getFileName(), cw.getId());
-                            addConverter(Paths.get(cw.getInputPath(), cw.getFileName()), cw.getId());
+                            addJob(Paths.get(cw.getInputPath(), cw.getFileName()), cw.getId(), cw.completeCallBack());
                         }
                     } catch (JAXBException | InterruptedException | ExecutionException | IOException e) {
                         LOGGER.error("Couldn't add incomplete jobs.", e);
@@ -346,6 +340,33 @@ public class ConverterService extends Widget implements Listener {
         } catch (IOException e) {
             LOGGER.error("Couldn't read incomplete jobs.", e);
         }
+    }
+
+    private Path compressOutput(Path path) throws IOException, URISyntaxException {
+        Path zip = Paths.get(path.getParent().toString(), path.getFileName() + ".zip");
+
+        if (Files.notExists(zip)) {
+            Map<String, String> env = new HashMap<>();
+            env.put("create", "true");
+
+            URI zipUri = new URI("jar:file:" + zip.toUri().getPath());
+            try (FileSystem fs = FileSystems.newFileSystem(zipUri, env)) {
+                Path root = fs.getPath(".");
+                try (Stream<Path> stream = Files.walk(path)) {
+                    stream.forEach(sourcePath -> {
+                        try {
+                            Files.copy(sourcePath,
+                                root.resolve(path.relativize(sourcePath).toString()),
+                                StandardCopyOption.REPLACE_EXISTING);
+                        } catch (IOException e) {
+                            throw new UncheckedIOException(e.getMessage(), e);
+                        }
+                    });
+                }
+            }
+        }
+
+        return zip;
     }
 
     public static class ConverterJob implements Runnable {
@@ -361,6 +382,8 @@ public class ConverterService extends Widget implements Listener {
         private final Path inputPath;
 
         private final Path outputPath;
+
+        private final String completeCallBack;
 
         private final List<Output> outputs;
 
@@ -386,12 +409,14 @@ public class ConverterService extends Widget implements Listener {
 
         private Timer timer;
 
-        public ConverterJob(final String id, final List<Output> outputs, final Path inputPath, final Path outputPath)
+        public ConverterJob(final String id, final List<Output> outputs, final Path inputPath, final Path outputPath,
+            final String completeCallBack)
             throws InterruptedException, IOException, JAXBException {
             this.id = id;
             this.outputs = outputs;
             this.inputPath = inputPath;
             this.outputPath = outputPath;
+            this.completeCallBack = completeCallBack;
             this.hwAccel = Optional.empty();
             this.addTime = Instant.now();
             this.done = false;
@@ -452,6 +477,10 @@ public class ConverterService extends Widget implements Listener {
 
         public String id() {
             return id;
+        }
+
+        public String completeCallBack() {
+            return completeCallBack;
         }
 
         public String command() {

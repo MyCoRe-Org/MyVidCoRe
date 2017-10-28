@@ -39,6 +39,7 @@
 		"bootstrap-slider" : "~9.9.0",
 		"font-awesome" : "~4.7.0",
 		"jquery" : "^3.2.1",
+		"ng-file-upload" : "~12.2.x",
 		"svg-gauge": "~1.0.3",
 		"video.js" : "^5.20.4",
 		"videojs-resolution-switcher" : "^0.4.2"

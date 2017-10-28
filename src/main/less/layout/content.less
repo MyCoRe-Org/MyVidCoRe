@@ -48,6 +48,26 @@ body {
 }
 
 #converter-jobs {
+  .action-group {
+    margin-top: -10px;
+    margin-right: -15px;
+    
+    .btn-action {
+      border-radius: 0;
+      background: transparent;
+      padding: 8px 12px;
+      
+      &:hover, &:focus {
+        background-color: darken(@panel-default-heading-bg, 5%);
+      }
+    }
+  }
+  
+  #addJob.panel-body {
+    padding: 10px 15px;
+    border-bottom: 1px solid @panel-default-border;
+  }
+  
   .panel-body {
     padding: 0 15px;
     .no-jobs {

@@ -7,6 +7,7 @@ module.exports = {
 	plugins : [ new webpack.ProvidePlugin({
 		$ : "jquery",
 		jQuery : "jquery",
+		"window.jQuery" : "jquery",
 		videojs : "video.js",
 		"window.videojs" : "video.js",
 		Gauge : "svg-gauge",

@@ -19,17 +19,30 @@
  */
 package org.mycore.vidconv.frontend.resource;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Singleton;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXBException;
 
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.mycore.vidconv.backend.encoder.FFMpegImpl;
+import org.mycore.vidconv.backend.service.ConverterService;
 import org.mycore.vidconv.frontend.annotation.CacheMaxAge;
 import org.mycore.vidconv.frontend.entity.CodecWrapper.Type;
 import org.mycore.vidconv.frontend.entity.CodecsWrapper;
@@ -37,6 +50,7 @@ import org.mycore.vidconv.frontend.entity.DecodersWrapper;
 import org.mycore.vidconv.frontend.entity.EncodersWrapper;
 import org.mycore.vidconv.frontend.entity.FormatsWrapper;
 import org.mycore.vidconv.frontend.entity.HWAccelsWrapper;
+import org.mycore.vidconv.frontend.widget.WidgetManager;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
@@ -118,5 +132,25 @@ public class ConverterResource {
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public HWAccelsWrapper getHWAccels() throws Exception {
         return FFMpegImpl.detectHWAccels();
+    }
+
+    @POST
+    @Path("addjob")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces({ MediaType.TEXT_PLAIN })
+    public String addJob(
+        @FormDataParam("file") InputStream is,
+        @FormDataParam("file") FormDataContentDisposition fileDetail,
+        @FormDataParam("callback") FormDataBodyPart callback)
+        throws IOException, InterruptedException, JAXBException, ExecutionException {
+        String completeCallBack = Optional.ofNullable(callback).map(cb -> cb.getValueAs(String.class)).orElse(null);
+
+        ConverterService converterService = ((ConverterService) WidgetManager.instance()
+            .get(ConverterService.class));
+
+        java.nio.file.Path tmpFile = Paths.get(converterService.getTempDir()).resolve(fileDetail.getFileName());
+        Files.copy(is, tmpFile, StandardCopyOption.REPLACE_EXISTING);
+
+        return converterService.addJob(tmpFile, null, completeCallBack);
     }
 }

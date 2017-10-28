@@ -1,0 +1,30 @@
+<form name="addJobForm" class="form-horizontal">
+	<fieldset>
+		<div class="form-group">
+			<div class="col-xs-12">
+				<input type="file" class="form-control" id="file" name="file" accept="video/mp4,video/x-m4v,video/*" data-ngf-select data-ng-model="file"
+					data-ngf-max-size="4192MB" data-ngf-model-invalid="errorFile" required
+				>
+			</div>
+		</div>
+		<div class="pull-right">
+			<button type="button" data-ng-disabled="addJobForm.$invalid" data-ng-click="upload(file)" class="btn btn-primary">{{'btn.upload' | translate}}</button>
+		</div>
+	</fieldset>
+</form>
+
+<div id="file-queue">
+	<div class="row" data-ng-repeat="file in files" data-ng-show="file.progress">
+		<div class="col-sm-12 text-ellipsis">
+			<strong>{{ file.name }}</strong>
+		</div>
+		<div class="col-sm-12">
+			<div class="progress">
+				<div class="progress-bar progress-bar-striped"
+					data-ng-class="{active:!file.uploaded && !file.error,'progress-bar-success':file.uploaded,'progress-bar-danger':file.error}" role="progressbar"
+					aria-valuenow="{{file.progress}}" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: {{ file.progress || 0 }}%"
+				>{{ file.progress || 0 }}%</div>
+			</div>
+		</div>
+	</div>
+</div>

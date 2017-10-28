@@ -57,10 +57,13 @@ public class Application {
     private Integer converterThreads;
 
     @Parameter(names = "--watchDir", description = "Set directory to watch for incomming videos")
-    private String watchDir = System.getProperty("java.io.tmpdir");
+    private String watchDir;
 
     @Parameter(names = "--outputDir", description = "Set directory to output converted videos")
-    private String outputDir = System.getProperty("java.io.tmpdir");
+    private String outputDir;
+
+    @Parameter(names = "--tempDir", description = "Set directory for temporary files")
+    private String tempDir = System.getProperty("java.io.tmpdir");
 
     @Parameter(names = { "--configDir", "-cd" }, description = "Set configuration dir")
     private String configDir;
@@ -73,13 +76,25 @@ public class Application {
             jcmd.usage();
         } else {
             try {
+                if (app.watchDir == null || app.outputDir == null || app.tempDir == null) {
+                    jcmd.usage();
+                    return;
+                }
+
                 if (Files.notExists(Paths.get(app.watchDir))) {
-                    throw new RuntimeException(
+                    throw new IllegalArgumentException(
                         "Watching directory \"" + app.watchDir + "\" isn't exists.");
                 } else if (Paths.get(app.watchDir).equals(Paths.get(app.outputDir).getParent())
                     || Paths.get(app.watchDir).equals(Paths.get(app.outputDir))) {
-                    throw new RuntimeException(
+                    throw new IllegalArgumentException(
                         "Watching directory isn't allowed to be the parent of output directory or the same.");
+                } else if (Files.notExists(Paths.get(app.tempDir))) {
+                    throw new IllegalArgumentException(
+                        "Temporary file directory \"" + app.tempDir + "\" isn't exists.");
+                } else if (Paths.get(app.tempDir).equals(Paths.get(app.outputDir).getParent())
+                    || Paths.get(app.tempDir).equals(Paths.get(app.outputDir))) {
+                    throw new IllegalArgumentException(
+                        "Temporary file directory isn't allowed to be the parent of output directory or the same.");
                 }
 
                 app.run();
@@ -111,7 +126,7 @@ public class Application {
             : converterThreads;
         LOGGER.info("Make use of " + converterThreads + " from available "
             + Runtime.getRuntime().availableProcessors() + " processors.");
-        new ConverterService(outputDir, converterThreads);
+        new ConverterService(outputDir, tempDir, converterThreads);
 
         DirectoryWatchService.instance().registerDirectory(Paths.get(watchDir));
     }

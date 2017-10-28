@@ -3,7 +3,7 @@ var routing = require("./utils/routing.js");
 
 var appName = "MyVidCoRe";
 
-var app = module.export = angular.module(appName, [ "ngAnimate", "ngSanitize", "ngRoute", "ngWebSocket", "pascalprecht.translate" ]);
+var app = module.exports = angular.module(appName, [ "ngAnimate", "ngFileUpload", "ngSanitize", "ngRoute", "ngWebSocket", "pascalprecht.translate" ]);
 
 /**
  * Configure App
@@ -41,9 +41,9 @@ app.factory("routeNavigation", routing.routeNavigation);
 /**
  * Register Components
  */
-angular.forEach([ require("./component/loader.component.js"), require("./component/alert.component.js"), 
-	require("./component/dirwatcher.component.js"), require("./component/nvmonitor.component.js"), 
-	require("./component/converter.component.js"), require("./component/settings.component.js") ], function(comp) {
+angular.forEach([ require("./component/loader.component.js"), require("./component/alert.component.js"), require("./component/dirwatcher.component.js"),
+		require("./component/nvmonitor.component.js"), require("./component/addjob.component.js"), require("./component/converter.component.js"),
+		require("./component/settings.component.js") ], function(comp) {
 	app.component.apply(app, comp);
 });
 
@@ -52,7 +52,7 @@ angular.forEach([ require("./component/loader.component.js"), require("./compone
  */
 app.run(function($animate, $route, $routeProvider, $http, $q, access, routeNavigation) {
 	$animate.enabled(true);
-	
+
 	routing.initRoutes($route, $routeProvider, $http, $q, access, routeNavigation);
 });
 
