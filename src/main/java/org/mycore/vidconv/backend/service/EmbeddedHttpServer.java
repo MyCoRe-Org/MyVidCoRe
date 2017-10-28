@@ -111,7 +111,7 @@ public class EmbeddedHttpServer extends Widget {
         if (this.host != null && !this.host.isEmpty())
             return this.host;
 
-        String hostName = "localhost";
+        String hostName = "0.0.0.0";
         try {
             hostName = InetAddress.getByName(hostName).getCanonicalHostName();
         } catch (UnknownHostException e) {
