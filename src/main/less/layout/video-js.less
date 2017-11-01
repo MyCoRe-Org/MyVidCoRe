@@ -1,0 +1,26 @@
+.video-js {
+  color: @brand-primary;
+  &:focus {
+    outline-style: none ! important;
+    outline-color: transparent ! important;
+    outline-width: 0 ! important;
+  }
+
+  .vjs-big-play-button {
+    background-color: rgba(2, 2, 2, 0.85);
+    border-color: @brand-primary;
+  }
+
+  .vjs-control-bar {
+    background-color: rgba(2, 2, 2, 0.85);
+  }
+
+  .vjs-slider {
+    background: fade(@brand-primary, 30%);
+  }
+
+  .vjs-load-progress, .vjs-load-progress div {
+    background: fade(@brand-primary, 20%);
+  }
+}
+
