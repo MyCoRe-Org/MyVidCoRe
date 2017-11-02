@@ -22,7 +22,6 @@
  */
 package org.mycore.vidconv.frontend.entity;
 
-import java.net.URL;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalTime;
@@ -55,7 +54,7 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
 
     private String fileName;
 
-    private String completeCallBack;
+    private String completeCallback;
 
     private List<Output> outputs;
 
@@ -89,7 +88,7 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
         this.command = converter.command();
         this.inputPath = converter.inputPath().getParent().toString();
         this.fileName = converter.inputPath().getFileName().toString();
-        this.setCompleteCallBack(converter.completeCallBack());
+        this.completeCallback = converter.completeCallBack();
         this.outputs = converter.outputs();
         this.hwAccel = converter.hwAccel();
         this.running = converter.isRunning();
@@ -122,9 +121,9 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
         return fileName;
     }
 
-    @XmlElement(name = "completeCallBack")
-    public String completeCallBack() {
-        return completeCallBack;
+    @XmlElement(name = "completeCallback")
+    public String getCompleteCallback() {
+        return completeCallback;
     }
 
     @XmlElement(name = "files")
@@ -222,17 +221,10 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
     }
 
     /**
-     * @param completeCallBack the completeCallBack to set
+     * @param completeCallback the completeCallBack to set
      */
-    public void setCompleteCallBack(String completeCallBack) {
-        this.completeCallBack = completeCallBack;
-    }
-
-    /**
-     * @param completeCallBack the completeCallBack to set
-     */
-    public void setCompleteCallBack(URL completeCallBack) {
-        this.completeCallBack = Optional.ofNullable(completeCallBack).map(cb -> cb.toExternalForm()).orElse(null);
+    public void setCompleteCallback(String completeCallback) {
+        this.completeCallback = completeCallback;
     }
 
     /**

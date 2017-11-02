@@ -329,7 +329,8 @@ public class ConverterService extends Widget implements Listener {
                         ConverterWrapper cw = JsonUtils.loadJSON(file.toFile(), ConverterWrapper.class);
                         if (!cw.isDone()) {
                             LOGGER.info("...restart \"{}\" with id \"{}\".", cw.getFileName(), cw.getId());
-                            addJob(Paths.get(cw.getInputPath(), cw.getFileName()), cw.getId(), cw.completeCallBack());
+                            addJob(Paths.get(cw.getInputPath(), cw.getFileName()), cw.getId(),
+                                cw.getCompleteCallback());
                         }
                     } catch (JAXBException | InterruptedException | ExecutionException | IOException e) {
                         LOGGER.error("Couldn't add incomplete jobs.", e);
