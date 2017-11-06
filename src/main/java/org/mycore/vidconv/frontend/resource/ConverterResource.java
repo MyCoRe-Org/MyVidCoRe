@@ -141,8 +141,10 @@ public class ConverterResource {
     public String addJob(
         @FormDataParam("file") InputStream is,
         @FormDataParam("file") FormDataContentDisposition fileDetail,
+        @FormDataParam("id") FormDataBodyPart id,
         @FormDataParam("callback") FormDataBodyPart callback)
         throws IOException, InterruptedException, JAXBException, ExecutionException {
+        String jobId = Optional.ofNullable(id).map(i -> i.getValueAs(String.class)).orElse(null);
         String completeCallBack = Optional.ofNullable(callback).map(cb -> cb.getValueAs(String.class)).orElse(null);
 
         ConverterService converterService = ((ConverterService) WidgetManager.instance()
@@ -151,6 +153,6 @@ public class ConverterResource {
         java.nio.file.Path tmpFile = Paths.get(converterService.getTempDir()).resolve(fileDetail.getFileName());
         Files.copy(is, tmpFile, StandardCopyOption.REPLACE_EXISTING);
 
-        return converterService.addJob(tmpFile, null, completeCallBack);
+        return converterService.addJob(tmpFile, jobId, completeCallBack);
     }
 }
