@@ -67,6 +67,7 @@
     <encoding>UTF-8</encoding>
     <java.version>1.8</java.version>
     <maven.compiler.target>${java.version}</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <webpack.assetsDir>${project.build.directory}/classes/META-INF/resources/assets</webpack.assetsDir>
     <webpack.baseDir>${project.build.directory}/webpack</webpack.baseDir>
     <webpack.mainFile>${basedir}/src/main/js/app.js</webpack.mainFile>
