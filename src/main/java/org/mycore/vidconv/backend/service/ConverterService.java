@@ -350,7 +350,7 @@ public class ConverterService extends Widget implements Listener {
             Map<String, String> env = new HashMap<>();
             env.put("create", "true");
 
-            URI zipUri = new URI("jar:file:" + zip.toUri().getPath());
+            URI zipUri = URI.create("jar:" + zip.toUri());
             try (FileSystem fs = FileSystems.newFileSystem(zipUri, env)) {
                 Path root = fs.getPath(".");
                 try (Stream<Path> stream = Files.walk(path)) {
