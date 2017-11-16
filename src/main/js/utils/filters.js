@@ -40,17 +40,16 @@ module.exports = {
 			return type === "int" ? parseInt(input) : type === "float" ? parseFloat(input) : input;
 		};
 	},
-	"convertToNumber" : function() {
-		return {
-			require : "ngModel",
-			link : function(scope, element, attrs, ngModel) {
-				ngModel.$parsers.push(function(val) {
-					return parseInt(val, 10);
-				});
-				ngModel.$formatters.push(function(val) {
-					return val === undefined || val.length === 0 ? null : val;
-				});
-			}
+	"hashCode" : function() {
+		return function(input) {
+			input = input || "";
+			var hash = 0;
+		    for (i = 0; i < input.length; i++) {
+		        char = input.charCodeAt(i);
+		        hash = ((hash<<5) - hash) + char;
+		        hash = hash & hash;
+		    }
+		    return hash.toString(16); 
 		};
 	}
 };
