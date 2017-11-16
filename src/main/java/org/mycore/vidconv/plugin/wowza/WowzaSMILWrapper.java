@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -57,9 +58,9 @@ public class WowzaSMILWrapper {
             if (p.getFormat() != null && p.getStreams() != null) {
                 final StreamWrapper vs = p.getStreams().stream().filter(s -> s.getCodecType().equalsIgnoreCase("video"))
                     .findFirst().orElse(null);
-                final StreamWrapper as = p.getStreams().stream().filter(s -> s.getCodecType().equalsIgnoreCase("audio"))
-                    .findFirst().orElse(null);
-                if (vs != null && as != null) {
+                final Optional<StreamWrapper> as = p.getStreams().stream()
+                    .filter(s -> s.getCodecType().equalsIgnoreCase("audio")).findFirst();
+                if (vs != null) {
                     final Video video = new Video();
 
                     video.setSrc(Paths.get(p.getFormat().getFilename()).getFileName().toString());
@@ -67,8 +68,8 @@ public class WowzaSMILWrapper {
                     video.setHeight(vs.getHeight());
                     video.setWidth(vs.getWidth());
 
-                    video.withParam(new Param<Integer>("videoBitrate", vs.getBitRate(), "data"))
-                        .withParam(new Param<Integer>("audioBitrate", as.getBitRate(), "data"));
+                    video.withParam(new Param<Integer>("videoBitrate", vs.getBitRate(), "data"));
+                    as.ifPresent(s -> video.withParam(new Param<Integer>("audioBitrate", s.getBitRate(), "data")));
 
                     videos.add(video);
                 }
@@ -117,11 +118,11 @@ public class WowzaSMILWrapper {
     }
 
     @XmlRootElement(name = "body")
-    @XmlType(name="SMIL.Body")
+    @XmlType(name = "SMIL.Body")
     public static class Body {
 
         private List<Video> switchBody;
-        
+
         protected Body() {
             super();
         }
@@ -148,7 +149,7 @@ public class WowzaSMILWrapper {
     }
 
     @XmlRootElement(name = "video")
-    @XmlType(name="SMIL.Video")
+    @XmlType(name = "SMIL.Video")
     public static class Video {
         private String src;
 
@@ -246,14 +247,14 @@ public class WowzaSMILWrapper {
     }
 
     @XmlRootElement(name = "param")
-    @XmlType(name="SMIL.Param")
+    @XmlType(name = "SMIL.Param")
     public static class Param<T> {
         private String name;
 
         private T value;
 
         private String valueType;
-        
+
         protected Param() {
             super();
         }
