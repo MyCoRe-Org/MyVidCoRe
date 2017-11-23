@@ -22,6 +22,7 @@
  */
 package org.mycore.vidconv.backend.service;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -31,6 +32,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
+import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -38,6 +40,7 @@ import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -320,6 +323,25 @@ public class ConverterService extends Widget implements Listener {
         return null;
     }
 
+    public boolean removeJob(String jobId) throws IOException {
+        ConverterJob job = converters.get(jobId);
+
+        if (job != null) {
+            if (job.isDone()) {
+                deleteRecursive(job.inputPath());
+                deleteRecursive(job.outputPath());
+                converters.remove(jobId);
+                return true;
+            } else {
+                LOGGER.warn("Couldn't remove job with id {}, because is running!", jobId);
+            }
+        } else {
+            LOGGER.error("Couldn't find a job with id {}!", jobId);
+        }
+
+        return false;
+    }
+
     private void addIncompleteJobs() {
         try {
             LOGGER.info("search for incomplete jobs...");
@@ -343,7 +365,7 @@ public class ConverterService extends Widget implements Listener {
         }
     }
 
-    private Path compressOutput(Path path) throws IOException, URISyntaxException {
+    private static Path compressOutput(Path path) throws IOException, URISyntaxException {
         Path zip = Paths.get(path.getParent().toString(), path.getFileName() + ".zip");
 
         if (Files.notExists(zip)) {
@@ -368,6 +390,13 @@ public class ConverterService extends Widget implements Listener {
         }
 
         return zip;
+    }
+
+    private static void deleteRecursive(Path path) throws IOException {
+        Files.walk(path, FileVisitOption.FOLLOW_LINKS)
+            .sorted(Comparator.reverseOrder())
+            .map(Path::toFile)
+            .forEach(File::delete);
     }
 
     public static class ConverterJob implements Runnable {

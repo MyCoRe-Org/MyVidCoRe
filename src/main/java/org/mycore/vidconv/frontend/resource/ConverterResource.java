@@ -155,4 +155,13 @@ public class ConverterResource {
 
         return converterService.addJob(tmpFile, jobId, completeCallBack);
     }
+
+    @GET
+    @Path("removejob/{jobId}")
+    public String removeJob(@PathParam("jobId") String jobId) throws IOException {
+        ConverterService converterService = ((ConverterService) WidgetManager.instance()
+            .get(ConverterService.class));
+
+        return Boolean.toString(converterService.removeJob(jobId));
+    }
 }
