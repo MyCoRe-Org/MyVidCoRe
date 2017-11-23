@@ -25,23 +25,16 @@ package org.mycore.vidconv.backend.service;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -75,6 +68,7 @@ import org.mycore.vidconv.frontend.entity.HWAccelDeviceSpec;
 import org.mycore.vidconv.frontend.entity.HWAccelWrapper;
 import org.mycore.vidconv.frontend.entity.SettingsWrapper;
 import org.mycore.vidconv.frontend.entity.SettingsWrapper.Output;
+import org.mycore.vidconv.frontend.util.ZipStreamingOutput;
 import org.mycore.vidconv.frontend.widget.Widget;
 
 /**
@@ -237,15 +231,37 @@ public class ConverterService extends Widget implements Listener {
             final ConverterJob converter = converters.get(converterId);
 
             if (converter != null && converter.isDone()) {
+                final String fileName = URLDecoder.decode(params.get(1), StandardCharsets.UTF_8.toString());
+                return converter.outputs.stream()
+                    .filter(o -> o.getOutputPath().getFileName().toString().equals(fileName))
+                    .findFirst()
+                    .map(o -> o.getOutputPath())
+                    .orElseThrow(() -> new FileNotFoundException("File \"" + fileName + "\" not found."));
+            }
+        }
+
+        return null;
+    }
+
+    /* (non-Javadoc)
+     * @see org.mycore.vidconv.frontend.widget.Widget#compress(java.util.List)
+     */
+    @Override
+    public ZipStreamingOutput compress(List<String> params) throws Exception {
+        if (!params.isEmpty()) {
+            final String converterId = params.get(0);
+            final ConverterJob converter = converters.get(converterId);
+
+            if (converter != null && converter.isDone()) {
                 if (params.size() == 1) {
-                    return compressOutput(converter.outputPath);
+                    return new ZipStreamingOutput(converter.outputPath, 0);
                 } else {
                     final String fileName = URLDecoder.decode(params.get(1), StandardCharsets.UTF_8.toString());
-                    return converter.outputs.stream()
+                    return new ZipStreamingOutput(converter.outputs.stream()
                         .filter(o -> o.getOutputPath().getFileName().toString().equals(fileName))
                         .findFirst()
                         .map(o -> o.getOutputPath())
-                        .orElseThrow(() -> new FileNotFoundException("File \"" + fileName + "\" not found."));
+                        .orElseThrow(() -> new FileNotFoundException("File \"" + fileName + "\" not found.")));
                 }
             }
         }
@@ -363,33 +379,6 @@ public class ConverterService extends Widget implements Listener {
         } catch (IOException e) {
             LOGGER.error("Couldn't read incomplete jobs.", e);
         }
-    }
-
-    private static Path compressOutput(Path path) throws IOException, URISyntaxException {
-        Path zip = Paths.get(path.getParent().toString(), path.getFileName() + ".zip");
-
-        if (Files.notExists(zip)) {
-            Map<String, String> env = new HashMap<>();
-            env.put("create", "true");
-
-            URI zipUri = URI.create("jar:" + zip.toUri());
-            try (FileSystem fs = FileSystems.newFileSystem(zipUri, env)) {
-                Path root = fs.getPath(".");
-                try (Stream<Path> stream = Files.walk(path)) {
-                    stream.forEach(sourcePath -> {
-                        try {
-                            Files.copy(sourcePath,
-                                root.resolve(path.relativize(sourcePath).toString()),
-                                StandardCopyOption.REPLACE_EXISTING);
-                        } catch (IOException e) {
-                            throw new UncheckedIOException(e.getMessage(), e);
-                        }
-                    });
-                }
-            }
-        }
-
-        return zip;
     }
 
     private static void deleteRecursive(Path path) throws IOException {

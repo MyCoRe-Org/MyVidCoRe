@@ -54,6 +54,7 @@ import org.mycore.vidconv.common.util.MimeType;
 import org.mycore.vidconv.frontend.annotation.NoCache;
 import org.mycore.vidconv.frontend.entity.ExceptionWrapper;
 import org.mycore.vidconv.frontend.util.RangeStreamingOutput;
+import org.mycore.vidconv.frontend.util.ZipStreamingOutput;
 import org.mycore.vidconv.frontend.widget.Widget;
 import org.mycore.vidconv.frontend.widget.WidgetManager;
 
@@ -180,6 +181,43 @@ public class WidgetResource {
                     return buildStream(path, range);
                 } else {
                     LOGGER.error("download path was empty.");
+                    return Response.status(Response.Status.NOT_FOUND).build();
+                }
+            } else {
+                LOGGER.error("widget \"" + widgetOptions + "\" not found.");
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ExceptionWrapper(e)).build();
+        }
+    }
+
+    @GET
+    @Path("{widget:.+}/{action:(compress)}")
+    @NoCache
+    @Produces("application/x-zip-compressed")
+    public Response widgetCompress(@PathParam("widget") String widgetOptions, @PathParam("action") String action) {
+        try {
+            final StringTokenizer tok = new StringTokenizer(widgetOptions, "/");
+
+            final String widgetName = tok.nextToken();
+            final List<String> widgetParams = new ArrayList<>();
+
+            while (tok.hasMoreTokens()) {
+                widgetParams.add(tok.nextToken());
+            }
+
+            final Widget widget = WIDGET_MANAGER.get(widgetName);
+
+            if (widget != null) {
+                final ZipStreamingOutput zipStream = widgetParams.isEmpty() ? widget.compress()
+                    : widget.compress(widgetParams);
+
+                if (zipStream != null) {
+                    return Response.ok(zipStream, "application/x-zip-compressed").header("content-disposition",
+                        "attachment; filename = \"" + zipStream.path().getFileName().toString() + ".zip\"").build();
+                } else {
+                    LOGGER.error("compressed download was empty.");
                     return Response.status(Response.Status.NOT_FOUND).build();
                 }
             } else {

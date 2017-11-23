@@ -25,6 +25,8 @@ package org.mycore.vidconv.frontend.widget;
 import java.nio.file.Path;
 import java.util.List;
 
+import org.mycore.vidconv.frontend.util.ZipStreamingOutput;
+
 /**
  * @author Ren\u00E9 Adler (eagle)
  *
@@ -118,10 +120,34 @@ public class Widget {
     /**
      * Returns a path for download.
      * 
+     * @param params a list of parameters
+     * 
      * @return the file to download
      * @throws Exception
      */
     public Path download(List<String> params) throws Exception {
         throw new UnsupportedOperationException("Download is not implemented");
+    }
+
+    /**
+     * Returns a ZipStreamingOutput for compressed download
+     * 
+     * @return the ZipStreamingOutput to download compressed
+     * @throws Exception
+     */
+    public ZipStreamingOutput compress() throws Exception {
+        throw new UnsupportedOperationException("Compress is not implemented");
+    }
+
+    /**
+     * Returns a ZipStreamingOutput for compressed download
+     * 
+     * @param params a list of parameters
+     * 
+     * @return the ZipStreamingOutput to download compressed
+     * @throws Exception
+     */
+    public ZipStreamingOutput compress(List<String> params) throws Exception {
+        throw new UnsupportedOperationException("Compress is not implemented");
     }
 }
