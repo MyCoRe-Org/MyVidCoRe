@@ -21,6 +21,7 @@ package org.mycore.vidconv.frontend.resource;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -141,19 +142,29 @@ public class ConverterResource {
     public String addJob(
         @FormDataParam("file") InputStream is,
         @FormDataParam("file") FormDataContentDisposition fileDetail,
+        @FormDataParam("filename") FormDataBodyPart fileName,
         @FormDataParam("id") FormDataBodyPart id,
         @FormDataParam("callback") FormDataBodyPart callback)
         throws IOException, InterruptedException, JAXBException, ExecutionException {
-        String jobId = Optional.ofNullable(id).map(i -> i.getValueAs(String.class)).orElse(null);
-        String completeCallBack = Optional.ofNullable(callback).map(cb -> cb.getValueAs(String.class)).orElse(null);
+        final String jobId = Optional.ofNullable(id).map(i -> i.getValueAs(String.class)).orElse(null);
+        final String completeCallBack = Optional.ofNullable(callback).map(cb -> cb.getValueAs(String.class))
+            .orElse(null);
+        final String fn = Optional.ofNullable(fileName).map(f -> f.getValueAs(String.class)).filter(f -> !f.isEmpty())
+            .orElse(decodeFormDataFileName(fileDetail.getFileName()));
 
         ConverterService converterService = ((ConverterService) WidgetManager.instance()
             .get(ConverterService.class));
 
-        java.nio.file.Path tmpFile = Paths.get(converterService.getTempDir()).resolve(fileDetail.getFileName());
+        java.nio.file.Path tmpFile = Paths.get(converterService.getTempDir()).resolve(fn);
         Files.copy(is, tmpFile, StandardCopyOption.REPLACE_EXISTING);
 
         return converterService.addJob(tmpFile, jobId, completeCallBack);
+    }
+
+    private String decodeFormDataFileName(String fileName) {
+        // Workaround to fix filename attribute of multipart/form-data
+        // https://tools.ietf.org/html/rfc7578#section-2.3
+        return new String(fileName.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
 
     @GET

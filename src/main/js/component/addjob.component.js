@@ -21,7 +21,8 @@ module.exports = [ "addJob", {
 			Upload.upload({
 				url : "/converter/addjob",
 				data : {
-					file : file
+					file : file,
+					filename : file.name
 				},
 			}).then(function(response) {
 				if (response.status === 200) {
