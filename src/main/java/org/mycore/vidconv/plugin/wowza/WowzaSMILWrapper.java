@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.xml.bind.JAXBContext;
@@ -54,7 +55,7 @@ public class WowzaSMILWrapper {
 
         final List<Video> videos = new ArrayList<>();
 
-        probes.forEach(p -> {
+        probes.stream().filter(Objects::nonNull).forEach(p -> {
             if (p.getFormat() != null && p.getStreams() != null) {
                 final StreamWrapper vs = p.getStreams().stream().filter(s -> s.getCodecType().equalsIgnoreCase("video"))
                     .findFirst().orElse(null);
