@@ -1,0 +1,57 @@
+<fieldset>
+	<legend>
+		<a class="btn" role="button" data-target="#{{type}}-advanced-options-{{ index }}" data-toggle="collapse" data-target="#{{type}}-advanced-options-{{ index }}"
+			aria-expanded="false" aria-controls="{{type}}-advanced-options-{{ index }}"
+		>{{'settings.advancedOptions' | translate}}</a>
+	</legend>
+	<div id="{{type}}-advanced-options-{{ index }}" class="collapse">
+		<div data-ng-repeat="param in codec[index][type].parameters"
+			data-ng-init="param.name = '0123456789'.indexOf(param.name[0]) !== -1 ? '_' + param.name : param.name"
+		>
+
+			<div class="form-group"
+				data-ng-if="('string|int|float'.indexOf(param.type) !== -1) && ('preset|tune|profile|level'.indexOf(param.name) === -1) && (param.values === undefined) && (((param.toValue - param.fromValue) < 1) || ((param.toValue - param.fromValue) > 100))"
+			>
+				<label for="{{ param.name }}">{{ param.name | translateWithFallBack:'settings.':param.description:'\\(((from\\s.*\\sto)|default)\\s[^\\)]+\\)' }}</label> <input
+					id="{{ param.name }}" class="form-control" data-ng-model="output[type].parameter[param.name]"
+					data-ng-init="output[type].parameter[param.name] = output[type].parameter[param.name] || (param.defaultValue | parseNumber:param.type)"
+				>
+			</div>
+
+			<div class="form-group" data-ng-if="(param.values !== undefined) && ('preset|tune|profile|level'.indexOf(param.name) === -1)">
+				<label for="{{ param.name }}">{{ param.name | translateWithFallBack:'settings.':param.description:'\\(((from\\s.*\\sto)|default)\\s[^\\)]+\\)' }}</label> <select
+					id="{{ param.name }}" class="form-control" data-ng-model="output[type].parameter[param.name]"
+					data-ng-init="output[type].parameter[param.name] = output[type].parameter[param.name] || param.defaultValue"
+					data-ng-options="value.name as (value.description || value.name) for value in param.values"
+				>
+				</select>
+			</div>
+
+			<div class="form-group"
+				data-ng-if="('int|float'.indexOf(param.type) !== -1) && ('preset|tune|profile|level'.indexOf(param.name) === -1) && (param.values === undefined) && (((param.toValue - param.fromValue) > 1) && ((param.toValue - param.fromValue) <= 100))"
+			>
+				<label for="{{ param.name }}">{{ param.name | translateWithFallBack:'settings.':param.description:'\\(((from\\s.*\\sto)|default)\\s[^\\)]+\\)' }}</label> <input
+					id="{{ param.name }}" class="form-control" data-ng-model="output[type].parameter[param.name]"
+					data-ng-init="output[type].parameter[param.name] = (output[type].parameter[param.name] || param.defaultValue) | parseNumber:param.type" slider
+					data-slider-id="param.name + 'Slider'" data-slider-step="param.type === 'int' ? 1 : 0.25" data-slider-min="param.fromValue | parseNumber:param.type"
+					data-slider-max="param.toValue | parseNumber:param.type"
+					data-slider-value="output[type].parameter[param.name] = (output[type].parameter[param.name] || param.defaultValue) | parseNumber:param.type"
+					data-slider-precision="param.type === 'float' ? 2 : 0"
+				>
+			</div>
+
+			<div class="form-group"
+				data-ng-if="('int|boolean'.indexOf(param.type) !== -1) && (param.values === undefined) && ((param.fromValue === undefined && param.toValue === undefined) || (param.toValue - param.fromValue) === 1)"
+			>
+				<div class="checkbox">
+					<label> <input type="checkbox" value="" data-ng-model="output[type].parameter[param.name]"
+						data-ng-init="output[type].parameter[param.name] = output[type].parameter[param.name] || ('0|1|true|false'.indexOf(param.defaultValue) !== -1 ? param.defaultValue : undefined)"
+						data-ng-true-value="{{ param.type === 'int' ? 1 : '\'true\'' }}" data-ng-false-value="{{ param.type === 'int' ? 0 : '\'false\'' }}"
+					> {{ param.name | translateWithFallBack:'settings.':param.description:'\\(((from\\s.*\\sto)|default)\\s[^\\)]+\\)' }}
+					</label>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</fieldset>

@@ -46,5 +46,18 @@ module.exports = {
 				}
 			}
 		};
+	},
+	"advancedOptions" : function() {
+		return {
+			restrict : "E",
+			require : "^^settings",
+			templateUrl : "/assets/templates/advanced-options.directive.html",
+			scope : {
+				type : "@",
+				index : "=index",
+				output : "=output",
+				codec : "=codec"
+			}
+		};
 	}
 };
