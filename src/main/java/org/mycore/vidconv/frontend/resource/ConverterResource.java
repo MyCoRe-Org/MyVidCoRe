@@ -26,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Optional;
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -155,7 +156,11 @@ public class ConverterResource {
         ConverterService converterService = ((ConverterService) WidgetManager.instance()
             .get(ConverterService.class));
 
-        java.nio.file.Path tmpFile = Paths.get(converterService.getTempDir()).resolve(fn);
+        java.nio.file.Path tmpFile = Paths.get(converterService.getTempDir())
+            .resolve(Optional.ofNullable(jobId).orElse(Long.toHexString(new Random().nextLong()))).resolve(fn);
+
+        Files.createDirectories(tmpFile.getParent());
+
         Files.copy(is, tmpFile, StandardCopyOption.REPLACE_EXISTING);
 
         return converterService.addJob(tmpFile, jobId, completeCallBack);
