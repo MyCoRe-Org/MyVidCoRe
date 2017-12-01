@@ -99,6 +99,18 @@ module.exports = [
 					return format !== undefined ? $scope.formats[format][type] : null;
 				};
 
+				$scope.isFilteredEncoder = function(encoder, filter) {
+					if (encoder !== undefined && filter !== undefined) {
+						for ( var i in filter) {
+							if (encoder.name.indexOf(filter[i]) !== -1) {
+								return true;
+							}
+						}
+					}
+					
+					return false;
+				};
+
 				$scope.filterEncoder = function(name) {
 					var encoders = formatService.getSupportedEncoders();
 					return encoders !== undefined && encoders.length !== 0 && formatService.getByProperty(encoders, "name", name);

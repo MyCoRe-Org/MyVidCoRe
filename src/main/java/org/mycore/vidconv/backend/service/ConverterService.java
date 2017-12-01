@@ -126,7 +126,7 @@ public class ConverterService extends Widget implements Listener {
             .sum();
 
         converterThreadPool = Executors.newFixedThreadPool(
-            hwAccelConverterThreads > 0 ? Integer.min(hwAccelConverterThreads, converterThreads)
+            hwAccelConverterThreads > 0 ? Integer.max(hwAccelConverterThreads, converterThreads)
                 : converterThreads);
 
         addIncompleteJobs();
@@ -317,7 +317,7 @@ public class ConverterService extends Widget implements Listener {
                         out.setInputPath(inputPath);
                         out.setOutputPath(outputPath.resolve(FFMpegImpl.filename(o.getFormat(), fileName,
                             appendix)));
-                        
+
                         return out;
                     }).collect(Collectors.toList());
 

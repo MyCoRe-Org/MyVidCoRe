@@ -104,7 +104,11 @@ public class SettingsWrapper {
 
         private Video video;
 
+        private Video videoFallback;
+
         private Audio audio;
+
+        private Audio audioFallback;
 
         private Path inputPath;
 
@@ -133,11 +137,40 @@ public class SettingsWrapper {
         }
 
         /**
+         * @param format the format to set
+         */
+        public void setFormat(String format) {
+            this.format = format;
+        }
+
+        /**
          * @return the video
          */
         @XmlElement
         public Video getVideo() {
             return video;
+        }
+
+        /**
+         * @param video the video to set
+         */
+        public void setVideo(Video video) {
+            this.video = video;
+        }
+
+        /**
+         * @return the videoFallback
+         */
+        @XmlElement(name = "video-fallback")
+        public Video getVideoFallback() {
+            return videoFallback;
+        }
+
+        /**
+         * @param videoFallback the videoFallback to set
+         */
+        public void setVideoFallback(Video videoFallback) {
+            this.videoFallback = videoFallback;
         }
 
         /**
@@ -149,24 +182,25 @@ public class SettingsWrapper {
         }
 
         /**
-         * @param format the format to set
-         */
-        public void setFormat(String format) {
-            this.format = format;
-        }
-
-        /**
-         * @param video the video to set
-         */
-        public void setVideo(Video video) {
-            this.video = video;
-        }
-
-        /**
          * @param audio the audio to set
          */
         public void setAudio(Audio audio) {
             this.audio = audio;
+        }
+
+        /**
+         * @return the audioFallback
+         */
+        @XmlElement(name = "audio-fallback")
+        public Audio getAudioFallback() {
+            return audioFallback;
+        }
+
+        /**
+         * @param audioFallback the audioFallback to set
+         */
+        public void setAudioFallback(Audio audioFallback) {
+            this.audioFallback = audioFallback;
         }
 
         /**
@@ -203,6 +237,8 @@ public class SettingsWrapper {
             Output out = new Output();
             out.audio = this.audio;
             out.video = this.video;
+            out.audioFallback = this.audioFallback;
+            out.videoFallback = this.videoFallback;
             out.filenameAppendix = this.filenameAppendix;
             out.format = this.format;
             out.inputPath = this.inputPath;

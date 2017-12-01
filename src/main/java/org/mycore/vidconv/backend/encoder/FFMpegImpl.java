@@ -447,8 +447,7 @@ public class FFMpegImpl {
      * @return the encoders wrapper
      * @throws NumberFormatException the number format exception
      */
-    public static EncodersWrapper encoder(final String name)
-        throws InterruptedException, NumberFormatException, ExecutionException {
+    public static EncodersWrapper encoder(final String name) throws NumberFormatException {
         if (supportedEncoders.containsKey(name)) {
             return supportedEncoders.get(name);
         }
@@ -829,10 +828,11 @@ public class FFMpegImpl {
 
     private static void buildVideoStreamCommand(StringBuffer cmd, final String processId, final Output output,
         final Optional<HWAccelWrapper<? extends HWAccelDeviceSpec>> hwAccel) {
-        Video video = output.getVideo();
+        Video video = hwAccel.isPresent() ? output.getVideo()
+            : Optional.ofNullable(output.getVideoFallback()).orElse(output.getVideo());
 
         if (hwAccel.isPresent()) {
-            buildHWAccelVideoStreamCommand(cmd, processId, output, hwAccel);
+            buildHWAccelVideoStreamCommand(cmd, processId, video, hwAccel);
         } else {
             Optional.ofNullable(video.getScale()).ifPresent(v -> cmd.append(" -vf 'scale=" + v + "'"));
         }
@@ -875,9 +875,8 @@ public class FFMpegImpl {
         });
     }
 
-    private static void buildHWAccelVideoStreamCommand(StringBuffer cmd, final String processId, final Output output,
+    private static void buildHWAccelVideoStreamCommand(StringBuffer cmd, final String processId, final Video video,
         final Optional<HWAccelWrapper<? extends HWAccelDeviceSpec>> hwAccel) {
-        Video video = output.getVideo();
 
         HWAccelWrapper<? extends HWAccelDeviceSpec> hw = hwAccel.get();
         if (HWAccelType.NVIDIA == hw.getType()) {
@@ -929,7 +928,7 @@ public class FFMpegImpl {
             EncodersWrapper encoders;
             try {
                 encoders = encoder(codec);
-            } catch (NumberFormatException | InterruptedException | ExecutionException e1) {
+            } catch (NumberFormatException e) {
                 encoders = null;
             }
 

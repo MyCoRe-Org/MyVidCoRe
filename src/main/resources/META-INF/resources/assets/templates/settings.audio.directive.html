@@ -1,0 +1,38 @@
+<div class="form-group">
+	<label for="acodec">{{'settings.codec' | translate}}</label> <select id="acodec" class="form-control" data-ng-model="audio.codec"
+		data-ng-change="parent.changeCodec(index, type)"
+	>
+		<optgroup data-ng-if="codec.encoders && parent.getLength(codec.encoders) > 1" data-ng-repeat="codec in parent.filterCodecs(output.format, 'audio')"
+			label="{{codec.description}}"
+		>
+			<option data-ng-repeat="encoder in codec.encoders" value="{{encoder.name}}">{{encoder.description}} {{ '(' + encoder.name + ') ' }}</option>
+		</optgroup>
+		<option data-ng-if="codec.encoders && parent.getLength(codec.encoders) == 1" data-ng-repeat="codec in parent.filterCodecs(output.format, 'audio')"
+			value="{{codec.encoders[0].name}}"
+		>{{codec.description}} {{ '(' + codec.name + ')' }}</option>
+	</select>
+</div>
+<!--              <div class="form-group"> -->
+<!--                <label for="mixdown">{{'settings.audio.mixdown' | translate}}</label> <select id="mixdown" class="form-control" data-ng-model="audio.mixdown"> -->
+<!--                  <option value="mono">{{'settings.audio.mixdown.mono' | translate}}</option> -->
+<!--                  <option value="mono-l">{{'settings.audio.mixdown.mono-l' | translate}}</option> -->
+<!--                  <option value="mono-r">{{'settings.audio.mixdown.mono-r' | translate}}</option> -->
+<!--                  <option value="stereo">{{'settings.audio.mixdown.stereo' | translate}}</option> -->
+<!--                </select> -->
+<!--              </div> -->
+<div class="form-group" data-ng-if="(selectedCodec[index][type] = selectedCodec[index][type] || parent.filterEncoder(audio.codec)).sampleRates.length > 0">
+	<label for="samplerate">{{'settings.audio.samplerate' | translate}}</label> <select id="samplerate" class="form-control" data-ng-model="audio.samplerate"
+		convert-to-number data-ng-options="sr as sr for sr in selectedCodec[index][type].sampleRates"
+	>
+		<option value="">{{'settings.auto' | translate}}</option>
+	</select>
+</div>
+<div class="form-group">
+	<label for="bitrate">{{'settings.audio.bitrate' | translate}}</label> <select id="bitrate" class="form-control" data-ng-model="audio.bitrate" convert-to-number
+		data-ng-options="br as (br + 'k' ) for br in parent.defaultBitrates"
+	>
+		<option value="">{{'settings.auto' | translate}}</option>
+	</select>
+</div>
+
+<settings-advanced-options type="{{type}}" index="index" output="output" codec="selectedCodec"></settings-advanced-options>

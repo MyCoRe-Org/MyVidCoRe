@@ -47,11 +47,40 @@ module.exports = {
 			}
 		};
 	},
-	"advancedOptions" : function() {
+	"settingsAudio" : function() {
 		return {
 			restrict : "E",
 			require : "^^settings",
-			templateUrl : "/assets/templates/advanced-options.directive.html",
+			templateUrl : "/assets/templates/settings.audio.directive.html",
+			scope : {
+				type : "@",
+				index : "=index",
+				parent : "=parent",
+				output : "=output",
+				audio : "=audio",
+			}
+		};
+	},
+	"settingsVideo" : function() {
+		return {
+			restrict : "E",
+			require : "^^settings",
+			templateUrl : "/assets/templates/settings.video.directive.html",
+			scope : {
+				type : "@",
+				index : "=index",
+				parent : "=parent",
+				output : "=output",
+				video : "=video",
+				encoderFilter : "=encoderFilter"
+			}
+		};
+	},
+	"settingsAdvancedOptions" : function() {
+		return {
+			restrict : "E",
+			require : "^^settings",
+			templateUrl : "/assets/templates/settings.advanced-options.directive.html",
 			scope : {
 				type : "@",
 				index : "=index",
