@@ -65,7 +65,7 @@ public class CodecsWrapper {
      * @return the codecs
      */
     @XmlElement
-    public synchronized List<CodecWrapper> getCodecs() {
+    public List<CodecWrapper> getCodecs() {
         return codecs;
     }
 
@@ -73,26 +73,26 @@ public class CodecsWrapper {
      * @param codecs the codecs to set
      */
     public CodecsWrapper setCodecs(List<CodecWrapper> codecs) {
-        this.codecs = Collections.synchronizedList(Collections.unmodifiableList(codecs));
+        this.codecs = Collections.unmodifiableList(codecs);
         return this;
     }
 
-    public synchronized List<CodecWrapper> getByType(Type type) {
+    public List<CodecWrapper> getByType(Type type) {
         return codecs.stream().filter(c -> c.getType() == type).collect(Collectors.toList());
     }
 
-    public synchronized List<CodecWrapper> getByName(String name) {
+    public List<CodecWrapper> getByName(String name) {
         return codecs.stream().filter(c -> StringUtils.filter(c.getName(), name))
             .collect(Collectors.toList());
     }
 
-    public synchronized List<CodecWrapper> getByDescription(String search) {
+    public List<CodecWrapper> getByDescription(String search) {
         return codecs.stream()
             .filter(c -> StringUtils.containsIgnoreCase(c.getDescription(), search))
             .collect(Collectors.toList());
     }
 
-    public synchronized List<CodecWrapper> getByEncoder(String encoder) {
+    public List<CodecWrapper> getByEncoder(String encoder) {
         return codecs.stream()
             .filter(c -> c.getEncoderLib() != null
                 && c.getEncoderLib().stream().filter(e -> StringUtils.filter(e, encoder))
@@ -100,7 +100,7 @@ public class CodecsWrapper {
             .collect(Collectors.toList());
     }
 
-    public synchronized List<CodecWrapper> getByDecoder(String decoder) {
+    public List<CodecWrapper> getByDecoder(String decoder) {
         return codecs.stream()
             .filter(c -> c.getDecoderLib() != null
                 && c.getDecoderLib().stream().filter(e -> StringUtils.filter(e, decoder))

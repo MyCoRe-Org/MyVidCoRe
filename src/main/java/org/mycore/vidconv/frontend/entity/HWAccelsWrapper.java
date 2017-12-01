@@ -38,7 +38,7 @@ public class HWAccelsWrapper {
      * @return the hwaccels
      */
     @XmlElement(name = "hwaccels")
-    public synchronized List<HWAccelWrapper<? extends HWAccelDeviceSpec>> getHWAccels() {
+    public List<HWAccelWrapper<? extends HWAccelDeviceSpec>> getHWAccels() {
         return hwaccels;
     }
 
@@ -46,7 +46,7 @@ public class HWAccelsWrapper {
      * @param hwaccels the hwaccels to set
      */
     public HWAccelsWrapper setHWAccels(List<HWAccelWrapper<? extends HWAccelDeviceSpec>> hwaccels) {
-        this.hwaccels = Collections.synchronizedList(Collections.unmodifiableList(hwaccels));
+        this.hwaccels = Collections.unmodifiableList(hwaccels);
         return this;
     }
 

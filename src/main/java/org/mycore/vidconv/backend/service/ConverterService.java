@@ -314,15 +314,11 @@ public class ConverterService extends Widget implements Listener {
                     }).map(o -> {
                         final Output out = o.getCopy();
                         final String appendix = Optional.ofNullable(o.getFilenameAppendix()).orElse(id);
-                        try {
-                            out.setInputPath(inputPath);
-                            out.setOutputPath(outputPath.resolve(FFMpegImpl.filename(o.getFormat(), fileName,
-                                appendix)));
-
-                            return out;
-                        } catch (ExecutionException e) {
-                            throw new RuntimeException(e);
-                        }
+                        out.setInputPath(inputPath);
+                        out.setOutputPath(outputPath.resolve(FFMpegImpl.filename(o.getFormat(), fileName,
+                            appendix)));
+                        
+                        return out;
                     }).collect(Collectors.toList());
 
                 final ConverterJob converter = new ConverterJob(id, outputs, inputPath, outputPath, completeCallBack);

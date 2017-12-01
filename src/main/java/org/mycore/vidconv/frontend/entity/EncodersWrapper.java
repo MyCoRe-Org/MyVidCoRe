@@ -39,7 +39,7 @@ public class EncodersWrapper {
     /**
      * @return the encoders
      */
-    public synchronized List<EncoderWrapper> getEncoders() {
+    public List<EncoderWrapper> getEncoders() {
         return encoders;
     }
 
@@ -47,7 +47,7 @@ public class EncodersWrapper {
      * @param encoders the encoders to set
      */
     public EncodersWrapper setEncoders(List<EncoderWrapper> encoders) {
-        this.encoders = Collections.synchronizedList(encoders);
+        this.encoders = Collections.unmodifiableList(encoders);
         return this;
     }
 

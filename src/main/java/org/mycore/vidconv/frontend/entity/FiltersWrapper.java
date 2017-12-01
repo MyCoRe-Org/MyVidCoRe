@@ -45,7 +45,7 @@ public class FiltersWrapper {
     /**
      * @return the filters
      */
-    public synchronized List<FilterWrapper> getFilters() {
+    public List<FilterWrapper> getFilters() {
         return filters;
     }
 
@@ -53,7 +53,7 @@ public class FiltersWrapper {
      * @param filters the filters to set
      */
     public FiltersWrapper setFilters(List<FilterWrapper> filters) {
-        this.filters = Collections.synchronizedList(Collections.unmodifiableList(filters));
+        this.filters = Collections.unmodifiableList(filters);
         return this;
     }
 

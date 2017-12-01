@@ -36,7 +36,7 @@ public class DecodersWrapper {
     /**
      * @return the decoders
      */
-    public synchronized List<DecoderWrapper> getDecoders() {
+    public List<DecoderWrapper> getDecoders() {
         return decoders;
     }
 
@@ -44,7 +44,7 @@ public class DecodersWrapper {
      * @param decoders the decoders to set
      */
     public DecodersWrapper setDecoders(List<DecoderWrapper> decoders) {
-        this.decoders = Collections.synchronizedList(decoders);
+        this.decoders = Collections.unmodifiableList(decoders);
         return this;
     }
 
