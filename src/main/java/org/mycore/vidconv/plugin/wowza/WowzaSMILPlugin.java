@@ -49,18 +49,21 @@ public class WowzaSMILPlugin extends ListenerPlugin {
             && event.getSource().equals(ConverterService.class)) {
 
             final ConverterJob job = (ConverterJob) event.getObject();
-            final String fileName = job.inputPath().getFileName().toString();
-            final Path file = job.outputPath()
-                .resolve(fileName.substring(0, fileName.lastIndexOf(".")) + ".smil");
 
-            LOGGER.info("save to " + file);
-            WowzaSMILWrapper.saveTo(file, job.outputs().stream().map(o -> {
-                try {
-                    return FFMpegImpl.probe(o.getOutputPath());
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }).collect(Collectors.toList()));
+            if (job.exitValue() == 0) {
+                final String fileName = job.inputPath().getFileName().toString();
+                final Path file = job.outputPath()
+                    .resolve(fileName.substring(0, fileName.lastIndexOf(".")) + ".smil");
+
+                LOGGER.info("save to " + file);
+                WowzaSMILWrapper.saveTo(file, job.outputs().stream().map(o -> {
+                    try {
+                        return FFMpegImpl.probe(o.getOutputPath());
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }).collect(Collectors.toList()));
+            }
         }
     }
 

@@ -52,38 +52,40 @@ public class ThumbnailPlugin extends ListenerPlugin {
             && event.getSource().equals(ConverterService.class)) {
             final ConverterJob job = (ConverterJob) event.getObject();
 
-            ProbeWrapper probe = job.outputs().stream().map(cj -> {
-                try {
-                    return FFMpegImpl.probe(cj.getOutputPath());
-                } catch (Exception e) {
-                    return null;
-                }
-            }).filter(pw -> pw != null && !pw.getStreams().isEmpty())
-                .reduce((pw1,
-                    pw2) -> (pw1.getStreams().get(0).getCodedWidth()
-                        + pw1.getStreams().get(0).getCodedHeight()) > (pw2.getStreams().get(0).getCodedWidth()
-                            + pw2.getStreams().get(0).getCodedHeight()) ? pw1 : pw2)
-                .orElse(null);
+            if (job.exitValue() == 0) {
+                ProbeWrapper probe = job.outputs().stream().map(cj -> {
+                    try {
+                        return FFMpegImpl.probe(cj.getOutputPath());
+                    } catch (Exception e) {
+                        return null;
+                    }
+                }).filter(pw -> pw != null && !pw.getStreams().isEmpty())
+                    .reduce((pw1,
+                        pw2) -> (pw1.getStreams().get(0).getCodedWidth()
+                            + pw1.getStreams().get(0).getCodedHeight()) > (pw2.getStreams().get(0).getCodedWidth()
+                                + pw2.getStreams().get(0).getCodedHeight()) ? pw1 : pw2)
+                    .orElse(null);
 
-            if (probe != null) {
-                float duration = Float.parseFloat(probe.getFormat().getDuration());
+                if (probe != null) {
+                    float duration = Float.parseFloat(probe.getFormat().getDuration());
 
-                for (int ti = 1; ti < NUM_THUMBS + 1; ti++) {
-                    long time = Math.round((ti - 0.5) * duration / NUM_THUMBS);
-                    String fName = job.inputPath().getFileName().toString();
-                    String tName = job.outputPath()
-                        .resolve(fName.substring(0, fName.lastIndexOf(".")) + "-thumb-" + formatIndex(ti) + ".jpg")
-                        .toAbsolutePath()
-                        .toString();
-                    String cmd = "ffmpeg -ss " + time + " -i \"" + probe.getFormat().getFilename()
-                        + "\" -vf select='eq(pict_type\\,I)' -vframes 1 \"" + tName + "\"";
+                    for (int ti = 1; ti < NUM_THUMBS + 1; ti++) {
+                        long time = Math.round((ti - 0.5) * duration / NUM_THUMBS);
+                        String fName = job.inputPath().getFileName().toString();
+                        String tName = job.outputPath()
+                            .resolve(fName.substring(0, fName.lastIndexOf(".")) + "-thumb-" + formatIndex(ti) + ".jpg")
+                            .toAbsolutePath()
+                            .toString();
+                        String cmd = "ffmpeg -ss " + time + " -i \"" + probe.getFormat().getFilename()
+                            + "\" -vf select='eq(pict_type\\,I)' -vframes 1 \"" + tName + "\"";
 
-                    LOGGER.info("generate thumbnail " + tName + "...");
-                    LOGGER.debug(cmd);
+                        LOGGER.info("generate thumbnail " + tName + "...");
+                        LOGGER.debug(cmd);
 
-                    Executable exec = new Executable(cmd);
-                    if (exec.runAndWait() == 0) {
-                        LOGGER.info("...done.");
+                        Executable exec = new Executable(cmd);
+                        if (exec.runAndWait() == 0) {
+                            LOGGER.info("...done.");
+                        }
                     }
                 }
             }
