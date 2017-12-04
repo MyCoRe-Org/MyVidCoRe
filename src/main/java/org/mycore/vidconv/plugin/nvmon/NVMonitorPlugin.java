@@ -60,7 +60,7 @@ import org.mycore.vidconv.plugin.annotation.Plugin.Type;
 @Plugin(name = "Nvidia Monitor Plugin", description = "Monitors Nvidia GPU Cards.", type = Type.GENERIC)
 public class NVMonitorPlugin extends GenericPlugin implements Runnable {
 
-    public static final String EVENT_DATA = "nvmontor-data";
+    public static final String EVENT_DATA = "nvmonitor-data";
 
     public static final String WS_PATH = "/ws/nvmonitor";
 
