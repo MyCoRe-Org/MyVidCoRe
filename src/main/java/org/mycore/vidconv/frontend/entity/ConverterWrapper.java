@@ -24,8 +24,6 @@ package org.mycore.vidconv.frontend.entity;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -336,7 +334,6 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
 
     @XmlRootElement
     static class Progress implements Comparable<Progress> {
-        private static final DateTimeFormatter DURATION_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss", Locale.ROOT);
 
         @XmlAttribute(name = "percent")
         private Integer percent;
@@ -378,9 +375,11 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
             return formatDuration(dur.toNanos());
         }
 
-        protected static String formatDuration(final long dur) {
-            LocalTime fTime = LocalTime.ofNanoOfDay(dur);
-            return fTime.format(DURATION_FORMAT);
+        protected static String formatDuration(final long nanos) {
+            long absSeconds = Math.abs(nanos / 1000000000);
+            String positive = String.format(Locale.ROOT, "%d:%02d:%02d", absSeconds / 3600, (absSeconds % 3600) / 60,
+                absSeconds % 60);
+            return nanos < 0 ? "-" + positive : positive;
         }
 
         /* (non-Javadoc)
