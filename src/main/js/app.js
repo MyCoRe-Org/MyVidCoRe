@@ -42,8 +42,8 @@ app.factory("routeNavigation", routing.routeNavigation);
  * Register Components
  */
 angular.forEach([ require("./component/loader.component.js"), require("./component/alert.component.js"), require("./component/dirwatcher.component.js"),
-		require("./component/nvmonitor.component.js"), require("./component/addjob.component.js"), require("./component/converter.component.js"),
-		require("./component/settings.component.js") ], function(comp) {
+		require("./component/nvmonitor.component.js"), require("./component/sysmonitor.component.js"), require("./component/addjob.component.js"),
+		require("./component/converter.component.js"), require("./component/settings.component.js") ], function(comp) {
 	app.component.apply(app, comp);
 });
 

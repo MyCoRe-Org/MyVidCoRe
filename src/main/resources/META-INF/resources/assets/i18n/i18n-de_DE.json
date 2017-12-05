@@ -58,5 +58,8 @@
 	"nvmonitor.encoder": "Encoder",
 	"nvmonitor.decoder": "Decoder",
 	"nvmonitor.memory": "Speicher",
-	"nvmonitor.temperature": "Temperatur"
+	"nvmonitor.temperature": "Temperatur",
+	"sysmonitor.cpuLoad": "Systemauslastung",
+	"sysmonitor.memory": "Speichernutzung",
+	"sysmonitor.swap": "Speichernutzung (Swap)"
 }

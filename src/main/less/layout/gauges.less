@@ -25,7 +25,7 @@
     }
   }
 
-  &.encoder {
+  &.encoder , &.cpu-load {
     &:nth-child(1) {
       margin-left: 10px;
       @media (max-width: @screen-xs-max) {
@@ -56,6 +56,18 @@
     }
   }
 
+  &.swap {
+    > .gauge {
+      > .value {
+        stroke: @brand-danger;
+      }
+
+      > .value-text {
+        fill: @brand-danger;
+      }
+    }
+  }
+
   &.memory {
     width: 30px;
     height: 15px;
@@ -63,7 +75,7 @@
     margin-right: -20px;
   }
 
-  &.temperature {
+  &.temperature , &.swap {
     width: 30px;
     height: 15px;
     top: 8px;
