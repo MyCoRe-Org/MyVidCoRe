@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
@@ -325,6 +326,12 @@ public class FFMpegImpl {
     private static final Pattern PATTERN_PARAM_DEFAULT = Pattern
         .compile("\\(default\\s([^\\)]+)\\)");
 
+    /**
+     * Parses the parameters.
+     *
+     * @param output the output
+     * @return the list
+     */
     private static List<ParameterWrapper> parseParameters(final String output) {
         final List<ParameterWrapper> parameters = new ArrayList<>();
 
@@ -772,9 +779,9 @@ public class FFMpegImpl {
      * @param outputs the outputs
      * @param hwAccel the optional hw accelerator
      * @return the command
-     * @throws ExecutionException 
-     * @throws JAXBException 
-     * @throws InterruptedException 
+     * @throws InterruptedException the interrupted exception
+     * @throws JAXBException the JAXB exception
+     * @throws ExecutionException the execution exception
      */
     public static String command(final String processId, final Path input, final List<Output> outputs,
         final Optional<HWAccelWrapper<? extends HWAccelDeviceSpec>> hwAccel)
@@ -790,8 +797,9 @@ public class FFMpegImpl {
         cmd.append(" -i \"" + input.toFile().getAbsolutePath() + "\" -stats -y");
 
         outputs.forEach(output -> {
-            buildVideoStreamCommand(cmd, processId, output, hwAccel);
-            buildAudioStreamCommand(cmd, inInfo, output);
+            final Set<String> ambiguousParams = checkForAmbiguousParameters(output, hwAccel);
+            buildVideoStreamCommand(cmd, processId, output, hwAccel, ambiguousParams);
+            buildAudioStreamCommand(cmd, inInfo, output, ambiguousParams);
 
             cmd.append(" \"" + output.getOutputPath().toFile().getAbsolutePath() + "\"");
         });
@@ -799,6 +807,14 @@ public class FFMpegImpl {
         return cmd.toString();
     }
 
+    /**
+     * Builds the input stream command.
+     *
+     * @param cmd the cmd
+     * @param inInfo the in info
+     * @param processId the process id
+     * @param hwAccel the hw accel
+     */
     private static void buildInputStreamCommand(StringBuffer cmd, final ProbeWrapper inInfo, final String processId,
         final Optional<HWAccelWrapper<? extends HWAccelDeviceSpec>> hwAccel) {
         hwAccel.ifPresent(hw -> {
@@ -826,8 +842,17 @@ public class FFMpegImpl {
         });
     }
 
+    /**
+     * Builds the video stream command.
+     *
+     * @param cmd the cmd
+     * @param processId the process id
+     * @param output the output
+     * @param hwAccel the hw accel
+     * @param ambiguousParams the ambiguous params
+     */
     private static void buildVideoStreamCommand(StringBuffer cmd, final String processId, final Output output,
-        final Optional<HWAccelWrapper<? extends HWAccelDeviceSpec>> hwAccel) {
+        final Optional<HWAccelWrapper<? extends HWAccelDeviceSpec>> hwAccel, final Set<String> ambiguousParams) {
         Video video = hwAccel.isPresent() ? output.getVideo()
             : Optional.ofNullable(output.getVideoFallback()).orElse(output.getVideo());
 
@@ -839,7 +864,7 @@ public class FFMpegImpl {
 
         cmd.append(" -codec:v " + video.getCodec());
 
-        cmd.append(buildParameters(video.getParameters(), video.getCodec()));
+        cmd.append(buildParameters(video.getParameters(), video.getCodec(), ambiguousParams, "v"));
 
         Optional.ofNullable(video.getPixelFormat())
             .ifPresent(v -> cmd.append(" -pix_fmt " + (!v.isEmpty() ? v : "yuv420p")));
@@ -875,6 +900,14 @@ public class FFMpegImpl {
         });
     }
 
+    /**
+     * Builds the HW accel video stream command.
+     *
+     * @param cmd the cmd
+     * @param processId the process id
+     * @param video the video
+     * @param hwAccel the hw accel
+     */
     private static void buildHWAccelVideoStreamCommand(StringBuffer cmd, final String processId, final Video video,
         final Optional<HWAccelWrapper<? extends HWAccelDeviceSpec>> hwAccel) {
 
@@ -900,13 +933,22 @@ public class FFMpegImpl {
         }
     }
 
-    private static void buildAudioStreamCommand(StringBuffer cmd, final ProbeWrapper inInfo, final Output output) {
+    /**
+     * Builds the audio stream command.
+     *
+     * @param cmd the cmd
+     * @param inInfo the in info
+     * @param output the output
+     * @param ambiguousParams the ambiguous params
+     */
+    private static void buildAudioStreamCommand(StringBuffer cmd, final ProbeWrapper inInfo, final Output output,
+        final Set<String> ambiguousParams) {
         Audio audio = output.getAudio();
 
         if (inInfo.getStreams().stream().anyMatch(s -> s.getCodecType().equalsIgnoreCase("audio"))) {
             cmd.append(" -codec:a " + audio.getCodec());
 
-            cmd.append(buildParameters(audio.getParameters(), audio.getCodec()));
+            cmd.append(buildParameters(audio.getParameters(), audio.getCodec(), ambiguousParams, "a"));
 
             Optional.ofNullable(audio.getBitrate()).ifPresent(v -> cmd.append(" -b:a " + v + "k"));
             Optional.ofNullable(audio.getSamplerate()).ifPresent(v -> cmd.append(" -ar " + v));
@@ -915,13 +957,60 @@ public class FFMpegImpl {
     }
 
     /**
+     * Check for ambiguous parameters.
+     *
+     * @param output the output
+     * @param hwAccel the hw accel
+     * @return the list
+     */
+    private static Set<String> checkForAmbiguousParameters(final Output output,
+        final Optional<HWAccelWrapper<? extends HWAccelDeviceSpec>> hwAccel) {
+        Video video = hwAccel.isPresent() ? output.getVideo()
+            : Optional.ofNullable(output.getVideoFallback()).orElse(output.getVideo());
+        Audio audio = output.getAudio();
+
+        EncodersWrapper vencs;
+        try {
+            vencs = encoder(video.getCodec());
+        } catch (NumberFormatException e) {
+            vencs = null;
+        }
+
+        EncodersWrapper aencs;
+        try {
+            aencs = encoder(audio.getCodec());
+        } catch (NumberFormatException e) {
+            aencs = null;
+        }
+
+        List<String> knownAmbiguous = Arrays.asList("b", "profile");
+
+        List<String> vparams = Stream.concat(knownAmbiguous.stream(), Optional.ofNullable(vencs.getEncoders())
+            .map(encs -> encs.stream().filter(e -> e.getName().equalsIgnoreCase(video.getCodec())).findFirst()
+                .orElse(null))
+            .map(e -> e.getParameters().stream().map(p -> p.getName()).sorted())
+            .orElse(Stream.empty())).collect(Collectors.toList());
+
+        List<String> aparams = Stream.concat(knownAmbiguous.stream(), Optional.ofNullable(aencs.getEncoders())
+            .map(encs -> encs.stream().filter(e -> e.getName().equalsIgnoreCase(audio.getCodec())).findFirst()
+                .orElse(null))
+            .map(e -> e.getParameters().stream().map(p -> p.getName()).sorted())
+            .orElse(Stream.empty())).collect(Collectors.toList());
+
+        return vparams.stream().filter(p -> aparams.contains(p)).collect(Collectors.toSet());
+    }
+
+    /**
      * Builds the parameters.
      *
      * @param parameters the parameters
      * @param codec the codec
+     * @param ambiguousParams the ambiguous params
+     * @param paramSuffix the param suffix
      * @return the string
      */
-    private static String buildParameters(Map<String, String> parameters, String codec) {
+    private static String buildParameters(Map<String, String> parameters, String codec, Set<String> ambiguousParams,
+        String paramSuffix) {
         StringBuffer cmd = new StringBuffer();
 
         Optional.ofNullable(parameters).ifPresent(params -> {
@@ -937,13 +1026,17 @@ public class FFMpegImpl {
                     .orElse(null))
                 .orElse(null);
 
-            params.entrySet().stream().filter(
-                entry -> enc == null || enc.getParameters() != null
-                    && enc.getParameters().stream().noneMatch(p -> p.getName().equals(entry.getKey())
-                        && (p.getDefaultValue() != null && p.getDefaultValue().equals(entry.getValue()))))
+            params.entrySet().stream()
+                .filter(entry -> enc != null && enc.getParameters().stream()
+                    .filter(p -> p.getName().equals(entry.getKey()) && (p.getDefaultValue() == null
+                        || !p.getDefaultValue().equals(entry.getValue())))
+                    .findAny().isPresent())
                 .forEach(
-                    entry -> cmd.append(" -" + entry.getKey() + " " + ("true".equalsIgnoreCase(entry.getValue()) ? "1"
-                        : "false".equalsIgnoreCase(entry.getValue()) ? "0" : entry.getValue())));
+                    entry -> cmd.append(
+                        " -" + entry.getKey() + (ambiguousParams.contains(entry.getKey()) ? ":" + paramSuffix : "")
+                            + " "
+                            + ("true".equalsIgnoreCase(entry.getValue()) ? "1"
+                                : "false".equalsIgnoreCase(entry.getValue()) ? "0" : entry.getValue())));
         });
 
         return cmd.toString();
