@@ -27,7 +27,6 @@ import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -48,6 +47,7 @@ import org.mycore.vidconv.common.event.EventManager;
 import org.mycore.vidconv.common.event.Listener;
 import org.mycore.vidconv.common.util.Executable;
 import org.mycore.vidconv.common.util.JsonUtils;
+import org.mycore.vidconv.common.util.MatcherStream;
 import org.mycore.vidconv.common.util.StreamConsumer;
 import org.mycore.vidconv.plugin.GenericPlugin;
 import org.mycore.vidconv.plugin.annotation.Plugin;
@@ -177,24 +177,18 @@ public class NVMonitorPlugin extends GenericPlugin implements Runnable {
                 try (Scanner scanner = new Scanner(out)) {
                     while (scanner.hasNextLine()) {
                         String line = scanner.nextLine();
-                        Matcher m = PATTERN_COLS.matcher(line);
                         if (line.startsWith("#")) {
                             if (parent.names == null) {
-                                parent.names = new ArrayList<>();
-                                while (m.find()) {
-                                    parent.names.add(m.group(1));
-                                }
+                                parent.names = MatcherStream.findMatches(PATTERN_COLS, line).map(mr -> mr.group(1))
+                                    .collect(Collectors.toList());
                             } else if (parent.units == null) {
-                                parent.units = new ArrayList<>();
-                                while (m.find()) {
-                                    parent.units.add(m.group(1));
-                                }
+                                parent.units = MatcherStream.findMatches(PATTERN_COLS, line).map(mr -> mr.group(1))
+                                    .collect(Collectors.toList());
                             }
                         } else {
-                            final List<String> vals = new ArrayList<>();
-                            while (m.find()) {
-                                vals.add(m.group(1));
-                            }
+                            final List<String> vals = MatcherStream.findMatches(PATTERN_COLS, line)
+                                .map(mr -> mr.group(1))
+                                .collect(Collectors.toList());
 
                             if (!vals.isEmpty() && vals.size() == parent.names.size()) {
                                 nvm.entries.add(

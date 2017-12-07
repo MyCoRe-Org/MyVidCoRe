@@ -25,16 +25,16 @@ package org.mycore.vidconv.backend.encoder;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -56,6 +56,7 @@ import org.mycore.vidconv.common.event.annotation.AutoExecutable;
 import org.mycore.vidconv.common.event.annotation.Startup;
 import org.mycore.vidconv.common.util.Executable;
 import org.mycore.vidconv.common.util.JsonUtils;
+import org.mycore.vidconv.common.util.MatcherStream;
 import org.mycore.vidconv.frontend.entity.CodecWrapper;
 import org.mycore.vidconv.frontend.entity.CodecsWrapper;
 import org.mycore.vidconv.frontend.entity.DecoderWrapper;
@@ -155,48 +156,41 @@ public class FFMpegImpl {
                 final String outputStream = exec.output();
 
                 if (outputStream != null && !outputStream.isEmpty()) {
-                    final List<CodecWrapper> codecs = new ArrayList<>();
-                    final Matcher m = PATTERN_CODECS.matcher(outputStream);
+                    supportedCodecs = new CodecsWrapper()
+                        .setCodecs(MatcherStream.findMatches(PATTERN_CODECS, outputStream).map(mr -> {
+                            final CodecWrapper codec = new CodecWrapper();
 
-                    while (m.find()) {
-                        final CodecWrapper codec = new CodecWrapper();
-
-                        switch (m.group(3)) {
-                            case "A":
+                            if ("A".equals(mr.group(3))) {
                                 codec.setType(CodecWrapper.Type.AUDIO);
-                                break;
-                            case "V":
+                            } else if ("V".equals(mr.group(3))) {
                                 codec.setType(CodecWrapper.Type.VIDEO);
-                                break;
-                            case "S":
+                            } else if ("S".equals(mr.group(3))) {
                                 codec.setType(CodecWrapper.Type.SUBTITLE);
-                                break;
-                            default:
-                                continue;
-                        }
-
-                        codec.setLossy(m.group(5).equalsIgnoreCase("L"));
-                        codec.setLossless(m.group(6).equalsIgnoreCase("S"));
-
-                        codec.setName(m.group(7));
-                        String desc = m.group(8).trim();
-                        if (desc != null) {
-                            final Matcher em = PATTERN_ENCODER_LIB.matcher(desc);
-                            while (em.find()) {
-                                codec.setEncoderLib(splitString(em.group(1)).collect(Collectors.toList()));
+                            } else {
+                                return null;
                             }
-                            final Matcher dm = PATTERN_DECODER_LIB.matcher(desc);
-                            while (dm.find()) {
-                                codec.setDecoderLib(splitString(dm.group(1)).collect(Collectors.toList()));
-                            }
-                            desc = desc.replaceAll(PATTERN_DECODER_LIB.pattern(), "");
-                            desc = desc.replaceAll(PATTERN_ENCODER_LIB.pattern(), "");
-                        }
-                        codec.setDescription(desc.trim());
-                        codecs.add(codec);
-                    }
 
-                    supportedCodecs = new CodecsWrapper().setCodecs(codecs);
+                            codec.setLossy(mr.group(5).equalsIgnoreCase("L"));
+                            codec.setLossless(mr.group(6).equalsIgnoreCase("S"));
+
+                            codec.setName(mr.group(7));
+                            String desc = mr.group(8).trim();
+                            if (desc != null) {
+                                MatcherStream.findMatches(PATTERN_ENCODER_LIB, desc).findFirst()
+                                    .map(m -> splitString(m.group(1)).collect(Collectors.toList()))
+                                    .ifPresent(codec::setEncoderLib);
+
+                                MatcherStream.findMatches(PATTERN_DECODER_LIB, desc).findFirst()
+                                    .map(m -> splitString(m.group(1)).collect(Collectors.toList()))
+                                    .ifPresent(codec::setDecoderLib);
+
+                                desc = desc.replaceAll(PATTERN_DECODER_LIB.pattern(), "");
+                                desc = desc.replaceAll(PATTERN_ENCODER_LIB.pattern(), "");
+                            }
+                            codec.setDescription(desc.trim());
+
+                            return codec;
+                        }).filter(Objects::nonNull).collect(Collectors.toList()));
                     return supportedCodecs;
                 }
             }
@@ -231,23 +225,19 @@ public class FFMpegImpl {
                 final String outputStream = exec.output();
 
                 if (outputStream != null && !outputStream.isEmpty()) {
-                    final List<FilterWrapper> filters = new ArrayList<>();
-                    final Matcher m = PATTERN_FILTERS.matcher(outputStream);
+                    supportedFilters = new FiltersWrapper()
+                        .setFilters(MatcherStream.findMatches(PATTERN_FILTERS, outputStream).map(mr -> {
+                            final FilterWrapper filter = new FilterWrapper();
 
-                    while (m.find()) {
-                        final FilterWrapper filter = new FilterWrapper();
+                            filter.setTimelineSupport(mr.group(1).equalsIgnoreCase("T"));
+                            filter.setSliceSupport(mr.group(2).equalsIgnoreCase("S"));
+                            filter.setCommandSupport(mr.group(3).equalsIgnoreCase("C"));
+                            filter.setName(mr.group(4).trim());
+                            filter.setIoSupport(mr.group(5).trim());
+                            filter.setDescription(mr.group(6).trim());
 
-                        filter.setTimelineSupport(m.group(1).equalsIgnoreCase("T"));
-                        filter.setSliceSupport(m.group(2).equalsIgnoreCase("S"));
-                        filter.setCommandSupport(m.group(3).equalsIgnoreCase("C"));
-                        filter.setName(m.group(4).trim());
-                        filter.setIoSupport(m.group(5).trim());
-                        filter.setDescription(m.group(6).trim());
-
-                        filters.add(filter);
-                    }
-
-                    supportedFilters = new FiltersWrapper().setFilters(filters);
+                            return filter;
+                        }).collect(Collectors.toList()));
                     return supportedFilters;
                 }
             }
@@ -282,21 +272,17 @@ public class FFMpegImpl {
                 final String outputStream = exec.output();
 
                 if (outputStream != null && !outputStream.isEmpty()) {
-                    final List<FormatWrapper> formats = new ArrayList<>();
-                    final Matcher m = PATTERN_FORMATS.matcher(outputStream);
+                    supportedFormats = new FormatsWrapper()
+                        .setFormats(MatcherStream.findMatches(PATTERN_FORMATS, outputStream).map(mr -> {
+                            final FormatWrapper format = new FormatWrapper();
 
-                    while (m.find()) {
-                        final FormatWrapper format = new FormatWrapper();
+                            format.setDemuxer(mr.group(1).equalsIgnoreCase("D"));
+                            format.setMuxer(mr.group(2).equalsIgnoreCase("E"));
+                            format.setName(mr.group(3).trim());
+                            format.setDescription(mr.group(4).trim());
 
-                        format.setDemuxer(m.group(1).equalsIgnoreCase("D"));
-                        format.setMuxer(m.group(2).equalsIgnoreCase("E"));
-                        format.setName(m.group(3).trim());
-                        format.setDescription(m.group(4).trim());
-
-                        formats.add(format);
-                    }
-
-                    supportedFormats = new FormatsWrapper().setFormats(formats);
+                            return format;
+                        }).collect(Collectors.toList()));
                     return supportedFormats;
                 }
             }
@@ -333,45 +319,37 @@ public class FFMpegImpl {
      * @return the list
      */
     private static List<ParameterWrapper> parseParameters(final String output) {
-        final List<ParameterWrapper> parameters = new ArrayList<>();
-
-        final Matcher pm = PATTERN_PARAMS.matcher(output);
-        while (pm.find()) {
+        return MatcherStream.findMatches(PATTERN_PARAMS, output).map(mr -> {
             final ParameterWrapper param = new ParameterWrapper();
-            param.setName(pm.group(1));
-            param.setType(pm.group(2));
-            param.setDescription(pm.group(3));
 
-            Optional.ofNullable(getPatternGroup(PATTERN_PARAM_FROM_TO, pm.group(3), 1))
+            param.setName(mr.group(1));
+            param.setType(mr.group(2));
+            param.setDescription(mr.group(3));
+
+            Optional.ofNullable(getPatternGroup(PATTERN_PARAM_FROM_TO, mr.group(3), 1))
                 .ifPresent(v -> param.setFromValue(v));
-            Optional.ofNullable(getPatternGroup(PATTERN_PARAM_FROM_TO, pm.group(3), 2))
+            Optional.ofNullable(getPatternGroup(PATTERN_PARAM_FROM_TO, mr.group(3), 2))
                 .ifPresent(v -> param.setToValue(v));
-            Optional.ofNullable(getPatternGroup(PATTERN_PARAM_DEFAULT, pm.group(3), 1))
+            Optional.ofNullable(getPatternGroup(PATTERN_PARAM_DEFAULT, mr.group(3), 1))
                 .ifPresent(v -> param.setDefaultValue(v));
 
-            Optional.ofNullable(pm.group(4)).ifPresent(vs -> {
-                if (!vs.isEmpty()) {
-                    final List<ParameterValue> values = new ArrayList<>();
-                    final Matcher pv = PATTERN_PARAM_VALUES.matcher(vs);
-                    while (pv.find()) {
-                        final ParameterValue value = new ParameterValue();
-                        value.setName(pv.group(1));
-                        Optional.ofNullable(pv.group(2)).ifPresent(v -> {
-                            v = v.trim();
-                            if (!v.isEmpty())
-                                value.setDescription(v);
-                        });
-                        values.add(value);
-                    }
-                    if (!values.isEmpty())
-                        param.setValues(values);
-                }
+            Optional.ofNullable(mr.group(4)).filter(vs -> !vs.isEmpty()).ifPresent(vs -> {
+                final List<ParameterValue> values = MatcherStream.findMatches(PATTERN_PARAM_VALUES, vs).map(pv -> {
+                    final ParameterValue value = new ParameterValue();
+
+                    value.setName(pv.group(1));
+                    Optional.ofNullable(pv.group(2)).map(String::trim).filter(v -> !v.isEmpty())
+                        .ifPresent(v -> value.setDescription(v));
+
+                    return value;
+                }).collect(Collectors.toList());
+
+                if (!values.isEmpty())
+                    param.setValues(values);
             });
 
-            parameters.add(param);
-        }
-
-        return parameters;
+            return param;
+        }).collect(Collectors.toList());
     }
 
     /** The supported decoders. */
@@ -397,24 +375,18 @@ public class FFMpegImpl {
                 final String outputStream = exec.output();
 
                 if (outputStream != null && !outputStream.isEmpty()) {
-                    final List<DecoderWrapper> decoders = PATTERN_ENTRY_SPLIT.splitAsStream(outputStream)
-                        .filter(os -> !os.isEmpty())
-                        .map(os -> {
-                            final Matcher m = PATTERN_DECODER.matcher(os);
-                            if (m.find()) {
+                    supportedDecoders.put(name,
+                        new DecodersWrapper().setDecoders(PATTERN_ENTRY_SPLIT.splitAsStream(outputStream)
+                            .filter(os -> !os.isEmpty())
+                            .map(os -> MatcherStream.findMatches(PATTERN_DECODER, os).map(mr -> {
                                 final DecoderWrapper decoder = new DecoderWrapper();
 
-                                decoder.setName(m.group(1));
-                                decoder.setDescription(m.group(2));
-                                decoder.setParameters(parseParameters(m.group(3)));
+                                decoder.setName(mr.group(1));
+                                decoder.setDescription(mr.group(2));
+                                decoder.setParameters(parseParameters(mr.group(3)));
 
                                 return decoder;
-                            }
-
-                            return null;
-                        }).filter(e -> e != null).collect(Collectors.toList());
-
-                    supportedDecoders.put(name, new DecodersWrapper().setDecoders(decoders));
+                            })).flatMap(ds -> ds).collect(Collectors.toList())));
                     return supportedDecoders.get(name);
                 }
             }
@@ -466,55 +438,35 @@ public class FFMpegImpl {
                 final String outputStream = exec.output();
 
                 if (outputStream != null && !outputStream.isEmpty()) {
-                    final List<EncoderWrapper> encoders = PATTERN_ENTRY_SPLIT.splitAsStream(outputStream)
-                        .filter(os -> !os.isEmpty())
-                        .map(os -> {
-                            final Matcher m = PATTERN_ENCODER.matcher(os);
-                            if (m.find()) {
+                    supportedEncoders.put(name,
+                        new EncodersWrapper().setEncoders(PATTERN_ENTRY_SPLIT.splitAsStream(outputStream)
+                            .filter(os -> !os.isEmpty())
+                            .map(os -> MatcherStream.findMatches(PATTERN_ENCODER, os).map(mr -> {
                                 final EncoderWrapper encoder = new EncoderWrapper();
 
-                                encoder.setName(m.group(1));
-                                encoder.setDescription(m.group(2));
+                                encoder.setName(mr.group(1));
+                                encoder.setDescription(mr.group(2));
 
-                                encoder.setPixelFormats(
-                                    Stream.of(m.group(3)).map(s -> PATTERN_PIX_FMT.matcher(s))
-                                        .filter(ma -> ma.find())
-                                        .flatMap(ma -> splitString(ma.group(1)))
-                                        .collect(Collectors.toList()));
+                                encoder.setPixelFormats(MatcherStream.findMatches(PATTERN_PIX_FMT, mr.group(3))
+                                    .flatMap(ma -> splitString(ma.group(1))).collect(Collectors.toList()));
 
-                                encoder.setFrameRates(
-                                    Stream.of(m.group(3)).map(s -> PATTERN_FRM_RATES.matcher(s))
-                                        .filter(ma -> ma.find())
-                                        .flatMap(ma -> splitString(ma.group(1)))
-                                        .collect(Collectors.toList()));
+                                encoder.setFrameRates(MatcherStream.findMatches(PATTERN_FRM_RATES, mr.group(3))
+                                    .flatMap(ma -> splitString(ma.group(1))).collect(Collectors.toList()));
 
-                                encoder.setSampleFormats(
-                                    Stream.of(m.group(3)).map(s -> PATTERN_SMP_FROMATS.matcher(s))
-                                        .filter(ma -> ma.find())
-                                        .flatMap(ma -> splitString(ma.group(1)))
-                                        .collect(Collectors.toList()));
+                                encoder.setSampleFormats(MatcherStream.findMatches(PATTERN_SMP_FROMATS, mr.group(3))
+                                    .flatMap(ma -> splitString(ma.group(1))).collect(Collectors.toList()));
 
-                                encoder.setSampleRates(
-                                    Stream.of(m.group(3)).map(s -> PATTERN_SMP_RATES.matcher(s))
-                                        .filter(ma -> ma.find())
-                                        .flatMap(ma -> splitString(ma.group(1))).map(s -> new Integer(s))
-                                        .collect(Collectors.toList()));
+                                encoder.setSampleRates(MatcherStream.findMatches(PATTERN_SMP_RATES, mr.group(3))
+                                    .flatMap(ma -> splitString(ma.group(1))).map(s -> new Integer(s))
+                                    .collect(Collectors.toList()));
 
-                                encoder.setChannelLayouts(
-                                    Stream.of(m.group(3)).map(s -> PATTERN_CH_LAYOUTS.matcher(s))
-                                        .filter(ma -> ma.find())
-                                        .flatMap(ma -> splitString(ma.group(1)))
-                                        .collect(Collectors.toList()));
+                                encoder.setChannelLayouts(MatcherStream.findMatches(PATTERN_CH_LAYOUTS, mr.group(3))
+                                    .flatMap(ma -> splitString(ma.group(1))).collect(Collectors.toList()));
 
-                                encoder.setParameters(parseParameters(m.group(3)));
+                                encoder.setParameters(parseParameters(mr.group(3)));
 
                                 return encoder;
-                            }
-
-                            return null;
-                        }).filter(e -> e != null).collect(Collectors.toList());
-
-                    supportedEncoders.put(name, new EncodersWrapper().setEncoders(encoders));
+                            })).flatMap(es -> es).collect(Collectors.toList())));
                     return supportedEncoders.get(name);
                 }
             }
@@ -565,20 +517,19 @@ public class FFMpegImpl {
                 final String outputStream = exec.output();
 
                 if (outputStream != null && !outputStream.isEmpty()) {
-                    final Matcher m = PATTERN_MUXER.matcher(outputStream);
-                    while (m.find()) {
+                    MatcherStream.findMatches(PATTERN_MUXER, outputStream).findFirst().map(mr -> {
                         final MuxerWrapper muxer = new MuxerWrapper();
 
-                        muxer.setName(m.group(1));
+                        muxer.setName(mr.group(1));
 
-                        muxer.setExtension(getPatternGroup(PATTERN_EXTENSION, m.group(2), 1));
-                        muxer.setMimeType(getPatternGroup(PATTERN_MIME_TYPE, m.group(2), 1));
-                        muxer.setAudioCodec(getPatternGroup(PATTERN_AUDIO_CODEC, m.group(2), 1));
-                        muxer.setVideoCodec(getPatternGroup(PATTERN_VIDEO_CODEC, m.group(2), 1));
-                        muxer.setSubtitleCodec(getPatternGroup(PATTERN_SUBTITLE_CODEC, m.group(2), 1));
+                        muxer.setExtension(getPatternGroup(PATTERN_EXTENSION, mr.group(2), 1));
+                        muxer.setMimeType(getPatternGroup(PATTERN_MIME_TYPE, mr.group(2), 1));
+                        muxer.setAudioCodec(getPatternGroup(PATTERN_AUDIO_CODEC, mr.group(2), 1));
+                        muxer.setVideoCodec(getPatternGroup(PATTERN_VIDEO_CODEC, mr.group(2), 1));
+                        muxer.setSubtitleCodec(getPatternGroup(PATTERN_SUBTITLE_CODEC, mr.group(2), 1));
 
-                        supportedMuxers.put(name, muxer);
-                    }
+                        return muxer;
+                    }).ifPresent(muxer -> supportedMuxers.put(name, muxer));
 
                     return supportedMuxers.get(name);
                 }
@@ -612,28 +563,24 @@ public class FFMpegImpl {
             if (exec.runAndWait() >= 0) {
                 final String outputStream = exec.error();
                 if (outputStream != null && !outputStream.isEmpty()) {
-                    final List<HWAccelWrapper<? extends HWAccelDeviceSpec>> hwaccels = new ArrayList<>();
-                    final Matcher m = PATTERN_NVENC_GPU.matcher(outputStream);
-
                     @SuppressWarnings("unchecked")
                     final List<HWAccelNvidiaSpec> specs = (List<HWAccelNvidiaSpec>) JsonUtils.loadJSON(
                         ConfigurationDir.getConfigResource("nvidia-matrix.json"),
                         HWAccelNvidiaSpec.class);
 
-                    while (m.find()) {
-                        HWAccelWrapper<HWAccelNvidiaSpec> hwaccel = new HWAccelWrapper<>();
+                    detectedHWAccels = new HWAccelsWrapper()
+                        .setHWAccels(MatcherStream.findMatches(PATTERN_NVENC_GPU, outputStream).map(mr -> {
+                            HWAccelWrapper<HWAccelNvidiaSpec> hwaccel = new HWAccelWrapper<>();
 
-                        hwaccel.setType(HWAccelType.NVIDIA);
-                        hwaccel.setIndex(Integer.parseInt(m.group(1)));
-                        hwaccel.setName(m.group(2).trim());
+                            hwaccel.setType(HWAccelType.NVIDIA);
+                            hwaccel.setIndex(Integer.parseInt(mr.group(1)));
+                            hwaccel.setName(mr.group(2).trim());
 
-                        specs.stream().filter(nv -> hwaccel.getName().contains(nv.getName())).findFirst()
-                            .ifPresent(nv -> hwaccel.setDeviceSpec(nv));
+                            specs.stream().filter(nv -> hwaccel.getName().contains(nv.getName())).findFirst()
+                                .ifPresent(nv -> hwaccel.setDeviceSpec(nv));
 
-                        hwaccels.add(hwaccel);
-                    }
-
-                    detectedHWAccels = new HWAccelsWrapper().setHWAccels(hwaccels);
+                            return hwaccel;
+                        }).collect(Collectors.toList()));
                     return detectedHWAccels;
                 }
             }
@@ -657,24 +604,15 @@ public class FFMpegImpl {
      * @return the progress value
      */
     public static Integer progress(final String stream) {
-        if (stream != null) {
-            final Matcher dm = PATTERN_DURATION.matcher(stream);
-            final Matcher cm = PATTERN_CURRENT.matcher(stream);
+        return Optional.ofNullable(stream).map(s -> {
+            OptionalLong duration = MatcherStream.findMatches(PATTERN_DURATION, s)
+                .mapToLong(d -> parseMillis(d.group(1))).findFirst();
+            OptionalLong current = MatcherStream.findMatches(PATTERN_CURRENT, s)
+                .mapToLong(c -> parseMillis(c.group(1))).max();
 
-            if (dm.find() && cm.find()) {
-                long duration = parseMillis(dm.group(1));
-
-                String last = "";
-                while (cm.find()) {
-                    last = cm.group(1);
-                }
-                long current = parseMillis(last);
-
-                return (int) ((float) current / (float) duration * 100.0);
-            }
-        }
-
-        return null;
+            return current.isPresent() && duration.isPresent()
+                ? (int) ((float) current.getAsLong() / (float) duration.getAsLong() * 100.0) : null;
+        }).orElse(null);
     }
 
     /**
@@ -1116,11 +1054,6 @@ public class FFMpegImpl {
      * @return the pattern group
      */
     private static String getPatternGroup(final Pattern pattern, final String str, int group) {
-        final Matcher m = pattern.matcher(str);
-        if (m.find()) {
-            return m.group(group).trim();
-        }
-
-        return null;
+        return MatcherStream.findMatches(pattern, str).findFirst().map(m -> m.group(group).trim()).orElse(null);
     }
 }

@@ -28,7 +28,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -49,12 +48,8 @@ public class Executable {
     private StreamConsumer errorConsumer;
 
     public Executable(final String command) {
-        List<String> cmdParts = new ArrayList<String>();
-        Matcher m = Pattern.compile("([^\"]\\S*|\".+?\"|[^\']\\S*|\'.+?\')\\s*").matcher(command);
-        while (m.find()) {
-            cmdParts.add(m.group(1).replaceAll("\"|\'", ""));
-        }
-        this.command = cmdParts;
+        this.command = MatcherStream.findMatches(Pattern.compile("([^\"]\\S*|\".+?\"|[^\']\\S*|\'.+?\')\\s*"), command)
+            .map(mr -> mr.group(1).replaceAll("\"|\'", "")).collect(Collectors.toList());
     }
 
     public Executable(final List<String> command) {
