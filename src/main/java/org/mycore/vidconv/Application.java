@@ -122,10 +122,8 @@ public class Application {
         embeddedHttpServer.start();
 
         int availableProcessors = Runtime.getRuntime().availableProcessors();
-        converterThreads = converterThreads == null ? availableProcessors - Math.floorDiv(availableProcessors, 4)
-            : converterThreads;
-        LOGGER.info("Make use of " + converterThreads + " from available "
-            + Runtime.getRuntime().availableProcessors() + " processors.");
+        converterThreads = converterThreads == null ? Math.floorDiv(availableProcessors, 4) : converterThreads;
+        LOGGER.info("Use {} converter threads for available {} processors.", converterThreads, availableProcessors);
         new ConverterService(outputDir, tempDir, converterThreads);
 
         DirectoryWatchService.instance().registerDirectory(Paths.get(watchDir));
