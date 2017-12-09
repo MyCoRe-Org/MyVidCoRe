@@ -15,7 +15,7 @@
 </div>
 
 <div class="row"
-	data-ng-if="((profile = parent.encoderParameter(selectedCodec[index][type], 'profile') ) && (level = parent.encoderParameter(selectedCodec[index][type], 'level')))"
+	data-ng-if="((profile = parent.encoderParameter(parent.selectedCodec[index][type], 'profile') ) && (level = parent.encoderParameter(parent.selectedCodec[index][type], 'level')))"
 >
 	<div class="form-group col-sm-6">
 		<label for="profile">{{'settings.profile' | translate}}</label> <select id="profile" class="form-control" data-ng-model="video.parameter['profile']"
@@ -35,7 +35,9 @@
 	</div>
 </div>
 
-<div class="form-group" data-ng-if="(preset = parent.encoderParameter(selectedCodec[index][type], 'preset')).values || parent.defaultPresets[video.codec]">
+<div class="form-group"
+	data-ng-if="(preset = parent.encoderParameter(parent.selectedCodec[index][type], 'preset')).values || parent.defaultPresets[video.codec]"
+>
 	<label for="preset">{{'settings.preset' | translate}}</label> <select id="preset" class="form-control" data-ng-model="video.parameter['preset']"
 		data-ng-init="video.parameter['preset'] = video.parameter['preset'] || preset.defaultValue"
 		data-ng-options="value.name as value.name + (value.description !== undefined ? ' (' + value.description + ')' : '') for value in preset.values || parent.defaultPresets[video.codec]"
@@ -43,7 +45,7 @@
 		<option value="">{{'settings.auto' | translate}}</option>
 	</select>
 </div>
-<div class="form-group" data-ng-if="(tune = parent.encoderParameter(selectedCodec[index][type], 'tune')).values || parent.defaultTunes[video.codec]">
+<div class="form-group" data-ng-if="(tune = parent.encoderParameter(parent.selectedCodec[index][type], 'tune')).values || parent.defaultTunes[video.codec]">
 	<label for="tune">{{'settings.tune' | translate}}</label> <select id="tune" class="form-control" data-ng-model="video.parameter['tune']"
 		data-ng-init="video.parameter['tune'] = video.parameter['tune'] || tune.defaultValue"
 		data-ng-options="value.name as value.name + (value.description !== undefined ? ' (' + value.description + ')' : '') for value in tune.values || parent.defaultTunes[video.codec]"
@@ -51,9 +53,11 @@
 		<option value="">{{'settings.auto' | translate}}</option>
 	</select>
 </div>
-<div class="form-group" data-ng-if="(selectedCodec[index][type] = selectedCodec[index][type] || parent.filterEncoder(video.codec)).pixelFormats.length > 0">
+<div class="form-group"
+	data-ng-if="(parent.selectedCodec[index][type] = parent.selectedCodec[index][type] || parent.filterEncoder(video.codec)).pixelFormats.length > 0"
+>
 	<label for="pixelFormat">{{'settings.colorSpace' | translate}}</label> <select id="pixelFormat" class="form-control" data-ng-model="video.pixelFormat"
-		data-ng-options="pf as pf for pf in selectedCodec[index][type].pixelFormats"
+		data-ng-options="pf as pf for pf in parent.selectedCodec[index][type].pixelFormats"
 	>
 		<option value="">{{'settings.auto' | translate}}</option>
 	</select>
@@ -74,7 +78,7 @@
 	<div class="col-sm-4">
 		<div class="form-group">
 			<label for="framerate">{{'settings.framerate' | translate}}</label> <select id="framerate" class="form-control" data-ng-model="video.framerate"
-				data-ng-options="fr for fr in selectedCodec[index][type].frameRates || parent.defaultFrameRates"
+				data-ng-options="fr for fr in parent.selectedCodec[index][type].frameRates || parent.defaultFrameRates"
 			>
 				<option value="">{{'settings.framerate.auto' | translate}}</option>
 			</select>
@@ -100,17 +104,17 @@
 
 	<div class="col-sm-4">
 		<label>{{'settings.quality' | translate}}</label>
-		<div class="radio" data-ng-if="(encoderParameter(selectedCodec[index][type], 'crf'))">
+		<div class="radio" data-ng-if="(encoderParameter(parent.selectedCodec[index][type], 'crf'))">
 			<label> <input type="radio" id="qTypeCRF" value="CRF" checked data-ng-model="video.quality.type"> {{'settings.quality.type.CRF' | translate}}
 				<input id="quality" class="form-control" type="text" data-ng-model="video.quality.rateFactor" data-ng-disabled="video.quality.type != 'CRF'"
-				slider="parent.qualityData(selectedCodec[index][type], 'crf', video.quality.rateFactor)"
+				slider="parent.qualityData(parent.selectedCodec[index][type], 'crf', video.quality.rateFactor)"
 			/>
 			</label>
 		</div>
-		<div class="radio" data-ng-if="!(encoderParameter(selectedCodec[index][type], 'crf'))">
+		<div class="radio" data-ng-if="!(encoderParameter(parent.selectedCodec[index][type], 'crf'))">
 			<label> <input type="radio" id="qTypeCQ" value="CQ" checked data-ng-model="video.quality.type"> {{'settings.quality.type.CRF' | translate}} <input
 				id="quality" class="form-control" type="text" data-ng-model="video.quality.scale" data-ng-disabled="video.quality.type != 'CQ'"
-				slider="parent.qualityData(selectedCodec[index][type], 'qscale', video.quality.scale)"
+				slider="parent.qualityData(parent.selectedCodec[index][type], 'qscale', video.quality.scale)"
 			/>
 			</label>
 		</div>
@@ -149,7 +153,7 @@
 	</div>
 </div>
 
-<settings-advanced-options type="{{type}}" index="index" output="output" codec="selectedCodec"></settings-advanced-options>
+<settings-advanced-options type="{{type}}" index="index" output="output" codec="parent.selectedCodec"></settings-advanced-options>
 
 <div class="row hidden">
 	<div class="form-group col-sm-12">
