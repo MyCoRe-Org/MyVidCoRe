@@ -356,12 +356,12 @@ public class ConverterService extends Widget implements Listener {
 
     private void addIncompleteJobs() {
         try {
-            LOGGER.info("search for incomplete jobs...");
+            LOGGER.info("search for incomplete/failed jobs...");
             try (Stream<Path> stream = Files.walk(Paths.get(outputDir))) {
                 stream.filter(f -> f.getFileName().equals(Paths.get(".convert"))).forEach(file -> {
                     try {
                         ConverterWrapper cw = JsonUtils.loadJSON(file.toFile(), ConverterWrapper.class);
-                        if (!cw.isDone()) {
+                        if (!cw.isDone() || cw.getExitValue() != 0) {
                             LOGGER.info("...restart \"{}\" with id \"{}\".", cw.getFileName(), cw.getId());
                             addJob(Paths.get(cw.getInputPath(), cw.getFileName()), cw.getId(),
                                 cw.getCompleteCallback());
