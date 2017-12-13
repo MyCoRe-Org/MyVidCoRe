@@ -78,7 +78,7 @@
 					<div class="btn-group" role="group">
 						<button class="btn btn-xs btn-default dropdown-toggle" aria-expanded="false" aria-controls="preview-{{converter.id | hashCode}}"
 							data-target="#preview-{{converter.id | hashCode}}" data-toggle="collapse"
-							data-ng-disabled="converter.exitValue !== 0 && !((converter.files | endsWith:'.mp4':'name') || (converter.files | endsWith:'.webm':'name'))"
+							data-ng-disabled="converter.exitValue !== 0 || !((converter.files | endsWith:'.mp4':'name') || (converter.files | endsWith:'.webm':'name'))"
 							data-ng-click="initPreview((converter.id | hashCode))"
 						>
 							<span class="fa fa-eye" aria-hidden="true"></span>
