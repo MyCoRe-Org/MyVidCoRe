@@ -88,7 +88,7 @@ module.exports = [ "converterStatus", {
 		};
 	
 		$scope.orderByPercent = function(converter) {
-			return converter.progress ? converter.progress.percent : -1;
+			return converter.progress && converter.progress.percent ? converter.progress.percent : -1;
 		};
 	
 		$scope.filterDone = function(converter) {
