@@ -46,6 +46,8 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
 
     private String id;
 
+    private int priority;
+
     private String command;
 
     private String inputPath;
@@ -83,6 +85,7 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
         this();
 
         this.id = id;
+        this.priority = converter.priority();
         this.command = converter.command();
         this.inputPath = converter.inputPath().getParent().toString();
         this.fileName = converter.inputPath().getFileName().toString();
@@ -295,10 +298,25 @@ public class ConverterWrapper implements Comparable<ConverterWrapper> {
         this.errorStream = errorStream;
     }
 
+    /**
+     * @return the priority
+     */
+    public int getPriority() {
+        return priority;
+    }
+
+    /**
+     * @param priority the priority to set
+     */
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
     public ConverterWrapper basicCopy() {
         final ConverterWrapper copy = new ConverterWrapper();
 
         copy.id = this.id;
+        copy.priority = this.priority;
         copy.fileName = this.fileName;
         copy.outputs = this.outputs;
         copy.hwAccel = Optional.ofNullable(this.hwAccel).map(HWAccelWrapper::basicCopy).orElse(null);

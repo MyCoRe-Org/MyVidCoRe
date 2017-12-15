@@ -145,9 +145,11 @@ public class ConverterResource {
         @FormDataParam("file") FormDataContentDisposition fileDetail,
         @FormDataParam("filename") FormDataBodyPart fileName,
         @FormDataParam("id") FormDataBodyPart id,
+        @FormDataParam("priority") FormDataBodyPart priority,
         @FormDataParam("callback") FormDataBodyPart callback)
         throws IOException, InterruptedException, JAXBException, ExecutionException {
         final String jobId = Optional.ofNullable(id).map(i -> i.getValueAs(String.class)).orElse(null);
+        final int prio = Optional.ofNullable(priority).map(i -> i.getValueAs(Integer.class)).orElse(0);
         final String completeCallBack = Optional.ofNullable(callback).map(cb -> cb.getValueAs(String.class))
             .orElse(null);
         final String fn = Optional.ofNullable(fileName).map(f -> f.getValueAs(String.class)).filter(f -> !f.isEmpty())
@@ -163,7 +165,7 @@ public class ConverterResource {
 
         Files.copy(is, tmpFile, StandardCopyOption.REPLACE_EXISTING);
 
-        return converterService.addJob(tmpFile, jobId, completeCallBack);
+        return converterService.addJob(tmpFile, jobId, prio, completeCallBack);
     }
 
     private String decodeFormDataFileName(String fileName) {

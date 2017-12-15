@@ -45,7 +45,6 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -62,6 +61,7 @@ import org.mycore.vidconv.common.event.Listener;
 import org.mycore.vidconv.common.util.Executable;
 import org.mycore.vidconv.common.util.JsonUtils;
 import org.mycore.vidconv.common.util.StreamConsumer;
+import org.mycore.vidconv.concurrent.PriorityExecutor;
 import org.mycore.vidconv.frontend.entity.ConverterWrapper;
 import org.mycore.vidconv.frontend.entity.ConvertersWrapper;
 import org.mycore.vidconv.frontend.entity.HWAccelDeviceSpec;
@@ -84,6 +84,12 @@ public class ConverterService extends Widget implements Listener {
     public static final String EVENT_CONVERT_PROGRESS = "converter_progress";
 
     public static final String EVENT_CONVERT_DONE = "converter_done";
+
+    public static final int PRIORITY_HIGHT = 100;
+
+    public static final int PRIORITY_NORMAL = 0;
+
+    public static final int PRIORITY_LOW = -1;
 
     private static final Logger LOGGER = LogManager.getLogger(ConverterService.class);
 
@@ -125,7 +131,7 @@ public class ConverterService extends Widget implements Listener {
             .mapToInt(hw -> hw.getDeviceSpec().numConcurrentProcesses())
             .sum();
 
-        converterThreadPool = Executors.newFixedThreadPool(
+        converterThreadPool = PriorityExecutor.newFixedThreadPool(
             hwAccelConverterThreads > 0 ? Integer.max(hwAccelConverterThreads, converterThreads)
                 : converterThreads);
 
@@ -277,7 +283,7 @@ public class ConverterService extends Widget implements Listener {
         if (DirectoryWatchService.EVENT_ENTRY_CREATE.equals(event.getType())
             && event.getSource().equals(DirectoryWatchService.class)) {
             Path inputPath = (Path) event.getObject();
-            addJob(inputPath, null, null);
+            addJob(inputPath, null, PRIORITY_NORMAL, null);
         }
 
         if ((ConverterJob.START.equals(event.getType()) || ConverterJob.PROGRESS.equals(event.getType())
@@ -292,7 +298,7 @@ public class ConverterService extends Widget implements Listener {
         }
     }
 
-    public String addJob(final Path inputPath, final String jobId, final String completeCallBack)
+    public String addJob(final Path inputPath, final String jobId, final int priority, final String completeCallBack)
         throws InterruptedException, JAXBException, ExecutionException, IOException {
         final SettingsWrapper settings = SETTINGS.getSettings();
 
@@ -301,6 +307,7 @@ public class ConverterService extends Widget implements Listener {
                 final String id = Optional.ofNullable(jobId).orElse(Long.toHexString(new Random().nextLong()));
                 final String fileName = inputPath.getFileName().toString();
                 final Path outputPath = Paths.get(outputDir, id);
+                final int prio = Math.min(PRIORITY_HIGHT, Math.max(PRIORITY_LOW, priority));
 
                 final List<Output> outputs = settings.getOutput().stream()
                     .sorted(Settings.sortOutputs)
@@ -321,10 +328,11 @@ public class ConverterService extends Widget implements Listener {
                         return out;
                     }).collect(Collectors.toList());
 
-                final ConverterJob converter = new ConverterJob(id, outputs, inputPath, outputPath, completeCallBack);
+                final ConverterJob converter = new ConverterJob(id, prio, outputs, inputPath, outputPath,
+                    completeCallBack);
 
                 converters.put(id, converter);
-                converterThreadPool.submit(converter);
+                converterThreadPool.submit(converter, prio);
 
                 return id;
             } else {
@@ -363,7 +371,7 @@ public class ConverterService extends Widget implements Listener {
                         ConverterWrapper cw = JsonUtils.loadJSON(file.toFile(), ConverterWrapper.class);
                         if (!cw.isDone() || cw.getExitValue() != 0) {
                             LOGGER.info("...restart \"{}\" with id \"{}\".", cw.getFileName(), cw.getId());
-                            addJob(Paths.get(cw.getInputPath(), cw.getFileName()), cw.getId(),
+                            addJob(Paths.get(cw.getInputPath(), cw.getFileName()), cw.getId(), cw.getPriority(),
                                 cw.getCompleteCallback());
                         }
                     } catch (JAXBException | InterruptedException | ExecutionException | IOException e) {
@@ -393,6 +401,8 @@ public class ConverterService extends Widget implements Listener {
         public static final String DONE = "done";
 
         private final String id;
+
+        private int priority;
 
         private final Path inputPath;
 
@@ -424,9 +434,9 @@ public class ConverterService extends Widget implements Listener {
 
         private Timer timer;
 
-        public ConverterJob(final String id, final List<Output> outputs, final Path inputPath, final Path outputPath,
-            final String completeCallBack)
-            throws InterruptedException, IOException, JAXBException {
+        public ConverterJob(final String id, int priority, final List<Output> outputs, final Path inputPath,
+            final Path outputPath,
+            final String completeCallBack) throws InterruptedException, IOException, JAXBException {
             this.id = id;
             this.outputs = outputs;
             this.inputPath = inputPath;
@@ -436,6 +446,7 @@ public class ConverterService extends Widget implements Listener {
             this.addTime = Instant.now();
             this.done = false;
             this.running = false;
+            this.priority = priority;
 
             if (!Files.exists(outputPath))
                 Files.createDirectories(outputPath);
@@ -492,6 +503,10 @@ public class ConverterService extends Widget implements Listener {
 
         public String id() {
             return id;
+        }
+
+        public int priority() {
+            return priority;
         }
 
         public String completeCallBack() {
