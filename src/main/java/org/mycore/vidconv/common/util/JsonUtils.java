@@ -171,7 +171,7 @@ public class JsonUtils {
         Optional<Class<?>> cls = Optional.ofNullable(entityClass);
         try {
             List<Class<?>> pe = EntityUtils.populateEntities(CONFIG.getStrings("APP.Jersey.DynamicEntities"));
-            return cls.map(c -> Streams.concat(Stream.of(c), pe.stream())).orElse(pe.stream())
+            return cls.map(c -> Streams.concat(Stream.of(c), pe.stream())).orElseGet(() -> pe.stream())
                 .toArray(Class<?>[]::new);
         } catch (IOException e) {
             return cls.map(c -> new Class<?>[] { c }).orElse(null);

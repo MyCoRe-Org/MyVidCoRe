@@ -304,7 +304,7 @@ public class ConverterService extends Widget implements Listener {
 
         if (settings != null && !settings.getOutput().isEmpty() && !Files.isDirectory(inputPath)) {
             if (FFMpegImpl.isEncodingSupported(inputPath)) {
-                final String id = Optional.ofNullable(jobId).orElse(Long.toHexString(new Random().nextLong()));
+                final String id = Optional.ofNullable(jobId).orElseGet(() -> Long.toHexString(new Random().nextLong()));
                 final String fileName = inputPath.getFileName().toString();
                 final Path outputPath = Paths.get(outputDir, id);
                 final int prio = Math.min(PRIORITY_HIGHT, Math.max(PRIORITY_LOW, priority));

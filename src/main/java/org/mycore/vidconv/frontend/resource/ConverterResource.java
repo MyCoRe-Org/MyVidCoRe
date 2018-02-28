@@ -153,13 +153,13 @@ public class ConverterResource {
         final String completeCallBack = Optional.ofNullable(callback).map(cb -> cb.getValueAs(String.class))
             .orElse(null);
         final String fn = Optional.ofNullable(fileName).map(f -> f.getValueAs(String.class)).filter(f -> !f.isEmpty())
-            .orElse(decodeFormDataFileName(fileDetail.getFileName()));
+            .orElseGet(() -> decodeFormDataFileName(fileDetail.getFileName()));
 
         ConverterService converterService = ((ConverterService) WidgetManager.instance()
             .get(ConverterService.class));
 
         java.nio.file.Path tmpFile = Paths.get(converterService.getTempDir())
-            .resolve(Optional.ofNullable(jobId).orElse(Long.toHexString(new Random().nextLong()))).resolve(fn);
+            .resolve(Optional.ofNullable(jobId).orElseGet(() -> Long.toHexString(new Random().nextLong()))).resolve(fn);
 
         Files.createDirectories(tmpFile.getParent());
 
