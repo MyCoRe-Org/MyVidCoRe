@@ -19,6 +19,7 @@
  */
 package org.mycore.vidconv.plugin.thumbnail;
 
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 import org.apache.logging.log4j.LogManager;
@@ -60,10 +61,10 @@ public class ThumbnailPlugin extends ListenerPlugin {
                         return null;
                     }
                 }).filter(pw -> pw != null && !pw.getStreams().isEmpty())
-                    .reduce((pw1,
-                        pw2) -> (pw1.getStreams().get(0).getCodedWidth()
-                            + pw1.getStreams().get(0).getCodedHeight()) > (pw2.getStreams().get(0).getCodedWidth()
-                                + pw2.getStreams().get(0).getCodedHeight()) ? pw1 : pw2)
+                    .reduce((pw1, pw2) -> (Optional.ofNullable(pw1.getStreams().get(0).getCodedWidth()).orElse(0)
+                        + Optional.ofNullable(pw1.getStreams().get(0).getCodedHeight())
+                            .orElse(0)) > (Optional.ofNullable(pw2.getStreams().get(0).getCodedWidth()).orElse(0)
+                                + Optional.ofNullable(pw2.getStreams().get(0).getCodedHeight()).orElse(0)) ? pw1 : pw2)
                     .orElse(null);
 
                 if (probe != null) {
