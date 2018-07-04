@@ -240,8 +240,8 @@ public class WidgetResource {
                 try {
                     final File assetFile = asset.toFile();
                     final long from = new Long(rm.group(2));
-                    final Optional<String> toVal = Optional.ofNullable(rm.group(3));
-                    final long to = toVal.isPresent() ? new Long(toVal.get()) : (int) (assetFile.length() - 1);
+                    final long to = Optional.ofNullable(rm.group(3)).map(Long::parseLong)
+                        .orElse(assetFile.length() - 1);
 
                     final String responseRange = String.format(Locale.ROOT, "bytes %d-%d/%d", from, to,
                         assetFile.length());
