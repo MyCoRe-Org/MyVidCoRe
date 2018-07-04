@@ -32,13 +32,13 @@ import javax.ws.rs.core.StreamingOutput;
  */
 public class RangeStreamingOutput implements StreamingOutput {
 
-    private int length;
+    private long length;
 
     private RandomAccessFile raf;
 
     private final byte[] buf = new byte[4096];
 
-    public RangeStreamingOutput(int length, RandomAccessFile raf) {
+    public RangeStreamingOutput(long length, RandomAccessFile raf) {
         this.length = length;
         this.raf = raf;
     }
@@ -48,7 +48,7 @@ public class RangeStreamingOutput implements StreamingOutput {
         try {
             try {
                 while (length != 0) {
-                    int read = raf.read(buf, 0, buf.length > length ? length : buf.length);
+                    int read = raf.read(buf, 0, buf.length > length ? (int) length : buf.length);
                     outputStream.write(buf, 0, read);
                     length -= read;
                 }
@@ -59,7 +59,7 @@ public class RangeStreamingOutput implements StreamingOutput {
         }
     }
 
-    public int getLenth() {
+    public long getLenth() {
         return length;
     }
 }

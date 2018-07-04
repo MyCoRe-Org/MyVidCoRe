@@ -239,16 +239,16 @@ public class WidgetResource {
             .map(rm -> {
                 try {
                     final File assetFile = asset.toFile();
-                    final int from = new Integer(rm.group(2));
+                    final long from = new Long(rm.group(2));
                     final Optional<String> toVal = Optional.ofNullable(rm.group(3));
-                    final int to = toVal.isPresent() ? new Integer(toVal.get()) : (int) (assetFile.length() - 1);
+                    final long to = toVal.isPresent() ? new Long(toVal.get()) : (int) (assetFile.length() - 1);
 
                     final String responseRange = String.format(Locale.ROOT, "bytes %d-%d/%d", from, to,
                         assetFile.length());
                     final RandomAccessFile raf = new RandomAccessFile(assetFile, "r");
                     raf.seek(from);
 
-                    final int len = to - from + 1;
+                    final long len = to - from + 1;
                     final RangeStreamingOutput streamer = new RangeStreamingOutput(len, raf);
 
                     return Response.ok(streamer, mimeType)
@@ -264,9 +264,7 @@ public class WidgetResource {
                 final StreamingOutput streamer = new StreamingOutput() {
                     @Override
                     public void write(final OutputStream output) throws IOException {
-                        byte[] data = Files.readAllBytes(asset);
-                        output.write(data);
-                        output.flush();
+                        Files.copy(asset, output);
                     }
                 };
 
