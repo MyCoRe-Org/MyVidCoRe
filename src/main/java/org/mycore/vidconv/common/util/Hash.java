@@ -37,34 +37,34 @@ import javax.xml.bind.DatatypeConverter;
  */
 public class Hash {
 
-    public static String getMD5String(String text) throws NoSuchAlgorithmException, UnsupportedEncodingException {
-        return getHash(1, null, text, "md5");
-    }
+	public static String getMD5String(String text) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+		return getHash(1, null, text, "md5");
+	}
 
-    private static String getHash(int iterations, byte[] salt, String str, String algorithm)
-        throws NoSuchAlgorithmException, UnsupportedEncodingException {
-        MessageDigest digest;
-        int it = iterations;
-        if (--it < 0) {
-            it = 0;
-        }
-        byte[] data;
+	private static String getHash(int iterations, byte[] salt, final String text, final String algorithm)
+			throws NoSuchAlgorithmException, UnsupportedEncodingException {
+		int it = iterations;
+		MessageDigest digest;
+		if (--it < 0) {
+			it = 0;
+		}
+		byte[] data;
 
-        digest = MessageDigest.getInstance(algorithm);
-        String text = Normalizer.normalize(str, Form.NFC);
-        if (salt != null) {
-            digest.update(salt);
-        }
-        data = digest.digest(text.getBytes("UTF-8"));
-        for (int i = 0; i < it; i++) {
-            data = digest.digest(data);
-        }
+		digest = MessageDigest.getInstance(algorithm);
+		String t = Normalizer.normalize(text, Form.NFC);
+		if (salt != null) {
+			digest.update(salt);
+		}
+		data = digest.digest(t.getBytes("UTF-8"));
+		for (int i = 0; i < it; i++) {
+			data = digest.digest(data);
+		}
 
-        return Hash.toHexString(data);
-    }
+		return Hash.toHexString(data);
+	}
 
-    public static String toHexString(byte[] data) {
-        return DatatypeConverter.printHexBinary(data).toLowerCase(Locale.ROOT);
-    }
+	public static String toHexString(byte[] data) {
+		return DatatypeConverter.printHexBinary(data).toLowerCase(Locale.ROOT);
+	}
 
 }

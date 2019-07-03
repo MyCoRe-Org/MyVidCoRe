@@ -58,7 +58,7 @@ import org.mycore.vidconv.plugin.annotation.Plugin.Type;
  * @author Ren\u00E9 Adler (eagle)
  *
  */
-@Plugin(name = "System Monitor Plugin", description = "Monitors System.", type = Type.GENERIC)
+@Plugin(name = "System Monitor Plugin", description = "Monitors System.", type = Type.GENERIC, enabled = true)
 public class SystemMonitorPlugin extends GenericPlugin {
 
     public static final String EVENT_DATA = "sysmonitor-data";
@@ -120,10 +120,14 @@ public class SystemMonitorPlugin extends GenericPlugin {
 
             osBean = ManagementFactory.getOperatingSystemMXBean();
             mCache = Arrays.stream(osBean.getClass().getDeclaredMethods())
-                .map(m -> {
-                    m.setAccessible(true);
-                    return m;
-                }).filter(m -> Modifier.isPublic(m.getModifiers())).collect(Collectors.toList());
+                    .map(m -> {
+                        try {
+                            m.setAccessible(true);
+                            return m;
+                        } catch (Exception e) {
+                            return null;
+                        }
+                    }).filter(m -> m != null && Modifier.isPublic(m.getModifiers())).collect(Collectors.toList());
         }
 
         /* (non-Javadoc)
@@ -131,18 +135,20 @@ public class SystemMonitorPlugin extends GenericPlugin {
          */
         @Override
         public void run() {
-            SysMonitor sysm = new SysMonitor(mCache.stream().map(m -> new SysAttrib(getPropertyName(m),
-                getSystemBeanValue((Object o) -> o.toString(), m.getName()))).collect(Collectors.toList()));
+            if (!mCache.isEmpty()) {
+                SysMonitor sysm = new SysMonitor(mCache.stream().map(m -> new SysAttrib(getPropertyName(m),
+                        getSystemBeanValue((Object o) -> o.toString(), m.getName()))).collect(Collectors.toList()));
 
-            EventManager.instance()
-                .fireEvent(
-                    new Event<SysMonitor>(EVENT_DATA, sysm, parent.getClass()).setInternal(false));
+                EventManager.instance()
+                        .fireEvent(new Event<SysMonitor>(EVENT_DATA, sysm, parent.getClass()).setInternal(false));
+            }
         }
 
         private <T> T getSystemBeanValue(Function<Object, T> valueTransformer, String... mmethodNames) {
             return mCache.stream()
-                .filter(m -> Arrays.stream(mmethodNames).anyMatch(mn -> mn.equalsIgnoreCase(m.getName()))).findFirst()
-                .map(m -> getMethodValue(m, valueTransformer)).orElse(null);
+                    .filter(m -> Arrays.stream(mmethodNames).anyMatch(mn -> mn.equalsIgnoreCase(m.getName())))
+                    .findFirst()
+                    .map(m -> getMethodValue(m, valueTransformer)).orElse(null);
 
         }
 
@@ -177,7 +183,7 @@ public class SystemMonitorPlugin extends GenericPlugin {
                 try {
                     String json = JsonUtils.toJSON(sysm);
                     this.getWebSockets().parallelStream().filter(WebSocket::isConnected)
-                        .forEach(ws -> ws.send(json));
+                            .forEach(ws -> ws.send(json));
                 } catch (JAXBException | IOException e) {
                     LOGGER.error(e.getMessage(), e);
                 }

@@ -28,6 +28,7 @@ import java.net.URL;
 import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
+import org.mycore.vidconv.common.ClassTools;
 
 /**
  * The Class ConfigurationDir.
@@ -142,8 +143,7 @@ public class ConfigurationDir {
 						.warn("Exception while returning URL for file: " + resolvedFile, e);
 			}
 		}
-		return getClassPathResource(relativePath,
-				classLoader == null ? ConfigurationDir.class.getClassLoader() : classLoader);
+		return getClassPathResource(relativePath, classLoader == null ? ClassTools.getClassLoader() : classLoader);
 	}
 
 	/**

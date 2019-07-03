@@ -36,6 +36,7 @@ import java.util.LinkedList;
 import java.util.Properties;
 
 import org.apache.logging.log4j.LogManager;
+import org.mycore.vidconv.common.ClassTools;
 
 /**
  * A InputStream from (preferably) property files. All available InputStreams
@@ -193,7 +194,7 @@ public class ConfigurationInputStream extends InputStream {
         if (configProperties.canRead()) {
             input = new FileInputStream(configProperties);
         } else {
-            URL url = ConfigurationInputStream.class.getClassLoader().getResource(filename);
+        	URL url = ClassTools.getClassLoader().getResource(filename);
             if (url != null) {
                 input = url.openStream();
             }

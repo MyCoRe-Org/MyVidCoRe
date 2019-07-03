@@ -50,74 +50,76 @@ import org.mycore.vidconv.frontend.widget.Widget;
  */
 public class EmbeddedHttpServer extends Widget {
 
-    public static final String WIDGET_NAME = "embeddedHttpServer";
+	public static final String WIDGET_NAME = "embeddedHttpServer";
 
-    public static final String EVENT_START = "startHttpServer";
+	public static final String EVENT_START = "startHttpServer";
 
-    public static final String EVENT_STOP = "stopHttpServer";
+	public static final String EVENT_STOP = "stopHttpServer";
 
-    private static final Logger LOGGER = LogManager.getLogger(EmbeddedHttpServer.class);
+	private static final Logger LOGGER = LogManager.getLogger(EmbeddedHttpServer.class);
 
-    private HttpServer httpServer;
+	private HttpServer httpServer;
 
-    private String host;
+	private String host;
 
-    private Integer port = 8085;
+	private Integer port = 8085;
 
-    public EmbeddedHttpServer(final String host, final Integer port) {
-        super(WIDGET_NAME);
+	public EmbeddedHttpServer(final String host, final Integer port) {
+		super(WIDGET_NAME);
 
-        this.host = host;
-        if (port != null && port.intValue() > 0)
-            this.port = port;
-    }
+		this.host = host;
+		if (port != null && port.intValue() > 0)
+			this.port = port;
+	}
 
-    @Override
-    public void start() throws Exception {
-        LOGGER.info("Starting Embedded HTTP Server...");
-        if (httpServer == null) {
-            httpServer = createHttpServer();
-            LOGGER.info(
-                String.format(Locale.ROOT,
-                    "Jersey Application Server started with WADL available at " + "%sapplication.wadl",
-                    getURI()));
+	@Override
+	public void start() throws Exception {
+		LOGGER.info("Starting Embedded HTTP Server...");
+		if (httpServer == null) {
+			httpServer = createHttpServer();
+			LOGGER.info(String.format(Locale.ROOT,
+					"Jersey Application Server started with WADL available at " + "%sapplication.wadl", getURI()));
 
-            WebSocketAddOn addon = new WebSocketAddOn();
-            httpServer.getListeners().forEach(listener -> listener.registerAddOn(addon));
-        }
-        httpServer.start();
-    }
+			WebSocketAddOn addon = new WebSocketAddOn();
+			httpServer.getListeners().forEach(listener -> listener.registerAddOn(addon));
+		}
+		httpServer.start();
+	}
 
-    @Override
-    public void stop() throws Exception {
-        LOGGER.info("Stopping Embedded HTTP Server...");
-        httpServer.shutdown();
-    }
+	@Override
+	public void stop() throws Exception {
+		LOGGER.info("Stopping Embedded HTTP Server...");
+		httpServer.shutdown();
+	}
 
-    private HttpServer createHttpServer()
-        throws IOException, IllegalArgumentException, UriBuilderException, URISyntaxException {
-        ResourceConfig resourceConfig = new ResourceConfig()
-            .packages(true, Configuration.instance().getStrings("APP.Jersey.Resources").toArray(new String[0]))
-            .register(FrontendFeature.class);
-        EncodingFilter.enableFor(resourceConfig, GZipEncoder.class);
-        return GrizzlyHttpServerFactory.createHttpServer(getURI(), resourceConfig, false);
-    }
+	public URI getURI() throws IllegalArgumentException, UriBuilderException, URISyntaxException {
+		return getURI(this.port);
+	}
 
-    private URI getURI() throws IllegalArgumentException, UriBuilderException, URISyntaxException {
-        return UriBuilder.fromUri(new URI("http://" + getHostName() + "/")).port(this.port.intValue()).build();
-    }
+	public URI getURI(Integer port) throws IllegalArgumentException, UriBuilderException, URISyntaxException {
+		return UriBuilder.fromUri(new URI("http://" + getHostName() + "/")).port(port.intValue()).build();
+	}
 
-    private String getHostName() {
-        if (this.host != null && !this.host.isEmpty())
-            return this.host;
+	private HttpServer createHttpServer()
+			throws IOException, IllegalArgumentException, UriBuilderException, URISyntaxException {
+		ResourceConfig resourceConfig = new ResourceConfig()
+				.packages(true, Configuration.instance().getStrings("APP.Jersey.Resources").toArray(new String[0]))
+				.register(FrontendFeature.class);
+		EncodingFilter.enableFor(resourceConfig, GZipEncoder.class);
+		return GrizzlyHttpServerFactory.createHttpServer(getURI(), resourceConfig, false);
+	}
 
-        String hostName = "0.0.0.0";
-        try {
-            hostName = InetAddress.getByName(hostName).getCanonicalHostName();
-        } catch (UnknownHostException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
+	private String getHostName() {
+		if (this.host != null && !this.host.isEmpty())
+			return this.host;
 
-        return hostName;
-    }
+		String hostName = "0.0.0.0";
+		try {
+			hostName = InetAddress.getByName(hostName).getCanonicalHostName();
+		} catch (UnknownHostException e) {
+			LOGGER.error(e.getMessage(), e);
+		}
+
+		return hostName;
+	}
 }

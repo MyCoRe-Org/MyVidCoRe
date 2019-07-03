@@ -22,14 +22,18 @@
  */
 package org.mycore.vidconv;
 
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.vidconv.backend.service.ConverterService;
 import org.mycore.vidconv.backend.service.DirectoryWatchService;
 import org.mycore.vidconv.backend.service.EmbeddedHttpServer;
+import org.mycore.vidconv.common.config.Configuration;
 import org.mycore.vidconv.common.config.ConfigurationDir;
 import org.mycore.vidconv.common.event.AutoExecutableHandler;
 
@@ -42,90 +46,117 @@ import com.beust.jcommander.Parameter;
  */
 public class Application {
 
-    private static final Logger LOGGER = LogManager.getRootLogger();
+	private static final Logger LOGGER = LogManager.getRootLogger();
 
-    @Parameter(names = { "-h", "--help" }, description = "Print help (this message) and exit", help = true)
-    private boolean help;
+	private static Application app;
 
-    @Parameter(names = { "--port", "-p" }, description = "Set port listen on")
-    private Integer port = 8085;
+	@Parameter(names = { "-h", "--help" }, description = "Print help (this message) and exit", help = true)
+	private boolean help;
 
-    @Parameter(names = "--host", description = "Set host listen on")
-    private String host;
+	@Parameter(names = { "--port", "-p" }, description = "Set port listen on")
+	private Integer port = 8085;
 
-    @Parameter(names = { "-ct", "--converterThreads" }, description = "Set the num of converter threads")
-    private Integer converterThreads;
+	@Parameter(names = "--host", description = "Set host listen on")
+	private String host;
 
-    @Parameter(names = "--watchDir", description = "Set directory to watch for incomming videos")
-    private String watchDir;
+	@Parameter(names = { "-ct", "--converterThreads" }, description = "Set the num of converter threads")
+	private Integer converterThreads;
 
-    @Parameter(names = "--outputDir", description = "Set directory to output converted videos")
-    private String outputDir;
+	@Parameter(names = "--watchDir", description = "Set directory to watch for incomming videos")
+	private String watchDir;
 
-    @Parameter(names = "--tempDir", description = "Set directory for temporary files")
-    private String tempDir = System.getProperty("java.io.tmpdir");
+	@Parameter(names = "--outputDir", description = "Set directory to output converted videos")
+	private String outputDir;
 
-    @Parameter(names = { "--configDir", "-cd" }, description = "Set configuration dir")
-    private String configDir;
+	@Parameter(names = "--tempDir", description = "Set directory for temporary files")
+	private String tempDir = System.getProperty("java.io.tmpdir");
 
-    public static void main(String[] args) {
-        Application app = new Application();
-        JCommander jcmd = new JCommander(app, null, args);
+	@Parameter(names = { "--configDir", "-cd" }, description = "Set configuration dir")
+	private String configDir;
 
-        if (app.help) {
-            jcmd.usage();
-        } else {
-            try {
-                if (app.watchDir == null || app.outputDir == null || app.tempDir == null) {
-                    jcmd.usage();
-                    return;
-                }
+	private Thread shutdownHook;
 
-                if (Files.notExists(Paths.get(app.watchDir))) {
-                    throw new IllegalArgumentException(
-                        "Watching directory \"" + app.watchDir + "\" isn't exists.");
-                } else if (Paths.get(app.watchDir).equals(Paths.get(app.outputDir).getParent())
-                    || Paths.get(app.watchDir).equals(Paths.get(app.outputDir))) {
-                    throw new IllegalArgumentException(
-                        "Watching directory isn't allowed to be the parent of output directory or the same.");
-                } else if (Files.notExists(Paths.get(app.tempDir))) {
-                    throw new IllegalArgumentException(
-                        "Temporary file directory \"" + app.tempDir + "\" isn't exists.");
-                } else if (Paths.get(app.tempDir).equals(Paths.get(app.outputDir).getParent())
-                    || Paths.get(app.tempDir).equals(Paths.get(app.outputDir))) {
-                    throw new IllegalArgumentException(
-                        "Temporary file directory isn't allowed to be the parent of output directory or the same.");
-                }
+	private EmbeddedHttpServer embeddedHttpServer;
 
-                app.run();
-            } catch (Exception e) {
-                LOGGER.error(e.getMessage(), e);
-            }
-        }
-    }
+	public static void main(String[] args) {
+		app = new Application();
+		JCommander jcmd = new JCommander(app, null, args);
 
-    private void run() throws Exception {
-        if (configDir != null) {
-            ConfigurationDir.setConfigurationDirectory(configDir);
-        }
+		if (app.help) {
+			jcmd.usage();
+		} else {
+			try {
+				if (app.watchDir == null || app.outputDir == null || app.tempDir == null) {
+					jcmd.usage();
+					return;
+				}
 
-        AutoExecutableHandler.setHaltOnError(false);
-        AutoExecutableHandler.startup();
+				if (Files.notExists(Paths.get(app.watchDir))) {
+					throw new IllegalArgumentException("Watching directory \"" + app.watchDir + "\" isn't exists.");
+				} else if (Paths.get(app.watchDir).equals(Paths.get(app.outputDir).getParent())
+						|| Paths.get(app.watchDir).equals(Paths.get(app.outputDir))) {
+					throw new IllegalArgumentException(
+							"Watching directory isn't allowed to be the parent of output directory or the same.");
+				} else if (Files.notExists(Paths.get(app.tempDir))) {
+					throw new IllegalArgumentException(
+							"Temporary file directory \"" + app.tempDir + "\" isn't exists.");
+				} else if (Paths.get(app.tempDir).equals(Paths.get(app.outputDir).getParent())
+						|| Paths.get(app.tempDir).equals(Paths.get(app.outputDir))) {
+					throw new IllegalArgumentException(
+							"Temporary file directory isn't allowed to be the parent of output directory or the same.");
+				}
 
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            public void run() {
-                AutoExecutableHandler.shutdown();
-            }
-        });
+				app.run();
+			} catch (Exception e) {
+				LOGGER.error(e.getMessage(), e);
+			}
+		}
+	}
 
-        EmbeddedHttpServer embeddedHttpServer = new EmbeddedHttpServer(host, port);
-        embeddedHttpServer.start();
+	public static void exit() {
+		try {
+			app.stop();
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage(), e);
+		}
+	}
 
-        int availableProcessors = Runtime.getRuntime().availableProcessors();
-        converterThreads = converterThreads == null ? Math.floorDiv(availableProcessors, 4) : converterThreads;
-        LOGGER.info("Use {} converter threads for available {} processors.", converterThreads, availableProcessors);
-        new ConverterService(outputDir, tempDir, converterThreads);
+	private Application() {
+		if (!(Application.class.getClassLoader() instanceof URLClassLoader)) {
+			System.out.println("Current ClassLoader is not extendable at runtime. Using workaround.");
+			Thread.currentThread().setContextClassLoader(new URLClassLoader(new URL[0]));
+		}
+	}
 
-        DirectoryWatchService.instance().registerDirectory(Paths.get(watchDir));
-    }
+	private void run() throws Exception {
+		if (configDir != null) {
+			ConfigurationDir.setConfigurationDirectory(configDir);
+		}
+
+		AutoExecutableHandler.setHaltOnError(false);
+		shutdownHook = new Thread(() -> AutoExecutableHandler.shutdown());
+		Runtime.getRuntime().addShutdownHook(shutdownHook);
+
+		AutoExecutableHandler.startup();
+
+		embeddedHttpServer = new EmbeddedHttpServer(host, port);
+		embeddedHttpServer.start();
+
+		Configuration.instance().set("APP.BaseURL",
+				Optional.ofNullable(Configuration.instance().getString("APP.BaseURL", null))
+						.orElse(embeddedHttpServer.getURI().toString()));
+
+		int availableProcessors = Runtime.getRuntime().availableProcessors();
+		converterThreads = converterThreads == null ? Math.floorDiv(availableProcessors, 4) : converterThreads;
+		LOGGER.info("Use {} converter threads for available {} processors.", converterThreads, availableProcessors);
+		new ConverterService(outputDir, tempDir, converterThreads);
+
+		DirectoryWatchService.instance().registerDirectory(Paths.get(watchDir));
+	}
+
+	private void stop() throws Exception {
+		embeddedHttpServer.stop();
+		AutoExecutableHandler.shutdown();
+		Runtime.getRuntime().removeShutdownHook(shutdownHook);
+	}
 }

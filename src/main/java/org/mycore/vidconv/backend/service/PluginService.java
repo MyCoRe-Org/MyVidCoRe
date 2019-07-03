@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mycore.vidconv.common.ClassTools;
 import org.mycore.vidconv.common.config.Settings;
 import org.mycore.vidconv.common.event.annotation.AutoExecutable;
 import org.mycore.vidconv.common.event.annotation.Startup;
@@ -66,7 +67,7 @@ public class PluginService {
         Plugin pa = p.getAnnotation(Plugin.class);
         LOGGER.info("load plugin " + pa.name() + "...");
         try {
-            plugins.put(pa.name(), p.newInstance());
+            plugins.put(pa.name(), ClassTools.newInstance(p));
 
             boolean enabled = Optional.ofNullable(isPluginEnabled(pa.name())).orElse(pa.enabled());
             if (enabled) {

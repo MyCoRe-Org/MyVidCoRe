@@ -349,6 +349,7 @@ public class HWAccelNvidiaSpec extends HWAccelDeviceSpec {
     /* (non-Javadoc)
      * @see org.mycore.vidconv.frontend.entity.HWAccelDeviceSpec#basicCopy()
      */
+    @SuppressWarnings("unchecked")
     @Override
     public HWAccelNvidiaSpec basicCopy() {
         HWAccelNvidiaSpec copy = new HWAccelNvidiaSpec();

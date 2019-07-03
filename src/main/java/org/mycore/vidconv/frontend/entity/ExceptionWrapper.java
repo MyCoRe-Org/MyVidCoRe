@@ -25,6 +25,9 @@ package org.mycore.vidconv.frontend.entity;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -32,27 +35,33 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Ren\u00E9 Adler (eagle)
  *
  */
+@XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement(name = "exception")
 public class ExceptionWrapper {
 
-    private Exception exception;
+	private Exception ex;
 
-    ExceptionWrapper() {
-    }
+	ExceptionWrapper() {
+	}
 
-    public ExceptionWrapper(final Exception exception) {
-        this.exception = exception;
-    }
+	public ExceptionWrapper(Exception ex) {
+		this.ex = ex;
+	}
 
-    @XmlElement(name = "message")
-    public String getMessage() {
-        return exception.getMessage();
-    }
+	@XmlAttribute(name = "type")
+	public String getType() {
+		return ex.getClass().getName();
+	}
 
-    @XmlElement(name = "stackTrace")
-    public String getStackTrace() {
-        final StringWriter sw = new StringWriter();
-        exception.printStackTrace(new PrintWriter(sw));
-        return sw.toString();
-    }
+	@XmlElement(name = "message")
+	public String getMessage() {
+		return ex.getMessage();
+	}
+
+	@XmlElement(name = "stackTrace")
+	public String getStackTrace() {
+		StringWriter sw = new StringWriter();
+		ex.printStackTrace(new PrintWriter(sw));
+		return sw.toString();
+	}
 }

@@ -29,13 +29,11 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeSet;
@@ -45,6 +43,7 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.vidconv.common.AppPropertiesResolver;
+import org.mycore.vidconv.common.ClassTools;
 
 import com.google.common.base.Predicates;
 import com.google.common.collect.Maps;
@@ -261,47 +260,28 @@ public class Configuration {
      *             the configuration exception
      */
     protected <T> T loadClass(String classname) throws ConfigurationException {
-        LogManager.getLogger().debug("Loading Class: " + classname);
+    	LogManager.getLogger().debug("Loading Class: " + classname);
 
-        T o = null;
-        Class<? extends T> cl;
-        try {
-            @SuppressWarnings("unchecked")
-            Class<? extends T> forName = (Class<? extends T>) Class.forName(classname);
-            cl = forName;
-        } catch (ClassNotFoundException ex) {
-            throw new ConfigurationException("Could not load class " + classname, ex);
-        }
+		T o = null;
+		Class<? extends T> cl;
+		try {
+			cl = ClassTools.forName(classname);
+		} catch (ClassNotFoundException ex) {
+			throw new ConfigurationException("Could not load class " + classname, ex);
+		}
 
-        try {
-            try {
-                o = cl.newInstance();
-            } catch (IllegalAccessException | InstantiationException e) {
-                // check for singleton
-                Method[] querymethods = cl.getMethods();
-
-                for (Method querymethod : querymethods) {
-                    if (querymethod.getName().toLowerCase(Locale.ROOT).equals("instance")
-                        || querymethod.getName().toLowerCase(Locale.ROOT).equals("getinstance")) {
-                        Object[] ob = new Object[0];
-                        @SuppressWarnings("unchecked")
-                        T invoke = (T) querymethod.invoke(cl, ob);
-                        o = invoke;
-                        break;
-                    }
-                }
-                if (o == null) {
-                    throw e;
-                }
-            }
-        } catch (ExceptionInInitializerError e) {
-            String msg = "Could not instantiate class " + classname;
-            throw new ConfigurationException(msg, e.getException());
-        } catch (Throwable t) {
-            String msg = "Could not instantiate class " + classname;
-            throw new ConfigurationException(msg, t);
-        }
-        return o;
+		try {
+			o = ClassTools.newInstance(cl);
+		} catch (Throwable t) {
+			String msg = "Could not instantiate class " + classname;
+			if (t instanceof ExceptionInInitializerError) {
+				Throwable t2 = ((ExceptionInInitializerError) t).getException();
+				throw new ConfigurationException(msg, t2);
+			} else {
+				throw new ConfigurationException(msg, t);
+			}
+		}
+		return o;
     }
 
     /**

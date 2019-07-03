@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.vidconv.Application;
+import org.mycore.vidconv.common.ClassTools;
 import org.mycore.vidconv.common.event.annotation.AutoExecutable;
 import org.mycore.vidconv.common.event.annotation.Shutdown;
 import org.mycore.vidconv.common.event.annotation.Startup;
@@ -111,14 +112,12 @@ public class AutoExecutableHandler {
                 .forEachOrdered(m -> {
                     try {
                         log("...invoke " + m.getName() + "() for " + type.getSimpleName());
-                        if (!m.isAccessible()) {
-                            m.setAccessible(true);
-                        }
-                        if (Modifier.isStatic(m.getModifiers())) {
-                            m.invoke(null);
-                        } else {
-                            m.invoke(autoExecutable.newInstance());
-                        }
+                        m.setAccessible(true);
+						if (Modifier.isStatic(m.getModifiers())) {
+							m.invoke(null);
+						} else {
+							m.invoke(ClassTools.newInstance(autoExecutable, false));
+						}
                     } catch (Exception e) {
                         throw new RuntimeException(e.getCause());
                     }

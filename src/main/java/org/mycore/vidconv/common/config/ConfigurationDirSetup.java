@@ -32,12 +32,14 @@ import java.time.Instant;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.status.StatusLogger;
+import org.mycore.vidconv.common.ClassTools;
 import org.mycore.vidconv.common.event.annotation.AutoExecutable;
 import org.mycore.vidconv.common.event.annotation.Startup;
 
@@ -62,17 +64,20 @@ public class ConfigurationDirSetup {
 			// no configuration dir exists
 			return;
 		}
-		ClassLoader classLoader = ConfigurationDir.class.getClassLoader();
-		if (!(classLoader instanceof URLClassLoader)) {
-			error(classLoader.getClass() + " is unsupported for adding extending CLASSPATH at runtime.");
+		Optional<URLClassLoader> classLoaderOptional = Stream
+				.of(ClassTools.getClassLoader(), Thread.currentThread().getContextClassLoader())
+				.filter(URLClassLoader.class::isInstance).map(URLClassLoader.class::cast).findFirst();
+		if (!classLoaderOptional.isPresent()) {
+			error(classLoaderOptional.getClass() + " is unsupported for adding extending CLASSPATH at runtime.");
 			return;
 		}
 		File libDir = ConfigurationDir.getConfigFile("lib");
-		Set<URL> currentCPElements = Stream.of(((URLClassLoader) classLoader).getURLs()).collect(Collectors.toSet());
-		Class<? extends ClassLoader> classLoaderClass = classLoader.getClass();
+		URLClassLoader urlClassLoader = classLoaderOptional.get();
+		Set<URL> currentCPElements = Stream.of(urlClassLoader.getURLs()).collect(Collectors.toSet());
+		Class<? extends ClassLoader> classLoaderClass = urlClassLoader.getClass();
 		try {
 			Method addUrlMethod = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
-			addUrlMethod.setAccessible(true);
+			ClassTools.trySetAccessible(addUrlMethod);
 			getFileStream(resourceDir, libDir).map(File::toURI).map(u -> {
 				try {
 					return u.toURL();
@@ -83,9 +88,9 @@ public class ConfigurationDirSetup {
 			}).filter(Objects::nonNull).filter(u -> !currentCPElements.contains(u)).forEach(u -> {
 				info("Adding to CLASSPATH: " + u);
 				try {
-					addUrlMethod.invoke(classLoader, u);
+					addUrlMethod.invoke(urlClassLoader, u);
 				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-					LOGGER.error("Could not add " + u + " to current classloader.", e);
+					LOGGER.error("Could not add {} to current classloader.", u, e);
 				}
 			});
 		} catch (NoSuchMethodException | SecurityException e) {

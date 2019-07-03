@@ -21,6 +21,7 @@ package org.mycore.vidconv.common.util;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,17 +36,21 @@ import org.reflections.Reflections;
  */
 public class EntityUtils {
 
-    private static final List<Class<?>> CACHED_ENTITIES = Collections.synchronizedList(new ArrayList<>());
+	private static final List<Class<?>> CACHED_ENTITIES = Collections.synchronizedList(new ArrayList<>());
 
-    public static List<Class<?>> populateEntities(List<String> pkgs) throws IOException {
-        synchronized (CACHED_ENTITIES) {
-            if (CACHED_ENTITIES.isEmpty()) {
-                CACHED_ENTITIES.addAll(
-                    pkgs.stream().map(pkg -> new Reflections(pkg).getTypesAnnotatedWith(XmlRootElement.class))
-                        .flatMap(ts -> ts.stream()).collect(Collectors.toList()));
-            }
-            return CACHED_ENTITIES;
-        }
-    }
+	public static List<Class<?>> populateEntities(String pkg) throws IOException {
+		return populateEntities(Arrays.asList(pkg));
+	}
+
+	public static List<Class<?>> populateEntities(List<String> pkgs) throws IOException {
+		synchronized (CACHED_ENTITIES) {
+			if (CACHED_ENTITIES.isEmpty()) {
+				CACHED_ENTITIES.addAll(
+						pkgs.stream().map(pkg -> new Reflections(pkg).getTypesAnnotatedWith(XmlRootElement.class))
+								.flatMap(ts -> ts.stream()).collect(Collectors.toList()));
+			}
+			return CACHED_ENTITIES;
+		}
+	}
 
 }

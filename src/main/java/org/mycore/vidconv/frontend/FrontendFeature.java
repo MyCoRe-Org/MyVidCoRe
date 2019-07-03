@@ -24,6 +24,7 @@ import org.apache.logging.log4j.Logger;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.moxy.json.MoxyJsonFeature;
 import org.glassfish.jersey.moxy.xml.MoxyXmlFeature;
+import org.mycore.vidconv.common.ClassTools;
 import org.mycore.vidconv.common.config.Configuration;
 import org.mycore.vidconv.frontend.filter.CacheFilter;
 import org.mycore.vidconv.frontend.provider.GenericExceptionMapper;
@@ -58,7 +59,7 @@ public class FrontendFeature implements Feature {
         Configuration.instance().getStrings("APP.Jersey.Features").forEach(cn -> {
             try {
                 LOGGER.info("Register Jersey Feature: {}", cn);
-                context.register(this.getClass().getClassLoader().loadClass(cn));
+                context.register(ClassTools.forName(cn));
             } catch (ClassNotFoundException e) {
                 LOGGER.error(e.getMessage(), e);
             }
