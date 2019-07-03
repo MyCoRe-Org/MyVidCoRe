@@ -24,7 +24,6 @@ package org.mycore.vidconv.common;
 
 import java.io.File;
 import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.InaccessibleObjectException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -91,7 +90,7 @@ public class ClassTools {
         try {
             Objects.requireNonNull(obj).setAccessible(true);
             return true;
-        } catch (InaccessibleObjectException | SecurityException e) {
+        } catch (SecurityException e) {
             LOGGER.warn("Couldn't set accessible flag for class {} because of {}.", obj.getClass(), e.getMessage());
             return false;
         }
