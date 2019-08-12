@@ -2,3 +2,7 @@
 /.settings/
 /.classpath
 /.project
+/node_modules/
+/.vscode/
+/package-lock.json
+/pom.xml.bak

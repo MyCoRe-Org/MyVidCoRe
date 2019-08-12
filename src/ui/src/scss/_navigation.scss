@@ -1,0 +1,357 @@
+$navbar-height: 50px !default;
+
+$sidebar-width: 225px !default;
+$sidebar-font-size: 1.1rem !default;
+
+.navbar {
+    padding: 0;
+  
+    .container-fluid {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
+    .navbar-header {
+        .navbar-logo {
+            float: left;
+            font-size: 1.2rem;
+            margin: 0px 10px;
+            text-indent: 5px;
+            line-height: 2.5em;
+         
+            &:hover, &:focus {
+                    text-decoration: none;
+            }
+         
+            @include media-breakpoint-only(xs) {
+                margin: 5px 10px;
+            }
+        }
+    }
+}
+
+.navbar-right {
+    margin-right: 0;
+}
+
+.navbar-dark {
+    @include gradient-vertical(rgba(#3C3C3C, 0.95), rgba(#222222, 0.95));
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    line-height: 1.25em;
+
+    .navbar-nav {
+        @include media-breakpoint-only(xs) {
+            float: right;
+            margin: 0;
+        }
+     
+        > li {
+            -webkit-tap-highlight-color: rgba(128, 128, 128, 0.5);
+            a {
+                padding: 15px 10px;
+                & > span {
+                    cursor: pointer;
+                }
+            }
+        
+            &:hover , &:focus {
+                @include gradient-vertical(#222222, #282828);
+                box-shadow: 0 3px 9px rgba(0, 0, 0, 0.25) inset;
+            }
+        
+            .dropdown-menu:before {
+                border-bottom: 8px solid rgba(0, 0, 0, 0.15);
+                border-left: 8px solid rgba(0, 0, 0, 0);
+                border-right: 8px solid rgba(0, 0, 0, 0);
+                content: "";
+                display: inline-block;
+                position: absolute;
+                right: 16px;
+                top: -9.5px;
+            }
+        
+            .dropdown-menu:after {
+                border-bottom: 8px solid #ffffff;
+                border-left: 8px solid rgba(0, 0, 0, 0);
+                border-right: 8px solid rgba(0, 0, 0, 0);
+                content: "";
+                display: inline-block;
+                position: absolute;
+                right: 16px;
+                top: -8px;
+            }
+        
+            .dropdown-menu {
+                margin-top: 3px;
+                position: absolute;
+
+                &.dropdown-menu-right {
+                    right: -10px;
+                    left: auto;
+                }
+            }
+        }
+    
+        & > .active > a {
+            @include gradient-vertical(#222222, #282828);
+            box-shadow: 0 3px 9px rgba(0, 0, 0, 0.25) inset;
+        }
+    
+        & > .dropdown.show > a {
+            @include gradient-vertical(#222222, #282828);
+            box-shadow: 0 3px 9px rgba(0, 0, 0, 0.25) inset;
+        }
+    
+        #user-info {
+            width: 300px;
+            
+            .controls {
+                background-color: #fafafa;
+            }
+            
+            @include media-breakpoint-only(xs) {
+                width: 250px;
+            }
+        }
+        
+    }
+}
+
+.navbar-header {
+    @include media-breakpoint-only(xs) {
+        float: left;
+    }
+}
+
+.navbar-toggler {
+    position: relative;
+    display: block;
+    float: right;
+    padding: 0 15px;
+    margin: 0;
+    height: $navbar-height;
+    border-radius: 0;
+    border: 0;
+    -webkit-tap-highlight-color: rgba(128, 128, 128, 0.5);
+  
+    @include media-breakpoint-only(xs) {
+        margin-right: 0;
+        padding: 0 10px;
+    }
+
+    @include media-breakpoint-up(sm) {
+        //display: none;
+    }
+
+    .navbar-dark & {
+        .navbar-toggler-icon {
+            color: #999;
+            pointer-events: none;
+        }
+    }
+
+    &:hover , &:focus {
+        .navbar-dark & {
+            .navbar-toggler-icon {
+                color: #fff;
+            }
+        }
+
+        @include gradient-vertical(#222222, #282828);
+        box-shadow: 0 3px 9px rgba(0, 0, 0, 0.25) inset;
+    }
+}
+
+/* ---------------------------------------------------
+    SIDEBAR STYLE
+----------------------------------------------------- */
+#sidebar {
+    width: $sidebar-width;
+    position: fixed;
+    top: $navbar-height;
+    bottom: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 999;
+    background: #f3f3f3;
+    @include gradient-horizontal(#f3f3f3, #dfdfdf, 93%, 100%);
+    color: #fff;
+    @include transition (left 0.5s ease-in-out 0s);
+    
+    overflow: auto;
+    overflow-x: hidden;
+    
+    &.active {
+        left: -$sidebar-width;
+    }
+
+    @include media-breakpoint-down(xs) {
+        left: -$sidebar-width;
+        overflow-y: scroll;
+        -webkit-overflow-scrolling: touch;
+        
+        &.active {
+            left: 0;
+        }
+    }
+
+    ul.components {
+        padding: 20px 0 ($navbar-height+20) 0;
+    }
+
+    ul {
+        p {
+            color: #fff;
+            padding: 10px;
+        }
+        
+        li {
+             overflow: hidden;
+            -webkit-tap-highlight-color: rgba($primary, 0.5);
+            
+            a {
+                padding: 10px;
+                font-size: $sidebar-font-size;
+                display: block;
+                color: #666666;
+                text-decoration: none !important;
+                
+                border-left: 3px solid transparent;
+                @include transition (color 0.5s ease 0s);
+                @include transition (border 0.5s ease 0s);
+                
+                &:hover {
+                    color: #000000;
+                    border-left: 3px solid $primary;
+                }
+            
+                &[data-toggle="collapse"] {
+                    position: relative;
+                }
+    
+                &[aria-expanded="false"]::before, &[aria-expanded="true"]::before {
+                    content: '\f078';
+                    display: inline-block;
+                    position: absolute;
+                    right: 20px;
+                    font-family: "Font Awesome 5 Free";
+                    font-size: 0.6em;
+                    font-weight: 900;
+                    line-height: 1.75rem;
+                    vertical-align: middle;
+                    @include transition (all 0.5s ease 0s);
+                }
+    
+                &[aria-expanded="true"]::before {
+                    transform: rotate(-180deg);
+                }
+            
+                &[aria-expanded="true"] {
+                    background: #e0e0e0;
+                    @include gradient-horizontal(#e0e0e0, #d0d0d0, 93%, 100%);
+                }
+            }
+        
+            &.active > a {
+                color: #000;
+                
+                &:before {
+                    color: #ffffff;
+                    content: "\f0d9";
+                    display: block;
+                    font-family: "Font Awesome 5 Free";
+                    font-size: 20px;
+                    font-weight: 900;
+                    height: 27px;
+                    line-height: normal;
+                    position: absolute;
+                    right: -21px;
+                    width: 27px;
+                }
+            }
+        }
+    
+        ul a {
+            font-size: $sidebar-font-size * 0.95;
+            padding-left: 30px !important;
+            background: #e0e0e0;
+            @include gradient-horizontal(#e0e0e0, #d0d0d0, 93%, 100%);
+            
+            &.active {
+                color: #000;
+            }
+            
+            &.active:before {
+                color: #ffffff;
+                content: "\f0d9";
+                display: block;
+                font-family: "Font Awesome 5 Free";
+                font-size: 20px;
+                font-weight: 900;
+                height: 27px;
+                line-height: normal;
+                position: absolute;
+                right: -21px;
+                width: 27px;
+            }
+        }
+    }
+}
+
+/* ---------------------------------------------------
+    CONTENT STYLE
+----------------------------------------------------- */
+#content {
+    display: block;
+    margin-left: $sidebar-width + 5px;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-bottom: 1em;
+    
+    @include transition(all 0.5s ease-in-out 0s);
+    
+    .spinner-container {
+        top: $navbar-height;
+        left: $sidebar-width;       
+        @include transition(all 0.5s ease-in-out 0s); 
+    }
+    
+    &.active {
+        margin-left: 0;
+        
+        .spinner-container {
+            left: 0;        
+        }
+    }
+    
+    @include media-breakpoint-down(xs) {
+        position: absolute;
+        left: 0;
+        right: 0;
+        margin-left: 0px;
+        
+        .spinner-container {
+            left: 0;        
+        }
+        
+        &.active {
+            margin-left: 0px;
+            left: $sidebar-width + 5px;
+            right: ($sidebar-width + 5px) * -1;
+            
+            .spinner-container {
+                left: $sidebar-width;        
+            }
+        }
+    }
+}
+
+#breadcrumb {
+    
+    > .container {
+        padding-right: 0;
+        padding-left: 0;
+    }
+}

@@ -1,0 +1,103 @@
+<div id="settings">
+    <ui-view>
+        <form novalidate [formGroup]="form" (ngSubmit)="onSubmit(form)">
+            <fieldset *ngIf="hwaccels && hwaccels.length !== 0">
+                <legend>{{ 'settings.legend.hwAccels' | translate }}</legend>
+                <label>{{ 'settings.autoBalancing' | translate }}</label>
+                <div class="form-group" *ngFor="let hw of hwaccels; let i = index">
+                    <div class="custom-control custom-switch">
+                        <input [id]="'hwaccel-' + hw.index" type="checkbox" class="custom-control-input"
+                            [checked]="isHwAccelsChecked(i)" (change)="onHWAccelChange(i)">
+                        <label [attr.for]="'hwaccel-' + hw.index" class="custom-control-label">#{{ hw.index }} -
+                            {{ hw.name }}</label>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend *ngIf="hwaccels && hwaccels.length !== 0">{{ 'settings.legend.converter' | translate }}</legend>
+                <ngb-tabset #t="ngbTabset" (tabChange)="beforeTabChange($event)" [destroyOnHide]="false"
+                    [activeId]="activeTab">
+                    <ngb-tab formArrayName="output"
+                        *ngFor="let o of output.controls; let i = index; let isFirst = first; let isLast = last"
+                        [id]="'tab-output-' + i">
+                        <ng-template ngbTabTitle>
+                            <span>{{ 'settings.outputLabel' | translate:{ index: i + 1 } }}</span>
+                            <button *ngIf="isFirst !== isLast || !isFirst && !isLast" type="button"
+                                class="remove-btn ml-2" (click)="removeOutput($event, i)">
+                                <i class="fas fa-minus text-danger"></i>
+                            </button>
+                        </ng-template>
+                        <ng-template ngbTabContent>
+                            <fieldset [formGroupName]="i" class="border border-top-0 p-2">
+                                <div class="form-group">
+                                    <label for="output-format-{{ i }}">{{ 'settings.format' | translate }}</label>
+                                    <select class="form-control custom-select" [id]="'output-format-' + i"
+                                        formControlName="format" (change)="onFormatChange(i)"
+                                        [ngClass]="{'is-invalid':output.controls[i].controls.format.errors && output.controls[i].controls.format.dirty}">
+                                        <option *ngFor="let format of allowedFormats" [value]="format.name">
+                                            {{ format.description }}
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label
+                                        for="output-fileappendix-{{ i }}">{{ 'settings.filenameAppendix' | translate }}</label>
+                                    <input type="text" class="form-control" [id]="'output-fileappendix-' + i"
+                                        formControlName="filenameAppendix"
+                                        placeholder="{{ 'settings.filenameAppendix' | translate }}"
+                                        [ngClass]="{'is-invalid':output.controls[i].controls.filenameAppendix.errors && output.controls[i].controls.filenameAppendix.dirty}">
+                                </div>
+
+                                <ng-container *ngIf="selectedFormat[i]">
+                                    <ngb-tabset #t="ngbTabset" [destroyOnHide]="false">
+                                        <ngb-tab formArrayName="video" [id]="'tab-output-' + i + '-video'"
+                                            [title]="'settings.video' | translate">
+                                            <ng-template ngbTabContent>
+                                                <ui-settings-video [settings]="settings"
+                                                    [selectedFormat]="selectedFormat[i]" [index]="i" [type]="'video'">
+                                                </ui-settings-video>
+                                            </ng-template>
+                                        </ngb-tab>
+
+                                        <ngb-tab *ngIf="hwaccels?.length > 0" formArrayName="video-fallback"
+                                            [id]="'tab-output-' + i + '-video-fallback'"
+                                            [title]="'settings.videoFallback' | translate">
+                                            <ng-template ngbTabContent>
+                                                <ui-settings-video [settings]="settings"
+                                                    [selectedFormat]="selectedFormat[i]" [index]="i"
+                                                    [type]="'video-fallback'">
+                                                </ui-settings-video>
+                                            </ng-template>
+                                        </ngb-tab>
+
+                                        <ngb-tab formArrayName="audio" [id]="'tab-output-' + i + '-audio'"
+                                            [title]="'settings.audio' | translate">
+                                            <ng-template ngbTabContent>
+                                                <ui-settings-audio [settings]="settings"
+                                                    [selectedFormat]="selectedFormat[i]" [index]="i" [type]="'audio'">
+                                                </ui-settings-audio>
+                                            </ng-template>
+                                        </ngb-tab>
+                                    </ngb-tabset>
+                                </ng-container>
+                            </fieldset>
+                        </ng-template>
+                    </ngb-tab>
+
+                    <ngb-tab id="tab-output-add">
+                        <ng-template ngbTabTitle>
+                            <i class="fas fa-plus"></i>
+                        </ng-template>
+                    </ngb-tab>
+                </ngb-tabset>
+            </fieldset>
+
+            <div class="d-flex justify-content-end mt-2">
+                <button type="submit" class="btn btn-primary mr-1"
+                    [disabled]="form.invalid">{{ 'button.save' | translate }}</button>
+            </div>
+        </form>
+    </ui-view>
+</div>

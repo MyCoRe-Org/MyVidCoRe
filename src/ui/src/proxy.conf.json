@@ -1,0 +1,22 @@
+{
+    "/widget/*": {
+        "target": "http://localhost:8085/",
+        "secure": false,
+        "changeOrigin": true
+    },
+    "/converter/*": {
+        "target": "http://localhost:8085/",
+        "secure": false,
+        "changeOrigin": true
+    },
+    "/plugins/*": {
+        "target": "http://localhost:8085/",
+        "secure": false,
+        "changeOrigin": true
+    },
+    "/settings/*": {
+        "target": "http://localhost:8085/",
+        "secure": false,
+        "changeOrigin": true
+    }
+}

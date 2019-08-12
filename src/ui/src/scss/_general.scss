@@ -1,0 +1,173 @@
+/**
+ * Generic Helpers
+ **/
+.w-auto {
+    width: auto !important;
+}
+
+.str-truncat {
+	@include text-truncate;
+}
+
+.str-truncat-100 {
+	@include text-truncate;
+	display: inline-block;
+	vertical-align: top;
+	max-width: 100%
+}
+
+.sortable {
+    cursor: pointer;
+    
+    > th {
+        @include text-truncate;
+    }
+
+    .sort-icon {
+        margin-left: 5px;
+    }
+}
+
+.sort-icon {
+    &.fa-sort-up, &.fa-sort-down {
+        color: $primary;
+    }
+}
+
+/**
+ * Generic Elements
+ **/
+ 
+dl {
+     line-height: 1.1em;
+     
+     > dd {
+         color: $text-muted;
+    }
+}
+
+fieldset {
+    legend {
+        display: block;
+        width: 100%;
+        padding: 0;
+        margin-bottom: 20px;
+        font-size: 21px;
+        line-height: inherit;
+        border: 0;
+        border-bottom: 1px solid $table-border-color;
+
+        > a, > button {
+            &[data-toggle="collapse"], &[aria-expanded="false"], &.collapsed {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                text-decoration: none;
+
+                &:after {
+                    content: "\f078";
+                    display: flex;
+                    font-family: "Font Awesome 5 Free";
+                    font-weight: 900;
+                    font-size: 1rem;
+                    margin-left: 0.5rem;
+                }
+            }
+        
+            &[aria-expanded="true"] {
+                &:after {
+                    content: "\f077";
+                    font-family: "Font Awesome 5 Free";
+                    font-weight: 900;
+                    font-size: 1rem;
+                    margin-left: 0.5rem;
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Boostrap Ovewrites (not working with vars)
+ **/
+ 
+.btn, .page-link {
+    @include box-shadow(0 -2px rgba(0, 0, 0, 0.05) inset);
+}
+
+.btn-default {
+    background-color: #fff;
+    color: lighten($body-color, 10%);
+    border-color: $input-border-color;
+    
+    &:active, &:focus, &:hover {
+        background-color: darken(#fff, 5%);
+    }
+}
+
+.btn-primary {
+    color: #fff;
+    
+    &.disabled, &:disabled {
+        color: darken(#fff, 5%);
+    }
+}
+
+/**
+ * Panel
+ **/
+
+.panel-default {
+    border: $table-border-width solid $table-border-color;
+    @include border-radius(2px);
+    @include box-shadow(0 1px 1px rgba(0, 0, 0, 0.05));
+    
+    .panel-heading {
+        background-color: #fafafa;
+        @include border-top-radius(2px);
+        @include box-shadow(0 -2px 0 rgba(0, 0, 0, 0.05) inset);
+        border-bottom: 1px solid $table-border-color;
+        color: #333333;
+        padding: $table-cell-padding;
+    }
+
+    .panel-footer {
+        background-color: #ffffff;
+        @include border-bottom-radius(2px);
+        border-top: $table-border-width solid $table-border-color;
+        padding: $table-cell-padding;
+    }
+}
+
+/**
+ * Search Form
+ **/
+ 
+.search-holder {
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+	.search-field-holder {
+		-webkit-flex: 1 0 auto;
+		flex: 1 0 auto;
+		position: relative;
+		margin-right: 0;
+		> .loading-indicator {
+			position: absolute;
+			top: 2px;
+			right: 0;
+			z-index: 2;
+			display: none;
+			width: 34px;
+			height: 34px;
+			line-height: 34px;
+			text-align: center;
+			pointer-events: none;
+			color: $primary;
+			&.is-loading {
+				display: block;
+			}
+		}
+	}
+}
