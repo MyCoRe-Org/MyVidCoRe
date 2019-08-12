@@ -18,7 +18,7 @@
 	<properties>
 		<eclipselink.version>2.7.4</eclipselink.version>
 		<jersey.version>2.29</jersey.version>
-		<log4j.version>2.11.2</log4j.version>
+		<log4j.version>2.12.1</log4j.version>
 		<grizzly.version>2.4.4</grizzly.version>
 		<encoding>UTF-8</encoding>
 		<java.version>8</java.version>
@@ -206,7 +206,7 @@
 		<dependency>
 			<groupId>org.glassfish.hk2.external</groupId>
 			<artifactId>jakarta.inject</artifactId>
-			<version>2.5.0</version>
+			<version>2.6.0</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
@@ -225,7 +225,7 @@
 		<dependency>
 			<groupId>org.ehcache</groupId>
 			<artifactId>ehcache</artifactId>
-			<version>3.7.0</version>
+			<version>3.8.0</version>
 		</dependency>
 
 		<dependency>
