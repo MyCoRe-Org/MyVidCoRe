@@ -70,7 +70,6 @@ public class WebResource {
     @Path("{fileName:.+}")
     @Produces("*/*")
     public Response getWebResource(@PathParam("fileName") String fileName) {
-        LOGGER.info("getWebResource {}", fileName);
         try {
             final Optional<ResourceWrapper> res = getResource(fileName);
             if (res.isPresent()) {
