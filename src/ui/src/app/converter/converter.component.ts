@@ -70,7 +70,6 @@ export class ConverterComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         this.timer.unsubscribe();
-        this.socket.unsubscribe();
 
         this.videoPlayer.forEach(p => p.dispose());
     }
