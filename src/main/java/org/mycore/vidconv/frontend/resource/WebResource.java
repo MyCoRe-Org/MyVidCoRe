@@ -88,7 +88,6 @@ public class WebResource {
 
     private Optional<ResourceWrapper> getResource(String fileName) {
         final String fn = RESOURCE_DIR + File.separator + fileName;
-        LOGGER.info("getResource {}", fn);
         try (final InputStream is = CLASS_LOADER.getResourceAsStream(fn)) {
             final ResourceWrapper res = new ResourceWrapper(fn, is);
             LOGGER.info("loaded resource \"" + fileName + "\" with mime type \"" + res.getMimeType() + "\"");
