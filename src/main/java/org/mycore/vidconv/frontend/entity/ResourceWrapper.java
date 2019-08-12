@@ -30,6 +30,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 
 import org.mycore.vidconv.common.util.Hash;
+import org.mycore.vidconv.common.util.MimeType;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
@@ -54,9 +55,7 @@ public class ResourceWrapper implements Serializable {
     public ResourceWrapper(final String fileName, final String mimeType, final InputStream is) {
         try {
             this.fileName = fileName;
-            // FIXME
-            // this.mimeType = mimeType != null ? mimeType : MimeType.detect(fileName);
-            this.mimeType = null;
+            this.mimeType = mimeType != null ? mimeType : MimeType.detect(fileName);
             this.content = toByteArray(is);
             this.etag = Hash.getMD5String(new String(this.content, StandardCharsets.UTF_8));
         } catch (IOException | NoSuchAlgorithmException e) {
