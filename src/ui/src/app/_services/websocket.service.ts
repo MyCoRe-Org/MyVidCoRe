@@ -9,6 +9,12 @@ export class WebsocketService {
 
     private subject: Subject<MessageEvent>;
 
+    static buildWSURL(context: string) {
+        const l = window.location;
+        return ((l.protocol === "https:") ? "wss://" : "ws://") + l.hostname +
+            (((l.port !== "80") && (l.port !== "443")) ? ":" + l.port : "") + "/ws" + context;
+    }
+
     public connect(url: string): Subject<MessageEvent> {
         if (!this.subject) {
             this.subject = this.create(url);

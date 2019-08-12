@@ -6,6 +6,5 @@
 export const environment = {
     production: false,
     apiBaseUrl: "",
-    apiHttpOptions: {},
-    wsBaseUrl: "ws://localhost:8085/",
+    apiHttpOptions: {}
 };
