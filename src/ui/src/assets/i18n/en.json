@@ -75,6 +75,9 @@
         "home": "Home"
     },
     "settings": {
+        "action": {
+            "saved": "Settings saved succesfully."
+        },
         "allowUpscale": "allow Upscale",
         "asSource": "same as Source",
         "audio": "Audio",

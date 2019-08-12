@@ -75,6 +75,9 @@
         "home": "Startseite"
     },
     "settings": {
+        "action": {
+            "saved": "Einstellungen wurden erfolgreich gespeichert."
+        },
         "allowUpscale": "erlaube Hochskalieren",
         "asSource": "wie Quelle",
         "audio": "Audio",

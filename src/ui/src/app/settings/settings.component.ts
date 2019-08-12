@@ -51,7 +51,8 @@ export class SettingsComponent implements OnInit {
 
     output: FormArray;
 
-    constructor(private $capi: ConverterApiService, private $spinner: SpinnerService, public $fb: FormBuilder) {
+    constructor(private $api: SettingsApiService, private $capi: ConverterApiService,
+        private $error: ErrorService, private $spinner: SpinnerService, public $fb: FormBuilder) {
     }
 
     ngOnInit() {
@@ -59,7 +60,8 @@ export class SettingsComponent implements OnInit {
 
         this.output = this.$fb.array([]);
         this.form = this.$fb.group({
-            output: this.output
+            output: this.output,
+            plugins: this.$fb.array([])
         });
 
         if (this.hwaccels && this.hwaccels.length > 0) {
@@ -231,7 +233,6 @@ export class SettingsComponent implements OnInit {
 
     onSubmit({ value, valid }) {
         if (valid) {
-            console.log(value);
             value.output.forEach((o: Output) => {
                 ["video", "video-fallback", "audio"].forEach(type => {
                     if (o[type]) {
@@ -247,7 +248,16 @@ export class SettingsComponent implements OnInit {
                     }
                 });
             });
+
             console.log(value);
+
+            this.$api.saveSettings(value).toPromise().then((res) => {
+                this.$spinner.setLoadingState(false);
+                this.$error.handleMessage("success", res, "settings.action.saved");
+            }).catch((err) => {
+                this.$spinner.setLoadingState(false);
+                this.$error.handleError(err);
+            });
         }
     }
 
