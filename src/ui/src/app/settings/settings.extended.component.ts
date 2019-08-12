@@ -76,7 +76,7 @@ export class SettingsExtendedComponent implements OnInit, OnChanges {
 
     static patchValues(fg: FormGroup, encParams: Array<(key: string) => any>, params: (key: string) => string) {
         encParams.forEach((p: any) => {
-            if (params[p.name] && fg.contains(p.name)) {
+            if (params && params[p.name] && fg.contains(p.name)) {
                 fg.get(p.name).patchValue(SettingsExtendedComponent.parseValue(p, params[p.name]));
             }
         });
