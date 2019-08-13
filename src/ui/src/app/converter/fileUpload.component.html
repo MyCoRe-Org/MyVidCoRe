@@ -1,7 +1,7 @@
 <div fileDropZone (files)="onFiles($event)"
     class="file-drop-zone d-flex justify-content-center align-items-center mb-1 p-1">
     <div>
-        <label for="files" class="m-0">{{ 'converter.upload.placeholderDrop' | translate }}</label>
+        <label for="files" class="p-4 m-0">{{ 'converter.upload.placeholderDrop' | translate }}</label>
         <input #filesInput type="file" id="files" name="files" [accept]="accept" multiple [hidden]="true">
     </div>
 </div>

@@ -148,15 +148,13 @@ export class FileDropZoneDirective {
 
     @HostListener("dragenter", ["$event"])
     @HostListener("dragover", ["$event"])
-    onDragOver(event: Event) {
-        event.preventDefault();
-
-        // TODO check if accept
+    onDragOver(event: any) {
+        this.preventDefault(event);
     }
 
     @HostListener("drop", ["$event"])
     onDrop(event: any) {
-        event.preventDefault();
+        this.preventDefault(event);
 
         if (event.dataTransfer.items) {
             this.getFilesWebkitDataTransferItems(event.dataTransfer.items).then((files) => this.upload(files));
@@ -167,7 +165,7 @@ export class FileDropZoneDirective {
 
     @HostListener("change", ["$event"])
     onChange(event: any) {
-        event.preventDefault();
+        this.preventDefault(event);
 
         if (event.target.webkitEntries) {
             this.getFilesWebkitDataTransferItems(event.target.webkitEntries).then((files) => this.upload(files));
@@ -207,6 +205,11 @@ export class FileDropZoneDirective {
             }
             Promise.all(entriesPromises).then(() => resolve(files));
         });
+    }
+
+    private preventDefault(event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
     }
 
     private upload(files: any) {
