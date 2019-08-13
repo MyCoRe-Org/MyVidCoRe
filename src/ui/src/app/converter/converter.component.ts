@@ -43,7 +43,7 @@ export class ConverterComponent implements OnInit, OnDestroy {
 
     start = 0;
 
-    limit = 10;
+    limit = 50;
 
     end = this.limit;
 
@@ -66,7 +66,7 @@ export class ConverterComponent implements OnInit, OnDestroy {
     constructor(private $api: ConverterApiService, private $error: ErrorService, private $state: StateService,
         private $jobsvc: ConverterJobService) {
         this.page = this.$state.params.page || 1;
-        this.limit = this.$state.params.limit || 10;
+        this.limit = this.$state.params.limit || 50;
     }
 
     ngOnInit() {
@@ -246,7 +246,7 @@ export const ConverterStates = {
         },
         limit: {
             type: "int",
-            value: 10,
+            value: 50,
             squash: true
         }
     },
