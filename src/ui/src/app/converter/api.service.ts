@@ -14,12 +14,12 @@ export class ConverterApiService extends ApiService {
         super($http);
     }
 
-    getRunning(start: number = 1, limit: number = 10) {
-        return this.$http.get(`${this.base}/widget/converter/${start}/${limit}/isdone/status`, this.forceNoCache(true));
+    getRunning(page: number = 1, limit: number = 10) {
+        return this.$http.get(`${this.base}/widget/converter/${page}/${limit}/isdone/status`, this.forceNoCache(true));
     }
 
-    getDone(start: number = 1, limit: number = 50) {
-        return this.$http.get(`${this.base}/widget/converter/${start}/${limit}/!isdone/status`, this.forceNoCache(true));
+    getDone(page: number = 1, limit: number = 50) {
+        return this.$http.get(`${this.base}/widget/converter/${page}/${limit}/!isdone/status`, this.forceNoCache(true));
     }
 
     getJobStatus(id: string) {
