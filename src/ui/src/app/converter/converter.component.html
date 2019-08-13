@@ -131,6 +131,15 @@
                     <strong>{{ 'converter.noDoneJobs' | translate }}</strong>
                 </div>
             </div>
+            <div class="card-footer d-flex justify-content-between" *ngIf="doneJobs?.total > doneJobs?.limit">
+                <div>
+                    <span
+                        class="d-none d-md-inline-block pt-2 pb-2">{{ 'dataTable.filterInfo' | translate:{start: start + 1, limit: end, total: doneJobs.total} }}</span>
+                </div>
+                <ngb-pagination class="mb-0" (pageChange)="pageChange($event)" [collectionSize]="doneJobs.total" [(page)]="page"
+                    [maxSize]="5" [pageSize]="limit" [rotate]="true" [ellipses]="false" [boundaryLinks]="false">
+                </ngb-pagination>
+            </div>
         </div>
     </ui-view>
 </div>

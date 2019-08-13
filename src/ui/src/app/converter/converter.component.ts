@@ -14,6 +14,7 @@ import { ErrorService } from "../_services/error.service";
 
 import { Job } from "./definitions";
 import { hashCode } from "../definitions/index.js";
+import { StateService } from "@uirouter/core";
 
 interface Source {
     src: string;
@@ -38,6 +39,14 @@ export class ConverterComponent implements OnInit, OnDestroy {
 
     baseUrl = environment.apiBaseUrl;
 
+    page = 1;
+
+    start = 0;
+
+    limit = 10;
+
+    end = this.limit;
+
     timer: Subscription;
 
     socket: Subscription;
@@ -54,7 +63,10 @@ export class ConverterComponent implements OnInit, OnDestroy {
 
     videoPlayer: Map<string, PlayerResSwitch> = new Map();
 
-    constructor(private $api: ConverterApiService, private $error: ErrorService, private $jobsvc: ConverterJobService) {
+    constructor(private $api: ConverterApiService, private $error: ErrorService, private $state: StateService,
+        private $jobsvc: ConverterJobService) {
+        this.page = this.$state.params.page || 1;
+        this.limit = this.$state.params.limit || 10;
     }
 
     ngOnInit() {
@@ -125,8 +137,15 @@ export class ConverterComponent implements OnInit, OnDestroy {
         return scale;
     }
 
+    pageChange(page: number) {
+        this.page = page;
+        this.start = (this.page - 1) * this.limit;
+        this.end = Math.min(this.start + this.limit, this.doneJobs.total);
+        this.transitionTo();
+    }
+
     private refreshDone() {
-        this.$api.getDone().toPromise().then((res: any) => this.doneJobs = res).
+        this.$api.getDone(this.page || 1, this.limit).toPromise().then((res: any) => this.doneJobs = res).
             catch(err => this.$error.handleError(err)).
             then(() => this.buildDone());
     }
@@ -176,6 +195,9 @@ export class ConverterComponent implements OnInit, OnDestroy {
     private buildDone() {
         this.mergeJobs(this.doneJobs && this.doneJobs.converter || [], this.done);
         this.done = this.done.filter(j => !this.filterDone(j)).map(this.injectHashCode).sort(this.sortByEndTime);
+
+        this.start = this.doneJobs.start || 0;
+        this.end = Math.min(this.start + this.limit, this.doneJobs.total);
     }
 
     private buildRunning() {
@@ -198,6 +220,13 @@ export class ConverterComponent implements OnInit, OnDestroy {
         this.done = this.done.filter(j => !this.filterDone(j)).map(this.injectHashCode);
     }
 
+    private transitionTo() {
+        this.$state.transitionTo(this.$state.$current.name, {
+            page: this.page,
+            limit: this.limit
+        }, { reload: true });
+    }
+
 }
 
 export const ConverterStates = {
@@ -208,5 +237,17 @@ export const ConverterStates = {
         parentState: "home",
         breadcrumb: "converter.breadcrumb",
         requiresAuth: false
+    },
+    params: {
+        page: {
+            type: "int",
+            value: 1,
+            squash: true
+        },
+        limit: {
+            type: "int",
+            value: 10,
+            squash: true
+        }
     },
 };
