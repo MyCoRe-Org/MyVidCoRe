@@ -5,7 +5,6 @@ import { Settings, Audio, AllowedFormat } from "./definitions";
 import {
     DEFAULT_BITRATES
 } from "./defaults";
-import { SettingsExtendedComponent } from "./settings.extended.component";
 
 @Component({
     selector: "ui-settings-audio",
