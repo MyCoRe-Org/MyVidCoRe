@@ -4,9 +4,8 @@ import { CommonModule } from "@angular/common";
 import { GaugeModule } from "angular-gauge";
 import { TranslateModule } from "@ngx-translate/core";
 
-import { WebsocketService } from "../_services/websocket.service";
-
 import { NVMonitorComponent } from "./nvmonitor.component";
+import { SystemMonitorComponent } from "./sysmonitor.component";
 
 @NgModule({
     imports: [
@@ -17,13 +16,14 @@ import { NVMonitorComponent } from "./nvmonitor.component";
     entryComponents: [
     ],
     declarations: [
-        NVMonitorComponent
+        NVMonitorComponent,
+        SystemMonitorComponent
     ],
     exports: [
-        NVMonitorComponent
+        NVMonitorComponent,
+        SystemMonitorComponent
     ],
     providers: [
-        WebsocketService
     ]
 })
 

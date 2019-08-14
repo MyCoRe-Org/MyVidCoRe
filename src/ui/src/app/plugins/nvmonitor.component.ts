@@ -2,6 +2,8 @@ import { Component, OnInit } from "@angular/core";
 
 import { Subscription } from "rxjs";
 
+import { WebsocketService } from "../_services/websocket.service";
+
 import { NVMonitorService, NVMonitorMessage } from "./nvmonitor.service";
 
 interface GPUAttrib {
@@ -16,7 +18,7 @@ interface GPUEntry {
 @Component({
     selector: "ui-nvmonitor-plugin",
     templateUrl: "./nvmonitor.component.html",
-    providers: [NVMonitorService]
+    providers: [WebsocketService, NVMonitorService]
 })
 export class NVMonitorComponent implements OnInit {
 

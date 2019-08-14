@@ -1,8 +1,9 @@
-ui-nvmonitor-plugin {
+ui-nvmonitor-plugin, ui-sysmonitor-plugin {
     display: flex;
     flex-direction: row;
     padding-right: 0.5rem;
     margin-top: 0.25rem;
+    float: left;
 
     @include media-breakpoint-down(sm) {
         display: none;

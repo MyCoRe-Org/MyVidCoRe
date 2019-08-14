@@ -80,6 +80,11 @@
             "encoder": "Encoder GPU #{index}",
             "memory": "Speicher GPU #{index}",
             "temperature": "Temperatur GPU #{index}"
+        },
+        "sysmonitor": {
+            "cpu-load": "Systemauslastung",
+            "memory": "Speicherauslastung",
+            "swap": "Speicherauslastung (Swap)"
         }
     },
     "settings": {

@@ -1,0 +1,25 @@
+<ng-template #gaugeTemplate let-name="name" let-attrib="attrib" let-max="max" let-startAngle="startAngle"
+    let-endAngle="endAngle" let-class="class">
+    <mwl-gauge *ngIf="attrib" [id]="name" class="gauge-container {{ name }} {{ class }}"
+        title="{{ 'plugin.sysmonitor.' + name | translate }}" [max]="max" [dialStartAngle]="startAngle"
+        [dialEndAngle]="endAngle" [value]="attrib.value" [label]="gaugeLabel(name, attrib)" [animated]="true"
+        [animationDuration]="1">
+    </mwl-gauge>
+</ng-template>
+
+<div *ngIf="entries" class="gauges d-inline-flex flex-row">
+    <ng-container
+        *ngTemplateOutlet="gaugeTemplate;context:{name: 'cpu-load', attrib: entries['cpu-load'], max: 100, startAngle: 135, endAngle: 45}">
+    </ng-container>
+    <ng-container
+        *ngTemplateOutlet="gaugeTemplate;context:{name: 'cpu-temp', attrib: entries['cpu-temp'], max: 100, startAngle: 135, endAngle: 45}">
+    </ng-container>
+    <div class="d-inline-flex flex-column">
+        <ng-container
+            *ngTemplateOutlet="gaugeTemplate;context:{name: 'memory', attrib: entries['mem-available'], max: entries['mem-total']?.value, startAngle: 180, endAngle: 0, class: 'align-self-start mb-1'}">
+        </ng-container>
+        <ng-container
+            *ngTemplateOutlet="gaugeTemplate;context:{name: 'swap', attrib: entries['swap-used'], max: entries['swap-total']?.value, startAngle: 180, endAngle: 0, class: 'align-self-end'}">
+        </ng-container>
+    </div>
+</div>
