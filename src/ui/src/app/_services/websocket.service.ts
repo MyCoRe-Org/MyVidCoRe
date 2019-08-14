@@ -16,7 +16,7 @@ export class WebsocketService {
     private subject: Subject<MessageEvent>;
 
     static buildWSURL(context: string) {
-        const l = !environment.production && new URL(environment.apiBaseUrl) || window.location;
+        const l = !environment.production && environment.apiBaseUrl.length !== 0 && new URL(environment.apiBaseUrl) || window.location;
         return ((l.protocol === "https:") ? "wss://" : "ws://") + l.hostname +
             (!environment.production && environment.apiBaseUrl.length === 0 ?
                 ":8085" : ((l.port !== "80") && (l.port !== "443")) ? ":" + l.port : ""
