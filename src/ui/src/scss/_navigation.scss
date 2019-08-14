@@ -22,10 +22,6 @@ $sidebar-font-size: 1.1rem !default;
             &:hover, &:focus {
                     text-decoration: none;
             }
-         
-            @include media-breakpoint-only(xs) {
-                margin: 5px 10px;
-            }
         }
     }
 }
