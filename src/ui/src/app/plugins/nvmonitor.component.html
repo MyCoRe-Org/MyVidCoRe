@@ -1,7 +1,7 @@
 <ng-template #gaugeTemplate let-index="index" let-name="name" let-attrib="attrib" let-startAngle="startAngle"
     let-endAngle="endAngle" let-class="class">
     <mwl-gauge *ngIf="attrib" [id]="name + '-' + index" class="gauge-container {{ name }} {{ class }}"
-        title="{{ 'nvmonitor.' + name | translate: index }}" [max]="['C', 'F'].indexOf(attrib.unit) !== -1 ? 250 : 100"
+        title="{{ 'plugin.nvmonitor.' + name | translate:{index: index} }}" [max]="['C', 'F'].indexOf(attrib.unit) !== -1 ? 250 : 100"
         [dialStartAngle]="startAngle" [dialEndAngle]="endAngle" [value]="attrib.value" [label]="gaugeLabel(attrib)"
         [animated]="true" [animationDuration]="1">
     </mwl-gauge>

@@ -74,6 +74,14 @@
         "dashboard": "Dashboard",
         "home": "Home"
     },
+    "plugin": {
+        "nvmonitor": {
+            "decoder": "Decoder GPU #{index}",
+            "encoder": "Encoder GPU #{index}",
+            "memory": "Memory GPU #{index}",
+            "temperature": "Temperature GPU #{index}"
+        }
+    },
     "settings": {
         "action": {
             "saved": "Settings saved succesfully."
