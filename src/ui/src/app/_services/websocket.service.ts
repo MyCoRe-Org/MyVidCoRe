@@ -16,9 +16,11 @@ export class WebsocketService {
     private subject: Subject<MessageEvent>;
 
     static buildWSURL(context: string) {
-        const l = window.location;
+        const l = !environment.production && new URL(environment.apiBaseUrl) || window.location;
         return ((l.protocol === "https:") ? "wss://" : "ws://") + l.hostname +
-            (!environment.production ? ":8085" : ((l.port !== "80") && (l.port !== "443")) ? ":" + l.port : "") + "/ws" + context;
+            (!environment.production && environment.apiBaseUrl.length === 0 ?
+                ":8085" : ((l.port !== "80") && (l.port !== "443")) ? ":" + l.port : ""
+            ) + "/ws" + context;
     }
 
     public connect(url: string, reconnect: boolean = true): Subject<MessageEvent> {
