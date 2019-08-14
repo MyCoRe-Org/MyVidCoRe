@@ -1,0 +1,26 @@
+<ng-template #gaugeTemplate let-index="index" let-name="name" let-attrib="attrib" let-startAngle="startAngle"
+    let-endAngle="endAngle" let-class="class">
+    <mwl-gauge *ngIf="attrib" [id]="name + '-' + index" class="gauge-container {{ name }} {{ class }}"
+        title="{{ 'nvmonitor.' + name | translate: index }}" [max]="['C', 'F'].indexOf(attrib.unit) !== -1 ? 250 : 100"
+        [dialStartAngle]="startAngle" [dialEndAngle]="endAngle" [value]="attrib.value" [label]="gaugeLabel(attrib)"
+        [animated]="true" [animationDuration]="1">
+    </mwl-gauge>
+</ng-template>
+
+<div class="gauges d-inline-flex flex-row" *ngFor="let e of entries; let i = index; trackBy: trackByGPU"
+    [id]="'gpu-' + i">
+    <ng-container
+        *ngTemplateOutlet="gaugeTemplate;context:{index: i, name: 'encoder', attrib: e['enc'], startAngle: 135, endAngle: 45}">
+    </ng-container>
+    <ng-container
+        *ngTemplateOutlet="gaugeTemplate;context:{index: i, name: 'decoder', attrib: e['dec'], startAngle: 135, endAngle: 45}">
+    </ng-container>
+    <div class="d-inline-flex flex-column">
+        <ng-container
+            *ngTemplateOutlet="gaugeTemplate;context:{index: i, name: 'memory', attrib: e['mem'], startAngle: 180, endAngle: 0, class: 'align-self-start mb-1'}">
+        </ng-container>
+        <ng-container
+            *ngTemplateOutlet="gaugeTemplate;context:{index: i, name: 'temperature', attrib: e['temp'], startAngle: 180, endAngle: 0, class: 'align-self-end'}">
+        </ng-container>
+    </div>
+</div>

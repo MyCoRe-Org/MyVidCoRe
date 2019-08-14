@@ -26,6 +26,7 @@ import { ErrorService } from "./_services/error.service";
 import { BreadcrumbModule } from "./breadcrumb/breadcrumb.module";
 import { SpinnerModule } from "./spinner/spinner.module";
 import { PipesModule } from "./_pipes/pipes.module";
+import { PluginsModule } from "./plugins/plugins.module";
 
 import { AppComponent } from "./app.component";
 
@@ -74,6 +75,7 @@ export const SettingsFutureState = {
         NgOptionHighlightModule,
         PipesModule,
         NgbModule,
+        PluginsModule,
         ToastrModule.forRoot({
             autoDismiss: true,
             timeOut: 10000,

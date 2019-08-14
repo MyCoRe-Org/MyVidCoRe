@@ -1,0 +1,98 @@
+ui-nvmonitor-plugin {
+    display: flex;
+    flex-direction: row;
+    padding-right: 0.5rem;
+    margin-top: 0.25rem;
+
+    @include media-breakpoint-down(sm) {
+        display: none;
+    }
+}
+
+.gauges {
+    margin: 0;
+    padding: 0;
+}
+
+.gauge-container {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    display: inline-block;
+    padding: 0px;
+
+    > .gauge {
+        > .dial {
+            stroke: #5a5a5a;
+            stroke-width: 8;
+            fill: rgba(0, 0, 0, 0);
+        }
+
+        > .value {
+            stroke: $primary;
+            stroke-width: 8;
+            fill: rgba(0, 0, 0, 0);
+        }
+
+        > .value-text {
+            fill: $primary;
+            font-family: "Titillium Web";
+            font-weight: bold;
+            font-size: 1.6em;
+        }
+    }
+
+    &.encoder , &.cpu-load {
+        &:nth-child(1) {
+            margin-left: 10px;
+            @include media-breakpoint-only(xs) {
+                margin-left: 5px;
+            }
+        }
+
+        > .gauge {
+            > .value {
+                stroke: $success;
+            }
+
+            > .value-text {
+                fill: $success;
+            }
+        }
+    }
+
+    &.decoder {
+        > .gauge {
+            > .value {
+                stroke: $danger;
+            }
+
+            > .value-text {
+                fill: $danger;
+            }
+        }
+    }
+
+    &.swap {
+        > .gauge {
+            > .value {
+                stroke: $danger;
+            }
+
+            > .value-text {
+                fill: $danger;
+            }
+        }
+    }
+
+    &.memory {
+        width: 30px;
+        height: 15px;
+    }
+
+    &.temperature , &.swap {
+        width: 30px;
+        height: 15px;
+    }
+}
+
