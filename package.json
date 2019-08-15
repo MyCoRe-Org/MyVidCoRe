@@ -48,12 +48,12 @@
     "zone.js": "~0.9.1"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "~0.802.1",
-    "@angular/cli": "8.2.1",
+    "@angular-devkit/build-angular": "~0.802.2",
+    "@angular/cli": "8.2.2",
     "@angular/compiler-cli": "8.2.2",
     "@angular/language-service": "8.2.2",
     "@types/jquery": "^3.3.31",
-    "@types/node": "^12.7.1",
+    "@types/node": "^12.7.2",
     "@types/video.js": "^7.2.12",
     "angular-ide": "^0.9.65",
     "codelyzer": "^5.1.0",
