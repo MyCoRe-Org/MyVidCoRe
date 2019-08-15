@@ -83,6 +83,7 @@
         },
          "sysmonitor": {
             "cpu-load": "CPU usage",
+            "cpu-temp": "CPU Temperature",
             "memory": "Memory usage",
             "swap": "Swap usage"
         }

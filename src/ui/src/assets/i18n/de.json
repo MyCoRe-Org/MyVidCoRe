@@ -83,6 +83,7 @@
         },
         "sysmonitor": {
             "cpu-load": "Systemauslastung",
+            "cpu-temp": "CPU Temperatur",
             "memory": "Speicherauslastung",
             "swap": "Speicherauslastung (Swap)"
         }
