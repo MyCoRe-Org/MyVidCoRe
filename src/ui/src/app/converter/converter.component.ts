@@ -200,8 +200,8 @@ export class ConverterComponent implements OnInit, OnDestroy {
         this.done = this.mergeJobs(this.doneJobs && this.doneJobs.converter || [], this.done);
         this.done = this.done.filter(j => !this.filterDone(j)).map(this.injectHashCode).sort(this.sortByEndTime);
 
-        this.start = this.doneJobs.start || 0;
-        this.end = Math.min(this.start + this.limit, this.doneJobs.total);
+        this.start = this.doneJobs && this.doneJobs.start || 0;
+        this.end = Math.min(this.start + this.limit, this.doneJobs && this.doneJobs.total || 0);
     }
 
     private buildRunning() {
