@@ -26,13 +26,7 @@ export class NVMonitorService {
 
     public events: Subject<NVMonitorMessage>;
 
-    constructor(wsService: WebsocketService) {
-        this.events = <Subject<NVMonitorMessage>>wsService.connect(WebsocketService.buildWSURL(WS_CONTEXT)).pipe(
-            map((response: MessageEvent): NVMonitorMessage => {
-                const data = JSON.parse(response.data);
-                return data;
-            }),
-            retry(3)
-        );
+    constructor(wsService: WebsocketService<NVMonitorMessage>) {
+        this.events = wsService.connect(WebsocketService.buildWSURL(WS_CONTEXT));
     }
 }

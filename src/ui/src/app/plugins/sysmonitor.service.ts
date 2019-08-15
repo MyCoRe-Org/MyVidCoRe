@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 
-import { Subject } from "rxjs";
-import { map, retry } from "rxjs/operators";
+import { Subject, timer } from "rxjs";
+import { retryWhen } from "rxjs/operators";
 
 import { WebsocketService } from "../_services/websocket.service";
 
@@ -22,13 +22,7 @@ export class SystemMonitorService {
 
     public events: Subject<SystemMonitorMessage>;
 
-    constructor(wsService: WebsocketService) {
-        this.events = <Subject<SystemMonitorMessage>>wsService.connect(WebsocketService.buildWSURL(WS_CONTEXT)).pipe(
-            map((response: MessageEvent): SystemMonitorMessage => {
-                const data = JSON.parse(response.data);
-                return data;
-            }),
-            retry(3)
-        );
+    constructor(wsService: WebsocketService<SystemMonitorMessage>) {
+        this.events = wsService.connect(WebsocketService.buildWSURL(WS_CONTEXT));
     }
 }

@@ -2,18 +2,16 @@ import { Injectable } from "@angular/core";
 
 import { environment } from "../../environments/environment";
 
-import { Subject, Observable, Observer } from "rxjs";
-import { AnonymousSubject } from "rxjs/internal/Subject";
+import { Subject, timer, throwError, Observable } from "rxjs";
+import { webSocket } from "rxjs/webSocket";
+import { retryWhen, mergeMap, finalize } from "rxjs/operators";
 
 @Injectable()
-export class WebsocketService {
+export class WebsocketService<T> {
+
     constructor() { }
 
-    private url: string;
-
-    private autoReconnect: boolean;
-
-    private subject: Subject<MessageEvent>;
+    private subject: Subject<T>;
 
     static buildWSURL(context: string) {
         const l = !environment.production && environment.apiBaseUrl.length !== 0 && new URL(environment.apiBaseUrl) || window.location;
@@ -23,56 +21,26 @@ export class WebsocketService {
             ) + "/ws" + context;
     }
 
-    public connect(url: string, reconnect: boolean = true): Subject<MessageEvent> {
-        this.url = url;
-        this.autoReconnect = reconnect;
-
+    public connect(url: string, autoReconnect: boolean = true, scalingDuration: number = 1000): Subject<T> {
         if (!this.subject) {
-            this.subject = this.create(url);
+            this.subject = <Subject<T>>webSocket(url).pipe(
+                retryWhen((attempts: Observable<any>) => {
+                    return attempts.pipe(
+                        mergeMap((error, i) => {
+                            const retryAttempt = i + 1;
+
+                            if (autoReconnect === true) {
+                                console.warn(`Retry to connect to ${url} in ${retryAttempt * scalingDuration}ms`);
+                                return timer(retryAttempt * scalingDuration);
+                            } else {
+                                return throwError(error);
+                            }
+                        })
+                    );
+                })
+            );
         }
         return this.subject;
     }
 
-    public disconnect() {
-        this.subject = null;
-    }
-
-    public reconnect() {
-        this.disconnect();
-        this.connect(this.url);
-    }
-
-    private create(url: string): Subject<MessageEvent> {
-        const ws = new WebSocket(url);
-
-        const observable = new Observable((obs: Observer<MessageEvent>) => {
-            ws.onmessage = obs.next.bind(obs);
-            ws.onerror = obs.error.bind(obs);
-            ws.onclose = obs.complete.bind(obs);
-            return ws.close.bind(ws);
-        });
-
-        const observer: Observer<Object> = {
-            next: (value: Object) => {
-                if (ws.readyState === WebSocket.OPEN) {
-                    ws.send(JSON.stringify(value));
-                }
-            },
-            error: (err: any) => {
-                console.error(err);
-
-                setTimeout(() => {
-                    if (this.autoReconnect) {
-                        console.log(`Try to reconnect to ${this.url}.`);
-                        this.reconnect();
-                    }
-                }, 1000);
-            },
-            complete: () => {
-                this.disconnect();
-            }
-        };
-
-        return new AnonymousSubject<MessageEvent>(observer, observable);
-    }
 }
