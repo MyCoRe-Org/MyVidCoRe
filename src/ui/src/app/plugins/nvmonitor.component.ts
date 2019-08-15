@@ -65,10 +65,9 @@ export class NVMonitorComponent implements OnInit {
                     if (!this.entries[i][n]) {
                         this.entries[i][n] = e[n];
                     } else {
-                        let val: any = e[n].value.indexOf(".") !== -1 ? parseFloat(e[n].value) : parseInt(e[n].value, 10);
-                        val = isNaN(val) ? e[n].value : val;
+                        const val: any = e[n].value.indexOf(".") !== -1 ? parseFloat(e[n].value) : parseInt(e[n].value, 10);
 
-                        this.entries[i][n].value = val === 0 ?  this.entries[i][n].value : val;
+                        this.entries[i][n].value =  isNaN(val) ? e[n].value : val;
                     }
                 });
             } else {
