@@ -39,6 +39,10 @@ export class NVMonitorComponent implements OnInit {
         return item["gpu"].value || index;
     }
 
+    private findByGPUIndex(entries: Array<GPUEntry>, index: number) {
+        return entries.findIndex(e => e["gpu"] && parseInt(e["gpu"].value, 10) === index);
+    }
+
     private handleMessage(msg: NVMonitorMessage) {
         const entries: Array<GPUEntry> = msg.entries.map(e => {
             const ge: GPUEntry = {};
@@ -57,9 +61,21 @@ export class NVMonitorComponent implements OnInit {
 
         entries.forEach((e, i) => {
             if (this.entries[i]) {
-                this.entries[i] = e;
+                Object.keys(e).forEach(n => {
+                    if (!this.entries[i][n]) {
+                        this.entries[i][n] = e[n];
+                    } else {
+                        let val: any = e[n].value.indexOf(".") !== -1 ? parseFloat(e[n].value) : parseInt(e[n].value, 10);
+                        val = isNaN(val) ? e[n].value : val;
+
+                        this.entries[i][n].value = val === 0 ?  this.entries[i][n].value : val;
+                    }
+                });
             } else {
-                this.entries.push(e);
+                const idx = e["gpu"] && parseInt(e["gpu"].value, 10);
+                if (this.findByGPUIndex(this.entries, idx) === -1) {
+                    this.entries.push(e);
+                }
             }
         });
     }

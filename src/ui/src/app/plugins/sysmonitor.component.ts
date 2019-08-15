@@ -36,12 +36,19 @@ export class SystemMonitorComponent implements OnInit {
     }
 
     private handleMessage(msg: SystemMonitorMessage) {
-        msg.attribs.forEach(a =>
-            this.entries[a.name] = <MonitorAttrib>{
-                value: a.value,
-                unit: a.unit
+        msg.attribs.forEach(a => {
+            if (!this.entries[a.name]) {
+                this.entries[a.name] = <MonitorAttrib>{
+                    value: a.value,
+                    unit: a.unit
+                };
+            } else {
+                let val: any = a.value.indexOf(".") !== -1 ? parseFloat(a.value) : parseInt(a.value, 10);
+                val = isNaN(val) ? a.value : val;
+
+                this.entries[a.name].value = val === 0 ? this.entries[a.name].value : val;
             }
-        );
+        });
     }
 
     gaugeLabel(name: string, attrib: MonitorAttrib) {
