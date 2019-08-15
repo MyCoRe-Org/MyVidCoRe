@@ -183,6 +183,10 @@ export class ConverterComponent implements OnInit, OnDestroy {
                 to.push(j);
             }
         });
+
+        return to.filter(j => {
+            return from.findIndex(fj => fj.id === j.id) !== -1;
+        });
     }
 
     private injectHashCode(job: Job) {
@@ -193,7 +197,7 @@ export class ConverterComponent implements OnInit, OnDestroy {
     }
 
     private buildDone() {
-        this.mergeJobs(this.doneJobs && this.doneJobs.converter || [], this.done);
+        this.done = this.mergeJobs(this.doneJobs && this.doneJobs.converter || [], this.done);
         this.done = this.done.filter(j => !this.filterDone(j)).map(this.injectHashCode).sort(this.sortByEndTime);
 
         this.start = this.doneJobs.start || 0;
