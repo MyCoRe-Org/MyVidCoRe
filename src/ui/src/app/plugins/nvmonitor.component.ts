@@ -59,20 +59,21 @@ export class NVMonitorComponent implements OnInit {
             return a["gpu"].value < b["gpu"].value ? -1 : 1;
         });
 
-        entries.forEach((e, i) => {
-            if (this.entries[i]) {
-                Object.keys(e).forEach(n => {
-                    if (!this.entries[i][n]) {
-                        this.entries[i][n] = e[n];
-                    } else {
-                        const val: any = e[n].value.indexOf(".") !== -1 ? parseFloat(e[n].value) : parseInt(e[n].value, 10);
+        entries.forEach(e => {
+            if (e["gpu"]) {
+                const idx = parseInt(e["gpu"].value, 10);
+                const fi = this.findByGPUIndex(this.entries, idx);
+                if (fi !== -1) {
+                    Object.keys(e).forEach(n => {
+                        if (!this.entries[fi][n]) {
+                            this.entries[fi][n] = e[n];
+                        } else {
+                            const val: any = e[n].value.indexOf(".") !== -1 ? parseFloat(e[n].value) : parseInt(e[n].value, 10);
 
-                        this.entries[i][n].value =  isNaN(val) ? e[n].value : val;
-                    }
-                });
-            } else {
-                const idx = e["gpu"] && parseInt(e["gpu"].value, 10);
-                if (this.findByGPUIndex(this.entries, idx) === -1) {
+                            this.entries[fi][n].value = isNaN(val) ? e[n].value : val;
+                        }
+                    });
+                } else {
                     this.entries.push(e);
                 }
             }
