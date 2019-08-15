@@ -22,6 +22,6 @@ export class SystemMonitorService {
     public events: Subject<SystemMonitorMessage>;
 
     constructor(wsService: WebsocketService<SystemMonitorMessage>) {
-        this.events = wsService.connect(WebsocketService.buildWSURL(WS_CONTEXT));
+        this.events = wsService.connect(WebsocketService.buildWSURL(WS_CONTEXT), true, [404]);
     }
 }

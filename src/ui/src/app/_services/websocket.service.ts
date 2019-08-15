@@ -21,7 +21,7 @@ export class WebsocketService<T> {
             ) + "/ws" + context;
     }
 
-    public connect(url: string, autoReconnect: boolean = true, scalingDuration: number = 1000): Subject<T> {
+    public connect(url: string, autoReconnect: boolean = true, excludedStatusCodes = [], scalingDuration: number = 1000): Subject<T> {
         if (!this.subject) {
             this.subject = <Subject<T>>webSocket(url).pipe(
                 retryWhen((attempts: Observable<any>) => {
@@ -29,7 +29,7 @@ export class WebsocketService<T> {
                         mergeMap((error, i) => {
                             const retryAttempt = i + 1;
 
-                            if (autoReconnect === true) {
+                            if (autoReconnect === true && excludedStatusCodes.find(e => e === error.status)) {
                                 console.warn(`Retry to connect to ${url} in ${retryAttempt * scalingDuration}ms`);
                                 return timer(retryAttempt * scalingDuration);
                             } else {
