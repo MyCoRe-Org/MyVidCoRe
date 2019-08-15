@@ -1,7 +1,6 @@
 import { Injectable } from "@angular/core";
 
-import { Subject, timer } from "rxjs";
-import { retryWhen } from "rxjs/operators";
+import { Subject } from "rxjs";
 
 import { WebsocketService } from "../_services/websocket.service";
 
