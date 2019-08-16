@@ -3,7 +3,9 @@ export function hashCode(input: string): string {
     let hash = 0;
     for (let i = 0; i < input.length; i++) {
         const char = input.charCodeAt(i);
+        // tslint:disable-next-line: no-bitwise
         hash = ((hash << 5) - hash) + char;
+        // tslint:disable-next-line: no-bitwise
         hash = hash & hash;
     }
 
