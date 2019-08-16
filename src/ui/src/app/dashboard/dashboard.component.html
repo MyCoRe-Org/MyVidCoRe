@@ -4,28 +4,32 @@
         <div class="card-body">
             <ui-sysmonitor-plugin class="flex-wrap align-content-center justify-content-between align-items-center">
                 <ng-template sysMonContent let-entries="entries">
-                    <div class="d-inline-flex flex-column justify-content-center align-items-center">
+                    <div *ngIf="entries['cpu-load']"
+                        class="d-inline-flex flex-column justify-content-center align-items-center">
                         <ui-gauge [i18nPrefix]="'plugin.sysmonitor.'" [name]="'cpu-load'"
                             [attrib]="entries['cpu-load']">
                         </ui-gauge>
                         <label for="cpu-load">{{ 'plugin.sysmonitor.cpu-load' | translate }}</label>
                     </div>
 
-                    <div class="d-inline-flex flex-column justify-content-center align-items-center">
+                    <div *ngIf="entries['cpu-temp']"
+                        class="d-inline-flex flex-column justify-content-center align-items-center">
                         <ui-gauge [i18nPrefix]="'plugin.sysmonitor.'" [name]="'cpu-temp'" [attrib]="entries['cpu-temp']"
                             [max]="120">
                         </ui-gauge>
                         <label for="cpu-temp">{{ 'plugin.sysmonitor.cpu-temp' | translate }}</label>
                     </div>
 
-                    <div class="d-inline-flex flex-column justify-content-center align-items-center">
+                    <div *ngIf="entries['mem-available']"
+                        class="d-inline-flex flex-column justify-content-center align-items-center">
                         <ui-gauge [i18nPrefix]="'plugin.sysmonitor.'" [name]="'memory'"
                             [attrib]="entries['mem-available']" [max]="entries['mem-total']?.value">
                         </ui-gauge>
                         <label for="memory">{{ 'plugin.sysmonitor.memory' | translate }}</label>
                     </div>
 
-                    <div class="d-inline-flex flex-column justify-content-center align-items-center">
+                    <div *ngIf="entries['swap-used']"
+                        class="d-inline-flex flex-column justify-content-center align-items-center">
                         <ui-gauge [i18nPrefix]="'plugin.sysmonitor.'" [name]="'swap'" [attrib]="entries['swap-used']"
                             [max]="entries['swap-total']?.value">
                         </ui-gauge>
