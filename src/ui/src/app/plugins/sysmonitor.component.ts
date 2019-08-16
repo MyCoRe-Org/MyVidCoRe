@@ -74,30 +74,4 @@ export class SystemMonitorComponent implements OnInit, OnDestroy, AfterContentCh
         });
     }
 
-    gaugeLabel(name: string, attrib: Attrib) {
-        if (attrib) {
-            if (["C", "F"].indexOf(attrib.unit) !== -1) {
-                return (value: number): string => {
-                    return `${Math.round(value)} °` + attrib.unit;
-                };
-            } else if (["memory", "swap"].indexOf(name) !== -1) {
-                return (value: number): string => {
-                    if (value >= (1024 * 1024 * 1024)) {
-                        return `${Math.round(value / (1024 * 1024 * 1024))} G`;
-                    } else if (value >= (1024 * 1024)) {
-                        return `${Math.round(value / (1024 * 1024))} M`;
-                    }
-
-                    return `${Math.round(value / 1024)} K`;
-                };
-            } else {
-                return (value: number): string => {
-                    return `${Math.round(value)} ` + attrib.unit;
-                };
-            }
-        }
-
-        return null;
-    }
-
 }

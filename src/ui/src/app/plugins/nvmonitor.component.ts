@@ -103,15 +103,4 @@ export class NVMonitorComponent implements OnInit, OnDestroy, AfterContentChecke
         });
     }
 
-    gaugeLabel(attrib: Attrib) {
-        return attrib && ["C", "F"].indexOf(attrib.unit) !== -1 ?
-            (value: number): string => {
-                return `${Math.round(value)} °` + attrib.unit;
-            }
-            :
-            (value: number): string => {
-                return `${Math.round(value)} ` + attrib.unit;
-            };
-    }
-
 }
