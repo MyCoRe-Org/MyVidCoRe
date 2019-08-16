@@ -19,7 +19,7 @@ export class ConverterJobService {
     public events: Subject<AppEvent<Job>>;
 
     constructor(private wsService: WebsocketService<AppEvent<Job>>) {
-        this.events = this.wsService.connect(WebsocketService.buildWSURL(WS_CONTEXT), true, [404]);
+        this.events = this.wsService.connect(WebsocketService.buildWSURL(WS_CONTEXT));
     }
 
 }

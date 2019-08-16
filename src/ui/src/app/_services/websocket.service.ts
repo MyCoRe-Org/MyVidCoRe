@@ -4,10 +4,12 @@ import { environment } from "../../environments/environment";
 
 import { Subject, timer, throwError, Observable } from "rxjs";
 import { webSocket } from "rxjs/webSocket";
-import { retryWhen, mergeMap, finalize } from "rxjs/operators";
+import { retryWhen, mergeMap } from "rxjs/operators";
 
 @Injectable()
 export class WebsocketService<T> {
+
+    url: string;
 
     constructor() { }
 
@@ -21,26 +23,31 @@ export class WebsocketService<T> {
             ) + "/ws" + context;
     }
 
-    public connect(url: string, autoReconnect: boolean = true, excludedStatusCodes = [], scalingDuration: number = 1000): Subject<T> {
+    public connect(url: string, autoReconnect: boolean = true, scalingDuration: number = 1000): Subject<T> {
+        this.url = url;
+
         if (!this.subject) {
             this.subject = <Subject<T>>webSocket(url).pipe(
-                retryWhen((attempts: Observable<any>) => {
-                    return attempts.pipe(
-                        mergeMap((error, i) => {
-                            const retryAttempt = i + 1;
-
-                            if (autoReconnect === true && excludedStatusCodes.find(e => e === error.status)) {
-                                console.warn(`Retry to connect to ${url} in ${retryAttempt * scalingDuration}ms`);
-                                return timer(retryAttempt * scalingDuration);
-                            } else {
-                                return throwError(error);
-                            }
-                        })
-                    );
-                })
+                retryWhen(this.reconnectStrategy(autoReconnect, scalingDuration)),
             );
         }
         return this.subject;
+    }
+
+    private reconnectStrategy(autoReconnect: boolean = true, scalingDuration: number = 1000) {
+        return (attempts: Observable<any>) => {
+            return attempts.pipe(
+                mergeMap((error, i) => {
+                    if (autoReconnect !== true) {
+                        return throwError(error);
+                    }
+
+                    const retryAttempt = i + 1;
+                    console.warn(`Retry to connect to ${this.url} in ${retryAttempt * scalingDuration}ms`);
+                    return timer(retryAttempt * scalingDuration);
+                })
+            );
+        };
     }
 
 }

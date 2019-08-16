@@ -4,6 +4,8 @@ import { CommonModule } from "@angular/common";
 import { GaugeModule } from "angular-gauge";
 import { TranslateModule } from "@ngx-translate/core";
 
+import { PluginApiService } from "./api.service";
+
 import { NVMonitorComponent } from "./nvmonitor.component";
 import { SystemMonitorComponent } from "./sysmonitor.component";
 
@@ -24,6 +26,7 @@ import { SystemMonitorComponent } from "./sysmonitor.component";
         SystemMonitorComponent
     ],
     providers: [
+        PluginApiService
     ]
 })
 

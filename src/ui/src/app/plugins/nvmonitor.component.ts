@@ -5,6 +5,9 @@ import { Subscription } from "rxjs";
 import { WebsocketService } from "../_services/websocket.service";
 
 import { NVMonitorService, NVMonitorMessage } from "./nvmonitor.service";
+import { PluginApiService } from "./api.service";
+
+const PLUGIN_NAME = "Nvidia Monitor Plugin";
 
 interface GPUAttrib {
     value: string;
@@ -26,12 +29,16 @@ export class NVMonitorComponent implements OnInit {
 
     entries: Array<GPUEntry> = new Array();
 
-    constructor(private $svc: NVMonitorService) {
+    constructor(private $api: PluginApiService, private $svc: NVMonitorService) {
     }
 
     ngOnInit() {
-        this.socket = this.$svc.events.subscribe((msg: NVMonitorMessage) => {
-            this.handleMessage(msg);
+        this.$api.isPluginEnabled(PLUGIN_NAME).subscribe((enabled: boolean) => {
+            if (enabled) {
+                this.socket = this.$svc.events.subscribe((msg: NVMonitorMessage) => {
+                    this.handleMessage(msg);
+                });
+            }
         });
     }
 

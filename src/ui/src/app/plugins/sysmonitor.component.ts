@@ -3,8 +3,11 @@ import { Component, OnInit } from "@angular/core";
 import { Subscription } from "rxjs";
 
 import { WebsocketService } from "../_services/websocket.service";
+import { PluginApiService } from "./api.service";
 
 import { SystemMonitorService, SystemMonitorMessage } from "./sysmonitor.service";
+
+const PLUGIN_NAME = "System Monitor Plugin";
 
 interface MonitorAttrib {
     value: string;
@@ -26,13 +29,18 @@ export class SystemMonitorComponent implements OnInit {
 
     entries: MonitorAttribs = {};
 
-    constructor(private $svc: SystemMonitorService) {
+    constructor(private $api: PluginApiService, private $svc: SystemMonitorService) {
     }
 
     ngOnInit() {
-        this.socket = this.$svc.events.subscribe((msg: SystemMonitorMessage) => {
-            this.handleMessage(msg);
+        this.$api.isPluginEnabled(PLUGIN_NAME).subscribe((enabled: boolean) => {
+            if (enabled) {
+                this.socket = this.$svc.events.subscribe((msg: SystemMonitorMessage) => {
+                    this.handleMessage(msg);
+                });
+            }
         });
+
     }
 
     private handleMessage(msg: SystemMonitorMessage) {

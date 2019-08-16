@@ -26,6 +26,6 @@ export class NVMonitorService {
     public events: Subject<NVMonitorMessage>;
 
     constructor(wsService: WebsocketService<NVMonitorMessage>) {
-        this.events = wsService.connect(WebsocketService.buildWSURL(WS_CONTEXT), true, [404]);
+        this.events = wsService.connect(WebsocketService.buildWSURL(WS_CONTEXT));
     }
 }
