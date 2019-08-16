@@ -6,3 +6,9 @@ export interface Plugin {
 export interface Plugins {
     plugins: Array<Plugin>;
 }
+
+export interface Attrib {
+    name?: string;
+    value: string;
+    unit: string;
+}

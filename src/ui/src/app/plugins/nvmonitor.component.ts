@@ -1,21 +1,20 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, Directive, TemplateRef, OnDestroy, AfterContentChecked, ContentChildren, QueryList } from "@angular/core";
 
 import { Subscription } from "rxjs";
 
 import { WebsocketService } from "../_services/websocket.service";
 
+import { Attrib } from "./definitions";
 import { NVMonitorService, NVMonitorMessage } from "./nvmonitor.service";
 import { PluginApiService } from "./api.service";
 
-const PLUGIN_NAME = "Nvidia Monitor Plugin";
-
-interface GPUAttrib {
-    value: string;
-    unit: string;
+interface GPUEntry {
+    [name: string]: Attrib;
 }
 
-interface GPUEntry {
-    [name: string]: GPUAttrib;
+@Directive({ selector: "ng-template[nvMonContent]" })
+export class NVMonitorContentDirective {
+    constructor(public templateRef: TemplateRef<any>) { }
 }
 
 @Component({
@@ -23,23 +22,40 @@ interface GPUEntry {
     templateUrl: "./nvmonitor.component.html",
     providers: [WebsocketService, NVMonitorService]
 })
-export class NVMonitorComponent implements OnInit {
+export class NVMonitorComponent implements OnInit, OnDestroy, AfterContentChecked {
+
+    static PLUGIN_NAME = "Nvidia Monitor Plugin";
 
     socket: Subscription;
 
     entries: Array<GPUEntry> = new Array();
 
+    contentTpl: NVMonitorContentDirective | null;
+
+    @ContentChildren(NVMonitorContentDirective, { descendants: false })
+    contentTpls: QueryList<NVMonitorContentDirective>;
+
     constructor(private $api: PluginApiService, private $svc: NVMonitorService) {
     }
 
     ngOnInit() {
-        this.$api.isPluginEnabled(PLUGIN_NAME).subscribe((enabled: boolean) => {
+        this.$api.isPluginEnabled(NVMonitorComponent.PLUGIN_NAME).subscribe((enabled: boolean) => {
             if (enabled) {
                 this.socket = this.$svc.events.subscribe((msg: NVMonitorMessage) => {
                     this.handleMessage(msg);
                 });
             }
         });
+    }
+
+    ngOnDestroy() {
+        if (this.socket) {
+            this.socket.unsubscribe();
+        }
+    }
+
+    ngAfterContentChecked() {
+        this.contentTpl = this.contentTpls.first;
     }
 
     trackByGPU(index: number, item: GPUEntry) {
@@ -54,7 +70,7 @@ export class NVMonitorComponent implements OnInit {
         const entries: Array<GPUEntry> = msg.entries.map(e => {
             const ge: GPUEntry = {};
             e.attribs.forEach(a =>
-                ge[a.name] = <GPUAttrib>{
+                ge[a.name] = <Attrib>{
                     value: a.value,
                     unit: a.unit
                 }
@@ -87,7 +103,7 @@ export class NVMonitorComponent implements OnInit {
         });
     }
 
-    gaugeLabel(attrib: GPUAttrib) {
+    gaugeLabel(attrib: Attrib) {
         return attrib && ["C", "F"].indexOf(attrib.unit) !== -1 ?
             (value: number): string => {
                 return `${Math.round(value)} °` + attrib.unit;

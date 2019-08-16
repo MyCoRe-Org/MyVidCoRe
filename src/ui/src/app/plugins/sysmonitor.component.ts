@@ -1,21 +1,20 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, Directive, TemplateRef, ContentChildren, QueryList, AfterContentChecked, OnDestroy } from "@angular/core";
 
 import { Subscription } from "rxjs";
 
 import { WebsocketService } from "../_services/websocket.service";
 import { PluginApiService } from "./api.service";
 
+import { Attrib } from "./definitions";
 import { SystemMonitorService, SystemMonitorMessage } from "./sysmonitor.service";
 
-const PLUGIN_NAME = "System Monitor Plugin";
-
-interface MonitorAttrib {
-    value: string;
-    unit: string;
+interface MonitorAttribs {
+    [name: string]: Attrib;
 }
 
-interface MonitorAttribs {
-    [name: string]: MonitorAttrib;
+@Directive({ selector: "ng-template[sysMonContent]" })
+export class SystemMonitorContentDirective {
+    constructor(public templateRef: TemplateRef<any>) { }
 }
 
 @Component({
@@ -23,30 +22,46 @@ interface MonitorAttribs {
     templateUrl: "./sysmonitor.component.html",
     providers: [WebsocketService, SystemMonitorService]
 })
-export class SystemMonitorComponent implements OnInit {
+export class SystemMonitorComponent implements OnInit, OnDestroy, AfterContentChecked {
+
+    static PLUGIN_NAME = "System Monitor Plugin";
 
     socket: Subscription;
 
     entries: MonitorAttribs = {};
 
+    contentTpl: SystemMonitorContentDirective | null;
+
+    @ContentChildren(SystemMonitorContentDirective, { descendants: false })
+    contentTpls: QueryList<SystemMonitorContentDirective>;
+
     constructor(private $api: PluginApiService, private $svc: SystemMonitorService) {
     }
 
     ngOnInit() {
-        this.$api.isPluginEnabled(PLUGIN_NAME).subscribe((enabled: boolean) => {
+        this.$api.isPluginEnabled(SystemMonitorComponent.PLUGIN_NAME).subscribe((enabled: boolean) => {
             if (enabled) {
                 this.socket = this.$svc.events.subscribe((msg: SystemMonitorMessage) => {
                     this.handleMessage(msg);
                 });
             }
         });
+    }
 
+    ngOnDestroy() {
+        if (this.socket) {
+            this.socket.unsubscribe();
+        }
+    }
+
+    ngAfterContentChecked() {
+        this.contentTpl = this.contentTpls.first;
     }
 
     private handleMessage(msg: SystemMonitorMessage) {
         msg.attribs.forEach(a => {
             if (!this.entries[a.name]) {
-                this.entries[a.name] = <MonitorAttrib>{
+                this.entries[a.name] = <Attrib>{
                     value: a.value,
                     unit: a.unit
                 };
@@ -59,7 +74,7 @@ export class SystemMonitorComponent implements OnInit {
         });
     }
 
-    gaugeLabel(name: string, attrib: MonitorAttrib) {
+    gaugeLabel(name: string, attrib: Attrib) {
         if (attrib) {
             if (["C", "F"].indexOf(attrib.unit) !== -1) {
                 return (value: number): string => {

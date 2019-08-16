@@ -28,6 +28,29 @@ $sidebar-font-size: 1.1rem !default;
 
 .navbar-right {
     margin-right: 0;
+
+    ui-nvmonitor-plugin, ui-sysmonitor-plugin {
+        display: flex;
+        flex-direction: row;
+        padding-right: 0.5rem;
+        margin-top: 0.25rem;
+        float: left;
+
+        @include media-breakpoint-down(sm) {
+            display: none;
+        }
+    }
+
+    .gauge-container {
+        &.encoder , &.cpu-load {
+            &:nth-child(1) {
+                margin-left: 10px;
+                @include media-breakpoint-only(xs) {
+                    margin-left: 5px;
+                }
+            }
+        }
+    }
 }
 
 .navbar-dark {

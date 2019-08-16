@@ -6,8 +6,9 @@ import { TranslateModule } from "@ngx-translate/core";
 
 import { PluginApiService } from "./api.service";
 
-import { NVMonitorComponent } from "./nvmonitor.component";
-import { SystemMonitorComponent } from "./sysmonitor.component";
+import { GaugeComponent } from "./gauge.component";
+import { NVMonitorComponent, NVMonitorContentDirective } from "./nvmonitor.component";
+import { SystemMonitorComponent, SystemMonitorContentDirective } from "./sysmonitor.component";
 
 @NgModule({
     imports: [
@@ -18,12 +19,18 @@ import { SystemMonitorComponent } from "./sysmonitor.component";
     entryComponents: [
     ],
     declarations: [
+        GaugeComponent,
         NVMonitorComponent,
-        SystemMonitorComponent
+        NVMonitorContentDirective,
+        SystemMonitorComponent,
+        SystemMonitorContentDirective
     ],
     exports: [
+        GaugeComponent,
         NVMonitorComponent,
-        SystemMonitorComponent
+        NVMonitorContentDirective,
+        SystemMonitorComponent,
+        SystemMonitorContentDirective
     ],
     providers: [
         PluginApiService

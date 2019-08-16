@@ -4,13 +4,9 @@ import { Subject } from "rxjs";
 
 import { WebsocketService } from "../_services/websocket.service";
 
-const WS_CONTEXT = "/nvmonitor";
+import { Attrib } from "./definitions";
 
-export interface Attrib {
-    name: string;
-    unit: string;
-    value: string;
-}
+const WS_CONTEXT = "/nvmonitor";
 
 export interface Attribs {
     attribs: Array<Attrib>;
