@@ -43,7 +43,7 @@ export class WebsocketService<T> {
                     }
 
                     const retryAttempt = i + 1;
-                    console.warn(`Retry to connect to ${this.url} in ${retryAttempt * scalingDuration}ms`);
+                    console.warn(`Retry connect to ${this.url} in ${retryAttempt * scalingDuration}ms`);
                     return timer(retryAttempt * scalingDuration);
                 })
             );
