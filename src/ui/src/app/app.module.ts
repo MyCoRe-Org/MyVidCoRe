@@ -30,7 +30,7 @@ import { PluginsModule } from "./plugins/plugins.module";
 
 import { AppComponent } from "./app.component";
 
-import { HomeComponent, HomeStates } from "./home/home.component";
+import { DashboardComponent, DashboardStates } from "./dashboard/dashboard.component";
 import { LoginComponent, LoginStates } from "./login/login.component";
 
 import { ConfirmComponent } from "./modals/confirm.component";
@@ -56,7 +56,7 @@ export const SettingsFutureState = {
     declarations: [
         AppComponent,
         LoginComponent,
-        HomeComponent,
+        DashboardComponent,
         ConfirmComponent
     ],
     entryComponents: [
@@ -97,7 +97,7 @@ export const SettingsFutureState = {
         UIRouterModule.forRoot({
             states: [
                 LoginStates,
-                HomeStates,
+                DashboardStates,
                 ConverterFutureState,
                 SettingsFutureState
             ],

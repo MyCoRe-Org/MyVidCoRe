@@ -6,7 +6,7 @@ import { Observable } from "rxjs";
 export interface Breadcrumb {
     name: string;
     params?: Object;
-    labelResolver?: Observable<string> |null;
+    labelResolver?: Observable<string> | null;
 }
 
 @Injectable()
@@ -20,7 +20,7 @@ export class BreadcrumbService {
 
     constructor(private $injector: Injector) {
         this.breadcrumbs = new Array();
-        this.root = { name: "home", params: { "#": null } };
+        this.root = { name: "dashboard", params: { "#": null } };
         this.breadcrumbs.push(this.root);
     }
 
@@ -55,7 +55,7 @@ export class BreadcrumbService {
                 (breadcrumb.name === "login" || withParams && this.paramsMatch(b.params, breadcrumb.params) || !withParams));
     }
 
-    private setBreadcrumbAtIndex(breadcrumb: Breadcrumb |null, index: number = 0) {
+    private setBreadcrumbAtIndex(breadcrumb: Breadcrumb | null, index: number = 0) {
         this.breadcrumbs.splice(index, this.breadcrumbs.length);
         if (breadcrumb) {
             this.breadcrumbs.push(breadcrumb);

@@ -25,10 +25,16 @@ export interface RouteMenu {
 
 export const ROUTES: Array<RouteMenu> = [
     {
+        id: "dashboard",
+        ref: "dashboard",
+        i18n: "dashboard.breadcrumb",
+        icon: "fas fa-tachometer-alt fa-fw"
+    },
+    {
         id: "converter",
         ref: "converter",
         i18n: "converter.breadcrumb",
-        icon: "fas fa-tachometer-alt fa-fw"
+        icon: "fas fa-compress-arrows-alt fa-fw"
     },
     {
         id: "settings",

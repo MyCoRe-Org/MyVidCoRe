@@ -238,7 +238,7 @@ export const ConverterStates = {
     url: "/converter",
     component: ConverterComponent,
     data: {
-        parentState: "home",
+        parentState: "dashboard",
         breadcrumb: "converter.breadcrumb",
         requiresAuth: false
     },

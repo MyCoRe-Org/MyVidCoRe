@@ -45,6 +45,11 @@
         "runningJobs": "Konverter Aufträge",
         "via": "via"
     },
+    "dashboard": {
+        "breadcrumb": "Übersicht",
+        "hwaccels": "Hardwarebeschleuniger",
+        "system": "Systemübersicht"
+    },
     "dataTable": {
         "filter": "Filter",
         "filterInfo": "{start} bis {limit} von {total} Einträgen",
@@ -69,10 +74,6 @@
         "notset": "nicht gesetzt",
         "pleaseSelect": "(bitte wählen)",
         "typeToSearch": "Tippen um zu suchen"
-    },
-    "nav": {
-        "dashboard": "Übersicht",
-        "home": "Startseite"
     },
     "plugin": {
         "nvmonitor": {

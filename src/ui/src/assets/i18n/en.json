@@ -45,6 +45,11 @@
         "runningJobs": "Converter Jobs",
         "via": "via"
     },
+    "dashboard": {
+        "breadcrumb": "Dashboard",
+        "hwaccels": "Hardware Accelerator",
+        "system": "System-Overview"
+    },
     "dataTable": {
         "filter": "Filter",
         "filterInfo": "{start} bis {limit} von {total} Einträgen",
@@ -70,10 +75,6 @@
         "pleaseSelect": "(please select)",
         "typeToSearch": "Type to search"
     },
-    "nav": {
-        "dashboard": "Dashboard",
-        "home": "Home"
-    },
     "plugin": {
         "nvmonitor": {
             "decoder": "Decoder GPU #{index}",
@@ -81,7 +82,7 @@
             "memory": "Memory GPU #{index}",
             "temperature": "Temperature GPU #{index}"
         },
-         "sysmonitor": {
+        "sysmonitor": {
             "cpu-load": "CPU usage",
             "cpu-temp": "CPU Temperature",
             "memory": "Memory usage",

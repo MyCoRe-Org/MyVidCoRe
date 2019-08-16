@@ -330,7 +330,7 @@ export const SettingsStates = {
     url: "/settings",
     component: SettingsComponent,
     data: {
-        parentState: "home",
+        parentState: "dashboard",
         breadcrumb: "settings.breadcrumb",
         requiresAuth: false
     },

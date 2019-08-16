@@ -39,7 +39,7 @@ class LoginComponent implements OnInit {
                 if (this.returnTo.name) {
                     this.$state.go(this.returnTo.name(), this.returnTo.params());
                 } else {
-                    this.$state.go("home");
+                    this.$state.go("dashboard");
                 }
             }).catch((err) => {
                 this.$spinner.setLoadingState(false);
