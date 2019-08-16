@@ -69,7 +69,7 @@ export class SystemMonitorComponent implements OnInit, OnDestroy, AfterContentCh
                 let val: any = a.value.indexOf(".") !== -1 ? parseFloat(a.value) : parseInt(a.value, 10);
                 val = isNaN(val) ? a.value : val;
 
-                this.entries[a.name].value = ["C", "F"].indexOf(a.unit) && val === 0 ? this.entries[a.name].value : val;
+                this.entries[a.name].value = ["C", "F"].indexOf(a.unit) !== -1 && val === 0 ? this.entries[a.name].value : val;
             }
         });
     }
