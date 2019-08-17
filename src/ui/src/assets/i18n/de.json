@@ -47,7 +47,14 @@
     },
     "dashboard": {
         "breadcrumb": "Übersicht",
+        "gpu": "GPU {index}",
         "hwaccels": "Hardwarebeschleuniger",
+        "nvmonitor": {
+            "decoder": "Decoder",
+            "encoder": "Encoder",
+            "memory": "Speicher",
+            "temperature": "Temperatur"
+        },
         "system": "Systemübersicht"
     },
     "dataTable": {
