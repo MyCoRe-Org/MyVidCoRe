@@ -98,7 +98,7 @@ public class ConverterService extends Widget implements Listener {
     private static final Settings SETTINGS = Settings.instance();
 
     private static final List<HWAccelWrapper<? extends HWAccelDeviceSpec>> hwAccels = Collections
-        .synchronizedList(new ArrayList<>());
+            .synchronizedList(new ArrayList<>());
 
     private final Map<String, ConverterJob> converters = new ConcurrentHashMap<>();
 
@@ -110,8 +110,9 @@ public class ConverterService extends Widget implements Listener {
 
     static {
         Optional.ofNullable(FFMpegImpl.detectHWAccels())
-            .ifPresent(dhw -> dhw.getHWAccels().stream().filter(hw -> SETTINGS.getSettings().getHwaccels().contains(hw))
-                .forEach(hw -> hwAccels.add(hw)));
+                .ifPresent(dhw -> dhw.getHWAccels().stream().filter(
+                        hw -> SETTINGS.getSettings() != null ? SETTINGS.getSettings().getHwaccels().contains(hw) : true)
+                        .forEach(hw -> hwAccels.add(hw)));
     }
 
     public ConverterService(final String outputDir, final String tempDir, int converterThreads) throws IOException {
@@ -128,12 +129,12 @@ public class ConverterService extends Widget implements Listener {
         EVENT_MANAGER.addListener(this);
 
         int hwAccelConverterThreads = hwAccels.stream()
-            .mapToInt(hw -> hw.getDeviceSpec().numConcurrentProcesses())
-            .sum();
+                .mapToInt(hw -> hw.getDeviceSpec().numConcurrentProcesses())
+                .sum();
 
         converterThreadPool = PriorityExecutor.newFixedThreadPool(
-            hwAccelConverterThreads > 0 ? Integer.max(hwAccelConverterThreads, converterThreads)
-                : converterThreads);
+                hwAccelConverterThreads > 0 ? Integer.max(hwAccelConverterThreads, converterThreads)
+                        : converterThreads);
 
         addIncompleteJobs();
     }
@@ -193,29 +194,29 @@ public class ConverterService extends Widget implements Listener {
             int start = (page - 1) * limit;
 
             final List<ConverterWrapper> filteredList = converters.entrySet().stream()
-                .map(e -> new ConverterWrapper(e.getKey(), e.getValue())).filter(cw -> {
-                    boolean ret = true;
-                    final String filter = params.size() == 3 ? params.get(2).toLowerCase(Locale.ROOT) : null;
-                    if (filter != null) {
-                        ret = Pattern.compile(",").splitAsStream(filter).map(f -> {
-                            boolean fb = true;
-                            if (f.endsWith("isdone"))
-                                fb = cw.isDone();
-                            if (f.endsWith("isrunning"))
-                                fb = cw.isRunning();
+                    .map(e -> new ConverterWrapper(e.getKey(), e.getValue())).filter(cw -> {
+                        boolean ret = true;
+                        final String filter = params.size() == 3 ? params.get(2).toLowerCase(Locale.ROOT) : null;
+                        if (filter != null) {
+                            ret = Pattern.compile(",").splitAsStream(filter).map(f -> {
+                                boolean fb = true;
+                                if (f.endsWith("isdone"))
+                                    fb = cw.isDone();
+                                if (f.endsWith("isrunning"))
+                                    fb = cw.isRunning();
 
-                            if (f.startsWith("!"))
-                                fb = !fb;
-                            return fb;
-                        }).filter(b -> !b).count() != 0;
-                    }
+                                if (f.startsWith("!"))
+                                    fb = !fb;
+                                return fb;
+                            }).filter(b -> !b).count() != 0;
+                        }
 
-                    return ret;
-                }).collect(Collectors.toCollection(ArrayList<ConverterWrapper>::new));
+                        return ret;
+                    }).collect(Collectors.toCollection(ArrayList<ConverterWrapper>::new));
 
             final ConvertersWrapper wrapper = new ConvertersWrapper(
-                (ArrayList<ConverterWrapper>) filteredList.stream().sorted().skip(start).limit(limit)
-                    .collect(Collectors.toCollection(ArrayList<ConverterWrapper>::new)));
+                    (ArrayList<ConverterWrapper>) filteredList.stream().sorted().skip(start).limit(limit)
+                            .collect(Collectors.toCollection(ArrayList<ConverterWrapper>::new)));
 
             wrapper.setTotal((int) filteredList.size());
             wrapper.setStart(start);
@@ -239,10 +240,10 @@ public class ConverterService extends Widget implements Listener {
             if (converter != null && converter.isDone()) {
                 final String fileName = URLDecoder.decode(params.get(1), StandardCharsets.UTF_8.toString());
                 return converter.outputs.stream()
-                    .filter(o -> o.getOutputPath().getFileName().toString().equals(fileName))
-                    .findFirst()
-                    .map(o -> o.getOutputPath())
-                    .orElseThrow(() -> new FileNotFoundException("File \"" + fileName + "\" not found."));
+                        .filter(o -> o.getOutputPath().getFileName().toString().equals(fileName))
+                        .findFirst()
+                        .map(o -> o.getOutputPath())
+                        .orElseThrow(() -> new FileNotFoundException("File \"" + fileName + "\" not found."));
             }
         }
 
@@ -264,10 +265,10 @@ public class ConverterService extends Widget implements Listener {
                 } else {
                     final String fileName = URLDecoder.decode(params.get(1), StandardCharsets.UTF_8.toString());
                     return new ZipStreamingOutput(converter.outputs.stream()
-                        .filter(o -> o.getOutputPath().getFileName().toString().equals(fileName))
-                        .findFirst()
-                        .map(o -> o.getOutputPath())
-                        .orElseThrow(() -> new FileNotFoundException("File \"" + fileName + "\" not found.")));
+                            .filter(o -> o.getOutputPath().getFileName().toString().equals(fileName))
+                            .findFirst()
+                            .map(o -> o.getOutputPath())
+                            .orElseThrow(() -> new FileNotFoundException("File \"" + fileName + "\" not found.")));
                 }
             }
         }
@@ -281,25 +282,25 @@ public class ConverterService extends Widget implements Listener {
     @Override
     public void handleEvent(Event<?> event) throws Exception {
         if (DirectoryWatchService.EVENT_ENTRY_CREATE.equals(event.getType())
-            && event.getSource().equals(DirectoryWatchService.class)) {
+                && event.getSource().equals(DirectoryWatchService.class)) {
             Path inputPath = (Path) event.getObject();
             addJob(inputPath, null, PRIORITY_NORMAL, null);
         }
 
         if ((ConverterJob.START.equals(event.getType()) || ConverterJob.PROGRESS.equals(event.getType())
-            || ConverterJob.DONE.equals(event.getType()))
-            && event.getSource().equals(ConverterJob.class)) {
+                || ConverterJob.DONE.equals(event.getType()))
+                && event.getSource().equals(ConverterJob.class)) {
             String type = ConverterJob.START.equals(event.getType()) ? EVENT_CONVERT_START
-                : ConverterJob.PROGRESS.equals(event.getType()) ? EVENT_CONVERT_PROGRESS : EVENT_CONVERT_DONE;
+                    : ConverterJob.PROGRESS.equals(event.getType()) ? EVENT_CONVERT_PROGRESS : EVENT_CONVERT_DONE;
             EVENT_MANAGER
-                .fireEvent(
-                    new Event<ConverterJob>(type, converters.get((String) event.getObject()), this.getClass())
-                        .setInternal(false));
+                    .fireEvent(
+                            new Event<ConverterJob>(type, converters.get((String) event.getObject()), this.getClass())
+                                    .setInternal(false));
         }
     }
 
     public String addJob(final Path inputPath, final String jobId, final int priority, final String completeCallBack)
-        throws InterruptedException, JAXBException, ExecutionException, IOException {
+            throws InterruptedException, JAXBException, ExecutionException, IOException {
         final SettingsWrapper settings = SETTINGS.getSettings();
 
         if (settings != null && !settings.getOutput().isEmpty() && !Files.isDirectory(inputPath)) {
@@ -310,26 +311,26 @@ public class ConverterService extends Widget implements Listener {
                 final int prio = Math.min(PRIORITY_HIGHT, Math.max(PRIORITY_LOW, priority));
 
                 final List<Output> outputs = settings.getOutput().stream()
-                    .sorted(Settings.sortOutputs)
-                    .filter(output -> {
-                        try {
-                            return output.getVideo().getUpscale()
-                                || !FFMpegImpl.isUpscaling(inputPath, output.getVideo().getScale());
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
-                    }).map(o -> {
-                        final Output out = o.getCopy();
-                        final String appendix = Optional.ofNullable(o.getFilenameAppendix()).orElse(id);
-                        out.setInputPath(inputPath);
-                        out.setOutputPath(outputPath.resolve(FFMpegImpl.filename(o.getFormat(), fileName,
-                            appendix)));
+                        .sorted(Settings.sortOutputs)
+                        .filter(output -> {
+                            try {
+                                return output.getVideo().getUpscale()
+                                        || !FFMpegImpl.isUpscaling(inputPath, output.getVideo().getScale());
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        }).map(o -> {
+                            final Output out = o.getCopy();
+                            final String appendix = Optional.ofNullable(o.getFilenameAppendix()).orElse(id);
+                            out.setInputPath(inputPath);
+                            out.setOutputPath(outputPath.resolve(FFMpegImpl.filename(o.getFormat(), fileName,
+                                    appendix)));
 
-                        return out;
-                    }).collect(Collectors.toList());
+                            return out;
+                        }).collect(Collectors.toList());
 
                 final ConverterJob converter = new ConverterJob(id, prio, outputs, inputPath, outputPath,
-                    completeCallBack);
+                        completeCallBack);
 
                 converters.put(id, converter);
                 converterThreadPool.submit(converter, prio);
@@ -372,7 +373,7 @@ public class ConverterService extends Widget implements Listener {
                         if (!cw.isDone() || cw.getExitValue() != 0) {
                             LOGGER.info("...restart \"{}\" with id \"{}\".", cw.getFileName(), cw.getId());
                             addJob(Paths.get(cw.getInputPath(), cw.getFileName()), cw.getId(), cw.getPriority(),
-                                cw.getCompleteCallback());
+                                    cw.getCompleteCallback());
                         }
                     } catch (JAXBException | InterruptedException | ExecutionException | IOException e) {
                         LOGGER.error("Couldn't add incomplete jobs.", e);
@@ -387,9 +388,9 @@ public class ConverterService extends Widget implements Listener {
 
     private static void deleteRecursive(Path path) throws IOException {
         Files.walk(path, FileVisitOption.FOLLOW_LINKS)
-            .sorted(Comparator.reverseOrder())
-            .map(Path::toFile)
-            .forEach(File::delete);
+                .sorted(Comparator.reverseOrder())
+                .map(Path::toFile)
+                .forEach(File::delete);
     }
 
     public static class ConverterJob implements Runnable {
@@ -435,8 +436,8 @@ public class ConverterService extends Widget implements Listener {
         private Timer timer;
 
         public ConverterJob(final String id, int priority, final List<Output> outputs, final Path inputPath,
-            final Path outputPath,
-            final String completeCallBack) throws InterruptedException, IOException, JAXBException {
+                final Path outputPath,
+                final String completeCallBack) throws InterruptedException, IOException, JAXBException {
             this.id = id;
             this.outputs = outputs;
             this.inputPath = inputPath;
@@ -464,8 +465,8 @@ public class ConverterService extends Widget implements Listener {
                 startTime = Instant.now();
 
                 hwAccel = hwAccels.stream()
-                    .filter(hw -> FFMpegImpl.canHWAccelerate(outputs, hw)).sorted()
-                    .findFirst();
+                        .filter(hw -> FFMpegImpl.canHWAccelerate(outputs, hw)).sorted()
+                        .findFirst();
 
                 command = FFMpegImpl.command(id, inputPath, outputs, hwAccel);
                 final Executable exec = new Executable(command);
@@ -584,7 +585,7 @@ public class ConverterService extends Widget implements Listener {
         @Override
         public void run() {
             EVENT_MANAGER
-                .fireEvent(new Event<String>(ConverterJob.PROGRESS, job.id(), job.getClass()));
+                    .fireEvent(new Event<String>(ConverterJob.PROGRESS, job.id(), job.getClass()));
         }
 
     }

@@ -1,0 +1,150 @@
+{
+    "alert": {
+        "network": {
+            "error": {
+                "0": "Konnte URL \"{url}\" nicht erreichen.",
+                "401": "Nicht autorisiert.",
+                "403": "Keine Zugriffsberechtigung.",
+                "500": "Interner Serverfehler"
+            }
+        },
+        "type": {
+            "error": "Fehler",
+            "info": "Info",
+            "success": "Erfolg",
+            "warning": "Warnung"
+        }
+    },
+    "button": {
+        "add": "Hinzufügen",
+        "cancel": "Abbrechen",
+        "close": "Schließen",
+        "details": "Details",
+        "delete": "Löschen",
+        "edit": "Bearbeiten",
+        "encode": "Enkodieren",
+        "login": "Anmelden",
+        "logout": "Abmelden",
+        "ok": "Ok",
+        "remove": "Entfernen",
+        "save": "Speichern",
+        "send": "Abschicken",
+        "share": "Teilen"
+    },
+    "converter": {
+        "addJob": "Auftrag einreichen",
+        "breadcrumb": "Konverter Aufträge",
+        "doneJobs": "Fetiggestellte Aufträge",
+        "noDoneJobs": "Keine fertiggestellte Aufträge vorhanden.",
+        "noJobs": "Keine Konverter-Aufträge vorhanden.",
+        "queued": "eingereiht",
+        "upload": {
+            "placeholderDrop": "Dateien hier fallen lassen oder klicken um auszuwählen!",
+            "queued": "eingereiht"
+        },
+        "runningJobs": "Konverter Aufträge",
+        "via": "via"
+    },
+    "dashboard": {
+        "breadcrumb": "Übersicht",
+        "gpu": "GPU {index}",
+        "hwaccels": "Hardwarebeschleuniger",
+        "nvmonitor": {
+            "decoder": "Decoder",
+            "encoder": "Encoder",
+            "memory": "Speicher",
+            "power": "Energieverbrauch",
+            "temperature": "Temperatur"
+        },
+        "system": "Systemübersicht"
+    },
+    "dataTable": {
+        "filter": "Filter",
+        "filterInfo": "{start} bis {limit} von {total} Einträgen",
+        "first": "Erster",
+        "last": "Letzter",
+        "lengthMenu": "Einträge anzeigen",
+        "next": "Nächster",
+        "noItemFound": "Kein Eintrag gefunden!",
+        "previous": "Zurück"
+    },
+    "general": {
+        "boolean": {
+            "false": "Nein",
+            "true": "Ja"
+        },
+        "buildIn": "eingebaut",
+        "created": "Erzeugt",
+        "deleteQuestion": "Wirklich löschen?",
+        "lastModified": "Bearbeitet",
+        "loading": "Lade...",
+        "noResult": "Suche liefert kein Ergebnis.",
+        "notset": "nicht gesetzt",
+        "pleaseSelect": "(bitte wählen)",
+        "typeToSearch": "Tippen um zu suchen"
+    },
+    "plugin": {
+        "nvmonitor": {
+            "decoder": "Decoder GPU #{index}",
+            "encoder": "Encoder GPU #{index}",
+            "memory": "Speicher GPU #{index}",
+            "power": "Energieverbrauch GPU #{index}",
+            "temperature": "Temperatur GPU #{index}"
+        },
+        "sysmonitor": {
+            "cpu-load": "Systemauslastung",
+            "cpu-temp": "CPU Temperatur",
+            "memory": "Speicherauslastung",
+            "swap": "Speicherauslastung (Swap)"
+        }
+    },
+    "settings": {
+        "action": {
+            "saved": "Einstellungen wurden erfolgreich gespeichert."
+        },
+        "allowUpscale": "erlaube Hochskalieren",
+        "asSource": "wie Quelle",
+        "audio": "Audio",
+        "auto": "automatisch",
+        "autoBalancing": "Auto-Balancing",
+        "bitrate": "Bitrate",
+        "breadcrumb": "Einstellungen",
+        "codec": "Codec",
+        "default": "Standard",
+        "extended": "Erweiterte Optionen",
+        "filenameAppendix": "Dateinamen Anhang",
+        "forceKeyFrames": "erzwinge Key Frames",
+        "format": "Ausgabe Format",
+        "framerate": "Wiederholungsrate (FPS)",
+        "framerateType": {
+            "CFR": "Konstante Wiederholrate",
+            "VFR": "Variable Wiederholrate"
+        },
+        "legend": {
+            "hwAccels": "Hardware-Beschleunigung",
+            "converter": "Konverter Einstellungen"
+        },
+        "level": "Level",
+        "outputLabel": "Ausgabe { index }",
+        "pixelFormat": "Farbraum",
+        "preset": "Vorlage",
+        "profile": "Profil",
+        "quality": {
+            "bufsize": "Buffer-Größe",
+            "label": "Qualität",
+            "maxrate": "max. Bitrate",
+            "minrate": "min. Bitrate",
+            "type": {
+                "ABR": "Durchsch. Bitrate",
+                "CQ": "Konstant",
+                "CRF": "Konstant"
+            }
+        },
+        "samplerate": "Abtastrate",
+        "scale": "Skalierung",
+        "secondsAbbr": "sek",
+        "tune": "Abstimmung",
+        "video": "Video",
+        "videoFallback": "Video (Fallback)"
+    }
+}

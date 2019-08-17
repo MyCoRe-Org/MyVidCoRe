@@ -1,0 +1,32 @@
+<div fileDropZone (files)="onFiles($event)"
+    class="file-drop-zone d-flex justify-content-center align-items-center mb-1 p-1">
+    <div>
+        <label for="files" class="p-4 m-0">{{ 'converter.upload.placeholderDrop' | translate }}</label>
+        <input #filesInput type="file" id="files" name="files" [accept]="accept" multiple [hidden]="true">
+    </div>
+</div>
+
+<div *ngIf="queue && queue.length !== 0" class="file-queue">
+    <div *ngFor="let item of queue; trackBy: trackByItem" class="row my-1">
+        <div class="col-12 text-truncate">
+            <strong>{{ item.file.filepath || item.file.name }}</strong>
+            <a *ngIf="item.error" class="text-dark ml-1" (click)="retry(item)">
+                <i class="fas fa-sync"></i>
+            </a>
+        </div>
+        <div *ngIf="item.progress" class="col-12 my-auto">
+            <ngb-progressbar [type]="!item.complete ? 'primary' : item.error !== true ? 'success' : 'danger'"
+                [value]="item.progress || 0" [animated]="item.processing" [striped]="true" [showValue]="true"
+                height="20px">
+            </ngb-progressbar>
+        </div>
+        <div *ngIf="!item.progress && !item.complete" class="col-12">
+            <div class="status-icon queued float-left">
+                <div class="is-rotating">
+                    <i class="circle"></i> <i class="circle"></i>
+                </div>
+            </div>
+            {{ 'converter.upload.queued' | translate }}
+        </div>
+    </div>
+</div>

@@ -1,0 +1,245 @@
+<div *ngIf="output && type" [formGroup]="output">
+    <!-- templates -->
+    <ng-template #codecSelect let-index="index" let-type="type">
+        <div class="form-group">
+            <label [attr.for]="'output-' + index + '-' + type + '-codec'">{{ 'settings.codec' | translate }}</label>
+            <select class="form-control custom-select" [id]="'output-' + index + '-' + type + '-codec'"
+                formControlName="codec" (change)="onCodecChange()">
+                <ng-container *ngFor="let cgrp of selectedFormat.video">
+                    <ng-container *ngIf="cgrp">
+                        <optgroup *ngIf="cgrp.encoders?.encoder.length &gt; 1" [label]="cgrp.description">
+                            <option *ngFor="let enc of cgrp.encoders.encoder" [value]="enc.name">
+                                {{ enc.description }} ({{ enc.name }})
+                            </option>
+                        </optgroup>
+                        <option *ngIf="cgrp.encoders?.encoder.length &lt;= 1" [value]="cgrp.name">
+                            {{ cgrp.description }}
+                        </option>
+                    </ng-container>
+                </ng-container>
+            </select>
+        </div>
+    </ng-template>
+    <!-- templates -->
+
+    <fieldset class="border border-top-0 p-2">
+        <ng-container *ngTemplateOutlet="codecSelect,context:{index: indexndex, type: type}">
+        </ng-container>
+
+        <ng-container *ngIf="selectedEncoder">
+            <!-- templates - video -->
+            <ng-template #videoParameterSelect let-index="index" let-ptype="ptype" let-defaults="defaults">
+                <ng-container formGroupName="parameter">
+                    <label for="output-{{ index }}-{{ type }}-{{ ptype }}">{{ 'settings.' + ptype | translate }}</label>
+                    <select class="form-control custom-select" [id]="'output-' + index + '-' + type + '-' + ptype"
+                        [formControlName]="ptype"
+                        [ngClass]="{'is-invalid':output.controls.parameter.controls[ptype].errors && output.controls.parameter.controls[ptype].dirty}">
+                        <option [value]="null">{{ 'settings.auto' | translate }}
+                        </option>
+                        <ng-container
+                            *ngFor="let p of filterParameter(selectedEncoder.parameters, ptype)?.values || defaults || []">
+                            <option *ngIf="['auto', 'default'].indexOf(p.name) === -1" [value]="p.name">
+                                {{ p.description || p.name }}</option>
+                        </ng-container>
+                    </select>
+                </ng-container>
+            </ng-template>
+            <!-- templates - video -->
+
+            <div class="form-group row" formGroupName="parameter"
+                *ngIf="filterParameter(selectedEncoder.parameters, 'profile') && filterParameter(selectedEncoder.parameters, 'level')">
+                <div class="col-12 col-md-6">
+                    <ng-container
+                        *ngTemplateOutlet="videoParameterSelect,context:{index: index, ptype: 'profile', defaults: profiles}">
+                    </ng-container>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <ng-container
+                        *ngTemplateOutlet="videoParameterSelect,context:{index: index, ptype: 'level', defaults: levels}">
+                    </ng-container>
+                </div>
+            </div>
+
+            <div class="form-group" *ngIf="filterParameter(selectedEncoder.parameters, 'preset')">
+                <ng-container
+                    *ngTemplateOutlet="videoParameterSelect,context:{index: index, ptype: 'preset', defaults: presets[selectedEncoder.name]}">
+                </ng-container>
+            </div>
+
+            <div class="form-group" formGroupName="parameter"
+                *ngIf="filterParameter(selectedEncoder.parameters, 'tune')">
+                <ng-container
+                    *ngTemplateOutlet="videoParameterSelect,context:{index: index, ptype: 'tune', defaults: tunes[selectedEncoder.name]}">
+                </ng-container>
+            </div>
+
+            <div *ngIf="selectedEncoder.pixelFormats" class="form-group">
+                <label for="output-{{ index }}-video-pixelformat">{{ 'settings.pixelFormat' | translate }}</label>
+                <select class="form-control custom-select" [id]="'output-' + index + '-' + type + '-pixelformat'"
+                    formControlName="pixelFormat"
+                    [ngClass]="{'is-invalid':output.controls.pixelFormat.errors && output.controls.pixelFormat.dirty}">
+                    <option [value]="null">{{ 'settings.auto' | translate }}
+                    </option>
+                    <option *ngFor="let pf of selectedEncoder.pixelFormats" [value]="pf">
+                        {{ pf }}</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="output-{{ index }}-video-scale">{{ 'settings.scale' | translate }}</label>
+                <select class="form-control custom-select" [id]="'output-' + index + '-' + type + '-scale'"
+                    formControlName="scale"
+                    [ngClass]="{'is-invalid':output.controls.scale.errors && output.controls.scale.dirty}">
+                    <option [value]="null">{{ 'settings.auto' | translate }}
+                    </option>
+                    <option *ngFor="let s of scales" [value]="s.value">
+                        {{ s.name }}</option>
+                </select>
+
+                <div class="custom-control custom-switch mt-2">
+                    <input type="checkbox" class="custom-control-input"
+                        [id]="'output-' + index + '-' + type + '-upcale'" formControlName="upscale">
+                    <label class="custom-control-label"
+                        [attr.for]="'output-' + index + '-' + type + '-upcale'">{{ 'settings.allowUpscale' | translate }}</label>
+                </div>
+            </div>
+        </ng-container>
+
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label for="output-{{ index }}-video-framerate">{{ 'settings.framerate' | translate }}</label>
+                    <select class="form-control custom-select" [id]="'output-' + index + '-' + type + '-framerate'"
+                        formControlName="framerate"
+                        [ngClass]="{'is-invalid':output.controls.framerate.errors && output.controls.framerate.dirty}">
+                        <option [value]="null">
+                            {{ 'settings.asSource' | translate }}
+                        </option>
+                        <option *ngFor="let fps of framerates" [value]="fps">
+                            {{ fps }}</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <div class="custom-control custom-radio">
+                        <input class="custom-control-input" type="radio"
+                            [id]="'output-' + index + '-' + type + '-framerateType-vfr'" formControlName="framerateType"
+                            value="VFR">
+                        <label class="custom-control-label"
+                            [attr.for]="'output-' + index + '-' + type + '-framerateType-vfr'">{{ 'settings.framerateType.VFR' | translate }}</label>
+                    </div>
+                    <div class="custom-control custom-radio">
+                        <input class="custom-control-input" type="radio"
+                            [id]="'output-' + index + '-' + type + '-framerateType-cfr'" formControlName="framerateType"
+                            value="CFR">
+                        <label class="custom-control-label"
+                            [attr.for]="'output-' + index + '-' + type + '-framerateType-cfr'">{{ 'settings.framerateType.CFR' | translate }}</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label
+                        [attr.for]="'output-' + index + '-' + type + '-forceKeyFrames'">{{ 'settings.forceKeyFrames' | translate }}</label>
+                    <div class="input-group">
+                        <input [id]="'output-' + index + '-' + type + '-forceKeyFrames'" type="number"
+                            class="form-control" formControlName="forceKeyFrames">
+                        <div class="input-group-append">
+                            <span class="input-group-text">{{ 'settings.secondsAbbr' | translate }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4" formGroupName="quality">
+                <label>{{ 'settings.quality.label' | translate }}</label>
+                <div class="form-group">
+                    <div *ngIf="filterParameter(selectedEncoder.parameters, 'crf')" class="custom-control custom-radio">
+                        <input class="custom-control-input" type="radio"
+                            [id]="'output-' + index + '-' + type + '-qType-crf'" formControlName="type" value="CRF"
+                            (change)="onQualityTypeChange()">
+                        <label class="custom-control-label"
+                            [attr.for]="'output-' + index + '-' + type + '-qType-crf'">{{ 'settings.quality.type.CRF' | translate }}</label>
+                        <div class="input-group">
+                            <ng-template #rateFactorRange let-param="param">
+                                <input type="range" class="custom-range" [min]="param.fromValue" [max]="param.toValue"
+                                    [step]="param.type === 'float' ? 0.25 : 1" formControlName="rateFactor">
+                            </ng-template>
+
+                            <ng-container
+                                *ngTemplateOutlet="rateFactorRange;context:{param: filterParameter(selectedEncoder.parameters, 'crf')}">
+                            </ng-container>
+                        </div>
+                    </div>
+
+                    <div *ngIf="!filterParameter(selectedEncoder.parameters, 'crf')"
+                        class="custom-control custom-radio">
+                        <input class="custom-control-input" type="radio"
+                            [id]="'output-' + index + '-' + type + '-qType-cq'" formControlName="type" value="CQ"
+                            (change)="onQualityTypeChange()">
+                        <label class="custom-control-label"
+                            [attr.for]="'output-' + index + '-' + type + '-qType-cq'">{{ 'settings.quality.type.CQ' | translate }}</label>
+                        <div class="input-group">
+                            <input type="range" class="custom-range" min="0" max="51" step="0.25"
+                                formControlName="scale">
+                        </div>
+                    </div>
+
+                    <div class="custom-control custom-radio">
+                        <input class="custom-control-input" type="radio"
+                            [id]="'output-' + index + '-' + type + '-qType-abr'" formControlName="type" value="ABR"
+                            (change)="onQualityTypeChange()">
+                        <label class="custom-control-label"
+                            [attr.for]="'output-' + index + '-' + type + '-qType-abr'">{{ 'settings.quality.type.ABR' | translate }}</label>
+                        <div class="input-group">
+                            <input [id]="'output-' + index + '-' + type + '-bitrate'" type="number" class="form-control"
+                                formControlName="bitrate">
+                            <div class="input-group-append">
+                                <span class="input-group-text">kbps</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4" formGroupName="quality">
+                <div class="form-group">
+                    <label
+                        [attr.for]="'output-' + index + '-' + type + '-minrate'">{{ 'settings.quality.minrate' | translate }}</label>
+                    <div class="input-group">
+                        <input [id]="'output-' + index + '-' + type + '-minrate'" type="number" class="form-control"
+                            formControlName="minrate">
+                        <div class="input-group-append">
+                            <span class="input-group-text">kbps</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label
+                        [attr.for]="'output-' + index + '-' + type + '-maxrate'">{{ 'settings.quality.maxrate' | translate }}</label>
+                    <div class="input-group">
+                        <input [id]="'output-' + index + '-' + type + '-maxrate'" type="number" class="form-control"
+                            formControlName="maxrate">
+                        <div class="input-group-append">
+                            <span class="input-group-text">kbps</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label
+                        [attr.for]="'output-' + index + '-' + type + '-bufsize'">{{ 'settings.quality.bufsize' | translate }}</label>
+                    <div class="input-group">
+                        <input [id]="'output-' + index + '-' + type + '-bufsize'" type="number" class="form-control"
+                            formControlName="bufsize">
+                        <div class="input-group-append">
+                            <span class="input-group-text">kbps</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <ui-settings-extended [settings]="settings" [selectedEncoder]="selectedEncoder" [index]="index" [type]="type">
+        </ui-settings-extended>
+    </fieldset>
+</div>

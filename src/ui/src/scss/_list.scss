@@ -1,0 +1,122 @@
+ul.content-list {
+	margin: $table-cell-padding-sm 0;
+	padding: 0;
+	list-style: none;
+	li {
+		border: $table-border-color;
+	}
+
+	& > li {
+		padding: $table-cell-padding 0;
+		border-bottom: 1px solid $table-border-color;
+		display: block;
+		margin: 0;
+		&:after {
+			content: " ";
+			display: table
+		}
+	}
+
+	& > li.video-container , & > li.pagination-row {
+		border-bottom: 0;
+	}
+
+	& > li.pagination-row {
+		.controls {
+			margin-left: auto;
+		}
+	}
+}
+
+.flex-list {
+	.flex-row {
+		display: -webkit-flex;
+		display: -ms-flexbox;
+		display: flex;
+		align-items: center;
+		white-space: nowrap;
+		&.clickable {
+			transition-property: background, color;
+			transition-duration: 250ms;
+			transition-timing-function: ease-in;
+			&:hover {
+				background-color: transparentize($primary, 0.95);
+				border-bottom: 1px solid transparentize($primary, 0.7);
+				cursor: pointer
+			}
+		}
+	}
+
+	.row-thumbnail {
+		max-height: 70px;
+		min-width: 129px;
+		margin-bottom: auto;
+		> a {
+			text-decoration: none;
+		}
+
+		span.thumb-placeholder {
+			color: $primary;
+			height: 66px;
+			width: 120px;
+			font-size: 60px;
+			font-family: "Font Awesome 5 Free";
+			line-height: 60px;
+			text-align: center;
+			text-rendering: auto;
+			&:before {
+				content: "\f144";
+			}
+		}
+
+		img , span.thumb-placeholder {
+			display: block;
+			padding: 2px;
+			margin-left: auto;
+			margin-right: $table-cell-padding;
+			background-color: #fff;
+			border: 1px solid $table-border-color;
+			border-radius: 4px;
+			-webkit-transition: border 0.2s ease-in-out;
+			-o-transition: border 0.2s ease-in-out;
+			transition: border 0.2s ease-in-out;
+			max-height: 70px;
+		}
+	}
+
+	.row-main-content {
+		flex: 1 1 auto;
+		overflow: hidden;
+		padding-right: $table-cell-padding;
+		//margin-bottom: auto;
+	}
+
+	.row-title {
+		font-weight: 600;
+	}
+
+	.row-second-line {
+		display: block;
+	}
+
+	.row-details {
+		ul.content-list {
+			& > li {
+				padding: $table-cell-padding-sm 0;
+				font-size: 90%;
+			}
+
+			& > li:last-child {
+				border-bottom: 0;
+			}
+		}
+	}
+
+	.controls {
+		float: right;
+		margin-bottom: auto;
+		& > .btn-group , & > .pagination {
+			display: flex;
+		}
+	}
+}

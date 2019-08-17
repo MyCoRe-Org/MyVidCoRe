@@ -50,54 +50,51 @@ import org.mycore.vidconv.frontend.entity.ResourceWrapper;
 @Singleton
 public class WebResource {
 
-	private static final Logger LOGGER = LogManager.getLogger(WebResource.class);
+    private static final Logger LOGGER = LogManager.getLogger(WebResource.class);
 
-	private static final ClassLoader CLASS_LOADER = ClassTools.getClassLoader();
+    private static final ClassLoader CLASS_LOADER = ClassTools.getClassLoader();
 
-	private static final String RESOURCE_DIR = "META-INF/resources";
+    private static final String RESOURCE_DIR = "META-INF/resources";
 
-	private static final String INDEX_FILE = "index.html";
+    private static final String INDEX_FILE = "index.html";
 
-	@GET
-	@CacheMaxAge(time = 1, unit = TimeUnit.HOURS)
-	@Produces("*/*")
-	public Response getWebResource() {
-		return getWebResource(INDEX_FILE);
-	}
+    @GET
+    @CacheMaxAge(time = 1, unit = TimeUnit.HOURS)
+    @Produces("*/*")
+    public Response getWebResource() {
+        return getWebResource(INDEX_FILE);
+    }
 
-	@GET
-	@CacheMaxAge(time = 1, unit = TimeUnit.HOURS)
-	@Path("{fileName:.+}")
-	@Produces("*/*")
-	public Response getWebResource(@PathParam("fileName") String fileName) {
-		LOGGER.info("getWebResource {}", fileName);
-		try {
-			final Optional<ResourceWrapper> res = getResource(fileName);
-			if (res.isPresent()) {
-				final ResourceWrapper r = res.get();
-				return Response.ok().tag(r.getETag()).type(r.getMimeType()).entity(r.getContent()).build();
-			} else {
-				LOGGER.error("resource \"{}\" not found.", fileName);
-				return Response.status(Response.Status.NOT_FOUND).build();
-			}
-		} catch (Exception e) {
-			LOGGER.error(e.getMessage(), e);
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ExceptionWrapper(e)).build();
-		}
-	}
+    @GET
+    @CacheMaxAge(time = 1, unit = TimeUnit.HOURS)
+    @Path("{fileName:.+}")
+    @Produces("*/*")
+    public Response getWebResource(@PathParam("fileName") String fileName) {
+        try {
+            final Optional<ResourceWrapper> res = getResource(fileName);
+            if (res.isPresent()) {
+                final ResourceWrapper r = res.get();
+                return Response.ok().tag(r.getETag()).type(r.getMimeType()).entity(r.getContent()).build();
+            } else {
+                LOGGER.error("resource \"{}\" not found.", fileName);
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ExceptionWrapper(e)).build();
+        }
+    }
 
-	private Optional<ResourceWrapper> getResource(String fileName) {
-		final String fn = RESOURCE_DIR + File.separator + fileName;
-		LOGGER.info("getResource {}", fn);
-		try (final InputStream is = CLASS_LOADER.getResourceAsStream(fn)) {
-			final ResourceWrapper res = new ResourceWrapper(fn, is);
-			LOGGER.info("loaded resource \"" + fileName + "\" with mime type \"" + res.getMimeType() + "\"");
-			LOGGER.info("getResource {}", res);
-			return Optional.of(res);
-		} catch (NullPointerException e) {
-			return Optional.empty();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
+    private Optional<ResourceWrapper> getResource(String fileName) {
+        final String fn = RESOURCE_DIR + File.separator + fileName;
+        try (final InputStream is = CLASS_LOADER.getResourceAsStream(fn)) {
+            final ResourceWrapper res = new ResourceWrapper(fn, is);
+            LOGGER.info("loaded resource \"" + fileName + "\" with mime type \"" + res.getMimeType() + "\"");
+            return Optional.of(res);
+        } catch (NullPointerException e) {
+            return Optional.empty();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

@@ -9,54 +9,7 @@
 	<packaging>jar</packaging>
 
 	<name>My Video (Converter) Core</name>
-	<url>https://github.com/MyCoRe-Org/MyVidCoRe</url>
 	<description>Converts Videos from hotfolder to output directory with given settings.</description>
-
-	<organization>
-		<name>MyCoRe</name>
-		<url>http://www.mycore.de</url>
-	</organization>
-	<inceptionYear>2016</inceptionYear>
-
-	<scm>
-		<url>https://github.com/MyCoRe-Org/MyVidCoRe</url>
-		<tag>master</tag>
-		<connection>scm:git:https://github.com/MyCoRe-Org/MyVidCoRe.git</connection>
-		<developerConnection>scm:git:https://github.com/MyCoRe-Org/MyVidCoRe.git</developerConnection>
-	</scm>
-
-	<issueManagement>
-		<url>https://github.com/MyCoRe-Org/MyVidCoRe/issues</url>
-		<system>GitHub Issues</system>
-	</issueManagement>
-
-	<ciManagement>
-		<system>Travis-CI</system>
-		<url>https://travis-ci.org/MyCoRe-Org/MyVidCoRe</url>
-	</ciManagement>
-
-	<licenses>
-		<license>
-			<name>GNU General Public License, version 3</name>
-			<distribution>repo</distribution>
-			<url>http://www.gnu.org/licenses/gpl-3.0.txt</url>
-		</license>
-	</licenses>
-
-	<developers>
-		<developer>
-			<id>mcradler</id>
-			<name>René Adler</name>
-			<organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
-			<organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
-			<email>rene.adler (at) uni-jena.de</email>
-			<timezone>+1</timezone>
-			<roles>
-				<role>architect</role>
-				<role>developer</role>
-			</roles>
-		</developer>
-	</developers>
 
 	<prerequisites>
 		<maven>3.1.0</maven>
@@ -65,7 +18,7 @@
 	<properties>
 		<eclipselink.version>2.7.4</eclipselink.version>
 		<jersey.version>2.29</jersey.version>
-		<log4j.version>2.11.2</log4j.version>
+		<log4j.version>2.12.1</log4j.version>
 		<grizzly.version>2.4.4</grizzly.version>
 		<encoding>UTF-8</encoding>
 		<java.version>8</java.version>
@@ -73,328 +26,7 @@
 		<npm.version>6.9.0</npm.version>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<webpack.assetsDir>${project.build.directory}/classes/META-INF/resources/assets</webpack.assetsDir>
-		<webpack.baseDir>${project.build.directory}/webpack</webpack.baseDir>
-		<webpack.mainFile>${basedir}/src/main/js/app.js</webpack.mainFile>
-		<webpack.lessDir>${basedir}/src/main/less/</webpack.lessDir>
 	</properties>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.6.0</version>
-				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
-					<encoding>${encoding}</encoding>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>3.0.1</version>
-				<configuration>
-					<encoding>${encoding}</encoding>
-				</configuration>
-				<executions>
-					<execution>
-						<id>create-resources</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${webpack.baseDir}</outputDirectory>
-							<resources>
-								<resource>
-									<filtering>true</filtering>
-									<directory>${basedir}/src/main/webpack</directory>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>com.github.eirslett</groupId>
-				<artifactId>frontend-maven-plugin</artifactId>
-				<version>1.6</version>
-
-				<configuration>
-					<nodeVersion>${node.version}</nodeVersion>
-					<npmVersion>${npm.version}</npmVersion>
-					<installDirectory>${settings.localRepository}/node-npm-${node.version}-${npm.version}</installDirectory>
-				</configuration>
-
-				<executions>
-					<execution>
-						<id>install node and npm</id>
-						<goals>
-							<goal>install-node-and-npm</goal>
-						</goals>
-					</execution>
-
-					<execution>
-						<id>webapp-deps</id>
-						<phase>process-resources</phase>
-						<goals>
-							<goal>npm</goal>
-						</goals>
-						<configuration>
-							<workingDirectory>${webpack.baseDir}</workingDirectory>
-							<arguments>install</arguments>
-						</configuration>
-					</execution>
-					<execution>
-						<id>webpack</id>
-						<phase>process-resources</phase>
-						<goals>
-							<goal>webpack</goal>
-						</goals>
-						<configuration>
-							<workingDirectory>${webpack.baseDir}</workingDirectory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>3.2.1</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-						<phase>package</phase>
-						<configuration>
-							<finalName>${project.artifactId}</finalName>
-							<filters>
-								<filter>
-									<artifact>*:*</artifact>
-									<excludes>
-										<exclude>META-INF/*.SF</exclude>
-										<exclude>META-INF/*.DSA</exclude>
-										<exclude>META-INF/*.RSA</exclude>
-									</excludes>
-								</filter>
-							</filters>
-							<transformers>
-								<transformer
-									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<manifestEntries>
-										<Main-Class>org.mycore.vidconv.Application</Main-Class>
-										<Multi-Release>true</Multi-Release>
-									</manifestEntries>
-								</transformer>
-							</transformers>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.6.0</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>java</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<mainClass>org.mycore.vidconv.Application</mainClass>
-					<arguments>
-						<argument>-ct</argument>
-						<argument>2</argument>
-						<argument>--watchDir</argument>
-						<argument>/tmp/input</argument>
-						<argument>--outputDir</argument>
-						<argument>/tmp/converted</argument>
-					</arguments>
-				</configuration>
-			</plugin>
-
-			<!-- Facilitates downloading source and javadoc in Eclipse -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-eclipse-plugin</artifactId>
-				<version>2.10</version>
-				<configuration>
-					<downloadSources>true</downloadSources>
-					<downloadJavadocs>true</downloadJavadocs>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>license-maven-plugin</artifactId>
-				<version>1.10</version>
-				<configuration>
-					<verbose>true</verbose>
-					<licenseName>gpl_v3</licenseName>
-				</configuration>
-				<executions>
-					<execution>
-						<id>download-licenses</id>
-						<goals>
-							<goal>update-project-license</goal>
-						</goals>
-						<phase>process-sources</phase>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.7.7.201606060606</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>prepare-agent</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>report</id>
-						<phase>test</phase>
-						<goals>
-							<goal>report</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<artifactId>maven-dependency-plugin</artifactId>
-			</plugin>
-
-			<plugin>
-				<groupId>de.thetaphi</groupId>
-				<artifactId>forbiddenapis</artifactId>
-				<executions>
-					<execution>
-						<goals>
-							<goal>check</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<artifactId>maven-dependency-plugin</artifactId>
-					<version>3.1.1</version>
-					<dependencies>
-						<!-- new version to support Java 11 -->
-						<dependency>
-							<groupId>org.apache.maven.shared</groupId>
-							<artifactId>maven-dependency-analyzer</artifactId>
-							<version>1.11.1</version>
-							<exclusions>
-								<exclusion>
-									<groupId>org.apache.maven</groupId>
-									<artifactId>maven-project</artifactId>
-								</exclusion>
-							</exclusions>
-						</dependency>
-					</dependencies>
-					<executions>
-						<execution>
-							<id>analyze</id>
-							<goals>
-								<goal>analyze-only</goal>
-							</goals>
-							<inherited>true</inherited>
-							<configuration>
-								<failOnWarning>true</failOnWarning>
-								<ignoreNonCompile>true</ignoreNonCompile>
-								<outputXML>true</outputXML>
-							</configuration>
-						</execution>
-					</executions>
-				</plugin>
-				<plugin>
-					<groupId>de.thetaphi</groupId>
-					<artifactId>forbiddenapis</artifactId>
-					<version>2.6</version>
-					<configuration>
-						<failOnUnsupportedJava>false</failOnUnsupportedJava>
-						<failOnMissingClasses>false</failOnMissingClasses>
-						<failOnUnresolvableSignatures>false</failOnUnresolvableSignatures>
-						<bundledSignatures>
-							<bundledSignature>jdk-unsafe</bundledSignature>
-							<bundledSignature>jdk-deprecated</bundledSignature>
-						</bundledSignatures>
-					</configuration>
-				</plugin>
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
-					only. It has no influence on the Maven build itself. -->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.codehaus.mojo</groupId>
-										<artifactId>
-											license-maven-plugin
-										</artifactId>
-										<versionRange>[1.9,)</versionRange>
-										<goals>
-											<goal>
-												update-project-license
-											</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore />
-									</action>
-								</pluginExecution>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>de.thetaphi</groupId>
-										<artifactId>forbiddenapis</artifactId>
-										<versionRange>[1.6.1,)</versionRange>
-										<goals>
-											<goal>check</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore />
-									</action>
-								</pluginExecution>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>com.github.eirslett</groupId>
-										<artifactId>frontend-maven-plugin</artifactId>
-										<versionRange>[1.2,)</versionRange>
-										<goals>
-											<goal>yarn</goal>
-											<goal>install-node-and-yarn</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore />
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
 
 	<dependencies>
 		<dependency>
@@ -574,7 +206,7 @@
 		<dependency>
 			<groupId>org.glassfish.hk2.external</groupId>
 			<artifactId>jakarta.inject</artifactId>
-			<version>2.5.0</version>
+			<version>2.6.0</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
@@ -593,7 +225,7 @@
 		<dependency>
 			<groupId>org.ehcache</groupId>
 			<artifactId>ehcache</artifactId>
-			<version>3.7.0</version>
+			<version>3.8.0</version>
 		</dependency>
 
 		<dependency>
@@ -614,6 +246,383 @@
 			<version>2.0.6</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.github.oshi</groupId>
+			<artifactId>oshi-core</artifactId>
+			<version>4.0.0</version>
+		</dependency>
+
 	</dependencies>
+
+	<build>
+
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>3.1.1</version>
+					<dependencies>
+						<!-- new version to support Java 11 -->
+						<dependency>
+							<groupId>org.apache.maven.shared</groupId>
+							<artifactId>maven-dependency-analyzer</artifactId>
+							<version>1.11.1</version>
+							<exclusions>
+								<exclusion>
+									<groupId>org.apache.maven</groupId>
+									<artifactId>maven-project</artifactId>
+								</exclusion>
+							</exclusions>
+						</dependency>
+					</dependencies>
+					<executions>
+						<execution>
+							<id>analyze</id>
+							<goals>
+								<goal>analyze-only</goal>
+							</goals>
+							<inherited>true</inherited>
+							<configuration>
+								<failOnWarning>true</failOnWarning>
+								<ignoreNonCompile>true</ignoreNonCompile>
+								<outputXML>true</outputXML>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>de.thetaphi</groupId>
+					<artifactId>forbiddenapis</artifactId>
+					<version>2.6</version>
+					<configuration>
+						<failOnUnsupportedJava>false</failOnUnsupportedJava>
+						<failOnMissingClasses>false</failOnMissingClasses>
+						<failOnUnresolvableSignatures>false</failOnUnresolvableSignatures>
+						<bundledSignatures>
+							<bundledSignature>jdk-unsafe</bundledSignature>
+							<bundledSignature>jdk-deprecated</bundledSignature>
+						</bundledSignatures>
+					</configuration>
+				</plugin>
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.codehaus.mojo</groupId>
+										<artifactId>license-maven-plugin</artifactId>
+										<versionRange>[1.9,)</versionRange>
+										<goals>
+											<goal>update-project-license</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>de.thetaphi</groupId>
+										<artifactId>forbiddenapis</artifactId>
+										<versionRange>[1.6.1,)</versionRange>
+										<goals>
+											<goal>check</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>com.github.eirslett</groupId>
+										<artifactId>frontend-maven-plugin</artifactId>
+										<versionRange>[1.2,)</versionRange>
+										<goals>
+											<goal>yarn</goal>
+											<goal>install-node-and-yarn</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.6.0</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+					<encoding>${encoding}</encoding>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>com.github.eirslett</groupId>
+				<artifactId>frontend-maven-plugin</artifactId>
+				<version>1.6</version>
+
+				<configuration>
+					<nodeVersion>${node.version}</nodeVersion>
+					<npmVersion>${npm.version}</npmVersion>
+					<installDirectory>${settings.localRepository}/node-npm-${node.version}-${npm.version}</installDirectory>
+				</configuration>
+
+				<executions>
+					<execution>
+						<id>install node and npm</id>
+						<goals>
+							<goal>install-node-and-npm</goal>
+						</goals>
+					</execution>
+
+					<execution>
+						<id>ui-deps</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<phase>process-resources</phase>
+						<configuration>
+							<arguments>install</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>ui-build</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<phase>process-resources</phase>
+						<configuration>
+							<arguments>run build</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>ui-image-optimize</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<phase>process-resources</phase>
+						<configuration>
+							<arguments>run optimize</arguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>pl.project13.maven</groupId>
+				<artifactId>git-commit-id-plugin</artifactId>
+				<version>2.2.4</version>
+				<configuration>
+					<generateGitPropertiesFile>true</generateGitPropertiesFile>
+					<generateGitPropertiesFilename>${project.build.outputDirectory}/META-INF/resources/assets/git.json</generateGitPropertiesFilename>
+					<format>json</format>
+					<dateFormat>yyyy-MM-dd'T'HH:mm:ssXXX</dateFormat>
+					<dateFormatTimeZone>UTC</dateFormatTimeZone>
+					<commitIdGenerationMode>full</commitIdGenerationMode>
+					<excludeProperties>
+						<excludeProperty>.*\.email</excludeProperty>
+						<excludeProperty>.*\.host</excludeProperty>
+					</excludeProperties>
+				</configuration>
+				<executions>
+					<execution>
+						<id>get-the-git-infos</id>
+						<goals>
+							<goal>revision</goal>
+						</goals>
+						<phase>process-resources</phase>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.2.1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<phase>package</phase>
+						<configuration>
+							<finalName>${project.artifactId}</finalName>
+							<filters>
+								<filter>
+									<artifact>*:*</artifact>
+									<excludes>
+										<exclude>META-INF/*.SF</exclude>
+										<exclude>META-INF/*.DSA</exclude>
+										<exclude>META-INF/*.RSA</exclude>
+									</excludes>
+								</filter>
+							</filters>
+							<transformers>
+								<transformer
+									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<manifestEntries>
+										<Main-Class>org.mycore.vidconv.Application</Main-Class>
+										<Multi-Release>true</Multi-Release>
+									</manifestEntries>
+								</transformer>
+							</transformers>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.6.0</version>
+				<configuration>
+					<mainClass>org.mycore.vidconv.Application</mainClass>
+					<arguments>
+						<argument>-ct</argument>
+						<argument>2</argument>
+						<argument>--watchDir</argument>
+						<argument>/tmp/input</argument>
+						<argument>--outputDir</argument>
+						<argument>/tmp/converted</argument>
+					</arguments>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>java</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Facilitates downloading source and javadoc in Eclipse -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.10</version>
+				<configuration>
+					<downloadSources>true</downloadSources>
+					<downloadJavadocs>true</downloadJavadocs>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>1.10</version>
+				<configuration>
+					<verbose>true</verbose>
+					<licenseName>gpl_v3</licenseName>
+				</configuration>
+				<executions>
+					<execution>
+						<id>download-licenses</id>
+						<goals>
+							<goal>update-project-license</goal>
+						</goals>
+						<phase>process-sources</phase>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.7.7.201606060606</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<goals>
+							<goal>report</goal>
+						</goals>
+						<phase>test</phase>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-dependency-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>de.thetaphi</groupId>
+				<artifactId>forbiddenapis</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	<url>https://github.com/MyCoRe-Org/MyVidCoRe</url>
+	<inceptionYear>2016</inceptionYear>
+
+	<organization>
+		<name>MyCoRe</name>
+		<url>http://www.mycore.de</url>
+	</organization>
+
+	<licenses>
+		<license>
+			<name>GNU General Public License, version 3</name>
+			<url>http://www.gnu.org/licenses/gpl-3.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<id>mcradler</id>
+			<name>René Adler</name>
+			<email>rene.adler (at) uni-jena.de</email>
+			<organization>Friedrich-Schiller-Universität Jena, Thüringer Universitäts- und Landesbibliothek</organization>
+			<organizationUrl>http://www.thulb.uni-jena.de/</organizationUrl>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
+	</developers>
+
+	<scm>
+		<connection>scm:git:https://github.com/MyCoRe-Org/MyVidCoRe.git</connection>
+		<developerConnection>scm:git:https://github.com/MyCoRe-Org/MyVidCoRe.git</developerConnection>
+		<url>https://github.com/MyCoRe-Org/MyVidCoRe</url>
+		<tag>master</tag>
+	</scm>
+
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/MyCoRe-Org/MyVidCoRe/issues</url>
+	</issueManagement>
+
+	<ciManagement>
+		<system>Travis-CI</system>
+		<url>https://travis-ci.org/MyCoRe-Org/MyVidCoRe</url>
+	</ciManagement>
 
 </project>

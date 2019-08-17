@@ -1,6 +1,0 @@
-<div class="gauges" data-ng-repeat="entry in monitor.entries" data-ng-init="idx = getAttrib(entry, 'gpu').value">
-  <div id="enc-{{ idx }}" class="gauge-container encoder" title="{{ 'nvmonitor.encoder' | translate }}"></div>
-  <div id="dec-{{ idx }}" class="gauge-container decoder" title="{{ 'nvmonitor.decoder' | translate }}"></div>
-  <div id="mem-{{ idx }}" class="gauge-container memory" title="{{ 'nvmonitor.memory' | translate }}"></div>
-  <div id="temp-{{ idx }}" class="gauge-container temperature" title="{{ 'nvmonitor.temperature' | translate }}"></div>
-</div>

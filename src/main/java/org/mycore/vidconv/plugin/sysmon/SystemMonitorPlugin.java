@@ -20,26 +20,18 @@
 package org.mycore.vidconv.plugin.sysmon;
 
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
-import java.lang.management.OperatingSystemMXBean;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlValue;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -53,6 +45,12 @@ import org.mycore.vidconv.common.util.JsonUtils;
 import org.mycore.vidconv.plugin.GenericPlugin;
 import org.mycore.vidconv.plugin.annotation.Plugin;
 import org.mycore.vidconv.plugin.annotation.Plugin.Type;
+
+import oshi.SystemInfo;
+import oshi.hardware.CentralProcessor;
+import oshi.hardware.GlobalMemory;
+import oshi.hardware.HardwareAbstractionLayer;
+import oshi.hardware.Sensors;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
@@ -111,23 +109,19 @@ public class SystemMonitorPlugin extends GenericPlugin {
 
         private SystemMonitorPlugin parent;
 
-        private OperatingSystemMXBean osBean;
+        private SystemInfo si;
 
-        private List<Method> mCache;
+        private HardwareAbstractionLayer hal;
+
+        private long[] prevTicks;
+
+        private long[][] prevProcTicks;
 
         public SystemMonitorTask(SystemMonitorPlugin parent) {
             this.parent = parent;
 
-            osBean = ManagementFactory.getOperatingSystemMXBean();
-            mCache = Arrays.stream(osBean.getClass().getDeclaredMethods())
-                    .map(m -> {
-                        try {
-                            m.setAccessible(true);
-                            return m;
-                        } catch (Exception e) {
-                            return null;
-                        }
-                    }).filter(m -> m != null && Modifier.isPublic(m.getModifiers())).collect(Collectors.toList());
+            this.si = new SystemInfo();
+            this.hal = si.getHardware();
         }
 
         /* (non-Javadoc)
@@ -135,36 +129,66 @@ public class SystemMonitorPlugin extends GenericPlugin {
          */
         @Override
         public void run() {
-            if (!mCache.isEmpty()) {
-                SysMonitor sysm = new SysMonitor(mCache.stream().map(m -> new SysAttrib(getPropertyName(m),
-                        getSystemBeanValue((Object o) -> o.toString(), m.getName()))).collect(Collectors.toList()));
+            List<SysAttrib> attribs = new ArrayList<>();
 
-                EventManager.instance()
-                        .fireEvent(new Event<SysMonitor>(EVENT_DATA, sysm, parent.getClass()).setInternal(false));
+            cpuLoad(attribs, hal.getProcessor());
+            memory(attribs, hal.getMemory());
+            sensors(attribs, hal.getSensors());
+
+            SysMonitor sysm = new SysMonitor(attribs);
+
+            EventManager.instance()
+                    .fireEvent(new Event<SysMonitor>(EVENT_DATA, sysm, parent.getClass()).setInternal(false));
+        }
+
+        private void cpuLoad(List<SysAttrib> attribs, CentralProcessor processor) {
+            if (processor != null) {
+                if (prevProcTicks != null) {
+                    double[] load = processor.getProcessorCpuLoadBetweenTicks(prevProcTicks);
+                    IntStream.range(0, load.length).forEach(i -> attribs
+                            .add(new SysAttrib("cpu-" + i + "-load", String.format(Locale.ROOT, " %.1f", load[i] * 100),
+                                    "%")));
+                }
+
+                prevProcTicks = processor.getProcessorCpuLoadTicks();
+
+                if (prevTicks != null) {
+                    attribs.add(new SysAttrib("cpu-load", String.format(Locale.ROOT, " %.1f",
+                            processor.getSystemCpuLoadBetweenTicks(prevTicks) * 100), "%"));
+                }
+
+                prevTicks = processor.getSystemCpuLoadTicks();
             }
         }
 
-        private <T> T getSystemBeanValue(Function<Object, T> valueTransformer, String... mmethodNames) {
-            return mCache.stream()
-                    .filter(m -> Arrays.stream(mmethodNames).anyMatch(mn -> mn.equalsIgnoreCase(m.getName())))
-                    .findFirst()
-                    .map(m -> getMethodValue(m, valueTransformer)).orElse(null);
+        private void memory(List<SysAttrib> attribs, GlobalMemory memory) {
+            if (memory != null) {
+                attribs.add(new SysAttrib("mem-total", Long.toString(memory.getTotal()), "B"));
+                attribs.add(new SysAttrib("mem-available", Long.toString(memory.getAvailable()), "B"));
 
-        }
-
-        private <T> T getMethodValue(Method m, Function<Object, T> valueTransformer) {
-            try {
-                return valueTransformer.apply(m.invoke(osBean));
-            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                return null;
+                if (memory.getVirtualMemory() != null) {
+                    attribs.add(
+                            new SysAttrib("swap-total", Long.toString(memory.getVirtualMemory().getSwapTotal()),
+                                    "B"));
+                    attribs.add(
+                            new SysAttrib("swap-used", Long.toString(memory.getVirtualMemory().getSwapUsed()),
+                                    "B"));
+                }
             }
         }
 
-        private String getPropertyName(Method m) {
-            String pn = m.getName().replaceAll("get", "");
-            return pn.substring(0, 1).toLowerCase(Locale.ROOT) + pn.substring(1);
-        }
+        private void sensors(List<SysAttrib> attribs, Sensors sensors) {
+            if (sensors != null) {
+                attribs.add(new SysAttrib("cpu-temp", String.format(Locale.ROOT, " %.1f",
+                        sensors.getCpuTemperature()), "C"));
+                attribs.add(new SysAttrib("cpu-voltage", String.format(Locale.ROOT, " %.1f",
+                        sensors.getCpuVoltage()), "V"));
 
+                int[] fans = sensors.getFanSpeeds();
+                IntStream.range(0, fans.length)
+                        .forEach(i -> new SysAttrib("fan-" + i, Integer.toString(fans[i]), "rpm"));
+            }
+        }
     }
 
     private static class SystemMonitorApplication extends WebSocketApplication implements Listener {
@@ -214,16 +238,20 @@ public class SystemMonitorPlugin extends GenericPlugin {
         @XmlAttribute
         private String name;
 
-        @XmlValue
+        @XmlAttribute
         private String value;
+
+        @XmlAttribute
+        private String unit;
 
         private SysAttrib() {
         }
 
-        public SysAttrib(String name, String value) {
+        public SysAttrib(String name, String value, String unit) {
             this();
             this.name = name;
             this.value = value;
+            this.unit = unit;
         }
 
     }

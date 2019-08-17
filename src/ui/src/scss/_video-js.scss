@@ -1,0 +1,29 @@
+@import "~video.js/dist/video-js.css";
+@import "~@guaclive/videojs-resolution-switcher/lib/videojs-resolution-switcher.css";
+
+.video-js {
+    color: $primary;
+    &:focus {
+        outline-style: none ! important;
+        outline-color: transparent ! important;
+        outline-width: 0 ! important;
+    }
+
+    .vjs-big-play-button {
+        background-color: rgba(2, 2, 2, 0.85);
+        border-color: $primary;
+    }
+
+    .vjs-control-bar {
+        background-color: rgba(2, 2, 2, 0.85);
+    }
+
+    .vjs-slider {
+        background: rgba($primary, 0.3);
+    }
+
+    .vjs-load-progress , .vjs-load-progress div {
+        background: rgba($primary, 0.2);
+    }
+}
+

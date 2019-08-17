@@ -1,0 +1,52 @@
+.status-icon {
+  height: 14px;
+  line-height: 0;
+  margin-right: 0.5em;
+  width: 13px;
+  * {
+    stroke-width: 2px;
+  }
+
+  .is-rotating {
+    -webkit-animation: rotation 3s infinite ease;
+    animation: rotation 3s infinite ease;
+    height: 18px;
+    line-height: 1.1;
+    text-align: center;
+    -webkit-transform-origin: center center;
+    transform-origin: center center;
+    width: 17px;
+    will-change: transform;
+    .circle {
+      border: 1px solid $body-color;
+      border-radius: 50%;
+      display: inline-block;
+      height: 5px;
+      transform-origin: center center 0;
+      vertical-align: middle;
+      width: 5px;
+    }
+  }
+
+  &.queued {
+    height: 19px;
+    .circle {
+      border-color: $primary;
+    }
+  }
+}
+
+#converter {
+    .action-group {
+        .btn-action {
+            border-radius: 0;
+            box-shadow: none;
+            background: transparent;
+            margin-right: -1em;
+        
+            &:hover, &:focus {
+                background-color: darken(#fafafa, 5%);
+            }
+        }
+    }
+}

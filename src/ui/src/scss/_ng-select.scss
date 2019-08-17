@@ -1,0 +1,30 @@
+@import "~@ng-select/ng-select/themes/default.theme.css";
+
+.ng-select {
+    &.ng-invalid .ng-select-container {
+        border-color: $form-feedback-invalid-color;
+        box-shadow: $input-btn-focus-box-shadow;
+    }
+
+    .ng-select-container {
+        border-color: $input-border-color;
+        border-radius: $border-radius;
+    }
+
+    &.focused > .ng-select-container, &.focused:not(.opened) > .ng-select-container,  {
+        border-color: $primary;
+        box-shadow: $input-btn-focus-box-shadow;
+    }
+
+    .ng-dropdown-panel .ng-dropdown-panel-items {
+        .ng-option {
+            &.selected {
+                background-color: transparentize($primary, 0.8);
+            }
+        
+            &.marked {
+                background-color: transparentize($primary, 0.9);
+            }
+        }
+    }
+}

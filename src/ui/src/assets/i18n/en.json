@@ -1,0 +1,150 @@
+{
+    "alert": {
+        "network": {
+            "error": {
+                "0": "URL \"{url}\" was unreachable.",
+                "401": "Unauthorized.",
+                "403": "No access right.",
+                "500": "Internal Servererror"
+            }
+        },
+        "type": {
+            "error": "Error",
+            "info": "Info",
+            "success": "Success",
+            "warning": "Warning"
+        }
+    },
+    "button": {
+        "add": "Add",
+        "cancel": "Cancel",
+        "close": "Close",
+        "details": "Details",
+        "delete": "Delete",
+        "edit": "Edit",
+        "encode": "Encode",
+        "login": "Login",
+        "logout": "Logout",
+        "ok": "Ok",
+        "remove": "Remove",
+        "save": "Save",
+        "send": "Send",
+        "share": "Share"
+    },
+    "converter": {
+        "addJob": "Add job",
+        "breadcrumb": "Converter Jobs",
+        "doneJobs": "Done Jobs",
+        "noDoneJobs": "No done jobs found.",
+        "noJobs": "No Jobs running.",
+        "queued": "queued",
+        "upload": {
+            "placeholderDrop": "Drop files here or click to choose!",
+            "queued": "queued"
+        },
+        "runningJobs": "Converter Jobs",
+        "via": "via"
+    },
+    "dashboard": {
+        "breadcrumb": "Dashboard",
+        "gpu": "GPU #{index}",
+        "hwaccels": "Hardware Accelerator",
+        "nvmonitor": {
+            "decoder": "Decoder",
+            "encoder": "Encoder",
+            "memory": "Memory",
+            "power": "Power consumption",
+            "temperature": "Temperature"
+        },
+        "system": "System-Overview"
+    },
+    "dataTable": {
+        "filter": "Filter",
+        "filterInfo": "{start} bis {limit} von {total} Einträgen",
+        "first": "First",
+        "last": "Last",
+        "lengthMenu": "Items to show",
+        "next": "Next",
+        "noItemFound": "No Items found!",
+        "previous": "Back"
+    },
+    "general": {
+        "boolean": {
+            "false": "No",
+            "true": "Yes"
+        },
+        "buildIn": "build in",
+        "created": "Created",
+        "deleteQuestion": "Really delete?",
+        "lastModified": "Modified",
+        "loading": "Loading...",
+        "noResult": "Seach has no result.",
+        "notset": "not set",
+        "pleaseSelect": "(please select)",
+        "typeToSearch": "Type to search"
+    },
+    "plugin": {
+        "nvmonitor": {
+            "decoder": "Decoder GPU #{index}",
+            "encoder": "Encoder GPU #{index}",
+            "memory": "Memory GPU #{index}",
+            "power": "Power consumption GPU #{index}",
+            "temperature": "Temperature GPU #{index}"
+        },
+        "sysmonitor": {
+            "cpu-load": "CPU usage",
+            "cpu-temp": "CPU Temperature",
+            "memory": "Memory usage",
+            "swap": "Swap usage"
+        }
+    },
+    "settings": {
+        "action": {
+            "saved": "Settings saved succesfully."
+        },
+        "allowUpscale": "allow Upscale",
+        "asSource": "same as Source",
+        "audio": "Audio",
+        "auto": "automatic",
+        "autoBalancing": "Auto-Balancing",
+        "bitrate": "Bitrate",
+        "breadcrumb": "Settings",
+        "codec": "Codec",
+        "default": "default",
+        "extended": "Extended Options",
+        "filenameAppendix": "Filename append",
+        "forceKeyFrames": "force Key Frames",
+        "format": "Output Format",
+        "framerate": "Framerate (FPS)",
+        "framerateType": {
+            "CFR": "Constant Framerate",
+            "VFR": "Variable Framerate"
+        },
+        "level": "Level",
+        "legend": {
+            "hwAccels": "Hardware Acceleration",
+            "converter": "Converter Settings"
+        },
+        "outputLabel": "Output { index }",
+        "pixelFormat": "Pixel format",
+        "preset": "Preset",
+        "profile": "Profil",
+        "quality": {
+            "bufsize": "Buffer-Size",
+            "label": "Quality",
+            "maxrate": "max. Bitrate",
+            "minrate": "min. Bitrate",
+            "type": {
+                "ABR": "avg. Bitrate",
+                "CQ": "Constant",
+                "CRF": "Constant"
+            }
+        },
+        "samplerate": "Samplerate",
+        "scale": "Scale",
+        "secondsAbbr": "sek",
+        "tune": "Tune",
+        "video": "Video",
+        "videoFallback": "Video (Fallback)"
+    }
+}

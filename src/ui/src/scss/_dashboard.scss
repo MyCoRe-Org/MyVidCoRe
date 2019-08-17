@@ -1,0 +1,75 @@
+#dashboard {
+    label {
+        font-weight: bold;
+
+        @include media-breakpoint-down(sm) {
+            font-size: 0.9em;
+            font-weight: normal;
+        }
+    }
+
+    .gauge-container {
+        width: 140px;
+        height: 140px;
+        display: inline-block;
+        padding: 0;
+        margin: 0;
+
+        > .gauge {
+            > .dial {
+                stroke: #5a5a5a;
+                stroke-width: 12;
+                fill: rgba(0, 0, 0, 0);
+            }
+
+            > .value {
+                stroke: $primary;
+                stroke-width: 12;
+                fill: rgba(0, 0, 0, 0);
+            }
+
+            > .value-text {
+                fill: $primary;
+                font-family: "Titillium Web";
+                font-weight: bold;
+                font-size: 1.2rem;
+            }
+        }
+
+        &.encoder , &.cpu-load {
+            > .gauge {
+                > .value {
+                    stroke: $success;
+                }
+
+                > .value-text {
+                    fill: $success;
+                }
+            }
+        }
+
+        &.decoder {
+            > .gauge {
+                > .value {
+                    stroke: $danger;
+                }
+
+                > .value-text {
+                    fill: $danger;
+                }
+            }
+        }
+
+        &.swap {
+            > .gauge {
+                > .value {
+                    stroke: $danger;
+                }
+
+                > .value-text {
+                    fill: $danger;
+                }
+            }
+        }
+    }
+}

@@ -81,13 +81,17 @@ public class PluginService {
     }
 
     private static Boolean isPluginEnabled(String name) {
-        Optional<SettingsWrapper.Plugin> pn = Optional.ofNullable(SETTINGS.getSettings().getPlugins())
-            .map(pl -> pl.stream()
-                .filter(sp -> sp.getName() == name)
-                .findFirst())
-            .orElse(Optional.empty());
+        if (SETTINGS.getSettings() != null) {
+            Optional<SettingsWrapper.Plugin> pn = Optional.ofNullable(SETTINGS.getSettings().getPlugins())
+                    .map(pl -> pl.stream()
+                            .filter(sp -> sp.getName() == name)
+                            .findFirst())
+                    .orElse(Optional.empty());
 
-        return pn.isPresent() ? pn.get().isEnabled() : null;
+            return pn.isPresent() ? pn.get().isEnabled() : null;
+        }
+
+        return null;
     }
 
     public static Map<String, GenericPlugin> plugins() {

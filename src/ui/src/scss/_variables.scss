@@ -1,0 +1,26 @@
+/**
+ * Bootstrap Overwrites
+ **/
+
+$primary: orange; //#ff813e;
+
+$body-color: #333;
+
+$border-radius:    .1rem;
+$border-radius-lg: .2rem;
+$border-radius-sm: .05rem;
+
+$input-btn-focus-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 2px rgba($primary, 0.6);
+
+$enable-shadows: true;
+
+/**
+ * Header navbar variables
+ **/
+$navbar-height: 50px;
+
+/**
+ * Sidebar variables
+ **/
+$sidebar-width: 225px;
+$sidebar-font-size: 1.1rem;
