@@ -40,7 +40,7 @@ export class GaugeComponent {
                 return (value: number): string => {
                     return `${Math.round(value)} °` + attrib.unit;
                 };
-            } else if (["B"].indexOf(attrib.unit) !== -1 || ["memory", "swap"].indexOf(name) !== -1) {
+            } else if (["B"].indexOf(attrib.unit) !== -1 || "%" !== attrib.unit && ["memory", "swap"].indexOf(name) !== -1) {
                 return (value: number): string => {
                     if (value >= (1024 * 1024 * 1024)) {
                         return `${Math.round(value / (1024 * 1024 * 1024))} G`;
