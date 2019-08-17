@@ -14,6 +14,8 @@ import { NVMonitorComponent } from "../plugins/nvmonitor.component";
 })
 export class DashboardComponent implements OnInit {
 
+    static maxValues = {};
+
     sysmon: Observable<Boolean>;
 
     nvmon: Observable<Boolean>;
@@ -23,6 +25,20 @@ export class DashboardComponent implements OnInit {
     ngOnInit() {
         this.sysmon = this.$api.isPluginEnabled(SystemMonitorComponent.PLUGIN_NAME);
         this.nvmon = this.$api.isPluginEnabled(NVMonitorComponent.PLUGIN_NAME);
+    }
+
+    isEmpty(value: any) {
+        return value instanceof Array ?
+            (<Array<any>>value).length === 0 : typeof value === "object" ?
+                Object.values(value).length === 0 : !value;
+    }
+
+    maxValue(name: string, value: any, defaultMax: number = 100) {
+        const val: number = typeof value === "string" ?
+            value.indexOf(".") !== -1 ? parseFloat(value) : parseInt(value, 10) : value;
+
+        DashboardComponent.maxValues[name] = Math.max(isNaN(val) ? val : 0, DashboardComponent.maxValues[name] || defaultMax);
+        return DashboardComponent.maxValues[name];
     }
 
 }

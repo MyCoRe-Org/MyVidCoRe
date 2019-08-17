@@ -53,6 +53,7 @@
             "decoder": "Decoder",
             "encoder": "Encoder",
             "memory": "Speicher",
+            "power": "Energieverbrauch",
             "temperature": "Temperatur"
         },
         "system": "Systemübersicht"
@@ -87,6 +88,7 @@
             "decoder": "Decoder GPU #{index}",
             "encoder": "Encoder GPU #{index}",
             "memory": "Speicher GPU #{index}",
+            "power": "Energieverbrauch GPU #{index}",
             "temperature": "Temperatur GPU #{index}"
         },
         "sysmonitor": {

@@ -3,7 +3,11 @@
         <h5 class="card-header">{{ 'dashboard.system' | translate }}</h5>
         <ui-sysmonitor-plugin>
             <ng-template sysMonContent let-entries="entries">
-                <div class="card-body">
+                <div class="card-body text-center" *ngIf="isEmpty(entries)">
+                    <strong>{{ 'general.loading' | translate }}</strong>
+                </div>
+
+                <div class="card-body" *ngIf="!isEmpty(entries)">
                     <div class="d-flex flex-wrap align-content-center justify-content-between align-items-center">
                         <div *ngIf="entries['cpu-load']"
                             class="d-inline-flex flex-column justify-content-center align-items-center">
@@ -46,6 +50,10 @@
         <h5 class="card-header">{{ 'dashboard.hwaccels' | translate }}</h5>
         <ui-nvmonitor-plugin>
             <ng-template nvMonContent let-entries="entries">
+                <div class="card-body text-center" *ngIf="isEmpty(entries)">
+                    <strong>{{ 'general.loading' | translate }}</strong>
+                </div>
+
                 <div class="card-body" *ngFor="let e of entries; let i = index" [id]="'gpu-' + i">
                     <h6 class="card-subtitle mb-2 text-muted">{{ 'dashboard.gpu' | translate:{index: i} }}</h6>
                     <div class="d-flex flex-wrap align-content-center justify-content-between align-items-center">
@@ -65,20 +73,28 @@
                             <label for="decoder">{{ 'dashboard.nvmonitor.decoder' | translate }}</label>
                         </div>
 
-                        <div *ngIf="e['temp']"
-                            class="d-inline-flex flex-column justify-content-center align-items-center">
-                            <ui-gauge [i18nPrefix]="'plugin.nvmonitor.'" [index]="i" [name]="'temperature'"
-                                [attrib]="e['temp']">
-                            </ui-gauge>
-                            <label for="temperature">{{ 'dashboard.nvmonitor.temperature' | translate }}</label>
-                        </div>
-
                         <div *ngIf="e['mem']"
                             class="d-inline-flex flex-column justify-content-center align-items-center">
                             <ui-gauge [i18nPrefix]="'plugin.nvmonitor.'" [index]="i" [name]="'memory'"
                                 [attrib]="e['mem']">
                             </ui-gauge>
                             <label for="memory">{{ 'dashboard.nvmonitor.memory' | translate }}</label>
+                        </div>
+
+                        <div *ngIf="e['temp']"
+                            class="d-inline-flex flex-column justify-content-center align-items-center">
+                            <ui-gauge [i18nPrefix]="'plugin.nvmonitor.'" [index]="i" [name]="'temperature'"
+                                [attrib]="e['temp']" [max]="120">
+                            </ui-gauge>
+                            <label for="temperature">{{ 'dashboard.nvmonitor.temperature' | translate }}</label>
+                        </div>
+
+                        <div *ngIf="e['pwr']"
+                            class="d-inline-flex flex-column justify-content-center align-items-center">
+                            <ui-gauge [i18nPrefix]="'plugin.nvmonitor.'" [index]="i" [name]="'power'"
+                                [attrib]="e['pwr']" [max]="maxValue('pwr', e['pwr'].value, 250)">
+                            </ui-gauge>
+                            <label for="power">{{ 'dashboard.nvmonitor.power' | translate }}</label>
                         </div>
                     </div>
                 </div>
