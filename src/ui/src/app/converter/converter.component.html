@@ -19,36 +19,38 @@
             </div>
             <div class="card-body p-2">
                 <div class="row my-1" *ngFor="let job of running; trackBy: trackByJobId">
-                    <div class="col-12 text-truncate">
-                        <strong>{{ job.file }}</strong>
-                        <span *ngIf="job.hwAccel" class="ml-1">{{ 'converter.via' | translate }}
-                            #{{ job.hwAccel.index }} -
-                            {{ job.hwAccel.name }}</span>
-                    </div>
-                    <ng-container *ngIf="job.running || job.done">
-                        <div class="col-12 col-md-9 my-auto">
-                            <ngb-progressbar showValue="true"
-                                [type]="job.running ? 'primary' : job.done ? 'success' : 'danger'" [striped]="true"
-                                [animated]="job.running" [value]="job.progress.percent || 0" height="20px">
-                            </ngb-progressbar>
+                    <ng-container *ngIf="job">
+                        <div class="col-12 text-truncate">
+                            <strong>{{ job.file }}</strong>
+                            <span *ngIf="job.hwAccel" class="ml-1">{{ 'converter.via' | translate }}
+                                #{{ job.hwAccel.index }} -
+                                {{ job.hwAccel.name }}</span>
                         </div>
-                        <div class="col-12 col-md-3 text-right my-auto">
-                            <i class="fa fa-hourglass-start" aria-hidden="true"></i>
-                            {{ job.progress.estimate || '0:00:00' }}
-                            <span> / </span>
-                            <i class="fa fa-hourglass-end" aria-hidden="true"></i>
-                            {{ job.progress.elapsed || '0:00:00' }}
-                        </div>
-                    </ng-container>
-                    <ng-container *ngIf="!job.running && !job.done">
-                        <div class="col-12">
-                            <div class="status-icon queued float-left">
-                                <div class="is-rotating">
-                                    <i class="circle"></i> <i class="circle"></i>
-                                </div>
+                        <ng-container *ngIf="job.running || job.done">
+                            <div class="col-12 col-md-9 my-auto">
+                                <ngb-progressbar showValue="true"
+                                    [type]="job.running ? 'primary' : job.done ? 'success' : 'danger'" [striped]="true"
+                                    [animated]="job.running" [value]="job.progress.percent || 0" height="20px">
+                                </ngb-progressbar>
                             </div>
-                            {{ 'converter.queued' | translate }}
-                        </div>
+                            <div class="col-12 col-md-3 text-right my-auto">
+                                <i class="fa fa-hourglass-start" aria-hidden="true"></i>
+                                {{ job.progress.estimate || '0:00:00' }}
+                                <span> / </span>
+                                <i class="fa fa-hourglass-end" aria-hidden="true"></i>
+                                {{ job.progress.elapsed || '0:00:00' }}
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="!job.running && !job.done">
+                            <div class="col-12">
+                                <div class="status-icon queued float-left">
+                                    <div class="is-rotating">
+                                        <i class="circle"></i> <i class="circle"></i>
+                                    </div>
+                                </div>
+                                {{ 'converter.queued' | translate }}
+                            </div>
+                        </ng-container>
                     </ng-container>
                 </div>
                 <div *ngIf="running.length === 0" class="col-12 text-center">
@@ -136,8 +138,9 @@
                     <span
                         class="d-none d-md-inline-block pt-2 pb-2">{{ 'dataTable.filterInfo' | translate:{start: start + 1, limit: end, total: doneJobs.total} }}</span>
                 </div>
-                <ngb-pagination class="mb-0" (pageChange)="pageChange($event)" [collectionSize]="doneJobs.total" [(page)]="page"
-                    [maxSize]="5" [pageSize]="limit" [rotate]="true" [ellipses]="false" [boundaryLinks]="false">
+                <ngb-pagination class="mb-0" (pageChange)="pageChange($event)" [collectionSize]="doneJobs.total"
+                    [(page)]="page" [maxSize]="5" [pageSize]="limit" [rotate]="true" [ellipses]="false"
+                    [boundaryLinks]="false">
                 </ngb-pagination>
             </div>
         </div>

@@ -120,8 +120,8 @@ export class ConverterComponent implements OnInit, OnDestroy {
         return this.jobStatus.get(id);
     }
 
-    trackByJobId(_index: number, item: Job) {
-        return item.hashCode || item.id;
+    trackByJobId(index: number, item: Job) {
+        return item && (item.hashCode || item.id) || index;
     }
 
     formatScale(scale: string) {
@@ -157,6 +157,10 @@ export class ConverterComponent implements OnInit, OnDestroy {
     }
 
     private filterDone(job: Job) {
+        if (!job) {
+            return false;
+        }
+
         const diff = new Date().getTime() - new Date(job.endTime).getTime();
         return job.running || !job.running && !job.done ?
             true : job.done && diff < ConverterComponent.REFRESH_INTERVAL ? true : false;
@@ -176,7 +180,7 @@ export class ConverterComponent implements OnInit, OnDestroy {
 
     private mergeJobs(from: Array<Job>, to: Array<Job>) {
         from.forEach((j: Job) => {
-            const fi = to.findIndex(fj => fj.id === j.id);
+            const fi = to.findIndex(fj => fj && j && fj.id === j.id);
             if (fi !== -1) {
                 to[fi] = j;
             } else {
@@ -185,7 +189,7 @@ export class ConverterComponent implements OnInit, OnDestroy {
         });
 
         return to.filter(j => {
-            return from.findIndex(fj => fj.id === j.id) !== -1;
+            return from.findIndex(fj => fj && j && fj.id === j.id) !== -1;
         });
     }
 
