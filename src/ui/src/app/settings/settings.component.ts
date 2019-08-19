@@ -237,6 +237,11 @@ export class SettingsComponent implements OnInit {
         this.selectedFormat[index] = this.allowedFormats.find(f => f.name === sel) || this.allowedFormats[0];
     }
 
+    private buildParamName(name: string) {
+        const re = /^\d.*/;
+        return name && re.test(name) ? "_" + name : name;
+    }
+
     onSubmit({ value, valid }) {
         if (valid) {
             value.output.forEach((o: Output) => {
@@ -251,6 +256,14 @@ export class SettingsComponent implements OnInit {
                             : cc.video[0].encoders.encoder[0];
 
                         o[type].parameter = SettingsExtendedComponent.cleanSettings(se.parameters, o[type].parameter);
+
+                        if (o[type].parameter) {
+                            const params = <(key: string) => string>{};
+                            Object.keys(o[type].parameter).forEach(n =>
+                                params[this.buildParamName(n)] = o[type].parameter[n]
+                            );
+                            o[type].parameter = params;
+                        }
                     }
                 });
             });
