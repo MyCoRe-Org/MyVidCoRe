@@ -45,6 +45,7 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -310,24 +311,31 @@ public class ConverterService extends Widget implements Listener {
                 final Path outputPath = Paths.get(outputDir, id);
                 final int prio = Math.min(PRIORITY_HIGHT, Math.max(PRIORITY_LOW, priority));
 
+                final Function<Output, Output> outMapper = (Output o) -> {
+                    final Output out = o.getCopy();
+                    final String appendix = Optional.ofNullable(o.getFilenameAppendix()).orElse(id);
+                    out.setInputPath(inputPath);
+                    out.setOutputPath(outputPath.resolve(FFMpegImpl.filename(o.getFormat(), fileName,
+                            appendix)));
+
+                    return out;
+                };
+
                 final List<Output> outputs = settings.getOutput().stream()
                         .sorted(Settings.sortOutputs)
                         .filter(output -> {
                             try {
                                 return output.getVideo().getUpscale()
-                                        || !FFMpegImpl.isUpscaling(inputPath, output.getVideo().getScale());
+                                        || output.getVideo().getScale() != null
+                                                && !FFMpegImpl.isUpscaling(inputPath, output.getVideo().getScale());
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
                             }
-                        }).map(o -> {
-                            final Output out = o.getCopy();
-                            final String appendix = Optional.ofNullable(o.getFilenameAppendix()).orElse(id);
-                            out.setInputPath(inputPath);
-                            out.setOutputPath(outputPath.resolve(FFMpegImpl.filename(o.getFormat(), fileName,
-                                    appendix)));
+                        }).map(outMapper).collect(Collectors.toList());
 
-                            return out;
-                        }).collect(Collectors.toList());
+                if (outputs.isEmpty() && settings.getOutput().size() == 1) {
+                    Optional.ofNullable(settings.getOutput().get(0)).map(outMapper).ifPresent(outputs::add);
+                }
 
                 final ConverterJob converter = new ConverterJob(id, prio, outputs, inputPath, outputPath,
                         completeCallBack);
