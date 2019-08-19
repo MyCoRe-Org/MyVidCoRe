@@ -332,6 +332,13 @@ public class ConverterService extends Widget implements Listener {
                 final ConverterJob converter = new ConverterJob(id, prio, outputs, inputPath, outputPath,
                         completeCallBack);
 
+                if (converters.containsKey(id)
+                        && Optional.ofNullable(converters.get(id)).filter(cj -> cj.inputPath().equals(inputPath))
+                                .map(ConverterJob::isRunning).orElse(false)) {
+                    LOGGER.warn("File \"" + inputPath.toFile().getAbsolutePath() + "\" is already in queue.");
+                    return null;
+                }
+
                 converters.put(id, converter);
                 converterThreadPool.submit(converter, prio);
 
