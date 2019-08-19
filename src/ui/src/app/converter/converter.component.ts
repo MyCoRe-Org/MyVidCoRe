@@ -125,15 +125,16 @@ export class ConverterComponent implements OnInit, OnDestroy {
     }
 
     formatScale(scale: string) {
-        const sp = scale.split(":", 2);
+        if (scale) {
+            const sp = scale.split(":", 2);
 
-        if (sp.length === 2) {
-            if (parseInt(sp[0], 10) > 0) {
-                return sp[0] + "x" + sp[1];
+            if (sp.length === 2) {
+                if (parseInt(sp[0], 10) > 0) {
+                    return sp[0] + "x" + sp[1];
+                }
+                return sp[1] + "p";
             }
-            return sp[1] + "p";
         }
-
         return scale;
     }
 
