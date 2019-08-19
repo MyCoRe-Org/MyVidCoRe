@@ -1,4 +1,4 @@
-import { Component, ViewContainerRef, ViewChild, OnInit } from "@angular/core";
+import { Component, ViewChild, OnInit, ElementRef } from "@angular/core";
 import { StateService } from "@uirouter/core";
 import { TranslateService } from "@ngx-translate/core";
 
@@ -18,19 +18,19 @@ export class AppComponent implements OnInit {
     private langs = ["de", "en"];
 
     @ViewChild("sidebar", { static: true })
-    public sidebar;
+    public sidebar: ElementRef;
 
     @ViewChild("content", { static: true })
-    public content;
+    public content: ElementRef;
 
-    public gitInfo;
+    public gitInfo: any;
 
     public Flags = RouteFlag;
 
     public routes: Array<RouteMenu> = ROUTES;
 
     constructor(public $auth: AuthService, public translate: TranslateService,
-        vcr: ViewContainerRef, private $api: ApiService, private $state: StateService) {
+        private $api: ApiService, private $state: StateService) {
         translate.addLangs(this.langs);
         translate.setDefaultLang(this.langs[0]);
 
