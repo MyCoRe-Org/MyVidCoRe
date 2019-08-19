@@ -52,7 +52,9 @@
         "nvmonitor": {
             "decoder": "Decoder",
             "encoder": "Encoder",
+            "mclk": "Memory clock",
             "memory": "Memory",
+            "pclk": "Processor clock",
             "power": "Power consumption",
             "temperature": "Temperature"
         },

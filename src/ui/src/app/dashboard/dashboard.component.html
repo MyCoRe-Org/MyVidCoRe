@@ -3,7 +3,7 @@
         <h5 class="card-header">{{ 'dashboard.system' | translate }}</h5>
         <ui-sysmonitor-plugin>
             <ng-template sysMonContent let-entries="entries">
-                <div class="card-body text-center" *ngIf="isEmpty(entries)">
+                <div class="card-body" *ngIf="isEmpty(entries)">
                     <strong>{{ 'general.loading' | translate }}</strong>
                 </div>
 
@@ -50,12 +50,20 @@
         <h5 class="card-header">{{ 'dashboard.hwaccels' | translate }}</h5>
         <ui-nvmonitor-plugin>
             <ng-template nvMonContent let-entries="entries">
-                <div class="card-body text-center" *ngIf="isEmpty(entries)">
+                <div class="card-body" *ngIf="isEmpty(entries)">
                     <strong>{{ 'general.loading' | translate }}</strong>
                 </div>
 
-                <div class="card-body" *ngFor="let e of entries; let i = index" [id]="'gpu-' + i">
-                    <h6 class="card-subtitle mb-2 text-muted">{{ 'dashboard.gpu' | translate:{index: i} }}</h6>
+                <div class="card-body" *ngFor="let e of entries; let i = index; trackBy: trackByGPU" [id]="'gpu-' + i">
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        {{ this.hwaccels[i]?.name || ('dashboard.gpu' | translate:{index: i}) }}
+                        <span *ngIf="e['pclk']" [title]="'dashboard.nvmonitor.pclk' | translate">@ <i
+                                class="fas fa-microchip"></i> {{ e['pclk'].value }}
+                            {{ e['pclk'].unit }}</span>
+                        <span *ngIf="e['mclk']" class="ml-2" [title]="'dashboard.nvmonitor.mclk' | translate"><i
+                                class="fas fa-memory"></i> {{ e['mclk'].value }}
+                            {{ e['mclk'].unit }}</span>
+                    </h6>
                     <div class="d-flex flex-wrap align-content-center justify-content-between align-items-center">
                         <div *ngIf="e['enc']"
                             class="d-inline-flex flex-column justify-content-center align-items-center">
