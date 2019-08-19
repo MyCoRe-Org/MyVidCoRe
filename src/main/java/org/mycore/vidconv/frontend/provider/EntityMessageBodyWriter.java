@@ -21,29 +21,21 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
-import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.Provider;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.mycore.vidconv.common.config.Configuration;
+import org.mycore.vidconv.common.util.EntityFactory;
 import org.mycore.vidconv.common.util.EntityUtils;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
  *
  */
-@Provider
-@Produces(MediaType.APPLICATION_XML)
-public class XmlMessageBodyWriter<T> implements MessageBodyWriter<T> {
-
-	private static final Configuration CONFIG = Configuration.instance();
+public class EntityMessageBodyWriter<T> implements MessageBodyWriter<T> {
 
 	/*
 	 * (non-Javadoc)
@@ -54,8 +46,9 @@ public class XmlMessageBodyWriter<T> implements MessageBodyWriter<T> {
 	 */
 	@Override
 	public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-		return (mediaType.isCompatible(MediaType.APPLICATION_XML_TYPE)
-				|| mediaType.isCompatible(MediaType.TEXT_XML_TYPE)) && type.isAnnotationPresent(XmlRootElement.class);
+		return (MediaType.APPLICATION_JSON_TYPE.isCompatible(mediaType)
+				|| MediaType.APPLICATION_XML_TYPE.isCompatible(mediaType))
+				&& type.getAnnotation(XmlRootElement.class) != null;
 	}
 
 	/*
@@ -82,16 +75,16 @@ public class XmlMessageBodyWriter<T> implements MessageBodyWriter<T> {
 	public void writeTo(T t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType,
 			MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
 			throws IOException, WebApplicationException {
-		try {
-			JAXBContext jc = JAXBContext
-					.newInstance(EntityUtils.populateEntities(CONFIG.getStrings("APP.Jersey.DynamicEntities"))
-							.stream().toArray(Class<?>[]::new));
-			final Marshaller marshaller = jc.createMarshaller();
-			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			marshaller.marshal(t, entityStream);
-		} catch (JAXBException e) {
-			throw new RuntimeException(e.getMessage(), e);
+		Class<?>[] entities = EntityUtils
+				.populateEntities(Configuration.instance().getStrings("APP.Jersey.DynamicEntities")).stream()
+				.toArray(Class<?>[]::new);
+
+		if (mediaType.equals(MediaType.APPLICATION_JSON_TYPE)) {
+			new EntityFactory<>(t, entities).toJSON(entityStream);
+			return;
 		}
+
+		new EntityFactory<>(t, entities).toXML(entityStream);
 	}
 
 }

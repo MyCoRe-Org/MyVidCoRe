@@ -29,9 +29,9 @@ import org.mycore.vidconv.common.config.Configuration;
 import org.mycore.vidconv.frontend.filter.CORSFilter;
 import org.mycore.vidconv.frontend.filter.CacheFilter;
 import org.mycore.vidconv.frontend.filter.IgnoreClientAbortInterceptor;
+import org.mycore.vidconv.frontend.provider.EntityMessageBodyReader;
+import org.mycore.vidconv.frontend.provider.EntityMessageBodyWriter;
 import org.mycore.vidconv.frontend.provider.GenericExceptionMapper;
-import org.mycore.vidconv.frontend.provider.XmlMessageBodyReader;
-import org.mycore.vidconv.frontend.provider.XmlMessageBodyWriter;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
@@ -54,8 +54,8 @@ public class FrontendFeature implements Feature {
         context.register(IgnoreClientAbortInterceptor.class);
 
         context.register(GenericExceptionMapper.class);
-        context.register(XmlMessageBodyReader.class);
-        context.register(XmlMessageBodyWriter.class);
+        context.register(EntityMessageBodyReader.class);
+        context.register(EntityMessageBodyWriter.class);
 
         context.register(MoxyJsonFeature.class);
         context.register(MoxyXmlFeature.class);
