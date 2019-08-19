@@ -100,7 +100,7 @@
                         <div *ngIf="e['pwr']"
                             class="d-inline-flex flex-column justify-content-center align-items-center">
                             <ui-gauge [i18nPrefix]="'plugin.nvmonitor.'" [index]="i" [name]="'power'"
-                                [attrib]="e['pwr']" [max]="maxValue('pwr', e['pwr'].value, 250)">
+                                [attrib]="e['pwr']" [max]="maxValue('pwr', e['pwr'].value, 75)">
                             </ui-gauge>
                             <label for="power">{{ 'dashboard.nvmonitor.power' | translate }}</label>
                         </div>
