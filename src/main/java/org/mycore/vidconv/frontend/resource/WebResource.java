@@ -38,7 +38,7 @@ import javax.ws.rs.core.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.vidconv.common.ClassTools;
-import org.mycore.vidconv.frontend.annotation.CacheMaxAge;
+import org.mycore.vidconv.frontend.annotation.CacheControl;
 import org.mycore.vidconv.frontend.entity.ExceptionWrapper;
 import org.mycore.vidconv.frontend.entity.ResourceWrapper;
 
@@ -59,14 +59,14 @@ public class WebResource {
     private static final String INDEX_FILE = "index.html";
 
     @GET
-    @CacheMaxAge(time = 1, unit = TimeUnit.HOURS)
+    @CacheControl(maxAge = @CacheControl.Age(time = 30, unit = TimeUnit.DAYS), proxyRevalidate = true)
     @Produces("*/*")
     public Response getWebResource() {
         return getWebResource(INDEX_FILE);
     }
 
     @GET
-    @CacheMaxAge(time = 1, unit = TimeUnit.HOURS)
+    @CacheControl(maxAge = @CacheControl.Age(time = 30, unit = TimeUnit.DAYS), proxyRevalidate = true)
     @Path("{fileName:.+}")
     @Produces("*/*")
     public Response getWebResource(@PathParam("fileName") String fileName) {

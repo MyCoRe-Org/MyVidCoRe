@@ -22,31 +22,29 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import java.util.concurrent.TimeUnit;
+import java.util.Date;
 
 @Documented
 @Retention(RUNTIME)
 @Target(METHOD)
 /**
- * Set the "Max-age" Cache header.
- * 
  * @author Ren\u00E9 Adler (eagle)
- * 
- * @see <a href=
- *      'http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9.3'>W3C
- *      Header Field Definitions</a>
  *
  */
-public @interface CacheMaxAge {
+public @interface LastModified {
 
-	/**
-	 * @return The amount of time to cache this resource.
-	 */
-	long time();
+	Class<? extends LastModifiedProvider<?>> value();
 
-	/**
-	 * @return The {@link TimeUnit} for the given {@link #time()}.
-	 */
-	TimeUnit unit();
+	public static abstract class LastModifiedProvider<T> {
+
+		protected final T type;
+
+		public LastModifiedProvider(T type) {
+			this.type = type;
+		}
+
+		public abstract Date lastModified();
+
+	}
 
 }

@@ -45,7 +45,7 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.mycore.vidconv.backend.encoder.FFMpegImpl;
 import org.mycore.vidconv.backend.service.ConverterService;
-import org.mycore.vidconv.frontend.annotation.CacheMaxAge;
+import org.mycore.vidconv.frontend.annotation.CacheControl;
 import org.mycore.vidconv.frontend.entity.CodecWrapper.Type;
 import org.mycore.vidconv.frontend.entity.CodecsWrapper;
 import org.mycore.vidconv.frontend.entity.DecodersWrapper;
@@ -63,11 +63,11 @@ import org.mycore.vidconv.frontend.widget.WidgetManager;
 public class ConverterResource {
 
     @GET
-    @CacheMaxAge(time = 1, unit = TimeUnit.HOURS)
+    @CacheControl(maxAge = @CacheControl.Age(time = 1, unit = TimeUnit.HOURS), proxyRevalidate = true)
     @Path("codecs{filter:(/[^/]+?)?}{value:(/([^/]+)?)?}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public CodecsWrapper getCodecs(@PathParam("filter") String filter, @PathParam("value") String value)
-        throws Exception {
+            throws Exception {
         CodecsWrapper codecs = FFMpegImpl.codecs();
 
         String f = Optional.ofNullable(filter.replaceAll("/", "")).orElse("");
@@ -91,11 +91,11 @@ public class ConverterResource {
     }
 
     @GET
-    @CacheMaxAge(time = 1, unit = TimeUnit.HOURS)
+    @CacheControl(maxAge = @CacheControl.Age(time = 1, unit = TimeUnit.HOURS), proxyRevalidate = true)
     @Path("formats{filter:(/[^/]+?)?}{value:(/([^/]+)?)?}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public FormatsWrapper getFormats(@PathParam("filter") String filter, @PathParam("value") String value)
-        throws Exception {
+            throws Exception {
         FormatsWrapper formats = FFMpegImpl.formats();
 
         String f = Optional.ofNullable(filter.replaceAll("/", "")).orElse("");
@@ -113,7 +113,7 @@ public class ConverterResource {
     }
 
     @GET
-    @CacheMaxAge(time = 1, unit = TimeUnit.HOURS)
+    @CacheControl(maxAge = @CacheControl.Age(time = 1, unit = TimeUnit.HOURS), proxyRevalidate = true)
     @Path("encoder/{name}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public EncodersWrapper getEncoder(@PathParam("name") String name) throws Exception {
@@ -121,7 +121,7 @@ public class ConverterResource {
     }
 
     @GET
-    @CacheMaxAge(time = 1, unit = TimeUnit.HOURS)
+    @CacheControl(maxAge = @CacheControl.Age(time = 1, unit = TimeUnit.HOURS), proxyRevalidate = true)
     @Path("decoder/{name}")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public DecodersWrapper getDecoder(@PathParam("name") String name) throws Exception {
@@ -129,7 +129,7 @@ public class ConverterResource {
     }
 
     @GET
-    @CacheMaxAge(time = 1, unit = TimeUnit.HOURS)
+    @CacheControl(maxAge = @CacheControl.Age(time = 1, unit = TimeUnit.HOURS), proxyRevalidate = true)
     @Path("hwaccels")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public HWAccelsWrapper getHWAccels() throws Exception {
@@ -141,25 +141,26 @@ public class ConverterResource {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces({ MediaType.TEXT_PLAIN })
     public String addJob(
-        @FormDataParam("file") InputStream is,
-        @FormDataParam("file") FormDataContentDisposition fileDetail,
-        @FormDataParam("filename") FormDataBodyPart fileName,
-        @FormDataParam("id") FormDataBodyPart id,
-        @FormDataParam("priority") FormDataBodyPart priority,
-        @FormDataParam("callback") FormDataBodyPart callback)
-        throws IOException, InterruptedException, JAXBException, ExecutionException {
+            @FormDataParam("file") InputStream is,
+            @FormDataParam("file") FormDataContentDisposition fileDetail,
+            @FormDataParam("filename") FormDataBodyPart fileName,
+            @FormDataParam("id") FormDataBodyPart id,
+            @FormDataParam("priority") FormDataBodyPart priority,
+            @FormDataParam("callback") FormDataBodyPart callback)
+            throws IOException, InterruptedException, JAXBException, ExecutionException {
         final String jobId = Optional.ofNullable(id).map(i -> i.getValueAs(String.class)).orElse(null);
         final int prio = Optional.ofNullable(priority).map(i -> i.getValueAs(Integer.class)).orElse(0);
         final String completeCallBack = Optional.ofNullable(callback).map(cb -> cb.getValueAs(String.class))
-            .orElse(null);
+                .orElse(null);
         final String fn = Optional.ofNullable(fileName).map(f -> f.getValueAs(String.class)).filter(f -> !f.isEmpty())
-            .orElseGet(() -> decodeFormDataFileName(fileDetail.getFileName()));
+                .orElseGet(() -> decodeFormDataFileName(fileDetail.getFileName()));
 
         ConverterService converterService = ((ConverterService) WidgetManager.instance()
-            .get(ConverterService.class));
+                .get(ConverterService.class));
 
         java.nio.file.Path tmpFile = Paths.get(converterService.getTempDir())
-            .resolve(Optional.ofNullable(jobId).orElseGet(() -> Long.toHexString(new Random().nextLong()))).resolve(fn);
+                .resolve(Optional.ofNullable(jobId).orElseGet(() -> Long.toHexString(new Random().nextLong())))
+                .resolve(fn);
 
         Files.createDirectories(tmpFile.getParent());
 
@@ -178,7 +179,7 @@ public class ConverterResource {
     @Path("removejob/{jobId}")
     public String removeJob(@PathParam("jobId") String jobId) throws IOException {
         ConverterService converterService = ((ConverterService) WidgetManager.instance()
-            .get(ConverterService.class));
+                .get(ConverterService.class));
 
         return Boolean.toString(converterService.removeJob(jobId));
     }

@@ -28,7 +28,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.mycore.vidconv.backend.service.PluginService;
-import org.mycore.vidconv.frontend.annotation.CacheMaxAge;
+import org.mycore.vidconv.frontend.annotation.CacheControl;
 import org.mycore.vidconv.frontend.entity.PluginsWrapper;
 
 /**
@@ -40,7 +40,7 @@ import org.mycore.vidconv.frontend.entity.PluginsWrapper;
 public class PluginResource {
 
     @GET
-    @CacheMaxAge(time = 1, unit = TimeUnit.HOURS)
+    @CacheControl(maxAge = @CacheControl.Age(time = 1, unit = TimeUnit.HOURS), proxyRevalidate = true)
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public PluginsWrapper plugins() {
         return PluginsWrapper.build(PluginService.plugins());

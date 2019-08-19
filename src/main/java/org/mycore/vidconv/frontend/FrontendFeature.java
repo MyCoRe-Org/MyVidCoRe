@@ -26,7 +26,9 @@ import org.glassfish.jersey.moxy.json.MoxyJsonFeature;
 import org.glassfish.jersey.moxy.xml.MoxyXmlFeature;
 import org.mycore.vidconv.common.ClassTools;
 import org.mycore.vidconv.common.config.Configuration;
+import org.mycore.vidconv.frontend.filter.CORSFilter;
 import org.mycore.vidconv.frontend.filter.CacheFilter;
+import org.mycore.vidconv.frontend.filter.IgnoreClientAbortInterceptor;
 import org.mycore.vidconv.frontend.provider.GenericExceptionMapper;
 import org.mycore.vidconv.frontend.provider.XmlMessageBodyReader;
 import org.mycore.vidconv.frontend.provider.XmlMessageBodyWriter;
@@ -46,15 +48,18 @@ public class FrontendFeature implements Feature {
      */
     @Override
     public boolean configure(FeatureContext context) {
-        context.register(MoxyJsonFeature.class);
-        context.register(MoxyXmlFeature.class);
-        context.register(MultiPartFeature.class);
-
         // internal features
         context.register(CacheFilter.class);
+        context.register(CORSFilter.class);
+        context.register(IgnoreClientAbortInterceptor.class);
+
         context.register(GenericExceptionMapper.class);
         context.register(XmlMessageBodyReader.class);
         context.register(XmlMessageBodyWriter.class);
+
+        context.register(MoxyJsonFeature.class);
+        context.register(MoxyXmlFeature.class);
+        context.register(MultiPartFeature.class);
 
         Configuration.instance().getStrings("APP.Jersey.Features").forEach(cn -> {
             try {
