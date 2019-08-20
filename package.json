@@ -54,7 +54,7 @@
     "@angular/language-service": "8.2.2",
     "@types/jquery": "^3.3.31",
     "@types/node": "^12.7.2",
-    "@types/video.js": "^7.2.13",
+    "@types/video.js": "^7.2.14",
     "angular-ide": "^0.9.65",
     "codelyzer": "^5.1.0",
     "imagemin": "^7.0.0",
