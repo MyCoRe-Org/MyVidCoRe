@@ -6,6 +6,7 @@ import {
 import { Subscription } from "rxjs";
 
 import { Attrib } from "./definitions";
+import { WebsocketService } from "../_services/websocket.service";
 import { NVMonitorService, NVMonitorMessage } from "./nvmonitor.service";
 
 export interface GPUEntry {
@@ -23,7 +24,8 @@ export class NVMonitorContentDirective {
 
 @Component({
     selector: "ui-nvmonitor-plugin",
-    templateUrl: "./nvmonitor.component.html"
+    templateUrl: "./nvmonitor.component.html",
+    providers: [WebsocketService, NVMonitorService]
 })
 export class NVMonitorComponent implements OnInit, OnDestroy, AfterContentChecked {
 
@@ -42,6 +44,7 @@ export class NVMonitorComponent implements OnInit, OnDestroy, AfterContentChecke
     ngOnInit() {
         this.$svc.informIsEnabled().subscribe(enabled => {
             if (enabled && !this.socket) {
+                console.log(enabled, this.$svc.getSubject());
                 this.socket = this.$svc.getSubject().subscribe((msg: NVMonitorMessage) => {
                     this.handleMessage(msg);
                 });

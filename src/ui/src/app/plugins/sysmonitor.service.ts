@@ -15,7 +15,7 @@ export interface SystemMonitorMessage {
     attribs: Array<Attrib>;
 }
 
-@Injectable()
+@Injectable({ providedIn: "root" })
 export class SystemMonitorService {
 
     private enabled = new ReplaySubject<Boolean>();

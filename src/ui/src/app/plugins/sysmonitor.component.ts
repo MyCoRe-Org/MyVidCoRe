@@ -6,6 +6,7 @@ import {
 import { Subscription } from "rxjs";
 
 import { Attrib } from "./definitions";
+import { WebsocketService } from "../_services/websocket.service";
 import { SystemMonitorService, SystemMonitorMessage } from "./sysmonitor.service";
 
 export interface MonitorAttribs {
@@ -23,7 +24,8 @@ export class SystemMonitorContentDirective {
 
 @Component({
     selector: "ui-sysmonitor-plugin",
-    templateUrl: "./sysmonitor.component.html"
+    templateUrl: "./sysmonitor.component.html",
+    providers: [WebsocketService, SystemMonitorService]
 })
 export class SystemMonitorComponent implements OnInit, OnDestroy, AfterContentChecked {
 
@@ -42,6 +44,7 @@ export class SystemMonitorComponent implements OnInit, OnDestroy, AfterContentCh
     ngOnInit() {
         this.$svc.informIsEnabled().subscribe(enabled => {
             if (enabled && !this.socket) {
+                console.log(enabled, this.$svc.getSubject());
                 this.socket = this.$svc.getSubject().subscribe((msg: SystemMonitorMessage) => {
                     this.handleMessage(msg);
                 });

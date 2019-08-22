@@ -19,7 +19,7 @@ export interface NVMonitorMessage {
     entries: Array<Attribs>;
 }
 
-@Injectable()
+@Injectable({ providedIn: "root" })
 export class NVMonitorService {
 
     private enabled = new ReplaySubject<Boolean>();
