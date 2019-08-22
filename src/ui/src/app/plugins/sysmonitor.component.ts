@@ -44,7 +44,6 @@ export class SystemMonitorComponent implements OnInit, OnDestroy, AfterContentCh
     ngOnInit() {
         this.$svc.informIsEnabled().subscribe(enabled => {
             if (enabled && !this.socket) {
-                console.log(enabled, this.$svc.getSubject());
                 this.socket = this.$svc.getSubject().subscribe((msg: SystemMonitorMessage) => {
                     this.handleMessage(msg);
                 });

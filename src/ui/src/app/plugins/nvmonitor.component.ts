@@ -44,7 +44,6 @@ export class NVMonitorComponent implements OnInit, OnDestroy, AfterContentChecke
     ngOnInit() {
         this.$svc.informIsEnabled().subscribe(enabled => {
             if (enabled && !this.socket) {
-                console.log(enabled, this.$svc.getSubject());
                 this.socket = this.$svc.getSubject().subscribe((msg: NVMonitorMessage) => {
                     this.handleMessage(msg);
                 });
