@@ -737,15 +737,13 @@ public class FFMpegImpl {
 
         cmd.append(" -i \"" + input.toFile().getAbsolutePath() + "\" -stats -y");
 
-        if (!hwAccel.isPresent()) {
-            // Workaround to fix Too many packets buffered for output stream
-            cmd.append(" -max_muxing_queue_size 512");
-        }
-
         outputs.forEach(output -> {
             final Set<String> ambiguousParams = checkForAmbiguousParameters(output, hwAccel);
             buildVideoStreamCommand(cmd, processId, output, hwAccel, ambiguousParams);
             buildAudioStreamCommand(cmd, inInfo, output, ambiguousParams);
+
+            // Workaround to fix Too many packets buffered for output stream
+            cmd.append(" -max_muxing_queue_size 512");
 
             cmd.append(" \"" + output.getOutputPath().toFile().getAbsolutePath() + "\"");
         });
