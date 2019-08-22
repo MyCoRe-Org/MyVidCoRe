@@ -19,7 +19,7 @@ export class WebsocketService<T> {
         const l = !environment.production && environment.apiBaseUrl.length !== 0 && new URL(environment.apiBaseUrl) || window.location;
         return ((l.protocol === "https:") ? "wss://" : "ws://") + l.hostname +
             (!environment.production && environment.apiBaseUrl.length === 0 ?
-                ":8085" : ((l.port !== "80") && (l.port !== "443")) ? ":" + l.port : ""
+                ":8085" : (l.port && (l.port !== "80") && (l.port !== "443")) ? ":" + l.port : ""
             ) + "/ws" + context;
     }
 
