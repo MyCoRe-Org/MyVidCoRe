@@ -1,60 +1,60 @@
 <div id="dashboard">
-    <div class="card shadow-sm rounded" *ngIf="(sysmon | async) === true">
-        <h5 class="card-header">{{ 'dashboard.system' | translate }}</h5>
-        <ui-sysmonitor-plugin>
-            <ng-template sysMonContent let-entries="entries">
-                <div class="card-body" *ngIf="isEmpty(entries)">
+    <ui-sysmonitor-plugin>
+        <ng-template sysMonContent (entries)="onSystemMonitorEntries($event)">
+            <div class="card shadow-sm rounded">
+                <h5 class="card-header">{{ 'dashboard.system' | translate }}</h5>
+                <div class="card-body" *ngIf="isEmpty(sysmon)">
                     <strong>{{ 'general.loading' | translate }}</strong>
                 </div>
 
-                <div class="card-body" *ngIf="!isEmpty(entries)">
+                <div class="card-body" *ngIf="!isEmpty(sysmon)">
                     <div class="d-flex flex-wrap align-content-center justify-content-between align-items-center">
-                        <div *ngIf="entries['cpu-load']"
+                        <div *ngIf="sysmon['cpu-load']"
                             class="d-inline-flex flex-column justify-content-center align-items-center">
                             <ui-gauge [i18nPrefix]="'plugin.sysmonitor.'" [name]="'cpu-load'"
-                                [attrib]="entries['cpu-load']">
+                                [attrib]="sysmon['cpu-load']">
                             </ui-gauge>
                             <label for="cpu-load">{{ 'plugin.sysmonitor.cpu-load' | translate }}</label>
                         </div>
 
-                        <div *ngIf="entries['cpu-temp']"
+                        <div *ngIf="sysmon['cpu-temp']"
                             class="d-inline-flex flex-column justify-content-center align-items-center">
                             <ui-gauge [i18nPrefix]="'plugin.sysmonitor.'" [name]="'cpu-temp'"
-                                [attrib]="entries['cpu-temp']" [max]="120">
+                                [attrib]="sysmon['cpu-temp']" [max]="120">
                             </ui-gauge>
                             <label for="cpu-temp">{{ 'plugin.sysmonitor.cpu-temp' | translate }}</label>
                         </div>
 
-                        <div *ngIf="entries['mem-available']"
+                        <div *ngIf="sysmon['mem-available']"
                             class="d-inline-flex flex-column justify-content-center align-items-center">
                             <ui-gauge [i18nPrefix]="'plugin.sysmonitor.'" [name]="'memory'"
-                                [attrib]="entries['mem-available']" [max]="entries['mem-total']?.value">
+                                [attrib]="sysmon['mem-available']" [max]="sysmon['mem-total']?.value">
                             </ui-gauge>
                             <label for="memory">{{ 'plugin.sysmonitor.memory' | translate }}</label>
                         </div>
 
-                        <div *ngIf="entries['swap-used']"
+                        <div *ngIf="sysmon['swap-used']"
                             class="d-inline-flex flex-column justify-content-center align-items-center">
-                            <ui-gauge [i18nPrefix]="'plugin.sysmonitor.'" [name]="'swap'"
-                                [attrib]="entries['swap-used']" [max]="entries['swap-total']?.value">
+                            <ui-gauge [i18nPrefix]="'plugin.sysmonitor.'" [name]="'swap'" [attrib]="sysmon['swap-used']"
+                                [max]="sysmon['swap-total']?.value">
                             </ui-gauge>
                             <label for="swap">{{ 'plugin.sysmonitor.swap' | translate }}</label>
                         </div>
                     </div>
                 </div>
-            </ng-template>
-        </ui-sysmonitor-plugin>
-    </div>
+            </div>
+        </ng-template>
+    </ui-sysmonitor-plugin>
 
-    <div class="card mt-3 shadow-sm rounded" *ngIf="(nvmon | async) === true">
-        <h5 class="card-header">{{ 'dashboard.hwaccels' | translate }}</h5>
-        <ui-nvmonitor-plugin>
-            <ng-template nvMonContent let-entries="entries">
-                <div class="card-body" *ngIf="isEmpty(entries)">
+    <ui-nvmonitor-plugin>
+        <ng-template nvMonContent (entries)="onNVMonitorEntries($event)">
+            <div class="card mt-3 shadow-sm rounded">
+                <h5 class="card-header">{{ 'dashboard.hwaccels' | translate }}</h5>
+                <div class="card-body" *ngIf="isEmpty(nvmon)">
                     <strong>{{ 'general.loading' | translate }}</strong>
                 </div>
 
-                <div class="card-body" *ngFor="let e of entries; let i = index; trackBy: trackByGPU" [id]="'gpu-' + i">
+                <div class="card-body" *ngFor="let e of nvmon; let i = index; trackBy: trackByGPU" [id]="'gpu-' + i">
                     <h6 class="card-subtitle mb-2 text-muted">
                         {{ this.hwaccels[i]?.name || ('dashboard.gpu' | translate:{index: i}) }}
                         <span *ngIf="e['pclk']" [title]="'dashboard.nvmonitor.pclk' | translate">@ <i
@@ -106,7 +106,7 @@
                         </div>
                     </div>
                 </div>
-            </ng-template>
-        </ui-nvmonitor-plugin>
-    </div>
+            </div>
+        </ng-template>
+    </ui-nvmonitor-plugin>
 </div>

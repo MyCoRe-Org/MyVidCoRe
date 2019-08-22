@@ -1,4 +1,4 @@
-<ng-container *ngIf="entries">
+<ng-container *ngIf="socket">
     <ng-container *ngIf="!contentTpl">
         <div class="gauges d-inline-flex flex-row" *ngFor="let e of entries; let i = index; trackBy: trackByGPU"
             [id]="'gpu-' + i">
@@ -17,6 +17,5 @@
         </div>
     </ng-container>
 
-    <ng-template [ngTemplateOutlet]="contentTpl?.templateRef" [ngTemplateOutletContext]="{entries: entries}">
-    </ng-template>
+    <ng-template [ngTemplateOutlet]="contentTpl?.templateRef"></ng-template>
 </ng-container>

@@ -1,10 +1,13 @@
 import { Injectable } from "@angular/core";
 
-import { Subject } from "rxjs";
+import { Subject, ReplaySubject } from "rxjs";
 
+import { PluginApiService } from "./api.service";
 import { WebsocketService } from "../_services/websocket.service";
 
 import { Attrib } from "./definitions";
+
+const PLUGIN_NAME = "Nvidia Monitor Plugin";
 
 const WS_CONTEXT = "/nvmonitor";
 
@@ -19,9 +22,27 @@ export interface NVMonitorMessage {
 @Injectable()
 export class NVMonitorService {
 
-    public events: Subject<NVMonitorMessage>;
+    private enabled = new ReplaySubject<Boolean>();
 
-    constructor(wsService: WebsocketService<NVMonitorMessage>) {
-        this.events = wsService.connect(WebsocketService.buildWSURL(WS_CONTEXT));
+    private subject: Subject<NVMonitorMessage>;
+
+    constructor($api: PluginApiService, wsService: WebsocketService<NVMonitorMessage>) {
+        $api.isPluginEnabled(PLUGIN_NAME).subscribe((enabled: boolean) => {
+            if (enabled) {
+                this.subject = wsService.connect(WebsocketService.buildWSURL(WS_CONTEXT));
+                this.enabled.next(true);
+            } else {
+                this.enabled.next(false);
+            }
+        });
     }
+
+    informIsEnabled() {
+        return this.enabled;
+    }
+
+    getSubject() {
+        return this.subject;
+    }
+
 }

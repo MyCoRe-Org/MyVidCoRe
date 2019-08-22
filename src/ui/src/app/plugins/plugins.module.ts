@@ -5,6 +5,9 @@ import { GaugeModule } from "angular-gauge";
 import { TranslateModule } from "@ngx-translate/core";
 
 import { PluginApiService } from "./api.service";
+import { NVMonitorService } from "./nvmonitor.service";
+import { SystemMonitorService } from "./sysmonitor.service";
+import { WebsocketService } from "../_services/websocket.service";
 
 import { GaugeComponent } from "./gauge.component";
 import { NVMonitorComponent, NVMonitorContentDirective } from "./nvmonitor.component";
@@ -33,7 +36,10 @@ import { SystemMonitorComponent, SystemMonitorContentDirective } from "./sysmoni
         SystemMonitorContentDirective
     ],
     providers: [
-        PluginApiService
+        PluginApiService,
+        NVMonitorService,
+        SystemMonitorService,
+        WebsocketService
     ]
 })
 

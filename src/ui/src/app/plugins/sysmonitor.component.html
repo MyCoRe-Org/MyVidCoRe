@@ -1,4 +1,4 @@
-<ng-container *ngIf="entries">
+<ng-container>
     <div *ngIf="!contentTpl" class="gauges d-inline-flex flex-row">
         <ui-gauge [i18nPrefix]="'plugin.sysmonitor.'" [name]="'cpu-load'" [attrib]="entries['cpu-load']">
         </ui-gauge>

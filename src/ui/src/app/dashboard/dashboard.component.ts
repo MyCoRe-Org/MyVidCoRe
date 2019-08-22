@@ -1,14 +1,12 @@
 import { Component, OnInit } from "@angular/core";
 
-import { Observable } from "rxjs";
-
 import { AuthService } from "../_services/auth.service";
 import { ConverterApiService } from "../converter/api.service";
 import { PluginApiService } from "../plugins/api.service";
 
-import { SystemMonitorComponent } from "../plugins/sysmonitor.component";
-import { NVMonitorComponent } from "../plugins/nvmonitor.component";
+import { MonitorAttribs } from "../plugins/sysmonitor.component";
 import { HWAccel } from "../converter/definitions";
+import { GPUEntry } from "../plugins/nvmonitor.component";
 
 @Component({
     selector: "ui-dashboard",
@@ -21,21 +19,26 @@ export class DashboardComponent implements OnInit {
 
     hwaccels: Array<HWAccel>;
 
-    sysmon: Observable<Boolean>;
+    sysmon: MonitorAttribs;
 
-    nvmon: Observable<Boolean>;
+    nvmon: Array<GPUEntry>;
 
     constructor(public $auth: AuthService, public $api: PluginApiService, public $capi: ConverterApiService) { }
 
     ngOnInit() {
-        this.sysmon = this.$api.isPluginEnabled(SystemMonitorComponent.PLUGIN_NAME);
-        this.nvmon = this.$api.isPluginEnabled(NVMonitorComponent.PLUGIN_NAME);
-
         this.$capi.getHWAccels().subscribe(res => this.hwaccels = res);
     }
 
     trackByGPU(index: number, item: Attr) {
         return item["gpu"].value || index;
+    }
+
+    onSystemMonitorEntries(entries: MonitorAttribs) {
+        this.sysmon = entries;
+    }
+
+    onNVMonitorEntries(entries: Array<GPUEntry>) {
+        this.nvmon = entries;
     }
 
     isEmpty(value: any) {
