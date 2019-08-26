@@ -9,7 +9,7 @@ import { environment } from "../../environments/environment";
 
 
 import { ConverterApiService } from "./api.service";
-import { ConverterJobService, AppEvent } from "./converterJob.service";
+import { ConverterJobService, AppEventData } from "./converterJob.service";
 import { ErrorService } from "../_services/error.service";
 
 import { Job } from "./definitions";
@@ -71,7 +71,7 @@ export class ConverterComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.socket = this.$jobsvc.events.subscribe(evt => {
-            this.handleEvent(evt);
+            this.handleEvent(evt.event);
         });
 
         this.timer = timer(100, ConverterComponent.REFRESH_INTERVAL).subscribe(() => {
@@ -215,7 +215,7 @@ export class ConverterComponent implements OnInit, OnDestroy {
         this.running = this.running.filter(this.filterDone).map(this.injectHashCode).sort(this.sortByPercent);
     }
 
-    private handleEvent(event: AppEvent<Job>) {
+    private handleEvent(event: AppEventData<Job>) {
         if (!this.running) {
             this.running = Array();
         }

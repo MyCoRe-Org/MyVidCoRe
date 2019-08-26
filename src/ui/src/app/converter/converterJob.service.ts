@@ -8,6 +8,10 @@ import { Job } from "./definitions";
 const WS_CONTEXT = "/converter";
 
 export interface AppEvent<T> {
+    event: AppEventData<T>;
+}
+
+export interface AppEventData<T> {
     object: T;
     source: string;
     type: string;
