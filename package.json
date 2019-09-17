@@ -54,7 +54,7 @@
     "@angular/language-service": "8.2.6",
     "@types/jquery": "^3.3.31",
     "@types/node": "^12.7.5",
-    "@types/video.js": "^7.2.14",
+    "@types/video.js": "^7.2.15",
     "angular-ide": "^0.9.66",
     "codelyzer": "^5.1.0",
     "imagemin": "^7.0.0",
@@ -63,9 +63,9 @@
     "imagemin-mozjpeg": "^8.0.0",
     "imagemin-pngquant": "^8.0.0",
     "imagemin-svgo": "^7.0.0",
-    "ts-node": "^8.3.0",
+    "ts-node": "^8.4.1",
     "tslint": "^5.20.0",
     "typescript": "3.5.3",
-    "webpack-bundle-analyzer": "^3.4.1"
+    "webpack-bundle-analyzer": "^3.5.0"
   }
 }
