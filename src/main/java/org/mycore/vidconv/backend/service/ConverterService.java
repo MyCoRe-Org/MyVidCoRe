@@ -470,6 +470,35 @@ public class ConverterService extends Widget implements Listener {
             save();
         }
 
+        private Process runJob(boolean allowHwAccel)
+                throws InterruptedException, JAXBException, ExecutionException, IOException {
+            hwAccel = !allowHwAccel ? Optional.empty()
+                    : hwAccels.stream()
+                            .filter(hw -> FFMpegImpl.canHWAccelerate(outputs, hw)).sorted()
+                            .findFirst();
+
+            command = FFMpegImpl.command(id, inputPath, outputs, hwAccel);
+            final Executable exec = new Executable(command);
+
+            EVENT_MANAGER.fireEvent(new Event<String>(START, id, this.getClass()));
+
+            timer = new Timer();
+            timer.scheduleAtFixedRate(new ConverterJobProgress(this), 0, 1000);
+
+            final Process p = exec.run();
+
+            outputConsumer = exec.outputConsumer();
+            errorConsumer = exec.errorConsumer();
+
+            p.waitFor();
+
+            timer.cancel();
+
+            hwAccel.ifPresent(hw -> hw.getDeviceSpec().unregisterProcessId(id));
+
+            return p;
+        }
+
         @Override
         public void run() {
             try {
@@ -479,33 +508,17 @@ public class ConverterService extends Widget implements Listener {
                 running = true;
                 startTime = Instant.now();
 
-                hwAccel = hwAccels.stream()
-                        .filter(hw -> FFMpegImpl.canHWAccelerate(outputs, hw)).sorted()
-                        .findFirst();
+                Process p = runJob(true);
 
-                command = FFMpegImpl.command(id, inputPath, outputs, hwAccel);
-                final Executable exec = new Executable(command);
-
-                EVENT_MANAGER.fireEvent(new Event<String>(START, id, this.getClass()));
-
-                timer = new Timer();
-                timer.scheduleAtFixedRate(new ConverterJobProgress(this), 0, 1000);
-
-                final Process p = exec.run();
-
-                outputConsumer = exec.outputConsumer();
-                errorConsumer = exec.errorConsumer();
-
-                p.waitFor();
-
-                timer.cancel();
+                if (p.exitValue() != 0 && hwAccel.isPresent()) {
+                    LOGGER.warn("Converting of " + inputPath.toString() + " failed, retry with fallback settings.");
+                    p = runJob(false);
+                }
 
                 exitValue = p.exitValue();
                 running = false;
                 done = true;
                 endTime = Instant.now();
-
-                hwAccel.ifPresent(hw -> hw.getDeviceSpec().unregisterProcessId(id));
 
                 save();
 
