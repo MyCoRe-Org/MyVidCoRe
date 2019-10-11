@@ -127,6 +127,8 @@ public class ConverterService extends Widget implements Listener {
             Files.createDirectories(outputPath);
         }
 
+        System.setProperty("java.io.tmpdir", tempDir);
+
         EVENT_MANAGER.addListener(this);
 
         int hwAccelConverterThreads = hwAccels.stream()
