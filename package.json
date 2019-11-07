@@ -31,7 +31,7 @@
     "angular-gauge": "^3.1.2",
     "angular-pipes": "^10.0.0",
     "bootstrap": "4.3.1",
-    "core-js": "^3.3.6",
+    "core-js": "^3.4.0",
     "jquery": "^3.4.1",
     "messageformat": "^2.3.0",
     "ngx-toastr": "^11.2.0",
@@ -52,7 +52,7 @@
     "@angular/compiler-cli": "8.2.13",
     "@angular/language-service": "8.2.13",
     "@types/jquery": "^3.3.31",
-    "@types/node": "^12.12.5",
+    "@types/node": "^12.12.6",
     "@types/video.js": "^7.3.2",
     "angular-ide": "^0.9.70",
     "codelyzer": "^5.2.0",
@@ -63,7 +63,7 @@
     "imagemin-pngquant": "^8.0.0",
     "imagemin-svgo": "^7.0.0",
     "ts-node": "^8.4.1",
-    "tslint": "^5.20.0",
+    "tslint": "^5.20.1",
     "typescript": "3.5.3",
     "webpack-bundle-analyzer": "^3.6.0"
   }
