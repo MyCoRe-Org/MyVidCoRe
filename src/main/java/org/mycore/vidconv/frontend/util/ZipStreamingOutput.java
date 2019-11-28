@@ -71,14 +71,15 @@ public class ZipStreamingOutput implements StreamingOutput {
             if (!Files.isDirectory(path)) {
                 addToZipStream(path, zipStream);
             } else {
-                DirectoryStream<Path> dirStream = Files.newDirectoryStream(path);
-                dirStream.forEach(p -> {
-                    try {
-                        addToZipStream(p, zipStream);
-                    } catch (IOException e) {
-                        throw new UncheckedIOException(e);
-                    }
-                });
+                try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(path)) {
+                    dirStream.forEach(p -> {
+                        try {
+                            addToZipStream(p, zipStream);
+                        } catch (IOException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    });
+                }
             }
         } finally {
             zipStream.close();
