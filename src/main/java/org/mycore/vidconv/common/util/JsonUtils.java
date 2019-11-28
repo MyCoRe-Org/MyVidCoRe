@@ -61,7 +61,7 @@ public class JsonUtils {
     }
 
     public static <T> T loadJSON(URL file, Class<T> entityClass, boolean includeRoot)
-        throws JAXBException, IOException {
+            throws JAXBException, IOException {
         return loadJSON(file.openStream(), entityClass, includeRoot);
     }
 
@@ -70,7 +70,7 @@ public class JsonUtils {
     }
 
     public static <T> T loadJSON(File file, Class<T> entityClass, boolean includeRoot)
-        throws JAXBException, IOException {
+            throws JAXBException, IOException {
         final File sFile = file;
 
         if (sFile.exists()) {
@@ -93,7 +93,7 @@ public class JsonUtils {
     }
 
     public static <T> T loadJSON(InputStream is, Class<T> entityClass, boolean includeRoot)
-        throws JAXBException, IOException {
+            throws JAXBException, IOException {
         final JAXBContext jc = JAXBContext.newInstance(populateEntities(entityClass));
         final Unmarshaller unmarshaller = jc.createUnmarshaller();
         unmarshaller.setProperty(UnmarshallerProperties.MEDIA_TYPE, "application/json");
@@ -108,7 +108,7 @@ public class JsonUtils {
     }
 
     public static <T> void saveJSON(File file, T entity, boolean includeRoot, boolean formated)
-        throws JAXBException, IOException {
+            throws JAXBException, IOException {
         final File sFile = file;
 
         FileOutputStream fos = null;
@@ -127,7 +127,7 @@ public class JsonUtils {
     }
 
     public static <T> void saveJSON(OutputStream out, T entity, boolean includeRoot, boolean formated)
-        throws JAXBException, IOException {
+            throws JAXBException, IOException {
         final JAXBContext jc = JAXBContext.newInstance(populateEntities(entity.getClass()));
         final Marshaller marshaller = jc.createMarshaller();
         marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, "application/json");
@@ -157,14 +157,16 @@ public class JsonUtils {
     }
 
     public static <T> T fromJSON(String json, Class<T> entityClass, boolean includeRoot)
-        throws JAXBException, IOException {
+            throws JAXBException, IOException {
         final JAXBContext jc = JAXBContext.newInstance(populateEntities(entityClass));
         final Unmarshaller unmarshaller = jc.createUnmarshaller();
         unmarshaller.setProperty(UnmarshallerProperties.MEDIA_TYPE, "application/json");
         unmarshaller.setProperty(UnmarshallerProperties.JSON_INCLUDE_ROOT, includeRoot);
 
-        final StreamSource ss = new StreamSource(new StringReader(json));
-        return unmarshaller.unmarshal(ss, entityClass).getValue();
+        try (final StringReader sr = new StringReader(json)) {
+            final StreamSource ss = new StreamSource(sr);
+            return unmarshaller.unmarshal(ss, entityClass).getValue();
+        }
     }
 
     private static Class<?>[] populateEntities(Class<?> entityClass) {
@@ -172,7 +174,7 @@ public class JsonUtils {
         try {
             List<Class<?>> pe = EntityUtils.populateEntities(CONFIG.getStrings("APP.Jersey.DynamicEntities"));
             return cls.map(c -> Streams.concat(Stream.of(c), pe.stream())).orElseGet(() -> pe.stream())
-                .toArray(Class<?>[]::new);
+                    .toArray(Class<?>[]::new);
         } catch (IOException e) {
             return cls.map(c -> new Class<?>[] { c }).orElse(null);
         }

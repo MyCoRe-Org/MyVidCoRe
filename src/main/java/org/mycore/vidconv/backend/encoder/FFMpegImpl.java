@@ -1036,12 +1036,14 @@ public class FFMpegImpl {
                 final JAXBContext jc = JAXBContext.newInstance(ProbeWrapper.class);
                 final Unmarshaller unmarshaller = jc.createUnmarshaller();
 
-                final ProbeWrapper pw = unmarshaller
-                        .unmarshal(new StreamSource(new StringReader(outputStream)), ProbeWrapper.class)
-                        .getValue();
+                try (final StringReader sr = new StringReader(outputStream)) {
+                    final ProbeWrapper pw = unmarshaller
+                            .unmarshal(new StreamSource(sr), ProbeWrapper.class)
+                            .getValue();
 
-                cache.put(inputFile, pw);
-                return pw;
+                    cache.put(inputFile, pw);
+                    return pw;
+                }
             }
         }
 
