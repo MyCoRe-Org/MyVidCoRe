@@ -404,10 +404,11 @@ public class ConverterService extends Widget implements Listener {
     }
 
     private static void deleteRecursive(Path path) throws IOException {
-        Files.walk(path, FileVisitOption.FOLLOW_LINKS)
-                .sorted(Comparator.reverseOrder())
-                .map(Path::toFile)
-                .forEach(File::delete);
+        try (Stream<Path> walk = Files.walk(path, FileVisitOption.FOLLOW_LINKS)) {
+            walk.sorted(Comparator.reverseOrder())
+                    .map(Path::toFile)
+                    .forEach(File::delete);
+        }
     }
 
     public static class ConverterJob implements Runnable {
