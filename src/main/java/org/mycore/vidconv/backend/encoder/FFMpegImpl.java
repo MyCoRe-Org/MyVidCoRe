@@ -35,6 +35,7 @@ import java.util.OptionalLong;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -99,6 +100,10 @@ public class FFMpegImpl {
                             .build())
             .build(true);
 
+    private static final long PROCESS_TIMEOUT_VALUE = 5;
+
+    private static final TimeUnit PROCESS_TIMEOUT_UNIT = TimeUnit.MINUTES;
+
     /**
      * Inits the.
      */
@@ -152,7 +157,7 @@ public class FFMpegImpl {
         final Executable exec = new Executable("ffmpeg", "-codecs");
 
         try {
-            if (exec.runAndWait() == 0) {
+            if (exec.runAndWait(PROCESS_TIMEOUT_VALUE, PROCESS_TIMEOUT_UNIT) == 0) {
                 final String outputStream = exec.output();
 
                 if (outputStream != null && !outputStream.isEmpty()) {
@@ -221,7 +226,7 @@ public class FFMpegImpl {
         final Executable exec = new Executable("ffmpeg", "-filters");
 
         try {
-            if (exec.runAndWait() == 0) {
+            if (exec.runAndWait(PROCESS_TIMEOUT_VALUE, PROCESS_TIMEOUT_UNIT) == 0) {
                 final String outputStream = exec.output();
 
                 if (outputStream != null && !outputStream.isEmpty()) {
@@ -268,7 +273,7 @@ public class FFMpegImpl {
         final Executable exec = new Executable("ffmpeg", "-formats");
 
         try {
-            if (exec.runAndWait() == 0) {
+            if (exec.runAndWait(PROCESS_TIMEOUT_VALUE, PROCESS_TIMEOUT_UNIT) == 0) {
                 final String outputStream = exec.output();
 
                 if (outputStream != null && !outputStream.isEmpty()) {
@@ -371,7 +376,7 @@ public class FFMpegImpl {
         final Executable exec = new Executable("ffmpeg", "-h", "decoder=" + name);
 
         try {
-            if (exec.runAndWait() == 0) {
+            if (exec.runAndWait(PROCESS_TIMEOUT_VALUE, PROCESS_TIMEOUT_UNIT) == 0) {
                 final String outputStream = exec.output();
 
                 if (outputStream != null && !outputStream.isEmpty()) {
@@ -434,7 +439,7 @@ public class FFMpegImpl {
         final Executable exec = new Executable("ffmpeg", "-h", "encoder=" + name);
 
         try {
-            if (exec.runAndWait() == 0) {
+            if (exec.runAndWait(PROCESS_TIMEOUT_VALUE, PROCESS_TIMEOUT_UNIT) == 0) {
                 final String outputStream = exec.output();
 
                 if (outputStream != null && !outputStream.isEmpty()) {
@@ -515,7 +520,7 @@ public class FFMpegImpl {
         final Executable exec = new Executable("ffmpeg", "-h", "muxer=" + name);
 
         try {
-            if (exec.runAndWait() == 0) {
+            if (exec.runAndWait(PROCESS_TIMEOUT_VALUE, PROCESS_TIMEOUT_UNIT) == 0) {
                 final String outputStream = exec.output();
 
                 if (outputStream != null && !outputStream.isEmpty()) {
@@ -562,7 +567,7 @@ public class FFMpegImpl {
         final Executable exec = new Executable("ffmpeg -f lavfi -i nullsrc -c:v h264_nvenc -gpu list -f null -");
 
         try {
-            if (exec.runAndWait() >= 0) {
+            if (exec.runAndWait(PROCESS_TIMEOUT_VALUE, PROCESS_TIMEOUT_UNIT) >= 0) {
                 final String outputStream = exec.error();
                 if (outputStream != null && !outputStream.isEmpty()) {
                     @SuppressWarnings("unchecked")
@@ -1024,7 +1029,7 @@ public class FFMpegImpl {
                 "-show_streams",
                 inputFile.toFile().getAbsolutePath());
 
-        if (exec.runAndWait() == 0) {
+        if (exec.runAndWait(PROCESS_TIMEOUT_VALUE, PROCESS_TIMEOUT_UNIT) == 0) {
             final String outputStream = exec.output();
 
             if (outputStream != null && !outputStream.isEmpty()) {

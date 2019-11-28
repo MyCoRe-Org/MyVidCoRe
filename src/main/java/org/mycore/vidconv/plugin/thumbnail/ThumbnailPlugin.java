@@ -20,6 +20,7 @@
 package org.mycore.vidconv.plugin.thumbnail;
 
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 import org.apache.logging.log4j.LogManager;
@@ -44,13 +45,17 @@ public class ThumbnailPlugin extends ListenerPlugin {
 
     private static int NUM_THUMBS = 10;
 
+    private static final long PROCESS_TIMEOUT_VALUE = 1;
+
+    private static final TimeUnit PROCESS_TIMEOUT_UNIT = TimeUnit.MINUTES;
+
     /* (non-Javadoc)
      * @see org.mycore.vidconv.common.event.Listener#handleEvent(org.mycore.vidconv.common.event.Event)
      */
     @Override
     public void handleEvent(Event<?> event) throws Exception {
         if (ConverterService.EVENT_CONVERT_DONE.equals(event.getType())
-            && event.getSource().equals(ConverterService.class)) {
+                && event.getSource().equals(ConverterService.class)) {
             final ConverterJob job = (ConverterJob) event.getObject();
 
             if (job.exitValue() == 0) {
@@ -61,11 +66,13 @@ public class ThumbnailPlugin extends ListenerPlugin {
                         return null;
                     }
                 }).filter(pw -> pw != null && !pw.getStreams().isEmpty())
-                    .reduce((pw1, pw2) -> (Optional.ofNullable(pw1.getStreams().get(0).getCodedWidth()).orElse(0)
-                        + Optional.ofNullable(pw1.getStreams().get(0).getCodedHeight())
-                            .orElse(0)) > (Optional.ofNullable(pw2.getStreams().get(0).getCodedWidth()).orElse(0)
-                                + Optional.ofNullable(pw2.getStreams().get(0).getCodedHeight()).orElse(0)) ? pw1 : pw2)
-                    .orElse(null);
+                        .reduce((pw1, pw2) -> (Optional.ofNullable(pw1.getStreams().get(0).getCodedWidth()).orElse(0)
+                                + Optional.ofNullable(pw1.getStreams().get(0).getCodedHeight())
+                                        .orElse(0)) > (Optional.ofNullable(pw2.getStreams().get(0).getCodedWidth())
+                                                .orElse(0)
+                                                + Optional.ofNullable(pw2.getStreams().get(0).getCodedHeight())
+                                                        .orElse(0)) ? pw1 : pw2)
+                        .orElse(null);
 
                 if (probe != null) {
                     float duration = Float.parseFloat(probe.getFormat().getDuration());
@@ -74,18 +81,24 @@ public class ThumbnailPlugin extends ListenerPlugin {
                         long time = Math.round((ti - 0.5) * duration / NUM_THUMBS);
                         String fName = job.inputPath().getFileName().toString();
                         String tName = job.outputPath()
-                            .resolve(fName.substring(0, fName.lastIndexOf(".")) + "-thumb-" + formatIndex(ti) + ".jpg")
-                            .toAbsolutePath()
-                            .toString();
+                                .resolve(fName.substring(0, fName.lastIndexOf(".")) + "-thumb-" + formatIndex(ti)
+                                        + ".jpg")
+                                .toAbsolutePath()
+                                .toString();
                         String cmd = "ffmpeg -ss " + time + " -i \"" + probe.getFormat().getFilename()
-                            + "\" -vf select='eq(pict_type\\,I)' -vframes 1 \"" + tName + "\"";
+                                + "\" -vf select='eq(pict_type\\,I)' -vframes 1 \"" + tName + "\"";
 
                         LOGGER.info("generate thumbnail " + tName + "...");
                         LOGGER.debug(cmd);
 
                         Executable exec = new Executable(cmd);
-                        if (exec.runAndWait() == 0) {
+
+                        int res = exec.runAndWait(PROCESS_TIMEOUT_VALUE, PROCESS_TIMEOUT_UNIT);
+
+                        if (res == 0) {
                             LOGGER.info("...done.");
+                        } else if (res == Executable.PROCESS_TIMEOUT) {
+                            LOGGER.warn("...timeout reached!");
                         }
                     }
                 }
@@ -96,7 +109,7 @@ public class ThumbnailPlugin extends ListenerPlugin {
     private static String formatIndex(int index) {
         StringBuffer sb = new StringBuffer();
         IntStream.range(0, Integer.toString(NUM_THUMBS).length() - Integer.toString(index).length())
-            .forEach(i -> sb.append("0"));
+                .forEach(i -> sb.append("0"));
         return sb.append(Integer.toString(index)).toString();
     }
 

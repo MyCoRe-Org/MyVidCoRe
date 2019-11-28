@@ -28,6 +28,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -36,6 +37,8 @@ import java.util.stream.Collectors;
  *
  */
 public class Executable {
+
+    public final static int PROCESS_TIMEOUT = -1234567;
 
     private final static ExecutorService EXECUTOR = Executors.newCachedThreadPool();
 
@@ -49,7 +52,7 @@ public class Executable {
 
     public Executable(final String command) {
         this.command = MatcherStream.findMatches(Pattern.compile("([^\"]\\S*|\".+?\"|[^\']\\S*|\'.+?\')\\s*"), command)
-            .map(mr -> mr.group(1).replaceAll("\"|\'", "")).collect(Collectors.toList());
+                .map(mr -> mr.group(1).replaceAll("\"|\'", "")).collect(Collectors.toList());
     }
 
     public Executable(final List<String> command) {
@@ -84,7 +87,31 @@ public class Executable {
             public Integer call() throws Exception {
                 process = run();
 
-                return process.waitFor();
+                try {
+                    return process.waitFor();
+                } finally {
+                    process.destroy();
+                }
+            }
+        });
+
+        return future.get();
+    }
+
+    public int runAndWait(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException {
+        Future<Integer> future = EXECUTOR.submit(new Callable<Integer>() {
+            public Integer call() throws Exception {
+                process = run();
+
+                try {
+                    if (process.waitFor(timeout, unit)) {
+                        return process.exitValue();
+                    }
+                } finally {
+                    process.destroy();
+                }
+
+                return PROCESS_TIMEOUT;
             }
         });
 
