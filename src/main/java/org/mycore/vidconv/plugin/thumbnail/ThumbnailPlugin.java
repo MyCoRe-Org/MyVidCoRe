@@ -45,6 +45,8 @@ public class ThumbnailPlugin extends ListenerPlugin {
 
     private static int NUM_THUMBS = 10;
 
+    private static int NUM_RETRIES = 3;
+
     private static final long PROCESS_TIMEOUT_VALUE = 1;
 
     private static final TimeUnit PROCESS_TIMEOUT_UNIT = TimeUnit.MINUTES;
@@ -91,15 +93,21 @@ public class ThumbnailPlugin extends ListenerPlugin {
                         LOGGER.info("generate thumbnail " + tName + "...");
                         LOGGER.debug(cmd);
 
-                        Executable exec = new Executable(cmd);
+                        int retry = 0;
+                        int res = -1;
+                        do {
+                            Executable exec = new Executable(cmd);
 
-                        int res = exec.runAndWait(PROCESS_TIMEOUT_VALUE, PROCESS_TIMEOUT_UNIT);
+                            res = exec.runAndWait(PROCESS_TIMEOUT_VALUE, PROCESS_TIMEOUT_UNIT);
 
-                        if (res == 0) {
-                            LOGGER.info("...done.");
-                        } else if (res == Executable.PROCESS_TIMEOUT) {
-                            LOGGER.warn("...timeout reached!");
-                        }
+                            if (res == 0) {
+                                LOGGER.info("...done.");
+                            } else if (res == Executable.PROCESS_TIMEOUT) {
+                                LOGGER.warn("...timeout reached!");
+                            }
+
+                            retry++;
+                        } while (res != 0 && retry < NUM_RETRIES);
                     }
                 }
             }
