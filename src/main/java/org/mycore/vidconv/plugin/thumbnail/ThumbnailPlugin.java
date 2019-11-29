@@ -19,6 +19,7 @@
  */
 package org.mycore.vidconv.plugin.thumbnail;
 
+import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
@@ -77,11 +78,12 @@ public class ThumbnailPlugin extends ListenerPlugin {
                         .orElse(null);
 
                 if (probe != null) {
+                    String fName = job.inputPath().getFileName().toString();
                     float duration = Float.parseFloat(probe.getFormat().getDuration());
+                    int posThumbs = Math.min(NUM_THUMBS, Math.round((float) Math.floor(duration)));
 
-                    for (int ti = 1; ti < NUM_THUMBS + 1; ti++) {
-                        long time = Math.round((ti - 0.5) * duration / NUM_THUMBS);
-                        String fName = job.inputPath().getFileName().toString();
+                    for (int ti = 1; ti < posThumbs + 1; ti++) {
+                        long time = Math.round((ti - 0.5) * duration / posThumbs);
                         String tName = job.outputPath()
                                 .resolve(fName.substring(0, fName.lastIndexOf(".")) + "-thumb-" + formatIndex(ti)
                                         + ".jpg")
@@ -108,6 +110,11 @@ public class ThumbnailPlugin extends ListenerPlugin {
 
                             retry++;
                         } while (res != 0 && retry < NUM_RETRIES);
+                    }
+
+                    if (posThumbs < NUM_THUMBS) {
+                        LOGGER.warn("not enough length ({} sec.) to generate {} thumbnails for {}.",
+                                String.format(Locale.ROOT, "%.2f", duration), NUM_THUMBS, fName);
                     }
                 }
             }
