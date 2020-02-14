@@ -1,7 +1,7 @@
 import { BrowserModule } from "@angular/platform-browser";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { HttpClientModule, HttpClient, HTTP_INTERCEPTORS } from "@angular/common/http";
-import { NgModule } from "@angular/core";
+import { NgModule, Injectable } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { TranslateCompiler, TranslateModule, TranslateLoader } from "@ngx-translate/core";
 import { TranslateHttpLoader } from "@ngx-translate/http-loader";
@@ -52,6 +52,10 @@ export const SettingsFutureState = {
     loadChildren: () => import("./settings/settings.module").then(m => m.SettingsModule)
 };
 
+// @FIXME workaround for ivy build
+@Injectable({ providedIn: "root" })
+export class InjectableTranslateMessageFormatCompiler extends TranslateMessageFormatCompiler { }
+
 @NgModule({
     declarations: [
         AppComponent,
@@ -91,7 +95,9 @@ export const SettingsFutureState = {
             },
             compiler: {
                 provide: TranslateCompiler,
-                useClass: TranslateMessageFormatCompiler
+                // @FIXME workaround for ivy build
+                // useClass: TranslateMessageFormatCompiler
+                useClass: InjectableTranslateMessageFormatCompiler
             }
         }),
         UIRouterModule.forRoot({
