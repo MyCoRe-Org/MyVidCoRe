@@ -1,47 +1,13 @@
 [
     {
-        "name": "Quadro K420",
-        "family": "Kepler",
-        "chip": "GK107",
+        "name": "GeForce GT 1030",
+        "family": "Pascal",
+        "chip": "GP108",
         "numChips": 1,
-        "numEncoder": 1,
-        "maxStreams": 2,
-        "encoders": {
-            "h264-420": true,
-            "h264-444": false,
-            "h264": false,
-            "h265-4k-420": false,
-            "h265-4k-444": false,
-            "h265-4k": false,
-            "h265-8k": false
-        }
-    },
-    {
-        "name": "Quadro K600",
-        "family": "Kepler",
-        "chip": "GK107",
-        "numChips": 1,
-        "numEncoder": 1,
-        "maxStreams": 2,
-        "encoders": {
-            "h264-420": true,
-            "h264-444": false,
-            "h264": false,
-            "h265-4k-420": false,
-            "h265-4k-444": false,
-            "h265-4k": false,
-            "h265-8k": false
-        }
-    },
-    {
-        "name": "Quadro K2000",
-        "family": "Kepler",
-        "chip": "GK107",
-        "numChips": 1,
-        "numEncoder": 1,
+        "numEncoder": 0,
         "maxStreams": -1,
         "encoders": {
-            "h264-420": true,
+            "h264-420": false,
             "h264-444": false,
             "h264": false,
             "h265-4k-420": false,
@@ -51,350 +17,607 @@
         },
         "numDecoder": 1,
         "decoders": {
+            "mpeg1": true,
             "mpeg2": true,
             "vc1": true,
-            "h264": true,
-            "h265": false,
             "vp8": false,
-            "vp9": false
+            "vp9": true,
+            "h264": true,
+            "h265": true
         }
     },
     {
-        "name": "Quadro K2000D",
-        "family": "Kepler",
-        "chip": "GK107",
+        "name": "GeForce GTX 1050",
+        "family": "Pascal",
+        "chip": "GP107",
         "numChips": 1,
         "numEncoder": 1,
         "maxStreams": -1,
         "encoders": {
-            "h264-420": true,
-            "h264-444": false,
-            "h264": false,
-            "h265-4k-420": false,
-            "h265-4k-444": false,
-            "h265-4k": false,
-            "h265-8k": false
-        },
-        "numDecoder": 1,
-        "decoders": {
-            "mpeg2": true,
-            "vc1": true,
-            "h264": true,
-            "h265": false,
-            "vp8": false,
-            "vp9": false
-        }
-    },
-    {
-        "name": "Quadro K4000",
-        "family": "Kepler",
-        "chip": "GK106",
-        "numChips": 1,
-        "numEncoder": 1,
-        "maxStreams": -1,
-        "encoders": {
-            "h264-420": true,
-            "h264-444": false,
-            "h264": false,
-            "h265-4k-420": false,
-            "h265-4k-444": false,
-            "h265-4k": false,
-            "h265-8k": false
-        },
-        "numDecoder": 1,
-        "decoders": {
-            "mpeg2": true,
-            "vc1": true,
-            "h264": true,
-            "h265": false,
-            "vp8": false,
-            "vp9": false
-        }
-    },
-    {
-        "name": "Quadro K4200",
-        "family": "Kepler",
-        "chip": "GK104",
-        "numChips": 1,
-        "numEncoder": 1,
-        "maxStreams": -1,
-        "encoders": {
-            "h264-420": true,
-            "h264-444": false,
-            "h264": false,
-            "h265-4k-420": false,
-            "h265-4k-444": false,
-            "h265-4k": false,
-            "h265-8k": false
-        },
-        "numDecoder": 1,
-        "decoders": {
-            "mpeg2": true,
-            "vc1": true,
-            "h264": true,
-            "h265": false,
-            "vp8": false,
-            "vp9": false
-        }
-    },
-    {
-        "name": "Quadro K5000",
-        "family": "Kepler",
-        "chip": "GK104",
-        "numChips": 1,
-        "numEncoder": 1,
-        "maxStreams": -1,
-        "encoders": {
-            "h264-420": true,
-            "h264-444": false,
-            "h264": false,
-            "h265-4k-420": false,
-            "h265-4k-444": false,
-            "h265-4k": false,
-            "h265-8k": false
-        },
-        "numDecoder": 1,
-        "decoders": {
-            "mpeg2": true,
-            "vc1": true,
-            "h264": true,
-            "h265": false,
-            "vp8": false,
-            "vp9": false
-        }
-    },
-    {
-        "name": "Quadro K5200",
-        "family": "Kepler (2nd Gen)",
-        "chip": "GK208",
-        "numChips": 1,
-        "numEncoder": 1,
-        "maxStreams": -1,
-        "encoders": {
-            "h264-420": true,
-            "h264-444": false,
-            "h264": false,
-            "h265-4k-420": false,
-            "h265-4k-444": false,
-            "h265-4k": false,
-            "h265-8k": false
-        },
-        "numDecoder": 1,
-        "decoders": {
-            "mpeg2": true,
-            "vc1": true,
-            "h264": true,
-            "h265": false,
-            "vp8": false,
-            "vp9": false
-        }
-    },
-    {
-        "name": "Quadro K6000",
-        "family": "Kepler (2nd Gen)",
-        "chip": "GK208",
-        "numChips": 1,
-        "numEncoder": 1,
-        "maxStreams": -1,
-        "encoders": {
-            "h264-420": true,
-            "h264-444": false,
-            "h264": false,
-            "h265-4k-420": false,
-            "h265-4k-444": false,
-            "h265-4k": false,
-            "h265-8k": false
-        },
-        "numDecoder": 1,
-        "decoders": {
-            "mpeg2": true,
-            "vc1": true,
-            "h264": true,
-            "h265": false,
-            "vp8": false,
-            "vp9": false
-        }
-    },
-    {
-        "name": "Quadro K620",
-        "family": "Maxwell (1st Gen)",
-        "chip": "GM107",
-        "numChips": 1,
-        "numEncoder": 1,
-        "maxStreams": 2,
-        "encoders": {
-            "h264-420": true,
+            "h264-420": false,
             "h264-444": true,
             "h264": true,
-            "h265-4k-420": false,
-            "h265-4k-444": false,
-            "h265-4k": false,
-            "h265-8k": false
+            "h265-4k-420": true,
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
         },
         "numDecoder": 1,
         "decoders": {
+            "mpeg1": true,
             "mpeg2": true,
             "vc1": true,
-            "h264": true,
-            "h265": false,
             "vp8": false,
-            "vp9": false
+            "vp9": true,
+            "h264": true,
+            "h265": true
         }
     },
     {
-        "name": "Quadro K1200",
-        "family": "Maxwell (1st Gen)",
-        "chip": "GM107",
-        "numChips": 1,
-        "numEncoder": 1,
-        "maxStreams": 2,
-        "encoders": {
-            "h264-420": true,
-            "h264-444": true,
-            "h264": true,
-            "h265-4k-420": false,
-            "h265-4k-444": false,
-            "h265-4k": false,
-            "h265-8k": false
-        },
-        "numDecoder": 1,
-        "decoders": {
-            "mpeg2": true,
-            "vc1": true,
-            "h264": true,
-            "h265": false,
-            "vp8": false,
-            "vp9": false
-        }
-    },
-    {
-        "name": "Quadro K2200",
-        "family": "Maxwell (1st Gen)",
-        "chip": "GM107",
+        "name": "GeForce GTX 1050 Ti",
+        "family": "Pascal",
+        "chip": "GP107",
         "numChips": 1,
         "numEncoder": 1,
         "maxStreams": -1,
         "encoders": {
-            "h264-420": true,
+            "h264-420": false,
             "h264-444": true,
             "h264": true,
-            "h265-4k-420": false,
-            "h265-4k-444": false,
-            "h265-4k": false,
-            "h265-8k": false
+            "h265-4k-420": true,
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
         },
         "numDecoder": 1,
         "decoders": {
+            "mpeg1": true,
             "mpeg2": true,
             "vc1": true,
-            "h264": true,
-            "h265": false,
             "vp8": false,
-            "vp9": false
+            "vp9": true,
+            "h264": true,
+            "h265": true
         }
     },
     {
-        "name": "Quadro M4000",
-        "family": "Maxwell (2nd Gen)",
-        "chip": "GM204",
+        "name": "GeForce GTX 1060",
+        "family": "Pascal",
+        "chip": "GP106",
+        "numChips": 1,
+        "numEncoder": 1,
+        "maxStreams": -1,
+        "encoders": {
+            "h264-420": false,
+            "h264-444": true,
+            "h264": true,
+            "h265-4k-420": true,
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
+        },
+        "numDecoder": 1,
+        "decoders": {
+            "mpeg1": true,
+            "mpeg2": true,
+            "vc1": true,
+            "vp8": false,
+            "vp9": true,
+            "h264": true,
+            "h265": true
+        }
+    },
+    {
+        "name": "GeForce GTX 1070M",
+        "family": "Pascal",
+        "chip": "GP104B",
         "numChips": 1,
         "numEncoder": 2,
         "maxStreams": -1,
         "encoders": {
-            "h264-420": true,
+            "h264-420": false,
             "h264-444": true,
             "h264": true,
             "h265-4k-420": true,
-            "h265-4k-444": false,
-            "h265-4k": false,
-            "h265-8k": false
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
         },
         "numDecoder": 1,
         "decoders": {
+            "mpeg1": true,
             "mpeg2": true,
             "vc1": true,
-            "h264": true,
-            "h265": false,
             "vp8": true,
-            "vp9": false
+            "vp9": true,
+            "h264": true,
+            "h265": true
         }
     },
     {
-        "name": "Quadro M5000",
-        "family": "Maxwell (2nd Gen)",
-        "chip": "GM204",
+        "name": "GeForce GTX 1080M",
+        "family": "Pascal",
+        "chip": "GP104B",
         "numChips": 1,
         "numEncoder": 2,
         "maxStreams": -1,
         "encoders": {
-            "h264-420": true,
+            "h264-420": false,
             "h264-444": true,
             "h264": true,
             "h265-4k-420": true,
-            "h265-4k-444": false,
-            "h265-4k": false,
-            "h265-8k": false
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
         },
         "numDecoder": 1,
         "decoders": {
+            "mpeg1": true,
             "mpeg2": true,
             "vc1": true,
-            "h264": true,
-            "h265": false,
             "vp8": true,
-            "vp9": false
+            "vp9": true,
+            "h264": true,
+            "h265": true
         }
     },
     {
-        "name": "Quadro M6000",
-        "family": "Maxwell (2nd Gen)",
-        "chip": "GM200",
+        "name": "GeForce GTX 1070",
+        "family": "Pascal",
+        "chip": "GP104",
         "numChips": 1,
         "numEncoder": 2,
         "maxStreams": -1,
         "encoders": {
-            "h264-420": true,
+            "h264-420": false,
             "h264-444": true,
             "h264": true,
             "h265-4k-420": true,
-            "h265-4k-444": false,
-            "h265-4k": false,
-            "h265-8k": false
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
         },
         "numDecoder": 1,
         "decoders": {
+            "mpeg1": true,
             "mpeg2": true,
             "vc1": true,
-            "h264": true,
-            "h265": false,
             "vp8": true,
-            "vp9": false
+            "vp9": true,
+            "h264": true,
+            "h265": true
         }
     },
     {
-        "name": "Quadro M2000",
-        "family": "Maxwell (GM206)",
-        "chip": "GM206",
+        "name": "GeForce GTX 1070Ti",
+        "family": "Pascal",
+        "chip": "GP104",
+        "numChips": 1,
+        "numEncoder": 2,
+        "maxStreams": -1,
+        "encoders": {
+            "h264-420": false,
+            "h264-444": true,
+            "h264": true,
+            "h265-4k-420": true,
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
+        },
+        "numDecoder": 1,
+        "decoders": {
+            "mpeg1": true,
+            "mpeg2": true,
+            "vc1": true,
+            "vp8": true,
+            "vp9": true,
+            "h264": true,
+            "h265": true
+        }
+    },
+    {
+        "name": "GeForce GTX 1080",
+        "family": "Pascal",
+        "chip": "GP104",
+        "numChips": 1,
+        "numEncoder": 2,
+        "maxStreams": -1,
+        "encoders": {
+            "h264-420": false,
+            "h264-444": true,
+            "h264": true,
+            "h265-4k-420": true,
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
+        },
+        "numDecoder": 1,
+        "decoders": {
+            "mpeg1": true,
+            "mpeg2": true,
+            "vc1": true,
+            "vp8": true,
+            "vp9": true,
+            "h264": true,
+            "h265": true
+        }
+    },
+    {
+        "name": "GeForce GTX 1080 Ti",
+        "family": "Pascal",
+        "chip": "GP102",
+        "numChips": 1,
+        "numEncoder": 2,
+        "maxStreams": -1,
+        "encoders": {
+            "h264-420": false,
+            "h264-444": true,
+            "h264": true,
+            "h265-4k-420": true,
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
+        },
+        "numDecoder": 1,
+        "decoders": {
+            "mpeg1": true,
+            "mpeg2": true,
+            "vc1": true,
+            "vp8": false,
+            "vp9": true,
+            "h264": true,
+            "h265": true
+        }
+    },
+    {
+        "name": "GeForce GTX Titan X",
+        "family": "Pascal",
+        "chip": "GP102",
+        "numChips": 1,
+        "numEncoder": 2,
+        "maxStreams": -1,
+        "encoders": {
+            "h264-420": false,
+            "h264-444": true,
+            "h264": true,
+            "h265-4k-420": true,
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
+        },
+        "numDecoder": 1,
+        "decoders": {
+            "mpeg1": true,
+            "mpeg2": true,
+            "vc1": true,
+            "vp8": false,
+            "vp9": true,
+            "h264": true,
+            "h265": true
+        }
+    },
+    {
+        "name": "GeForce GTX Titan Xp",
+        "family": "Pascal",
+        "chip": "GP102",
+        "numChips": 1,
+        "numEncoder": 2,
+        "maxStreams": -1,
+        "encoders": {
+            "h264-420": false,
+            "h264-444": true,
+            "h264": true,
+            "h265-4k-420": true,
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
+        },
+        "numDecoder": 1,
+        "decoders": {
+            "mpeg1": true,
+            "mpeg2": true,
+            "vc1": true,
+            "vp8": false,
+            "vp9": true,
+            "h264": true,
+            "h265": true
+        }
+    },
+    {
+        "name": "Titan V",
+        "family": "Volta",
+        "chip": "GV100",
+        "numChips": 1,
+        "numEncoder": 3,
+        "maxStreams": -1,
+        "encoders": {
+            "h264-420": false,
+            "h264-444": true,
+            "h264": true,
+            "h265-4k-420": true,
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
+        },
+        "numDecoder": 1,
+        "decoders": {
+            "mpeg1": true,
+            "mpeg2": true,
+            "vc1": true,
+            "vp8": true,
+            "vp9": true,
+            "h264": true,
+            "h265": true
+        }
+    },
+    {
+        "name": "GeForce GTX 1650",
+        "family": "Turing*",
+        "chip": "TU117",
         "numChips": 1,
         "numEncoder": 1,
         "maxStreams": -1,
         "encoders": {
-            "h264-420": true,
+            "h264-420": false,
             "h264-444": true,
             "h264": true,
             "h265-4k-420": true,
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
+        },
+        "numDecoder": 1,
+        "decoders": {
+            "mpeg1": true,
+            "mpeg2": true,
+            "vc1": true,
+            "vp8": true,
+            "vp9": true,
+            "h264": true,
+            "h265": true
+        }
+    },
+    {
+        "name": "GeForce GTX 1660 Ti",
+        "family": "Turing",
+        "chip": "TU116",
+        "numChips": 1,
+        "numEncoder": 1,
+        "maxStreams": -1,
+        "encoders": {
+            "h264-420": false,
+            "h264-444": true,
+            "h264": true,
+            "h265-4k-420": true,
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
+        },
+        "numDecoder": 1,
+        "decoders": {
+            "mpeg1": true,
+            "mpeg2": true,
+            "vc1": true,
+            "vp8": true,
+            "vp9": true,
+            "h264": true,
+            "h265": true
+        }
+    },
+    {
+        "name": "GeForce GTX 1660",
+        "family": "Turing",
+        "chip": "TU116",
+        "numChips": 1,
+        "numEncoder": 1,
+        "maxStreams": -1,
+        "encoders": {
+            "h264-420": false,
+            "h264-444": true,
+            "h264": true,
+            "h265-4k-420": true,
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
+        },
+        "numDecoder": 1,
+        "decoders": {
+            "mpeg1": true,
+            "mpeg2": true,
+            "vc1": true,
+            "vp8": true,
+            "vp9": true,
+            "h264": true,
+            "h265": true
+        }
+    },
+    {
+        "name": "GeForce RTX 2060",
+        "family": "Turing",
+        "chip": "TU106",
+        "numChips": 1,
+        "numEncoder": 1,
+        "maxStreams": -1,
+        "encoders": {
+            "h264-420": false,
+            "h264-444": true,
+            "h264": true,
+            "h265-4k-420": true,
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
+        },
+        "numDecoder": 1,
+        "decoders": {
+            "mpeg1": true,
+            "mpeg2": true,
+            "vc1": true,
+            "vp8": true,
+            "vp9": true,
+            "h264": true,
+            "h265": true
+        }
+    },
+    {
+        "name": "GeForce RTX 2070",
+        "family": "Turing",
+        "chip": "TU106",
+        "numChips": 1,
+        "numEncoder": 1,
+        "maxStreams": -1,
+        "encoders": {
+            "h264-420": false,
+            "h264-444": true,
+            "h264": true,
+            "h265-4k-420": true,
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
+        },
+        "numDecoder": 1,
+        "decoders": {
+            "mpeg1": true,
+            "mpeg2": true,
+            "vc1": true,
+            "vp8": true,
+            "vp9": true,
+            "h264": true,
+            "h265": true
+        }
+    },
+    {
+        "name": "GeForce RTX 2080",
+        "family": "Turing",
+        "chip": "TU104",
+        "numChips": 1,
+        "numEncoder": 1,
+        "maxStreams": -1,
+        "encoders": {
+            "h264-420": false,
+            "h264-444": true,
+            "h264": true,
+            "h265-4k-420": true,
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
+        },
+        "numDecoder": 1,
+        "decoders": {
+            "mpeg1": true,
+            "mpeg2": true,
+            "vc1": true,
+            "vp8": true,
+            "vp9": true,
+            "h264": true,
+            "h265": true
+        }
+    },
+    {
+        "name": "GeForce RTX 2080 Ti",
+        "family": "Turing",
+        "chip": "TU102",
+        "numChips": 1,
+        "numEncoder": 1,
+        "maxStreams": -1,
+        "encoders": {
+            "h264-420": false,
+            "h264-444": true,
+            "h264": true,
+            "h265-4k-420": true,
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
+        },
+        "numDecoder": 1,
+        "decoders": {
+            "mpeg1": true,
+            "mpeg2": true,
+            "vc1": true,
+            "vp8": true,
+            "vp9": true,
+            "h264": true,
+            "h265": true
+        }
+    },
+    {
+        "name": "Titan RTX",
+        "family": "Turing",
+        "chip": "TU102",
+        "numChips": 1,
+        "numEncoder": 1,
+        "maxStreams": -1,
+        "encoders": {
+            "h264-420": false,
+            "h264-444": true,
+            "h264": true,
+            "h265-4k-420": true,
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
+        },
+        "numDecoder": 1,
+        "decoders": {
+            "mpeg1": true,
+            "mpeg2": true,
+            "vc1": true,
+            "vp8": true,
+            "vp9": true,
+            "h264": true,
+            "h265": true
+        }
+    },
+    {
+        "name": "Quadro P500",
+        "family": "Pascal",
+        "chip": "GP108",
+        "numChips": 1,
+        "numEncoder": 0,
+        "maxStreams": -1,
+        "encoders": {
+            "h264-420": false,
+            "h264-444": false,
+            "h264": false,
+            "h265-4k-420": false,
             "h265-4k-444": false,
             "h265-4k": false,
             "h265-8k": false
         },
         "numDecoder": 1,
         "decoders": {
+            "mpeg1": true,
             "mpeg2": true,
             "vc1": true,
+            "vp8": false,
+            "vp9": true,
             "h264": true,
-            "h265": true,
-            "vp8": true,
-            "vp9": true
+            "h265": true
+        }
+    },
+    {
+        "name": "Quadro P520",
+        "family": "Pascal",
+        "chip": "GP108",
+        "numChips": 1,
+        "numEncoder": 0,
+        "maxStreams": -1,
+        "encoders": {
+            "h264-420": false,
+            "h264-444": false,
+            "h264": false,
+            "h265-4k-420": false,
+            "h265-4k-444": false,
+            "h265-4k": false,
+            "h265-8k": false
+        },
+        "numDecoder": 1,
+        "decoders": {
+            "mpeg1": true,
+            "mpeg2": true,
+            "vc1": true,
+            "vp8": false,
+            "vp9": true,
+            "h264": true,
+            "h265": true
         }
     },
     {
@@ -403,9 +626,9 @@
         "chip": "GP107",
         "numChips": 1,
         "numEncoder": 1,
-        "maxStreams": 2,
+        "maxStreams": -1,
         "encoders": {
-            "h264-420": true,
+            "h264-420": false,
             "h264-444": true,
             "h264": true,
             "h265-4k-420": true,
@@ -415,12 +638,13 @@
         },
         "numDecoder": 1,
         "decoders": {
+            "mpeg1": true,
             "mpeg2": true,
             "vc1": true,
-            "h264": true,
-            "h265": true,
             "vp8": false,
-            "vp9": true
+            "vp9": true,
+            "h264": true,
+            "h265": true
         }
     },
     {
@@ -429,9 +653,9 @@
         "chip": "GP107",
         "numChips": 1,
         "numEncoder": 1,
-        "maxStreams": 2,
+        "maxStreams": -1,
         "encoders": {
-            "h264-420": true,
+            "h264-420": false,
             "h264-444": true,
             "h264": true,
             "h265-4k-420": true,
@@ -441,12 +665,13 @@
         },
         "numDecoder": 1,
         "decoders": {
+            "mpeg1": true,
             "mpeg2": true,
             "vc1": true,
-            "h264": true,
-            "h265": true,
             "vp8": false,
-            "vp9": true
+            "vp9": true,
+            "h264": true,
+            "h265": true
         }
     },
     {
@@ -455,9 +680,9 @@
         "chip": "GP107",
         "numChips": 1,
         "numEncoder": 1,
-        "maxStreams": 2,
+        "maxStreams": -1,
         "encoders": {
-            "h264-420": true,
+            "h264-420": false,
             "h264-444": true,
             "h264": true,
             "h265-4k-420": true,
@@ -467,23 +692,51 @@
         },
         "numDecoder": 1,
         "decoders": {
+            "mpeg1": true,
             "mpeg2": true,
             "vc1": true,
-            "h264": true,
-            "h265": true,
             "vp8": false,
-            "vp9": true
+            "vp9": true,
+            "h264": true,
+            "h265": true
         }
     },
     {
         "name": "Quadro P2000",
+        "family": "Pascal",
+        "chip": "GP107",
+        "numChips": 1,
+        "numEncoder": 1,
+        "maxStreams": -1,
+        "encoders": {
+            "h264-420": false,
+            "h264-444": true,
+            "h264": true,
+            "h265-4k-420": true,
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
+        },
+        "numDecoder": 1,
+        "decoders": {
+            "mpeg1": true,
+            "mpeg2": true,
+            "vc1": true,
+            "vp8": false,
+            "vp9": true,
+            "h264": true,
+            "h265": true
+        }
+    },
+    {
+        "name": "Quadro P2200",
         "family": "Pascal",
         "chip": "GP106",
         "numChips": 1,
         "numEncoder": 1,
         "maxStreams": -1,
         "encoders": {
-            "h264-420": true,
+            "h264-420": false,
             "h264-444": true,
             "h264": true,
             "h265-4k-420": true,
@@ -493,12 +746,94 @@
         },
         "numDecoder": 1,
         "decoders": {
+            "mpeg1": true,
             "mpeg2": true,
             "vc1": true,
-            "h264": true,
-            "h265": true,
             "vp8": false,
-            "vp9": true
+            "vp9": true,
+            "h264": true,
+            "h265": true
+        }
+    },
+    {
+        "name": "Quadro P3200",
+        "family": "Pascal",
+        "chip": "GP104",
+        "numChips": 1,
+        "numEncoder": 2,
+        "maxStreams": -1,
+        "encoders": {
+            "h264-420": false,
+            "h264-444": true,
+            "h264": true,
+            "h265-4k-420": true,
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
+        },
+        "numDecoder": 1,
+        "decoders": {
+            "mpeg1": true,
+            "mpeg2": true,
+            "vc1": true,
+            "vp8": true,
+            "vp9": true,
+            "h264": true,
+            "h265": true
+        }
+    },
+    {
+        "name": "Quadro P4200",
+        "family": "Pascal",
+        "chip": "GP104",
+        "numChips": 1,
+        "numEncoder": 2,
+        "maxStreams": -1,
+        "encoders": {
+            "h264-420": false,
+            "h264-444": true,
+            "h264": true,
+            "h265-4k-420": true,
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
+        },
+        "numDecoder": 1,
+        "decoders": {
+            "mpeg1": true,
+            "mpeg2": true,
+            "vc1": true,
+            "vp8": true,
+            "vp9": true,
+            "h264": true,
+            "h265": true
+        }
+    },
+    {
+        "name": "Quadro P5200",
+        "family": "Pascal",
+        "chip": "GP104",
+        "numChips": 1,
+        "numEncoder": 2,
+        "maxStreams": -1,
+        "encoders": {
+            "h264-420": false,
+            "h264-444": true,
+            "h264": true,
+            "h265-4k-420": true,
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
+        },
+        "numDecoder": 1,
+        "decoders": {
+            "mpeg1": true,
+            "mpeg2": true,
+            "vc1": true,
+            "vp8": true,
+            "vp9": true,
+            "h264": true,
+            "h265": true
         }
     },
     {
@@ -509,7 +844,7 @@
         "numEncoder": 1,
         "maxStreams": -1,
         "encoders": {
-            "h264-420": true,
+            "h264-420": false,
             "h264-444": true,
             "h264": true,
             "h265-4k-420": true,
@@ -519,12 +854,13 @@
         },
         "numDecoder": 1,
         "decoders": {
+            "mpeg1": true,
             "mpeg2": true,
             "vc1": true,
-            "h264": true,
-            "h265": true,
             "vp8": true,
-            "vp9": true
+            "vp9": true,
+            "h264": true,
+            "h265": true
         }
     },
     {
@@ -535,7 +871,7 @@
         "numEncoder": 2,
         "maxStreams": -1,
         "encoders": {
-            "h264-420": true,
+            "h264-420": false,
             "h264-444": true,
             "h264": true,
             "h265-4k-420": true,
@@ -545,12 +881,13 @@
         },
         "numDecoder": 1,
         "decoders": {
+            "mpeg1": true,
             "mpeg2": true,
             "vc1": true,
-            "h264": true,
-            "h265": true,
             "vp8": true,
-            "vp9": true
+            "vp9": true,
+            "h264": true,
+            "h265": true
         }
     },
     {
@@ -561,7 +898,7 @@
         "numEncoder": 2,
         "maxStreams": -1,
         "encoders": {
-            "h264-420": true,
+            "h264-420": false,
             "h264-444": true,
             "h264": true,
             "h265-4k-420": true,
@@ -571,12 +908,13 @@
         },
         "numDecoder": 1,
         "decoders": {
+            "mpeg1": true,
             "mpeg2": true,
             "vc1": true,
-            "h264": true,
-            "h265": true,
             "vp8": false,
-            "vp9": true
+            "vp9": true,
+            "h264": true,
+            "h265": true
         }
     },
     {
@@ -587,334 +925,239 @@
         "numEncoder": 3,
         "maxStreams": -1,
         "encoders": {
-            "h264-420": true,
+            "h264-420": false,
             "h264-444": true,
             "h264": true,
             "h265-4k-420": true,
             "h265-4k-444": true,
             "h265-4k": true,
-            "h265-8k": false
+            "h265-8k": true
         },
         "numDecoder": 1,
         "decoders": {
+            "mpeg1": true,
             "mpeg2": true,
             "vc1": true,
-            "h264": true,
-            "h265": true,
             "vp8": true,
-            "vp9": true
-        }
-    },
-    {
-        "name": "GRID K1",
-        "family": "Kepler",
-        "chip": "GK107",
-        "numChips": 4,
-        "numEncoder": 1,
-        "maxStreams": -1,
-        "encoders": {
-            "h264-420": true,
-            "h264-444": false,
-            "h264": false,
-            "h265-4k-420": false,
-            "h265-4k-444": false,
-            "h265-4k": false,
-            "h265-8k": false
-        },
-        "numDecoder": 1,
-        "decoders": {
-            "mpeg2": true,
-            "vc1": true,
+            "vp9": true,
             "h264": true,
-            "h265": false,
-            "vp8": false,
-            "vp9": false
+            "h265": true
         }
     },
     {
-        "name": "GRID K2",
-        "family": "Kepler",
-        "chip": "GK104",
-        "numChips": 2,
-        "numEncoder": 1,
-        "maxStreams": -1,
-        "encoders": {
-            "h264-420": true,
-            "h264-444": false,
-            "h264": false,
-            "h265-4k-420": false,
-            "h265-4k-444": false,
-            "h265-4k": false,
-            "h265-8k": false
-        },
-        "numDecoder": 1,
-        "decoders": {
-            "mpeg2": true,
-            "vc1": true,
-            "h264": true,
-            "h265": false,
-            "vp8": false,
-            "vp9": false
-        }
-    },
-    {
-        "name": "GRID K340",
-        "family": "Kepler",
-        "chip": "GK107",
-        "numChips": 4,
-        "numEncoder": 1,
-        "maxStreams": -1,
-        "encoders": {
-            "h264-420": true,
-            "h264-444": false,
-            "h264": false,
-            "h265-4k-420": false,
-            "h265-4k-444": false,
-            "h265-4k": false,
-            "h265-8k": false
-        },
-        "numDecoder": 1,
-        "decoders": {
-            "mpeg2": true,
-            "vc1": true,
-            "h264": true,
-            "h265": false,
-            "vp8": false,
-            "vp9": false
-        }
-    },
-    {
-        "name": "GRID K520",
-        "family": "Kepler",
-        "chip": "GK104",
-        "numChips": 2,
-        "numEncoder": 1,
-        "maxStreams": -1,
-        "encoders": {
-            "h264-420": true,
-            "h264-444": false,
-            "h264": false,
-            "h265-4k-420": false,
-            "h265-4k-444": false,
-            "h265-4k": false,
-            "h265-8k": false
-        },
-        "numDecoder": 1,
-        "decoders": {
-            "mpeg2": true,
-            "vc1": true,
-            "h264": true,
-            "h265": false,
-            "vp8": false,
-            "vp9": false
-        }
-    },
-    {
-        "name": "Tesla K10",
-        "family": "Kepler",
-        "chip": "GK104",
-        "numChips": 2,
-        "numEncoder": 1,
-        "maxStreams": -1,
-        "encoders": {
-            "h264-420": true,
-            "h264-444": false,
-            "h264": false,
-            "h265-4k-420": false,
-            "h265-4k-444": false,
-            "h265-4k": false,
-            "h265-8k": false
-        },
-        "numDecoder": 1,
-        "decoders": {
-            "mpeg2": true,
-            "vc1": true,
-            "h264": true,
-            "h265": false,
-            "vp8": false,
-            "vp9": false
-        }
-    },
-    {
-        "name": "Tesla K20X",
-        "family": "Kepler",
-        "chip": "GK110",
+        "name": "Quadro GV100",
+        "family": "Volta",
+        "chip": "GV100",
         "numChips": 1,
-        "numEncoder": 1,
+        "numEncoder": 3,
         "maxStreams": -1,
         "encoders": {
-            "h264-420": true,
-            "h264-444": false,
-            "h264": false,
-            "h265-4k-420": false,
-            "h265-4k-444": false,
-            "h265-4k": false,
-            "h265-8k": false
-        },
-        "numDecoder": 1,
-        "decoders": {
-            "mpeg2": true,
-            "vc1": true,
-            "h264": true,
-            "h265": false,
-            "vp8": false,
-            "vp9": false
-        }
-    },
-    {
-        "name": "Tesla K40",
-        "family": "Kepler",
-        "chip": "GK110B",
-        "numChips": 1,
-        "numEncoder": 1,
-        "maxStreams": -1,
-        "encoders": {
-            "h264-420": true,
-            "h264-444": false,
-            "h264": false,
-            "h265-4k-420": false,
-            "h265-4k-444": false,
-            "h265-4k": false,
-            "h265-8k": false
-        },
-        "numDecoder": 1,
-        "decoders": {
-            "mpeg2": true,
-            "vc1": true,
-            "h264": true,
-            "h265": false,
-            "vp8": false,
-            "vp9": false
-        }
-    },
-    {
-        "name": "Tesla K80",
-        "family": "Kepler (2nd Gen)",
-        "chip": "GK210",
-        "numChips": 2,
-        "numEncoder": 1,
-        "maxStreams": -1,
-        "encoders": {
-            "h264-420": true,
-            "h264-444": false,
-            "h264": false,
-            "h265-4k-420": false,
-            "h265-4k-444": false,
-            "h265-4k": false,
-            "h265-8k": false
-        },
-        "numDecoder": 1,
-        "decoders": {
-            "mpeg2": true,
-            "vc1": true,
-            "h264": true,
-            "h265": false,
-            "vp8": false,
-            "vp9": false
-        }
-    },
-    {
-        "name": "Tesla M4",
-        "family": "Maxwell (GM206)",
-        "chip": "GM206",
-        "numChips": 1,
-        "numEncoder": 1,
-        "maxStreams": -1,
-        "encoders": {
-            "h264-420": true,
+            "h264-420": false,
             "h264-444": true,
             "h264": true,
             "h265-4k-420": true,
-            "h265-4k-444": false,
-            "h265-4k": false,
-            "h265-8k": false
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
         },
         "numDecoder": 1,
         "decoders": {
+            "mpeg1": true,
             "mpeg2": true,
             "vc1": true,
-            "h264": true,
-            "h265": true,
             "vp8": true,
-            "vp9": true
+            "vp9": true,
+            "h264": true,
+            "h265": true
         }
     },
     {
-        "name": "Tesla M40",
-        "family": "Maxwell (2nd Gen)",
-        "chip": "GM200",
+        "name": "Quadro T1000",
+        "family": "Turing",
+        "chip": "TU117",
         "numChips": 1,
-        "numEncoder": 2,
+        "numEncoder": 1,
         "maxStreams": -1,
         "encoders": {
-            "h264-420": true,
+            "h264-420": false,
             "h264-444": true,
             "h264": true,
             "h265-4k-420": true,
-            "h265-4k-444": false,
-            "h265-4k": false,
-            "h265-8k": false
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
         },
         "numDecoder": 1,
         "decoders": {
+            "mpeg1": true,
             "mpeg2": true,
             "vc1": true,
-            "h264": true,
-            "h265": false,
             "vp8": true,
-            "vp9": false
+            "vp9": true,
+            "h264": true,
+            "h265": true
         }
     },
     {
-        "name": "Tesla M6",
-        "family": "Maxwell (2nd Gen)",
-        "chip": "GM204",
+        "name": "Quadro T2000",
+        "family": "Turing",
+        "chip": "TU117",
         "numChips": 1,
-        "numEncoder": 2,
+        "numEncoder": 1,
         "maxStreams": -1,
         "encoders": {
-            "h264-420": true,
+            "h264-420": false,
             "h264-444": true,
             "h264": true,
             "h265-4k-420": true,
-            "h265-4k-444": false,
-            "h265-4k": false,
-            "h265-8k": false
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
         },
         "numDecoder": 1,
         "decoders": {
+            "mpeg1": true,
             "mpeg2": true,
             "vc1": true,
-            "h264": true,
-            "h265": false,
             "vp8": true,
-            "vp9": false
+            "vp9": true,
+            "h264": true,
+            "h265": true
         }
     },
     {
-        "name": "Tesla M60",
-        "family": "Maxwell (2nd Gen)",
-        "chip": "GM204",
-        "numChips": 2,
-        "numEncoder": 2,
+        "name": "Quadro RTX 3000",
+        "family": "Turing",
+        "chip": "TU106",
+        "numChips": 1,
+        "numEncoder": 1,
         "maxStreams": -1,
         "encoders": {
-            "h264-420": true,
+            "h264-420": false,
             "h264-444": true,
             "h264": true,
             "h265-4k-420": true,
-            "h265-4k-444": false,
-            "h265-4k": false,
-            "h265-8k": false
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
+        },
+        "numDecoder": 3,
+        "decoders": {
+            "mpeg1": true,
+            "mpeg2": true,
+            "vc1": true,
+            "vp8": true,
+            "vp9": true,
+            "h264": true,
+            "h265": true
+        }
+    },
+    {
+        "name": "Quadro RTX 4000",
+        "family": "Turing",
+        "chip": "TU104",
+        "numChips": 1,
+        "numEncoder": 1,
+        "maxStreams": -1,
+        "encoders": {
+            "h264-420": false,
+            "h264-444": true,
+            "h264": true,
+            "h265-4k-420": true,
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
+        },
+        "numDecoder": 2,
+        "decoders": {
+            "mpeg1": true,
+            "mpeg2": true,
+            "vc1": true,
+            "vp8": true,
+            "vp9": true,
+            "h264": true,
+            "h265": true
+        }
+    },
+    {
+        "name": "Quadro RTX 5000",
+        "family": "Turing",
+        "chip": "TU104",
+        "numChips": 1,
+        "numEncoder": 1,
+        "maxStreams": -1,
+        "encoders": {
+            "h264-420": false,
+            "h264-444": true,
+            "h264": true,
+            "h265-4k-420": true,
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
+        },
+        "numDecoder": 2,
+        "decoders": {
+            "mpeg1": true,
+            "mpeg2": true,
+            "vc1": true,
+            "vp8": true,
+            "vp9": true,
+            "h264": true,
+            "h265": true
+        }
+    },
+    {
+        "name": "Quadro RTX 6000",
+        "family": "Turing",
+        "chip": "TU102",
+        "numChips": 1,
+        "numEncoder": 1,
+        "maxStreams": -1,
+        "encoders": {
+            "h264-420": false,
+            "h264-444": true,
+            "h264": true,
+            "h265-4k-420": true,
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
         },
         "numDecoder": 1,
         "decoders": {
+            "mpeg1": true,
             "mpeg2": true,
             "vc1": true,
-            "h264": true,
-            "h265": false,
             "vp8": true,
-            "vp9": false
+            "vp9": true,
+            "h264": true,
+            "h265": true
+        }
+    },
+    {
+        "name": "Quadro RTX 8000",
+        "family": "Turing",
+        "chip": "TU102",
+        "numChips": 1,
+        "numEncoder": 1,
+        "maxStreams": -1,
+        "encoders": {
+            "h264-420": false,
+            "h264-444": true,
+            "h264": true,
+            "h265-4k-420": true,
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
+        },
+        "numDecoder": 1,
+        "decoders": {
+            "mpeg1": true,
+            "mpeg2": true,
+            "vc1": true,
+            "vp8": true,
+            "vp9": true,
+            "h264": true,
+            "h265": true
         }
     },
     {
@@ -925,7 +1168,7 @@
         "numEncoder": 2,
         "maxStreams": -1,
         "encoders": {
-            "h264-420": true,
+            "h264-420": false,
             "h264-444": true,
             "h264": true,
             "h265-4k-420": true,
@@ -935,12 +1178,40 @@
         },
         "numDecoder": 1,
         "decoders": {
+            "mpeg1": true,
             "mpeg2": true,
             "vc1": true,
-            "h264": true,
-            "h265": true,
             "vp8": true,
-            "vp9": true
+            "vp9": true,
+            "h264": true,
+            "h265": true
+        }
+    },
+    {
+        "name": "Tesla P6",
+        "family": "Pascal",
+        "chip": "GP104",
+        "numChips": 1,
+        "numEncoder": 2,
+        "maxStreams": -1,
+        "encoders": {
+            "h264-420": false,
+            "h264-444": true,
+            "h264": true,
+            "h265-4k-420": true,
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
+        },
+        "numDecoder": 1,
+        "decoders": {
+            "mpeg1": true,
+            "mpeg2": true,
+            "vc1": true,
+            "vp8": true,
+            "vp9": true,
+            "h264": true,
+            "h265": true
         }
     },
     {
@@ -951,7 +1222,7 @@
         "numEncoder": 2,
         "maxStreams": -1,
         "encoders": {
-            "h264-420": true,
+            "h264-420": false,
             "h264-444": true,
             "h264": true,
             "h265-4k-420": true,
@@ -961,12 +1232,13 @@
         },
         "numDecoder": 1,
         "decoders": {
+            "mpeg1": true,
             "mpeg2": true,
             "vc1": true,
-            "h264": true,
-            "h265": true,
             "vp8": false,
-            "vp9": true
+            "vp9": true,
+            "h264": true,
+            "h265": true
         }
     },
     {
@@ -977,22 +1249,77 @@
         "numEncoder": 3,
         "maxStreams": -1,
         "encoders": {
-            "h264-420": true,
+            "h264-420": false,
             "h264-444": true,
             "h264": true,
             "h265-4k-420": true,
             "h265-4k-444": true,
             "h265-4k": true,
-            "h265-8k": false
+            "h265-8k": true
         },
         "numDecoder": 1,
         "decoders": {
+            "mpeg1": true,
             "mpeg2": true,
             "vc1": true,
-            "h264": true,
-            "h265": true,
             "vp8": true,
-            "vp9": true
+            "vp9": true,
+            "h264": true,
+            "h265": true
+        }
+    },
+    {
+        "name": "Tesla V100",
+        "family": "Volta",
+        "chip": "GV100",
+        "numChips": 1,
+        "numEncoder": 3,
+        "maxStreams": -1,
+        "encoders": {
+            "h264-420": false,
+            "h264-444": true,
+            "h264": true,
+            "h265-4k-420": true,
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
+        },
+        "numDecoder": 1,
+        "decoders": {
+            "mpeg1": true,
+            "mpeg2": true,
+            "vc1": true,
+            "vp8": true,
+            "vp9": true,
+            "h264": true,
+            "h265": true
+        }
+    },
+    {
+        "name": "Tesla T4",
+        "family": "Turing",
+        "chip": "TU104",
+        "numChips": 1,
+        "numEncoder": 1,
+        "maxStreams": -1,
+        "encoders": {
+            "h264-420": false,
+            "h264-444": true,
+            "h264": true,
+            "h265-4k-420": true,
+            "h265-4k-444": true,
+            "h265-4k": true,
+            "h265-8k": true
+        },
+        "numDecoder": 2,
+        "decoders": {
+            "mpeg1": true,
+            "mpeg2": true,
+            "vc1": true,
+            "vp8": true,
+            "vp9": true,
+            "h264": true,
+            "h265": true
         }
     }
 ]
