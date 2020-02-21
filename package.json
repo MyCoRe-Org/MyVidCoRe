@@ -58,6 +58,7 @@
     "@types/node": "^13.7.1",
     "@types/video.js": "^7.3.3",
     "angular-ide": "^0.9.73",
+    "cheerio": "^1.0.0-rc.3",
     "codelyzer": "^5.1.2",
     "imagemin": "^7.0.1",
     "imagemin-giflossy": "^5.1.10",
