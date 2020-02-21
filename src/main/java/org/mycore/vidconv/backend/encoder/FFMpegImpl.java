@@ -36,6 +36,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -121,11 +122,21 @@ public class FFMpegImpl {
         LOGGER.info("detect hw accelerators...");
         HWAccelsWrapper hwaccels = detectHWAccels();
         if (hwaccels != null && !hwaccels.getHWAccels().isEmpty()) {
-            hwaccels.getHWAccels()
-                    .forEach(hw -> LOGGER.info("...found {} {} ({}).", hw.getIndex(), hw.getName(), hw.getType()));
+            hwaccels.getHWAccels().forEach(outputHWAccelInfo());
         } else {
             LOGGER.info("...none found.");
         }
+    }
+
+    private static Consumer<HWAccelWrapper<? extends HWAccelDeviceSpec>> outputHWAccelInfo() {
+        return hw -> {
+            if (hw.getDeviceSpec() == null) {
+                LOGGER.warn("...found {} {} ({}) - but missing in support matrix.", hw.getIndex(), hw.getName(),
+                        hw.getType());
+            } else {
+                LOGGER.info("...found {} {} ({}).", hw.getIndex(), hw.getName(), hw.getType());
+            }
+        };
     }
 
     /** The Constant PATTERN_ENTRY_SPLIT. */
@@ -712,7 +723,9 @@ public class FFMpegImpl {
      */
     public static boolean canHWAccelerate(final List<Output> outputs,
             final HWAccelWrapper<? extends HWAccelDeviceSpec> hwAccel) {
-        return hwAccel.getType() == HWAccelType.NVIDIA && ((HWAccelNvidiaSpec) hwAccel.getDeviceSpec()).canUseEncoder()
+        return hwAccel.getType() == HWAccelType.NVIDIA
+                && Optional.ofNullable((HWAccelNvidiaSpec) hwAccel.getDeviceSpec()).map(ds -> ds.canUseEncoder())
+                        .orElse(false)
                 && outputs.stream().allMatch(o -> o.getVideo().getCodec().toLowerCase(Locale.ROOT)
                         .contains("nvenc"));
     }
@@ -863,7 +876,7 @@ public class FFMpegImpl {
         HWAccelWrapper<? extends HWAccelDeviceSpec> hw = hwAccel.get();
         if (HWAccelType.NVIDIA == hw.getType()) {
             HWAccelNvidiaSpec devSpec = (HWAccelNvidiaSpec) hw.getDeviceSpec();
-            if (devSpec.canUseEncoder() || devSpec.canUseEncoder(processId)) {
+            if (devSpec != null && (devSpec.canUseEncoder() || devSpec.canUseEncoder(processId))) {
                 devSpec.registerEncoderProcessId(processId);
                 cmd.append(" -gpu " + hw.getIndex());
 

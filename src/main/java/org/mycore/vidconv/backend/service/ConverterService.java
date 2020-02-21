@@ -132,7 +132,8 @@ public class ConverterService extends Widget implements Listener {
         EVENT_MANAGER.addListener(this);
 
         int hwAccelConverterThreads = hwAccels.stream()
-                .mapToInt(hw -> hw.getDeviceSpec().numConcurrentProcesses())
+                .mapToInt(
+                        hw -> Optional.ofNullable(hw.getDeviceSpec()).map(ds -> ds.numConcurrentProcesses()).orElse(0))
                 .sum();
 
         converterThreadPool = PriorityExecutor.newFixedThreadPool(
