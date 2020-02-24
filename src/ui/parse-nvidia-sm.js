@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+const yargs = require("yargs");
 const cheerio = require("cheerio");
 const https = require("https");
 
@@ -43,18 +45,22 @@ const parseNVEncRow = ($, row, devices) => {
     }
 };
 
-const parseNVEncTable = ($, devices) => {
+const parseNVEncTable = ($, devices, complete = false) => {
     devices = devices || [];
-    const table = $("div > a[name='Encoder'] ~ table");
+    const tables = complete ? $("div > a[name='Encoder']").parent().parent().find("div div.collapse > table") : $("div > a[name='Encoder'] ~ table");
 
-    if (table.first().text().indexOf("BOARD") !== -1) {
-        table.find("tbody tr").each((_i, el) => {
-            const row = $(el);
-            parseNVEncRow($, row, devices);
-        });
-    } else {
-        throw "Coludn't parse encode table.";
-    }
+    tables.each((_i, el) => {
+        const table = $(el);
+
+        if (table.first().text().indexOf("BOARD") !== -1) {
+            table.find("tbody tr").each((_i, el) => {
+                const row = $(el);
+                parseNVEncRow($, row, devices);
+            });
+        } else {
+            throw "Coludn't parse encode table.";
+        }
+    });
 
     return devices;
 };
@@ -88,24 +94,38 @@ const parseNVDecRow = ($, row, devices) => {
     }
 };
 
-const parseNVDecTable = ($, devices) => {
+const parseNVDecTable = ($, devices, complete = false) => {
     devices = devices || [];
-    const table = $("div > a[name='Decoder'] ~ table");
+    const tables = complete ? $("div > a[name='Decoder'] ~ div div.collapse > table") : $("div > a[name='Decoder'] ~ table");
 
-    if (table.first().text().indexOf("BOARD") !== -1) {
-        table.find("tbody tr").each((_i, el) => {
-            const row = $(el);
-            parseNVDecRow($, row, devices);
-        });
-    } else {
-        throw "Coludn't parse decoder table.";
-    }
+    tables.each((_i, el) => {
+        const table = $(el);
+
+        if (table.first().text().indexOf("BOARD") !== -1) {
+            table.find("tbody tr").each((_i, el) => {
+                const row = $(el);
+                parseNVDecRow($, row, devices);
+            });
+        } else {
+            throw "Coludn't parse decoder table.";
+        }
+    });
 
     return devices;
 };
 
+const argv = yargs
+    .option("complete", {
+        alias: "c",
+        type: "boolean",
+        description: "Parse complete list."
+    }).option("formated", {
+        alias: "f",
+        type: "boolean",
+        description: "Output formated json."
+    }).argv;
 
-let req = https.request("https://developer.nvidia.com/video-encode-decode-gpu-support-matrix", (res) => {
+const req = https.request("https://developer.nvidia.com/video-encode-decode-gpu-support-matrix", (res) => {
     let data = "";
     res.setEncoding("utf-8");
     res.on("data", function (chunk) {
@@ -115,10 +135,10 @@ let req = https.request("https://developer.nvidia.com/video-encode-decode-gpu-su
         const $ = cheerio.load(data);
         let devices = [];
 
-        devices = parseNVEncTable($, devices);
-        devices = parseNVDecTable($, devices);
+        devices = parseNVEncTable($, devices, argv.complete || false);
+        devices = parseNVDecTable($, devices, argv.complete || false);
 
-        console.log(JSON.stringify(devices, null, 4));
+        console.log(JSON.stringify(devices, null, argv.formated && 4));
     });
 }).on("error", (e) => console.error(e));
 req.end();
