@@ -3,10 +3,9 @@ import { Component, OnInit, OnDestroy } from "@angular/core";
 import { timer, Subscription, Observable } from "rxjs";
 
 import videojs from "video.js";
-import "../../../../../node_modules/@guaclive/videojs-resolution-switcher/lib/videojs-resolution-switcher.js";
+import videojsPluginQualitySelector from "@silvermine/videojs-quality-selector";
 
 import { environment } from "../../environments/environment";
-
 
 import { ConverterApiService } from "./api.service";
 import { ConverterJobService, AppEventData } from "./converterJob.service";
@@ -15,17 +14,6 @@ import { ErrorService } from "../_services/error.service";
 import { Job } from "./definitions";
 import { hashCode } from "../definitions/index.js";
 import { StateService } from "@uirouter/core";
-
-interface Source {
-    src: string;
-    type: string;
-    label?: string;
-}
-
-interface PlayerResSwitch extends videojs.Player {
-    videoJsResolutionSwitcher?: (options?: any) => void;
-    updateSrc?: (src: Array<Source>) => any;
-}
 
 @Component({
     selector: "ui-converter",
@@ -61,7 +49,7 @@ export class ConverterComponent implements OnInit, OnDestroy {
 
     jobStatus: Map<string, Observable<Job>> = new Map();
 
-    videoPlayer: Map<string, PlayerResSwitch> = new Map();
+    videoPlayer: Map<string, videojs.Player> = new Map();
 
     constructor(private $api: ConverterApiService, private $error: ErrorService, private $state: StateService,
         private $jobsvc: ConverterJobService) {
@@ -96,11 +84,19 @@ export class ConverterComponent implements OnInit, OnDestroy {
         if (!player) {
             const playerId = "video-" + id;
             if (document.getElementById(playerId)) {
-                player = videojs(playerId, {}, () => {
-                    player.videoJsResolutionSwitcher({
-                        "default": "high",
-                        dynamicLabel: true
-                    });
+                player = videojs(playerId, {
+                    controlBar: {
+                        children: [
+                            "playToggle",
+                            "progressControl",
+                            "volumePanel",
+                            "qualitySelector",
+                            "fullscreenToggle",
+                        ],
+                    },
+                }, () => {
+                    videojsPluginQualitySelector(videojs);
+                    player.controlBar.addChild("QualitySelector");
                 });
             }
 
