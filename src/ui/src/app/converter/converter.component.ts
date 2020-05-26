@@ -208,6 +208,7 @@ export class ConverterComponent implements OnInit, OnDestroy {
     private buildRunning() {
         this.mergeJobs(this.doneJobs && this.doneJobs.converter || [], this.running);
         this.mergeJobs(this.runningJobs && this.runningJobs.converter || [], this.running);
+        this.done = this.mergeJobs(this.running.filter(j => !this.filterDone(j)), this.done);
         this.running = this.running.filter(this.filterDone).map(this.injectHashCode).sort(this.sortByPercent);
     }
 
