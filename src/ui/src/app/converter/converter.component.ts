@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from "@angular/core";
 
 import { timer, Subscription, Observable } from "rxjs";
+import { throttleTime } from "rxjs/operators";
 
 import videojs from "video.js";
 import videojsPluginQualitySelector from "@silvermine/videojs-quality-selector";
@@ -58,7 +59,7 @@ export class ConverterComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        this.socket = this.$jobsvc.events.subscribe(evt => {
+        this.socket = this.$jobsvc.events.pipe(throttleTime(1000)).subscribe(evt => {
             this.handleEvent(evt.event);
         });
 
@@ -70,6 +71,7 @@ export class ConverterComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         this.timer.unsubscribe();
+        this.socket.unsubscribe();
 
         this.videoPlayer.forEach(p => p.dispose());
     }

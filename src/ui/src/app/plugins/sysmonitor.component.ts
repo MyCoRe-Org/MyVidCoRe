@@ -4,10 +4,12 @@ import {
 } from "@angular/core";
 
 import { Subscription } from "rxjs";
+import { throttleTime } from "rxjs/operators";
 
 import { Attrib } from "./definitions";
 import { WebsocketService } from "../_services/websocket.service";
 import { SystemMonitorService, SystemMonitorMessage } from "./sysmonitor.service";
+
 
 export interface MonitorAttribs {
     [name: string]: Attrib;
@@ -44,7 +46,7 @@ export class SystemMonitorComponent implements OnInit, OnDestroy, AfterContentCh
     ngOnInit() {
         this.$svc.informIsEnabled().subscribe(enabled => {
             if (enabled && !this.socket) {
-                this.socket = this.$svc.getSubject().subscribe((msg: SystemMonitorMessage) => {
+                this.socket = this.$svc.getSubject().pipe(throttleTime(1000)).subscribe((msg: SystemMonitorMessage) => {
                     this.handleMessage(msg);
                 });
             }

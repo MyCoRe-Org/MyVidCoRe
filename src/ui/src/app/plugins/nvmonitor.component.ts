@@ -4,6 +4,7 @@ import {
 } from "@angular/core";
 
 import { Subscription } from "rxjs";
+import { throttleTime } from "rxjs/operators";
 
 import { Attrib } from "./definitions";
 import { WebsocketService } from "../_services/websocket.service";
@@ -44,7 +45,7 @@ export class NVMonitorComponent implements OnInit, OnDestroy, AfterContentChecke
     ngOnInit() {
         this.$svc.informIsEnabled().subscribe(enabled => {
             if (enabled && !this.socket) {
-                this.socket = this.$svc.getSubject().subscribe((msg: NVMonitorMessage) => {
+                this.socket = this.$svc.getSubject().pipe(throttleTime(1000)).subscribe((msg: NVMonitorMessage) => {
                     this.handleMessage(msg);
                 });
             }
