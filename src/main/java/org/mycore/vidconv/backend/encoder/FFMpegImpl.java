@@ -81,6 +81,7 @@ import org.mycore.vidconv.frontend.entity.SettingsWrapper.Audio;
 import org.mycore.vidconv.frontend.entity.SettingsWrapper.Output;
 import org.mycore.vidconv.frontend.entity.SettingsWrapper.Video;
 import org.mycore.vidconv.frontend.entity.probe.ProbeWrapper;
+import org.mycore.vidconv.frontend.entity.probe.StreamWrapper;
 
 /**
  * The Class FFMpegImpl.
@@ -757,7 +758,7 @@ public class FFMpegImpl {
 
         outputs.forEach(output -> {
             final Set<String> ambiguousParams = checkForAmbiguousParameters(output, hwAccel);
-            buildVideoStreamCommand(cmd, processId, output, hwAccel, ambiguousParams);
+            buildVideoStreamCommand(cmd, inInfo, processId, output, hwAccel, ambiguousParams);
             buildAudioStreamCommand(cmd, inInfo, output, ambiguousParams);
 
             // Workaround to fix Too many packets buffered for output stream
@@ -804,6 +805,13 @@ public class FFMpegImpl {
         });
     }
 
+    private static String getInputPixelFormat(ProbeWrapper pw) {
+        return pw.getStreams().stream()
+                .filter(s -> s.getCodecType().equalsIgnoreCase("video"))
+                .findFirst()
+                .map(StreamWrapper::getPixFmt).orElse(null);
+    }
+
     /**
      * Builds the video stream command.
      *
@@ -813,23 +821,23 @@ public class FFMpegImpl {
      * @param hwAccel the hw accel
      * @param ambiguousParams the ambiguous params
      */
-    private static void buildVideoStreamCommand(StringBuffer cmd, final String processId, final Output output,
+    private static void buildVideoStreamCommand(StringBuffer cmd, final ProbeWrapper inInfo, final String processId,
+            final Output output,
             final Optional<HWAccelWrapper<? extends HWAccelDeviceSpec>> hwAccel, final Set<String> ambiguousParams) {
         Video video = hwAccel.isPresent() ? output.getVideo()
                 : Optional.ofNullable(output.getVideoFallback()).orElse(output.getVideo());
 
         if (hwAccel.isPresent()) {
-            buildHWAccelVideoStreamCommand(cmd, processId, video, hwAccel);
+            buildHWAccelVideoStreamCommand(cmd, inInfo, processId, video, hwAccel);
         } else {
-            Optional.ofNullable(video.getScale()).ifPresent(v -> cmd.append(" -vf 'scale=" + v + "'"));
+            Optional.ofNullable(video.getScale()).ifPresent(v -> cmd.append(" -filter:v 'scale=" + v + "'"));
+            Optional.ofNullable(video.getPixelFormat()).filter(v -> !v.equalsIgnoreCase(getInputPixelFormat(inInfo)))
+                    .ifPresent(v -> cmd.append(" -pix_fmt " + (!v.isEmpty() ? v : "yuv420p")));
         }
 
         cmd.append(" -codec:v " + video.getCodec());
 
         cmd.append(buildParameters(video.getParameters(), video.getCodec(), ambiguousParams, "v"));
-
-        Optional.ofNullable(video.getPixelFormat())
-                .ifPresent(v -> cmd.append(" -pix_fmt " + (!v.isEmpty() ? v : "yuv420p")));
 
         Optional.ofNullable(video.getFramerate()).ifPresent(v -> {
             cmd.append(" -r " + v);
@@ -870,7 +878,8 @@ public class FFMpegImpl {
      * @param video the video
      * @param hwAccel the hw accel
      */
-    private static void buildHWAccelVideoStreamCommand(StringBuffer cmd, final String processId, final Video video,
+    private static void buildHWAccelVideoStreamCommand(StringBuffer cmd, final ProbeWrapper inInfo,
+            final String processId, final Video video,
             final Optional<HWAccelWrapper<? extends HWAccelDeviceSpec>> hwAccel) {
 
         HWAccelWrapper<? extends HWAccelDeviceSpec> hw = hwAccel.get();
@@ -883,13 +892,23 @@ public class FFMpegImpl {
                 if (devSpec.canUseDecoder(processId)) {
                     if (filters().getFilters().stream()
                             .anyMatch(f -> "scale_npp".equalsIgnoreCase(f.getName()))) {
-                        Optional.ofNullable(video.getScale()).ifPresent(v -> cmd.append(" -vf 'scale_npp=" + v + "'"));
+                        String pxf = Optional.ofNullable(video.getPixelFormat())
+                                .filter(v -> !v.equalsIgnoreCase(getInputPixelFormat(inInfo)))
+                                .map(v -> ":format=" + (!v.isEmpty() ? v : "same")).orElse("");
+
+                        Optional.ofNullable(video.getScale())
+                                .ifPresent(v -> cmd.append(
+                                        " -filter:v 'scale_npp=" + v + pxf + ":interp_algo=lanczos'"));
                     } else {
                         LOGGER.warn(
                                 "Couldn't use \"scale_npp\", ignore scale settings now. Compile FFMpeg with --enable-libnpp.");
                     }
                 } else {
-                    Optional.ofNullable(video.getScale()).ifPresent(v -> cmd.append(" -vf 'scale=" + v + "'"));
+                    Optional.ofNullable(video.getScale())
+                            .ifPresent(v -> cmd.append(" -filter:v 'scale=" + v + "'"));
+                    Optional.ofNullable(video.getPixelFormat())
+                            .filter(v -> !v.equalsIgnoreCase(getInputPixelFormat(inInfo)))
+                            .ifPresent(v -> cmd.append(" -pix_fmt " + (!v.isEmpty() ? v : "yuv420p")));
                 }
             }
         }
