@@ -1,7 +1,6 @@
 import { Component, OnInit, OnDestroy } from "@angular/core";
 
 import { timer, Subscription, Observable } from "rxjs";
-import { debounceTime } from "rxjs/operators";
 
 import videojs from "video.js";
 import videojsPluginQualitySelector from "@silvermine/videojs-quality-selector";
@@ -9,7 +8,7 @@ import videojsPluginQualitySelector from "@silvermine/videojs-quality-selector";
 import { environment } from "../../environments/environment";
 
 import { ConverterApiService } from "./api.service";
-import { ConverterJobService, AppEventData, AppEvent } from "./converterJob.service";
+import { ConverterJobService, AppEventData } from "./converterJob.service";
 import { ErrorService } from "../_services/error.service";
 
 import { Job } from "./definitions";
@@ -36,8 +35,6 @@ export class ConverterComponent implements OnInit, OnDestroy {
 
     end = this.limit;
 
-    debounceObservable: Observable<AppEvent<Job>>;
-
     timer: Subscription;
 
     socket: Subscription;
@@ -61,8 +58,7 @@ export class ConverterComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        this.debounceObservable = this.$jobsvc.events.pipe(debounceTime(1000));
-        this.socket = this.debounceObservable.subscribe(evt => {
+        this.socket = this.$jobsvc.events.subscribe(evt => {
             this.handleEvent(evt.event);
         });
 
