@@ -62,11 +62,19 @@ export class SettingsExtendedComponent implements OnInit, OnChanges {
         return $fb.control(null);
     }
 
+    static isInValues(param: any, value: any) {
+        if (param.values) {
+            return param.values.findIndex(p => p.name === value) !== -1;
+        }
+
+        return false;
+    }
+
     static parseValue(param: any, value: any) {
         if (param.type === "int") {
-            return "default" === value ? value : parseInt(value, 10) || value;
+            return "default" === value || SettingsExtendedComponent.isInValues(param, value) ? value : parseInt(value, 10) || value;
         } else if (param.type === "float") {
-            return "default" === value ? value : parseFloat(value) || value;
+            return "default" === value || SettingsExtendedComponent.isInValues(param, value) ? value : parseFloat(value) || value;
         } else if (param.type === "boolean") {
             return value === "auto" ? value : value === "true";
         }
