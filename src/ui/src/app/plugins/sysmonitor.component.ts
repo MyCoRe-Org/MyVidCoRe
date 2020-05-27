@@ -3,8 +3,8 @@ import {
     QueryList, AfterContentChecked, OnDestroy, Output, EventEmitter
 } from "@angular/core";
 
-import { Subscription } from "rxjs";
-import { throttleTime } from "rxjs/operators";
+import { Subscription, Observable } from "rxjs";
+import { debounceTime } from "rxjs/operators";
 
 import { Attrib } from "./definitions";
 import { WebsocketService } from "../_services/websocket.service";
@@ -31,6 +31,8 @@ export class SystemMonitorContentDirective {
 })
 export class SystemMonitorComponent implements OnInit, OnDestroy, AfterContentChecked {
 
+    debounceObservable: Observable<SystemMonitorMessage>;
+
     socket: Subscription;
 
     entries: MonitorAttribs = {};
@@ -46,7 +48,8 @@ export class SystemMonitorComponent implements OnInit, OnDestroy, AfterContentCh
     ngOnInit() {
         this.$svc.informIsEnabled().subscribe(enabled => {
             if (enabled && !this.socket) {
-                this.socket = this.$svc.getSubject().pipe(throttleTime(1000)).subscribe((msg: SystemMonitorMessage) => {
+                this.debounceObservable = this.$svc.getSubject().pipe(debounceTime(1000));
+                this.socket = this.debounceObservable.subscribe((msg: SystemMonitorMessage) => {
                     this.handleMessage(msg);
                 });
             }

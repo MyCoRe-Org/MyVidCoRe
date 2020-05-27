@@ -3,7 +3,7 @@ import {
     ContentChildren, QueryList, Output, EventEmitter
 } from "@angular/core";
 
-import { Subscription } from "rxjs";
+import { Subscription, Observable } from "rxjs";
 import { throttleTime } from "rxjs/operators";
 
 import { Attrib } from "./definitions";
@@ -30,6 +30,8 @@ export class NVMonitorContentDirective {
 })
 export class NVMonitorComponent implements OnInit, OnDestroy, AfterContentChecked {
 
+    debounceObservable: Observable<NVMonitorMessage>;
+
     socket: Subscription;
 
     entries: Array<GPUEntry> = new Array();
@@ -45,7 +47,8 @@ export class NVMonitorComponent implements OnInit, OnDestroy, AfterContentChecke
     ngOnInit() {
         this.$svc.informIsEnabled().subscribe(enabled => {
             if (enabled && !this.socket) {
-                this.socket = this.$svc.getSubject().pipe(throttleTime(1000)).subscribe((msg: NVMonitorMessage) => {
+                this.debounceObservable = this.$svc.getSubject().pipe(throttleTime(1000));
+                this.socket = this.debounceObservable.subscribe((msg: NVMonitorMessage) => {
                     this.handleMessage(msg);
                 });
             }
