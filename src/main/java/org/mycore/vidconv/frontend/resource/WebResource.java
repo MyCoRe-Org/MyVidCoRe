@@ -22,9 +22,9 @@
  */
 package org.mycore.vidconv.frontend.resource;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -53,6 +53,8 @@ public class WebResource {
     private static final Logger LOGGER = LogManager.getLogger(WebResource.class);
 
     private static final ClassLoader CLASS_LOADER = ClassTools.getClassLoader();
+
+    private static final String SEPARATOR = "/";
 
     private static final String RESOURCE_DIR = "META-INF/resources";
 
@@ -86,8 +88,9 @@ public class WebResource {
     }
 
     private Optional<ResourceWrapper> getResource(String fileName) {
-        final String fn = RESOURCE_DIR + File.separator + fileName;
-        try (final InputStream is = CLASS_LOADER.getResourceAsStream(fn)) {
+        final String fn = RESOURCE_DIR + SEPARATOR + fileName;
+        try (final InputStream is = Optional.ofNullable(CLASS_LOADER.getResourceAsStream(fn))
+                .orElseGet(() -> getResourceAsStream(fn))) {
             final ResourceWrapper res = new ResourceWrapper(fn, is);
             LOGGER.info("loaded resource \"" + fileName + "\" with mime type \"" + res.getMimeType() + "\"");
             return Optional.of(res);
@@ -96,5 +99,19 @@ public class WebResource {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private InputStream getResourceAsStream(String fileName) {
+        // FIXME workaround for Windows based systems
+        URL jarLoc = getClass().getProtectionDomain().getCodeSource().getLocation();
+        if (jarLoc.getFile().endsWith(".jar")) {
+            try {
+                return new URL("jar:" + jarLoc.toString() + "!/" + fileName).openStream();
+            } catch (IOException e) {
+                return null;
+            }
+        }
+
+        return null;
     }
 }
