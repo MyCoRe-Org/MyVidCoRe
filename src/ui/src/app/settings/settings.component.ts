@@ -4,7 +4,7 @@ import { FormBuilder, FormArray, FormGroup, Validators } from "@angular/forms";
 import { of, forkJoin } from "rxjs";
 import { mergeMap, map, mergeAll, retry } from "rxjs/operators";
 
-import { NgbTabChangeEvent } from "@ng-bootstrap/ng-bootstrap";
+import { NgbNavChangeEvent } from "@ng-bootstrap/ng-bootstrap";
 import { Transition } from "@uirouter/core";
 
 import { ConverterApiService } from "../converter/api.service";
@@ -225,7 +225,7 @@ export class SettingsComponent implements OnInit {
         }
     }
 
-    beforeTabChange(event: NgbTabChangeEvent) {
+    beforeTabChange(event: NgbNavChangeEvent) {
         if (event.nextId === "tab-output-add") {
             event.preventDefault();
             this.addOutput();
