@@ -37,6 +37,7 @@ import org.mycore.vidconv.common.event.annotation.AutoExecutable;
 import org.mycore.vidconv.common.event.annotation.Shutdown;
 import org.mycore.vidconv.common.event.annotation.Startup;
 import org.reflections.Reflections;
+import org.reflections.scanners.TypeAnnotationsScanner;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
@@ -51,8 +52,9 @@ public class AutoExecutableHandler {
     private static Set<Class<?>> executables;
 
     static {
-        final Reflections reflections = new Reflections(Application.class.getPackage().getName());
-        executables = reflections.getTypesAnnotatedWith(AutoExecutable.class);
+        final Reflections reflections = new Reflections(Application.class.getPackage().getName(),
+                new TypeAnnotationsScanner());
+        executables = reflections.getTypesAnnotatedWith(AutoExecutable.class, true);
     }
 
     /**
@@ -89,9 +91,9 @@ public class AutoExecutableHandler {
      */
     public static void startup() {
         executables.stream()
-            .sorted((o1, o2) -> Integer.compare(o2.getAnnotation(AutoExecutable.class).priority(),
-                o1.getAnnotation(AutoExecutable.class).priority()))
-            .forEachOrdered(autoExecutable -> runExecutables(autoExecutable, Startup.class));
+                .sorted((o1, o2) -> Integer.compare(o2.getAnnotation(AutoExecutable.class).priority(),
+                        o1.getAnnotation(AutoExecutable.class).priority()))
+                .forEachOrdered(autoExecutable -> runExecutables(autoExecutable, Startup.class));
     }
 
     /**
@@ -99,29 +101,29 @@ public class AutoExecutableHandler {
      */
     public static void shutdown() {
         executables.stream()
-            .sorted((o1, o2) -> Integer.compare(o1.getAnnotation(AutoExecutable.class).priority(),
-                o2.getAnnotation(AutoExecutable.class).priority()))
-            .forEachOrdered(autoExecutable -> runExecutables(autoExecutable, Shutdown.class));
+                .sorted((o1, o2) -> Integer.compare(o1.getAnnotation(AutoExecutable.class).priority(),
+                        o2.getAnnotation(AutoExecutable.class).priority()))
+                .forEachOrdered(autoExecutable -> runExecutables(autoExecutable, Shutdown.class));
     }
 
     private static void runExecutables(Class<?> autoExecutable, Class<? extends Annotation> type) {
         log("Run " + autoExecutable.getAnnotation(AutoExecutable.class).name() + " with priority of "
-            + autoExecutable.getAnnotation(AutoExecutable.class).priority());
+                + autoExecutable.getAnnotation(AutoExecutable.class).priority());
         try {
             sort(type, Arrays.stream(autoExecutable.getDeclaredMethods()).filter(m -> m.isAnnotationPresent(type)))
-                .forEachOrdered(m -> {
-                    try {
-                        log("...invoke " + m.getName() + "() for " + type.getSimpleName());
-                        m.setAccessible(true);
-						if (Modifier.isStatic(m.getModifiers())) {
-							m.invoke(null);
-						} else {
-							m.invoke(ClassTools.newInstance(autoExecutable, false));
-						}
-                    } catch (Exception e) {
-                        throw new RuntimeException(e.getCause());
-                    }
-                });
+                    .forEachOrdered(m -> {
+                        try {
+                            log("...invoke " + m.getName() + "() for " + type.getSimpleName());
+                            m.setAccessible(true);
+                            if (Modifier.isStatic(m.getModifiers())) {
+                                m.invoke(null);
+                            } else {
+                                m.invoke(ClassTools.newInstance(autoExecutable, false));
+                            }
+                        } catch (Exception e) {
+                            throw new RuntimeException(e.getCause());
+                        }
+                    });
         } catch (RuntimeException e) {
             if (haltOnError) {
                 throw e;
@@ -134,10 +136,10 @@ public class AutoExecutableHandler {
         if (type.equals(Startup.class)) {
             // reverse ordering: highest priority first
             return methods.sorted((o1, o2) -> Integer.compare(o2.getAnnotation(Startup.class).priority(),
-                o1.getAnnotation(Startup.class).priority()));
+                    o1.getAnnotation(Startup.class).priority()));
         } else if (type.equals(Shutdown.class)) {
             return methods.sorted((o1, o2) -> Integer.compare(o1.getAnnotation(Shutdown.class).priority(),
-                o2.getAnnotation(Shutdown.class).priority()));
+                    o2.getAnnotation(Shutdown.class).priority()));
         }
 
         return methods;
@@ -148,8 +150,10 @@ public class AutoExecutableHandler {
             LOGGER.info(msg);
         } else {
             System.out.println(
-                (new MessageFormat("{0} INFO\t{1}: {2}", Locale.ROOT)).format(new Object[] { Instant.now().toString(),
-                    AutoExecutableHandler.class.getSimpleName(), msg }, new StringBuffer(), null).toString());
+                    (new MessageFormat("{0} INFO\t{1}: {2}", Locale.ROOT))
+                            .format(new Object[] { Instant.now().toString(),
+                                    AutoExecutableHandler.class.getSimpleName(), msg }, new StringBuffer(), null)
+                            .toString());
         }
     }
 }
