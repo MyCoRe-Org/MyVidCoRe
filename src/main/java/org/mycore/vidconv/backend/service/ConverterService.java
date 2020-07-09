@@ -515,7 +515,9 @@ public class ConverterService extends Widget implements Listener {
                 Process p = runJob(true);
 
                 if (p.exitValue() != 0 && hwAccel.isPresent()) {
-                    LOGGER.warn("Converting of " + inputPath.toString() + " failed, retry with fallback settings.");
+                    LOGGER.warn("Converting of " + inputPath.toString() + " failed, retry with fallback settings...");
+                    LOGGER.warn("...result:\n{}\nF{}", outputConsumer.getStreamOutput(),
+                            errorConsumer.getStreamOutput());
                     p = runJob(false);
                 }
 
