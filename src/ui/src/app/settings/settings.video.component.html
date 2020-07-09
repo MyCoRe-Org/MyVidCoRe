@@ -5,6 +5,7 @@
             <label [attr.for]="'output-' + index + '-' + type + '-codec'">{{ 'settings.codec' | translate }}</label>
             <select class="form-control custom-select" [id]="'output-' + index + '-' + type + '-codec'"
                 formControlName="codec" (change)="onCodecChange()">
+                <option [value]="''">{{ 'general.pleaseSelect' | translate }}</option>
                 <ng-container *ngFor="let cgrp of selectedFormat.video">
                     <ng-container *ngIf="cgrp">
                         <optgroup *ngIf="cgrp.encoders?.encoder.length &gt; 1" [label]="cgrp.description">
@@ -33,7 +34,7 @@
                     <label for="output-{{ index }}-{{ type }}-{{ ptype }}">{{ 'settings.' + ptype | translate }}</label>
                     <select class="form-control custom-select" [id]="'output-' + index + '-' + type + '-' + ptype"
                         [formControlName]="ptype"
-                        [ngClass]="{'is-invalid':output.controls.parameter.controls[ptype].errors && output.controls.parameter.controls[ptype].dirty}">
+                        [ngClass]="{'is-invalid':output.controls.parameter.controls[ptype].errors}">
                         <option [value]="null">{{ 'settings.auto' | translate }}
                         </option>
                         <ng-container
@@ -78,7 +79,7 @@
                 <label for="output-{{ index }}-video-pixelformat">{{ 'settings.pixelFormat' | translate }}</label>
                 <select class="form-control custom-select" [id]="'output-' + index + '-' + type + '-pixelformat'"
                     formControlName="pixelFormat"
-                    [ngClass]="{'is-invalid':output.controls.pixelFormat.errors && output.controls.pixelFormat.dirty}">
+                    [ngClass]="{'is-invalid':output.controls.pixelFormat.errors}">
                     <option [value]="null">{{ 'settings.auto' | translate }}
                     </option>
                     <option *ngFor="let pf of selectedEncoder.pixelFormats" [value]="pf">
@@ -112,7 +113,7 @@
                     <label for="output-{{ index }}-video-framerate">{{ 'settings.framerate' | translate }}</label>
                     <select class="form-control custom-select" [id]="'output-' + index + '-' + type + '-framerate'"
                         formControlName="framerate"
-                        [ngClass]="{'is-invalid':output.controls.framerate.errors && output.controls.framerate.dirty}">
+                        [ngClass]="{'is-invalid':output.controls.framerate.errors}">
                         <option [value]="null">
                             {{ 'settings.asSource' | translate }}
                         </option>

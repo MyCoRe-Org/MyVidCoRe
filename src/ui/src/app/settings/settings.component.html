@@ -34,7 +34,8 @@
                                     <label for="output-format-{{ i }}">{{ 'settings.format' | translate }}</label>
                                     <select class="form-control custom-select" [id]="'output-format-' + i"
                                         formControlName="format" (change)="onFormatChange(i)"
-                                        [ngClass]="{'is-invalid':output.controls[i].controls.format.errors && output.controls[i].controls.format.dirty}">
+                                        [ngClass]="{'is-invalid':output.controls[i].controls.format.errors}">
+                                        <option [value]="''">{{ 'general.pleaseSelect' | translate }}</option>
                                         <option *ngFor="let format of allowedFormats" [value]="format.name">
                                             {{ format.description }}
                                         </option>
@@ -47,7 +48,7 @@
                                     <input type="text" class="form-control" [id]="'output-fileappendix-' + i"
                                         formControlName="filenameAppendix"
                                         placeholder="{{ 'settings.filenameAppendix' | translate }}"
-                                        [ngClass]="{'is-invalid':output.controls[i].controls.filenameAppendix.errors && output.controls[i].controls.filenameAppendix.dirty}">
+                                        [ngClass]="{'is-invalid':output.controls[i].controls.filenameAppendix.errors}">
                                 </div>
 
                                 <ng-container *ngIf="selectedFormat[i]">

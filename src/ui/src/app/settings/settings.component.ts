@@ -268,8 +268,6 @@ export class SettingsComponent implements OnInit {
                 });
             });
 
-            console.log(value);
-
             this.$api.saveSettings(value).toPromise().then((res) => {
                 this.$spinner.setLoadingState(false);
                 this.$error.handleMessage("success", res, "settings.action.saved");

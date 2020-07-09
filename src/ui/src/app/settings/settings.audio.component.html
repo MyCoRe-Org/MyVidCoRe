@@ -5,6 +5,7 @@
             <label [attr.for]="'output-' + index + '-' + type + '-codec'">{{ 'settings.codec' | translate }}</label>
             <select class="form-control custom-select" [id]="'output-' + index + '-' + type + '-codec'"
                 formControlName="codec" (change)="onCodecChange()">
+                <option [value]="''">{{ 'general.pleaseSelect' | translate }}</option>
                 <ng-container *ngFor="let cgrp of selectedFormat.audio">
                     <ng-container *ngIf="cgrp">
                         <optgroup *ngIf="cgrp.encoders?.encoder.length &gt; 1" [label]="cgrp.description">
@@ -31,7 +32,7 @@
                 <label for="output-{{ index }}-audio-samplerate">{{ 'settings.samplerate' | translate }}</label>
                 <select class="form-control custom-select" [id]="'output-' + index + '-audio-samplerate'"
                     formControlName="samplerate"
-                    [ngClass]="{'is-invalid':output.controls.samplerate.errors && output.controls.samplerate.dirty}">
+                    [ngClass]="{'is-invalid':output.controls.samplerate.errors}">
                     <option [value]="null">{{ 'settings.auto' | translate }}
                     </option>
                     <option *ngFor="let sr of selectedEncoder.sampleRates" [value]="sr">
@@ -43,7 +44,7 @@
                 <label for="output-{{ index }}-audio-bitrate">{{ 'settings.bitrate' | translate }}</label>
                 <select class="form-control custom-select" [id]="'output-' + index + '-audio-bitrate'"
                     formControlName="bitrate"
-                    [ngClass]="{'is-invalid':output.controls.bitrate.errors && output.controls.bitrate.dirty}">
+                    [ngClass]="{'is-invalid':output.controls.bitrate.errors}">
                     <option [value]="null">{{ 'settings.auto' | translate }}
                     </option>
                     <option *ngFor="let br of audioBitrates" [value]="br">

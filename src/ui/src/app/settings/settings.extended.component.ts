@@ -72,11 +72,13 @@ export class SettingsExtendedComponent implements OnInit, OnChanges {
 
     static parseValue(param: any, value: any) {
         if (param.type === "int") {
-            return "default" === value || SettingsExtendedComponent.isInValues(param, value) ? value : parseInt(value, 10) || value;
+            return "default" === value && "default" === param.defaultValue || param.defaultValue === value
+                || SettingsExtendedComponent.isInValues(param, value) ? value : parseInt(value, 10) || value;
         } else if (param.type === "float") {
-            return "default" === value || SettingsExtendedComponent.isInValues(param, value) ? value : parseFloat(value) || value;
+            return "default" === value && "default" === param.defaultValue || param.defaultValue === value
+                || SettingsExtendedComponent.isInValues(param, value) ? value : parseFloat(value) || value;
         } else if (param.type === "boolean") {
-            return value === "auto" ? value : value === "true";
+            return "auto" === value ? value : value === true || value === "true";
         }
 
         return value;
@@ -85,7 +87,9 @@ export class SettingsExtendedComponent implements OnInit, OnChanges {
     static patchValues(fg: FormGroup, encParams: Array<(key: string) => any>, params: (key: string) => string) {
         encParams.forEach((p: any) => {
             if (params && params[p.name] && fg.contains(p.name)) {
-                fg.get(p.name).patchValue(SettingsExtendedComponent.parseValue(p, params[p.name]));
+                fg.get(p.name).patchValue(
+                    SettingsExtendedComponent.parseValue(p, params[p.name] || p.defaultValue)
+                );
             }
         });
     }
@@ -97,13 +101,16 @@ export class SettingsExtendedComponent implements OnInit, OnChanges {
             Object.keys(params).forEach(name => {
                 if (params[name] !== undefined && params[name] !== null) {
                     const ep: any = encParams.find((p: any) => p.name === name);
-                    if (ep && ep.defaultValue) {
-                        const dv = SettingsExtendedComponent.parseValue(ep, ep.defaultValue);
-                        if (dv !== params[name]) {
-                            res[name] = params[name];
+                    if (ep) {
+                        const value = SettingsExtendedComponent.parseValue(ep, params[name]);
+                        if (ep.defaultValue) {
+                            const dv = SettingsExtendedComponent.parseValue(ep, ep.defaultValue);
+                            if (dv !== value) {
+                                res[name] = value;
+                            }
+                        } else {
+                            res[name] = value;
                         }
-                    } else {
-                        res[name] = params[name];
                     }
                 }
             });

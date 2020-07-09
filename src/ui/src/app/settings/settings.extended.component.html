@@ -40,7 +40,7 @@
                 <label [attr.for]="'output-' + i + '-' + type + '-' + param.name">{{ param.description }}</label>
                 <input type="text" class="form-control" [id]="'output-' + i + '-' + type + '-' + param.name"
                     [formControlName]="param.name"
-                    [ngClass]="{'is-invalid':parameter.controls[param.name].errors && parameter.controls[param.name].dirty}">
+                    [ngClass]="{'is-invalid':parameter.controls[param.name].errors}">
             </ng-container>
 
             <ng-container *ngIf="param.type === 'int' || param.type === 'float'">
@@ -48,14 +48,14 @@
                     <label [attr.for]="'output-' + i + '-' + type + '-' + param.name">{{ param.description }}</label>
                     <input type="number" class="form-control" [id]="'output-' + i + '-' + type + '-' + param.name"
                         [formControlName]="param.name" [attr.min]="param.fromValue" [attr.max]="param.toValue"
-                        [ngClass]="{'is-invalid':parameter.controls[param.name].errors && parameter.controls[param.name].dirty}">
+                        [ngClass]="{'is-invalid':parameter.controls[param.name].errors}">
                 </ng-container>
 
                 <ng-container *ngIf="param.values">
                     <label [attr.for]="'output-' + i + '-' + type + '-' + param.name">{{ param.description }}</label>
                     <select class="form-control custom-select" [id]="'output-' + i + '-' + type + '-' + param.name"
                         [formControlName]="param.name"
-                        [ngClass]="{'is-invalid':parameter.controls[param.name].errors && parameter.controls[param.name].dirty}">
+                        [ngClass]="{'is-invalid':parameter.controls[param.name].errors}">
                         <option [value]="param.defaultValue">
                             {{ 'settings.default' | translate }}
                         </option>
