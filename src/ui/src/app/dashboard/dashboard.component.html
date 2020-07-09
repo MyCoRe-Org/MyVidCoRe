@@ -89,10 +89,10 @@
                             <label for="memory">{{ 'dashboard.nvmonitor.memory' | translate }}</label>
                         </div>
 
-                        <div *ngIf="e['temp']"
+                        <div *ngIf="e['temp'] || e['gtemp']"
                             class="d-inline-flex flex-column justify-content-center align-items-center">
                             <ui-gauge [i18nPrefix]="'plugin.nvmonitor.'" [index]="i" [name]="'temperature'"
-                                [attrib]="e['temp']" [max]="120">
+                                [attrib]="e['temp'] || e['gtemp']" [max]="120">
                             </ui-gauge>
                             <label for="temperature">{{ 'dashboard.nvmonitor.temperature' | translate }}</label>
                         </div>
