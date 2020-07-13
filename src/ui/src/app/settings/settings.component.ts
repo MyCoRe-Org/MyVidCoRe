@@ -2,7 +2,7 @@ import { Component, OnInit, Input } from "@angular/core";
 import { FormBuilder, FormArray, FormGroup, Validators } from "@angular/forms";
 
 import { of, forkJoin } from "rxjs";
-import { mergeMap, map, mergeAll, retry } from "rxjs/operators";
+import { mergeMap, map, mergeAll, take, delay, retryWhen } from "rxjs/operators";
 
 import { NgbNavChangeEvent } from "@ng-bootstrap/ng-bootstrap";
 import { Transition } from "@uirouter/core";
@@ -84,7 +84,7 @@ export class SettingsComponent implements OnInit {
                 this.form.patchValue(this.settings);
             } else {
                 this.output.push(this.createOutput());
-                this.onFormatChange(0);
+                // this.onFormatChange(0);
             }
 
             this.activeTab = "tab-output-0";
@@ -101,7 +101,7 @@ export class SettingsComponent implements OnInit {
                             mergeMap(cce => of(cce.encoders.encoder).pipe(
                                 mergeMap(el => forkJoin(el.map(e =>
                                     this.$capi.getEncoder(e).pipe(
-                                        retry(3),
+                                        retryWhen(errors => errors.pipe(delay(1000), take(3))),
                                         map((res: any) => res.encoders[0])
                                     )
                                 )))
@@ -114,7 +114,7 @@ export class SettingsComponent implements OnInit {
 
                     return of(cc).pipe(
                         mergeMap(cce => this.$capi.getEncoder(cce.name).pipe(
-                            retry(3),
+                            retryWhen(errors => errors.pipe(delay(1000), take(3))),
                             map((res: any) => res.encoders[0]))
                         )
                     ).pipe(
@@ -234,7 +234,7 @@ export class SettingsComponent implements OnInit {
 
     onFormatChange(index: number) {
         const sel = this.output.controls[index].get("format").value;
-        this.selectedFormat[index] = this.allowedFormats.find(f => f.name === sel) || this.allowedFormats[0];
+        this.selectedFormat[index] = sel && (this.allowedFormats.find(f => f.name === sel) || this.allowedFormats[0]) || null;
     }
 
     private buildParamName(name: string) {
@@ -285,7 +285,9 @@ export function resolveFnCodecs($api: ConverterApiService, $error: ErrorService,
 
     const reload = typeof trans.options().reload === "boolean" ? <boolean>trans.options().reload : false;
 
-    return $api.getCodecs(null, null, reload).pipe(retry(3)).toPromise().then((res: any) => {
+    return $api.getCodecs(null, null, reload).pipe(
+        retryWhen(errors => errors.pipe(delay(1000), take(3)))
+    ).toPromise().then((res: any) => {
         $spinner.setLoadingState(false);
         return res;
     }).catch((err) => {
@@ -299,7 +301,9 @@ export function resolveFnFormats($api: ConverterApiService, $error: ErrorService
 
     const reload = typeof trans.options().reload === "boolean" ? <boolean>trans.options().reload : false;
 
-    return $api.getFormats(null, null, reload).pipe(retry(3)).toPromise().then((res: any) => {
+    return $api.getFormats(null, null, reload).pipe(
+        retryWhen(errors => errors.pipe(delay(1000), take(3)))
+    ).toPromise().then((res: any) => {
         $spinner.setLoadingState(false);
         return res;
     }).catch((err) => {
@@ -322,7 +326,8 @@ export function resolveFnHWaccels($api: ConverterApiService, $error: ErrorServic
     });
 }
 
-export function resolveFnSettings($api: SettingsApiService, $error: ErrorService, $spinner: SpinnerService, trans: Transition) {
+export function resolveFnSettings($api: SettingsApiService, $error: ErrorService, $spinner: SpinnerService, trans: Transition,
+    _codecs: Array<Codec>, _formats: Array<Format>, _hwAccesls: Array<HWAccel>) {
     $spinner.setLoadingState(trans.options().source !== "url" && trans.from().name !== trans.to().name);
 
     const reload = typeof trans.options().reload === "boolean" ? <boolean>trans.options().reload : false;
@@ -363,7 +368,7 @@ export const SettingsStates = {
         },
         {
             token: "settings",
-            deps: [SettingsApiService, ErrorService, SpinnerService, Transition],
+            deps: [SettingsApiService, ErrorService, SpinnerService, Transition, "codecs", "formats", "hwaccels"],
             resolveFn: resolveFnSettings
         }
     ]
