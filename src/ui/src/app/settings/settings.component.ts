@@ -142,8 +142,14 @@ export class SettingsComponent implements OnInit {
             mergeMap(laf =>
                 forkJoin(laf.map(
                     af => forkJoin([
-                        of(af.audio).pipe(map(a => this.resolveEncoders(a)), mergeAll()),
-                        of(af.video).pipe(map(v => this.resolveEncoders(v)), mergeAll())
+                        of(af.audio).pipe(
+                            retryWhen(errors => errors.pipe(delay(10000), take(3))),
+                            map(a => this.resolveEncoders(a)), mergeAll()
+                        ),
+                        of(af.video).pipe(
+                            retryWhen(errors => errors.pipe(delay(10000), take(3))),
+                            map(v => this.resolveEncoders(v)), mergeAll()
+                        )
                     ]).pipe(
                         map(renc => {
                             af.audio = <Array<Codec>>renc[0];
