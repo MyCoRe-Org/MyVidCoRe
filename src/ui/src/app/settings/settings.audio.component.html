@@ -24,7 +24,7 @@
     <!-- templates -->
 
     <fieldset class="border border-top-0 p-2">
-        <ng-container *ngTemplateOutlet="codecSelect,context:{i: index, type: 'audio'}">
+        <ng-container *ngTemplateOutlet="codecSelect,context:{index: index, type: 'audio'}">
         </ng-container>
 
         <ng-container *ngIf="selectedEncoder">
