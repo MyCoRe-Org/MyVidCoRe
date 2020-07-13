@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
 import org.mycore.vidconv.common.config.Settings;
@@ -164,25 +165,27 @@ public class TestSettings extends TestSharedHelpers {
         waitForInvisibleElement(By.id("spinner"), 3);
         assertNotNull(waitForElement(By.id("settings")));
 
-        int tabIndex = 0;
+        AtomicInteger tabIndex = new AtomicInteger(0);
 
         do {
-            Map<String, String> os = OUTPUT_SETTINGS.get(tabIndex);
+            Map<String, String> os = OUTPUT_SETTINGS.get(tabIndex.get());
 
-            waitAndClick(By.id("tab-output-" + tabIndex));
+            assertNotNull(reloadRetry(() -> {
+                return waitAndClick(By.id("tab-output-" + tabIndex.get()));
+            }));
 
             waitAndSelectByValue(By.id("output-format-" + tabIndex), os.get("format"));
             waitForElement(By.id("output-fileappendix-" + tabIndex)).sendKeys(os.get("fileappendix"));
 
-            fillVideoTab(tabIndex);
-            fillAudioTab(tabIndex);
+            fillVideoTab(tabIndex.get());
+            fillAudioTab(tabIndex.get());
 
-            tabIndex++;
+            tabIndex.incrementAndGet();
 
-            if (tabIndex < OUTPUT_SETTINGS.size()) {
+            if (tabIndex.get() < OUTPUT_SETTINGS.size()) {
                 waitAndClick(By.id("tab-output-add"));
             }
-        } while (tabIndex < OUTPUT_SETTINGS.size());
+        } while (tabIndex.get() < OUTPUT_SETTINGS.size());
 
         waitAndClick(By.cssSelector("*[type = 'submit']"));
 
