@@ -1,13 +1,32 @@
 language: java
+dist: xenial
 jdk:
   - openjdk8
   - openjdk11
+install: true
+cache:
+  directories:
+    - $HOME/.m2/repository
+env:
+  global:
+    - MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
+    - MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true"
+    - SELENIUM_DRIVER: "chrome"
+    - SELENIUM_DRIVER_ARGS: "--headless window-size=1280,1024 --no-sandbox"
+addons:
+  apt:
+    packages:
+      - google-chrome-stable
+      - ffmpeg
+script:
+  - mkdir ${HOME}/tmp
+  - export TMPDIR="${HOME}/tmp"
+  - mvn -B clean install
 after_script:
   - mvn com.gavinmogan:codacy-maven-plugin:coverage -DcoverageReportFile=target/site/jacoco/jacoco.xml -DprojectToken=${CODACY_PROJECT_TOKEN} -DapiToken=${CODACY_API_TOKEN}
 deploy:
   provider: releases
   api_key: ${GH_TOKEN}
   file: "target/myvidcore.jar"
-  skip_cleanup: true
   on:
     tags: true

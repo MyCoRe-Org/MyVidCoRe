@@ -101,7 +101,7 @@ export class SettingsComponent implements OnInit {
                             mergeMap(cce => of(cce.encoders.encoder).pipe(
                                 mergeMap(el => forkJoin(el.map(e =>
                                     this.$capi.getEncoder(e).pipe(
-                                        retryWhen(errors => errors.pipe(delay(1000), take(3))),
+                                        retryWhen(errors => errors.pipe(delay(10000), take(3))),
                                         map((res: any) => res.encoders[0])
                                     )
                                 )))
@@ -114,7 +114,7 @@ export class SettingsComponent implements OnInit {
 
                     return of(cc).pipe(
                         mergeMap(cce => this.$capi.getEncoder(cce.name).pipe(
-                            retryWhen(errors => errors.pipe(delay(1000), take(3))),
+                            retryWhen(errors => errors.pipe(delay(10000), take(3))),
                             map((res: any) => res.encoders[0]))
                         )
                     ).pipe(
@@ -142,8 +142,14 @@ export class SettingsComponent implements OnInit {
             mergeMap(laf =>
                 forkJoin(laf.map(
                     af => forkJoin([
-                        of(af.audio).pipe(map(a => this.resolveEncoders(a)), mergeAll()),
-                        of(af.video).pipe(map(v => this.resolveEncoders(v)), mergeAll())
+                        of(af.audio).pipe(
+                            retryWhen(errors => errors.pipe(delay(10000), take(3))),
+                            map(a => this.resolveEncoders(a)), mergeAll()
+                        ),
+                        of(af.video).pipe(
+                            retryWhen(errors => errors.pipe(delay(10000), take(3))),
+                            map(v => this.resolveEncoders(v)), mergeAll()
+                        )
                     ]).pipe(
                         map(renc => {
                             af.audio = <Array<Codec>>renc[0];
@@ -286,7 +292,7 @@ export function resolveFnCodecs($api: ConverterApiService, $error: ErrorService,
     const reload = typeof trans.options().reload === "boolean" ? <boolean>trans.options().reload : false;
 
     return $api.getCodecs(null, null, reload).pipe(
-        retryWhen(errors => errors.pipe(delay(1000), take(3)))
+        retryWhen(errors => errors.pipe(delay(10000), take(3)))
     ).toPromise().then((res: any) => {
         $spinner.setLoadingState(false);
         return res;
@@ -302,7 +308,7 @@ export function resolveFnFormats($api: ConverterApiService, $error: ErrorService
     const reload = typeof trans.options().reload === "boolean" ? <boolean>trans.options().reload : false;
 
     return $api.getFormats(null, null, reload).pipe(
-        retryWhen(errors => errors.pipe(delay(1000), take(3)))
+        retryWhen(errors => errors.pipe(delay(10000), take(3)))
     ).toPromise().then((res: any) => {
         $spinner.setLoadingState(false);
         return res;
