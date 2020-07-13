@@ -3,6 +3,7 @@ dist: xenial
 jdk:
   - openjdk8
   - openjdk11
+install: true
 cache:
   directories:
     - $HOME/.m2/repository
