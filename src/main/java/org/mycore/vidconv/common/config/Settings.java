@@ -46,9 +46,9 @@ public class Settings {
         if (o1.getFormat().equals(o2.getFormat())) {
             if (o1.getVideo().getScale() != null && o2.getVideo().getScale() != null) {
                 final Integer[] sc1 = Arrays.stream(o1.getVideo().getScale().split(":")).map(Integer::new)
-                    .toArray(Integer[]::new);
+                        .toArray(Integer[]::new);
                 final Integer[] sc2 = Arrays.stream(o2.getVideo().getScale().split(":")).map(Integer::new)
-                    .toArray(Integer[]::new);
+                        .toArray(Integer[]::new);
                 return sc1[0] < 0 && sc1[0] < 0 ? Integer.compare(sc2[1], sc1[1]) : Integer.compare(sc2[1], sc1[1]);
             }
 
@@ -100,9 +100,17 @@ public class Settings {
      */
     public void setSettings(SettingsWrapper settings) throws JAXBException, IOException {
         settings.setOutput(settings.getOutput().stream()
-            .sorted(sortOutputs).collect(Collectors.toList()));
+                .sorted(sortOutputs).collect(Collectors.toList()));
         this.settings = settings;
         saveSettings(this.settings);
+    }
+
+    /**
+     * clears all settings
+     */
+    public void clearSettings() {
+        this.settings = null;
+        ConfigurationDir.getConfigFile("settings.json").delete();
     }
 
     private void loadSettings() throws JAXBException, IOException {

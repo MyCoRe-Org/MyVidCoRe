@@ -1,13 +1,33 @@
 language: java
+dist: xenial
 jdk:
   - openjdk8
   - openjdk11
+cache:
+  directories:
+    - $HOME/.m2/repository
+env:
+  global:
+    - MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
+    - MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true"
+    - SELENIUM_DRIVER: "chrome"
+    - SELENIUM_DRIVER_ARGS: "--headless window-size=1280,1024 --no-sandbox"
+before_script:
+  - echo "deb http://ftp.de.debian.org/debian/ sid main" | tee /etc/apt/sources.list.d/sid-packages.list
+  - wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add -
+  - echo "deb http://dl.google.com/linux/chrome/deb/ stable main" | tee /etc/apt/sources.list.d/google-chrome.list
+  - apt-get update -y
+  - apt-get -y install build-essential autoconf g++
+  - apt-get -y install google-chrome-stable ffmpeg
+script:
+  - mkdir ${HOME}/tmp
+  - export TMPDIR="${HOME}/tmp"
+  - mvn -B clean install
 after_script:
   - mvn com.gavinmogan:codacy-maven-plugin:coverage -DcoverageReportFile=target/site/jacoco/jacoco.xml -DprojectToken=${CODACY_PROJECT_TOKEN} -DapiToken=${CODACY_API_TOKEN}
 deploy:
   provider: releases
   api_key: ${GH_TOKEN}
   file: "target/myvidcore.jar"
-  skip_cleanup: true
   on:
     tags: true
