@@ -163,7 +163,8 @@ public class TestSettings extends TestSharedHelpers {
 
         assertNotNull(reloadRetry(() -> {
             waitForInvisibleElement(By.id("spinner"), 3);
-            return waitForElement(By.id("settings"));
+            waitForElement(By.id("settings"));
+            return waitForElement(By.id("tab-output-0"));
         }));
 
         int tabIndex = 0;
