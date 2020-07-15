@@ -66,6 +66,7 @@
     "imagemin-mozjpeg": "^9.0.0",
     "imagemin-pngquant": "^9.0.0",
     "imagemin-svgo": "^8.0.0",
+    "p-limit": "^3.0.2",
     "ts-node": "^8.10.2",
     "tslint": "~6.1.0",
     "typescript": "3.9.5",
