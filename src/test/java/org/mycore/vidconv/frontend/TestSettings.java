@@ -164,7 +164,12 @@ public class TestSettings extends TestSharedHelpers {
         assertNotNull(reloadRetry(() -> {
             waitForInvisibleElement(By.id("spinner"), 3);
             waitForElement(By.id("settings"));
-            return waitForElement(By.id("tab-output-0"));
+            waitForElement(By.id("tab-output-0"));
+            
+            waitAndSelectByValue(By.id("output-format-0"), OUTPUT_SETTINGS.get(0).get("format"));
+            waitForElement(By.id("output-fileappendix-0")).sendKeys(OUTPUT_SETTINGS.get(0).get("fileappendix"));
+            
+            return waitForElement(By.id("output-0-video-codec"));
         }));
 
         int tabIndex = 0;
