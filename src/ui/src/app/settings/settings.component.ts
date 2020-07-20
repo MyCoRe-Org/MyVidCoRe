@@ -74,22 +74,32 @@ export class SettingsComponent implements OnInit {
             this.form.addControl("hwaccels", this.hwAccelsForm);
         }
 
-        this.buildAllowedFormats().toPromise().then(res => this.allowedFormats = res).then(() => {
-            if (this.settings) {
-                this.settings.output.forEach((o, i) => {
-                    this.output.push(this.createOutput(o));
-                    this.onFormatChange(i);
-                });
+        this.buildAllowedFormats().toPromise()
+            .then(res => this.allowedFormats = res)
+            .catch((err) => {
+                this.$spinner.setLoadingState(false);
+                this.$error.handleError(err);
+            })
+            .then(() => {
+                if (this.settings) {
+                    this.settings.output.forEach((o, i) => {
+                        this.output.push(this.createOutput(o));
+                        this.onFormatChange(i);
+                    });
 
-                this.form.patchValue(this.settings);
-            } else {
-                this.output.push(this.createOutput());
-                // this.onFormatChange(0);
-            }
+                    this.form.patchValue(this.settings);
+                } else {
+                    this.output.push(this.createOutput());
+                    // this.onFormatChange(0);
+                }
 
-            this.activeTab = "tab-output-0";
-            this.$spinner.setLoadingState(false);
-        });
+                this.activeTab = "tab-output-0";
+                this.$spinner.setLoadingState(false);
+            })
+            .catch((err) => {
+                this.$spinner.setLoadingState(false);
+                this.$error.handleError(err);
+            });
     }
 
     private resolveEncoders(codecs: Array<Codec>) {
