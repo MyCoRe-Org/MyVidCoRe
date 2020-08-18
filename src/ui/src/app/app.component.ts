@@ -1,5 +1,5 @@
-import { Component, ViewChild, OnInit, ElementRef } from "@angular/core";
-import { StateService } from "@uirouter/core";
+import { Component, ViewChild, OnInit } from "@angular/core";
+import { StateService, UIRouterGlobals } from "@uirouter/core";
 import { TranslateService } from "@ngx-translate/core";
 
 import { AuthService } from "./_services/auth.service";
@@ -17,11 +17,11 @@ export class AppComponent implements OnInit {
 
     private langs = ["de", "en"];
 
-    @ViewChild("sidebar", { static: true })
-    public sidebar: ElementRef;
+    @ViewChild("sidebar")
+    public sidebar: any;
 
-    @ViewChild("content", { static: true })
-    public content: ElementRef;
+    @ViewChild("content")
+    public content: any;
 
     public gitInfo: any;
 
@@ -30,7 +30,7 @@ export class AppComponent implements OnInit {
     public routes: Array<RouteMenu> = ROUTES;
 
     constructor(public $auth: AuthService, public translate: TranslateService,
-        private $api: ApiService, private $state: StateService) {
+        private $api: ApiService, private $state: StateService, private globals: UIRouterGlobals) {
         translate.addLangs(this.langs);
         translate.setDefaultLang(this.langs[0]);
 
@@ -52,7 +52,7 @@ export class AppComponent implements OnInit {
         this.$state.go("user", {
             action: "updateProfile",
             name: this.$auth.user.name,
-            returnTo: this.$state.target(this.$state.current, this.$state.params)
+            returnTo: this.$state.target(this.globals.current, this.globals.params)
         });
     }
 

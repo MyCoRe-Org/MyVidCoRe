@@ -13,7 +13,7 @@ import { ErrorService } from "../_services/error.service";
 
 import { Job } from "./definitions";
 import { hashCode } from "../definitions/index.js";
-import { StateService } from "@uirouter/core";
+import { StateService, UIRouterGlobals } from "@uirouter/core";
 
 @Component({
     selector: "ui-converter",
@@ -52,9 +52,9 @@ export class ConverterComponent implements OnInit, OnDestroy {
     videoPlayer: Map<string, videojs.Player> = new Map();
 
     constructor(private $api: ConverterApiService, private $error: ErrorService, private $state: StateService,
-        private $jobsvc: ConverterJobService) {
-        this.page = this.$state.params.page || 1;
-        this.limit = this.$state.params.limit || 50;
+        private $jobsvc: ConverterJobService, private globals: UIRouterGlobals) {
+        this.page = this.globals.params.page || 1;
+        this.limit = this.globals.params.limit || 50;
     }
 
     ngOnInit() {
@@ -228,7 +228,7 @@ export class ConverterComponent implements OnInit, OnDestroy {
     }
 
     private transitionTo() {
-        this.$state.transitionTo(this.$state.$current.name, {
+        this.$state.transitionTo(this.globals.$current.name, {
             page: this.page,
             limit: this.limit
         }, { reload: true });

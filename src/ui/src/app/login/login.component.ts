@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { ToastrService } from "ngx-toastr";
 import { TranslateService } from "@ngx-translate/core";
-import { TargetState, StateService } from "@uirouter/core";
+import { TargetState, StateService, UIRouterGlobals } from "@uirouter/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 
 import { AuthService } from "../_services/auth.service";
@@ -17,11 +17,12 @@ class LoginComponent implements OnInit {
     invalidCredentials = false;
 
     constructor(public $fb: FormBuilder, private $state: StateService, private $spinner: SpinnerService,
-        private $auth: AuthService, private toastr: ToastrService, private translate: TranslateService) { }
+        private $auth: AuthService, private toastr: ToastrService, private translate: TranslateService,
+        private globals: UIRouterGlobals) { }
 
     ngOnInit() {
         this.$spinner.setLoadingState(false);
-        this.returnTo = this.$state.params.returnTo;
+        this.returnTo = this.globals.params.returnTo;
 
         this.form = this.$fb.group({
             username: ["", Validators.required],
@@ -39,7 +40,7 @@ class LoginComponent implements OnInit {
                 if (this.returnTo.name) {
                     this.$state.go(this.returnTo.name(), this.returnTo.params());
                 } else {
-                    this.$state.go("dashboard");
+                    this.$state.go("home");
                 }
             }).catch((err) => {
                 this.$spinner.setLoadingState(false);
