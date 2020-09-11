@@ -319,7 +319,8 @@ public class FFMpegImpl {
             .compile("\\s+-([^\\s]+)\\s+<([^>]+)>\\s+(?:[^\\s]+)\\s([^\\n]+)([\\S\\s]+?(?=\\s+-))?");
 
     /** The Constant PATTERN_PARAM_VALUES. */
-    private static final Pattern PATTERN_PARAM_VALUES = Pattern.compile("\\s+([^\\s]+)\\s+(?:\\d+\\s+)?(?:[^\\s]+)([^\\n]*)");
+    private static final Pattern PATTERN_PARAM_VALUES = Pattern
+            .compile("\\s+([^\\s]+)\\s+(?:\\d+\\s+)?(?:[^\\s]+)([^\\n]*)");
 
     /** The Constant PATTERN_PARAM_FROM_TO. */
     private static final Pattern PATTERN_PARAM_FROM_TO = Pattern
@@ -357,7 +358,7 @@ public class FFMpegImpl {
                     value.setName(pv.group(1));
                     Optional.ofNullable(pv.group(2)).map(String::trim).filter(v -> !v.isEmpty())
                             .ifPresent(v -> value.setDescription(v));
-                    LOGGER.info("{} = {} {}", pv.group(), pv.group(1), pv.group(2));
+
                     return value;
                 }).collect(Collectors.toList());
 
