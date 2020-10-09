@@ -68,8 +68,8 @@
         <jersey.version>2.30.1</jersey.version>
         <log4j.version>2.13.3</log4j.version>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <node.version>v12.14.1</node.version>
-        <npm.version>6.13.6</npm.version>
+        <node.version>v14.13.0</node.version>
+        <npm.version>6.14.8</npm.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <selenium.version>3.141.59</selenium.version>
     </properties>
@@ -181,7 +181,7 @@
         <dependency>
             <groupId>org.ehcache</groupId>
             <artifactId>ehcache</artifactId>
-            <version>3.8.1</version>
+            <version>3.9.0</version>
         </dependency>
 
         <dependency>
@@ -343,7 +343,7 @@
         <dependency>
             <groupId>io.github.bonigarcia</groupId>
             <artifactId>webdrivermanager</artifactId>
-            <version>4.2.0</version>
+            <version>4.2.2</version>
             <scope>test</scope>
         </dependency>
 
@@ -361,7 +361,7 @@
                         <dependency>
                             <groupId>org.apache.maven.shared</groupId>
                             <artifactId>maven-dependency-analyzer</artifactId>
-                            <version>1.11.1</version>
+                            <version>1.11.3</version>
                             <exclusions>
                                 <exclusion>
                                     <groupId>org.apache.maven</groupId>
