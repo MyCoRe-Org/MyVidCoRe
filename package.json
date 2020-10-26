@@ -55,7 +55,7 @@
     "@angular/compiler-cli": "10.2.0",
     "@angular/language-service": "10.2.0",
     "@types/jquery": "^3.5.3",
-    "@types/node": "^14.14.2",
+    "@types/node": "^14.14.3",
     "@types/video.js": "^7.3.11",
     "angular-ide": "^0.9.75",
     "cheerio": "^1.0.0-rc.3",
