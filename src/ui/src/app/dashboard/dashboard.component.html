@@ -28,7 +28,7 @@
                         <div *ngIf="sysmon['mem-available']"
                             class="d-inline-flex flex-column justify-content-center align-items-center">
                             <ui-gauge [i18nPrefix]="'plugin.sysmonitor.'" [name]="'memory'"
-                                [attrib]="sysmon['mem-available']" [max]="sysmon['mem-total']?.value">
+                                [attrib]="sysmon['mem-available']" [max]="sysmon['mem-total']?.value" [negate]="true">
                             </ui-gauge>
                             <label for="memory">{{ 'plugin.sysmonitor.memory' | translate }}</label>
                         </div>

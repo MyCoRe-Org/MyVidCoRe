@@ -6,7 +6,7 @@
         </ui-gauge>
         <div class="d-inline-flex flex-column">
             <ui-gauge [i18nPrefix]="'plugin.sysmonitor.'" [name]="'memory'" [attrib]="entries['mem-available']"
-                [max]="entries['mem-total']?.value" [startAngle]="180" [endAngle]="0">
+                [max]="entries['mem-total']?.value" [negate]="true" [startAngle]="180" [endAngle]="0">
             </ui-gauge>
             <ui-gauge [i18nPrefix]="'plugin.sysmonitor.'" [name]="'swap'" [attrib]="entries['swap-used']"
                 [max]="entries['swap-total']?.value" [startAngle]="180" [endAngle]="0">
