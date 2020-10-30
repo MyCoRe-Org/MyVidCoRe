@@ -1,5 +1,5 @@
 <mwl-gauge *ngIf="attrib" [id]="name + (index ? '-' + index : '')" class="gauge-container {{ name }} {{ class }}"
     title="{{ i18nPrefix && (i18nPrefix + name | translate:{index: index}) }}" [max]="max" [dialStartAngle]="startAngle"
-    [dialEndAngle]="endAngle" [value]="attrib.value" [label]="gaugeLabel(name, attrib)" [animated]="true"
-    [animationDuration]="1">
+    [dialEndAngle]="endAngle" [value]="negate ? minus(max, attrib.value) : attrib.value"
+    [label]="gaugeLabel(name, attrib)" [animated]="true" [animationDuration]="1">
 </mwl-gauge>

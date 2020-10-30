@@ -24,6 +24,9 @@ export class GaugeComponent {
     max = 100;
 
     @Input()
+    negate = false;
+
+    @Input()
     startAngle = 145;
 
     @Input()
@@ -58,6 +61,19 @@ export class GaugeComponent {
         }
 
         return null;
+    }
+
+    parseNumber(value: any): number {
+        const val: number = typeof value === "string" ?
+            value.indexOf(".") !== -1 ? parseFloat(value) : parseInt(value, 10) : value;
+        return isNaN(val) ? null : val;
+    }
+
+    minus(min: any, sub: any) {
+        const m: number = this.parseNumber(min);
+        const s: number = this.parseNumber(sub);
+
+        return m !== null && s !== null ? m - s : s;
     }
 
 }
