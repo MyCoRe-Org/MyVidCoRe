@@ -16,19 +16,19 @@
 
             <fieldset>
                 <legend *ngIf="hwaccels && hwaccels.length !== 0">{{ 'settings.legend.converter' | translate }}</legend>
-                <ngb-tabset #t="ngbTabset" (tabChange)="beforeTabChange($event)" [destroyOnHide]="false"
-                    [activeId]="activeTab">
-                    <ngb-tab formArrayName="output"
+                <ul ngbNav #navOutput="ngbNav" class="nav-tabs" [destroyOnHide]="false" [(activeId)]="activeTab">
+                    <li formArrayName="output"
                         *ngFor="let o of output.controls; let i = index; let isFirst = first; let isLast = last"
-                        [id]="'tab-output-' + i">
-                        <ng-template ngbTabTitle>
-                            <span>{{ 'settings.outputLabel' | translate:{ index: i + 1 } }}</span>
-                            <button *ngIf="isFirst !== isLast || !isFirst && !isLast" type="button"
-                                class="remove-btn ml-2" (click)="removeOutput($event, i)">
+                        [ngbNavItem]="'tab-output-' + i" [domId]="'tab-output-' + i">
+                        <a ngbNavLink>
+                            {{ 'settings.outputLabel' | translate:{ index: i + 1 } }}
+                            <span *ngIf="isFirst !== isLast || !isFirst && !isLast"
+                                class="close position-relative pl-2 font-weight-light"
+                                (click)="removeOutput($event, i)">
                                 <i class="fas fa-minus text-danger"></i>
-                            </button>
-                        </ng-template>
-                        <ng-template ngbTabContent>
+                            </span>
+                        </a>
+                        <ng-template ngbNavContent>
                             <fieldset [formGroupName]="i" class="border border-top-0 p-2">
                                 <div class="form-group">
                                     <label for="output-format-{{ i }}">{{ 'settings.format' | translate }}</label>
@@ -52,47 +52,53 @@
                                 </div>
 
                                 <ng-container *ngIf="selectedFormat[i]">
-                                    <ngb-tabset #t="ngbTabset" [destroyOnHide]="false">
-                                        <ngb-tab formArrayName="video" [id]="'tab-output-' + i + '-video'"
-                                            [title]="'settings.video' | translate">
-                                            <ng-template ngbTabContent>
+                                    <ul ngbNav #navOutputType="ngbNav" class="nav-tabs" [destroyOnHide]="false">
+                                        <li [ngbNavItem]="'tab-output-' + i + '-video'"
+                                            [domId]="'tab-output-' + i + '-video'" formArrayName="video">
+                                            <a ngbNavLink>{{ 'settings.video' | translate }}</a>
+                                            <ng-template ngbNavContent>
                                                 <ui-settings-video [settings]="settings"
                                                     [selectedFormat]="selectedFormat[i]" [index]="i" [type]="'video'">
                                                 </ui-settings-video>
                                             </ng-template>
-                                        </ngb-tab>
+                                        </li>
 
-                                        <ngb-tab *ngIf="hwaccels?.length > 0" formArrayName="video-fallback"
-                                            [id]="'tab-output-' + i + '-video-fallback'"
-                                            [title]="'settings.videoFallback' | translate">
-                                            <ng-template ngbTabContent>
+                                        <li [ngbNavItem]="'tab-output-' + i + '-video-fallback'"
+                                            [domId]="'tab-output-' + i + '-video-fallback'" *ngIf="hwaccels?.length > 0"
+                                            formArrayName="video-fallback">
+                                            <a ngbNavLink>{{ 'settings.videoFallback' | translate }}</a>
+                                            <ng-template ngbNavContent>
                                                 <ui-settings-video [settings]="settings"
                                                     [selectedFormat]="selectedFormat[i]" [index]="i"
                                                     [type]="'video-fallback'">
                                                 </ui-settings-video>
                                             </ng-template>
-                                        </ngb-tab>
+                                        </li>
 
-                                        <ngb-tab formArrayName="audio" [id]="'tab-output-' + i + '-audio'"
-                                            [title]="'settings.audio' | translate">
-                                            <ng-template ngbTabContent>
+                                        <li [ngbNavItem]="'tab-output-' + i + '-audio'"
+                                            [domId]="'tab-output-' + i + '-audio'" formArrayName="audio">
+                                            <a ngbNavLink>{{ 'settings.audio' | translate }}</a>
+                                            <ng-template ngbNavContent>
                                                 <ui-settings-audio [settings]="settings"
                                                     [selectedFormat]="selectedFormat[i]" [index]="i" [type]="'audio'">
                                                 </ui-settings-audio>
                                             </ng-template>
-                                        </ngb-tab>
-                                    </ngb-tabset>
+                                        </li>
+                                    </ul>
+
+                                    <div [ngbNavOutlet]="navOutputType"></div>
                                 </ng-container>
+
                             </fieldset>
                         </ng-template>
-                    </ngb-tab>
+                    </li>
 
-                    <ngb-tab id="tab-output-add">
-                        <ng-template ngbTabTitle>
-                            <i class="fas fa-plus"></i>
-                        </ng-template>
-                    </ngb-tab>
-                </ngb-tabset>
+                    <li id="tab-output-add" class="nav-item">
+                        <a class="nav-link" href (click)="addOutput($event)"><i class="fas fa-plus"></i></a>
+                    </li>
+                </ul>
+
+                <div [ngbNavOutlet]="navOutput"></div>
             </fieldset>
 
             <div class="d-flex justify-content-end mt-2">

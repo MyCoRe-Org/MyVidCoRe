@@ -4,7 +4,6 @@ import { FormBuilder, FormArray, FormGroup, Validators } from "@angular/forms";
 import { of, forkJoin } from "rxjs";
 import { mergeMap, map, mergeAll, take, delay, retryWhen } from "rxjs/operators";
 
-import { NgbNavChangeEvent } from "@ng-bootstrap/ng-bootstrap";
 import { Transition } from "@uirouter/core";
 
 import { ConverterApiService } from "../converter/api.service";
@@ -229,22 +228,18 @@ export class SettingsComponent implements OnInit {
         return fg;
     }
 
-    addOutput() {
+    addOutput(event: MouseEvent) {
+        event.preventDefault();
         this.output.push(this.createOutput());
         this.onFormatChange(this.output.length - 1);
     }
 
     removeOutput(event: MouseEvent, index: number) {
         event.preventDefault();
+        event.stopImmediatePropagation();
         if (this.output.controls.length > 1) {
             this.output.removeAt(index);
-        }
-    }
-
-    beforeTabChange(event: NgbNavChangeEvent) {
-        if (event.nextId === "tab-output-add") {
-            event.preventDefault();
-            this.addOutput();
+            this.activeTab = "tab-output-" + (this.output.length - 1);
         }
     }
 
