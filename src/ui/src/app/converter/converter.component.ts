@@ -12,7 +12,7 @@ import { ConverterJobService, AppEventData } from "./converterJob.service";
 import { ErrorService } from "../_services/error.service";
 
 import { Job } from "./definitions";
-import { hashCode } from "../definitions/index.js";
+import { hashCode } from "../definitions";
 import { StateService, UIRouterGlobals } from "@uirouter/core";
 
 @Component({
