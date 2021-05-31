@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.mycore</groupId>
     <artifactId>myvidcore</artifactId>
-    <version>1.1.8-SNAPSHOT</version>
+    <version>1.1.8</version>
     <packaging>jar</packaging>
 
     <name>My Video (Converter) Core</name>
@@ -46,7 +46,7 @@
     <scm>
         <connection>scm:git:https://github.com/MyCoRe-Org/MyVidCoRe.git</connection>
         <developerConnection>scm:git:https://github.com/MyCoRe-Org/MyVidCoRe.git</developerConnection>
-        <tag>master</tag>
+        <tag>1.1.8</tag>
         <url>https://github.com/MyCoRe-Org/MyVidCoRe</url>
     </scm>
 
