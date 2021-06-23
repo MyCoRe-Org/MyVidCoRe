@@ -19,8 +19,10 @@
  */
 package org.mycore.vidconv.plugin.thumbnail;
 
+import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
@@ -78,43 +80,35 @@ public class ThumbnailPlugin extends ListenerPlugin {
                         .orElse(null);
 
                 if (probe != null) {
-                    String fName = job.inputPath().getFileName().toString();
                     float duration = Float.parseFloat(probe.getFormat().getDuration());
                     int posThumbs = Math.min(NUM_THUMBS, Math.round((float) Math.floor(duration)));
 
-                    for (int ti = 1; ti < posThumbs + 1; ti++) {
-                        long time = Math.round((ti - 0.5) * duration / posThumbs);
-                        String tName = job.outputPath()
-                                .resolve(fName.substring(0, fName.lastIndexOf(".")) + "-thumb-" + formatIndex(ti)
-                                        + ".jpg")
-                                .toAbsolutePath()
-                                .toString();
-                        String cmd = "ffmpeg -ss " + time + " -i \"" + probe.getFormat().getFilename()
-                                + "\" -vf select='eq(pict_type\\,I)' -vframes 1 \"" + tName + "\"";
+                    int ti, exitCode = -1;
+
+                    for (ti = 1; ti < posThumbs + 1; ti++) {
+                        String tName = formatFileName(job.outputPath(), job.inputPath(), ti);
+                        String cmd = buildThumbCommand(probe.getFormat().getFilename(), tName,
+                                formatTime(Math.round((ti - 0.5) * duration * 1000 / posThumbs)));
 
                         LOGGER.info("generate thumbnail " + tName + "...");
-                        LOGGER.debug(cmd);
 
-                        int retry = 0;
-                        int res = -1;
-                        do {
-                            Executable exec = new Executable(cmd);
-
-                            res = exec.runAndWait(PROCESS_TIMEOUT_VALUE, PROCESS_TIMEOUT_UNIT);
-
-                            if (res == 0) {
-                                LOGGER.info("...done.");
-                            } else if (res == Executable.PROCESS_TIMEOUT) {
-                                LOGGER.warn("...timeout reached!");
-                            }
-
-                            retry++;
-                        } while (res != 0 && retry < NUM_RETRIES);
+                        exitCode = runCommand(cmd);
                     }
 
                     if (posThumbs < NUM_THUMBS) {
                         LOGGER.warn("not enough length ({} sec.) to generate {} thumbnails for {}.",
-                                String.format(Locale.ROOT, "%.2f", duration), NUM_THUMBS, fName);
+                                String.format(Locale.ROOT, "%.2f", duration), NUM_THUMBS,
+                                job.inputPath().getFileName().toString());
+
+                        if (ti <= 2 && exitCode != 0) {
+                            String tName = formatFileName(job.outputPath(), job.inputPath(), 1);
+                            String cmd = buildThumbCommand(probe.getFormat().getFilename(), tName,
+                                    formatTime(Math.round(duration * 1000 / 2)));
+
+                            LOGGER.info("generate thumbnail " + tName + "...");
+
+                            runCommand(cmd);
+                        }
                     }
                 }
             }
@@ -126,6 +120,54 @@ public class ThumbnailPlugin extends ListenerPlugin {
         IntStream.range(0, Integer.toString(NUM_THUMBS).length() - Integer.toString(index).length())
                 .forEach(i -> sb.append("0"));
         return sb.append(Integer.toString(index)).toString();
+    }
+
+    private static String formatFileName(Path outputPath, Path inputFile, int index) {
+        String fName = inputFile.getFileName().toString();
+        return outputPath
+                .resolve(fName.substring(0, fName.lastIndexOf(".")) + "-thumb-" + formatIndex(index) + ".jpg")
+                .toAbsolutePath()
+                .toString();
+    }
+
+    public static String formatTime(long milis) {
+        long ms = milis % 1000;
+        long s = (milis / 1000) % 60;
+        long m = (milis / 6000) % 60;
+        long h = (milis / (6000 * 60)) % 24;
+
+        return String.format(Locale.ROOT, "%02d:%02d:%02d.%03d", h, m, s, ms);
+    }
+
+    private static String buildThumbCommand(String inputFileName, String outputFileName, String timeString) {
+        return "ffmpeg -ss " + timeString + " -i \"" + inputFileName + "\" -vf select='eq(pict_type\\,I)' -vframes 1 \""
+                + outputFileName + "\"";
+    }
+
+    private static int runCommand(String cmd) throws InterruptedException, ExecutionException {
+        LOGGER.debug(cmd);
+
+        int retry = 0;
+        int res = -1;
+        do {
+            Executable exec = new Executable(cmd);
+
+            res = exec.runAndWait(PROCESS_TIMEOUT_VALUE, PROCESS_TIMEOUT_UNIT);
+
+            if (res == 0) {
+                LOGGER.info("...done.");
+            } else if (res == Executable.PROCESS_TIMEOUT) {
+                LOGGER.warn("...timeout reached!");
+            }
+
+            retry++;
+        } while (res != 0 && retry < NUM_RETRIES);
+
+        if (res != 0 || retry == NUM_RETRIES) {
+            LOGGER.warn("...failed!");
+        }
+
+        return res;
     }
 
 }
