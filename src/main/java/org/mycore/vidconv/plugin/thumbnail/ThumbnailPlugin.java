@@ -88,7 +88,7 @@ public class ThumbnailPlugin extends ListenerPlugin {
                     for (ti = 1; ti < posThumbs + 1; ti++) {
                         String tName = formatFileName(job.outputPath(), job.inputPath(), ti);
                         String cmd = buildThumbCommand(probe.getFormat().getFilename(), tName,
-                                formatTime(Math.round((ti - 0.5) * duration * 1000 / posThumbs)));
+                                Long.toString(Math.round((ti - 0.5) * duration / posThumbs)));
 
                         LOGGER.info("generate thumbnail " + tName + "...");
 
