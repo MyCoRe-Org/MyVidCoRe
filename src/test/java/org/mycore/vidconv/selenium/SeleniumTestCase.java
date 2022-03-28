@@ -26,6 +26,7 @@ import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Callable;
@@ -204,7 +205,7 @@ public class SeleniumTestCase {
     }
 
     public WebElement waitAndClick(By by) {
-        WebDriverWait wait = new WebDriverWait(driver, MAX_WAIT_TIME);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(MAX_WAIT_TIME));
         WebElement elm = null;
 
         int retry = 0;
@@ -231,7 +232,7 @@ public class SeleniumTestCase {
     }
 
     public WebElement waitAndSelectByValue(By by, String value) {
-        WebDriverWait wait = new WebDriverWait(driver, MAX_WAIT_TIME);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(MAX_WAIT_TIME));
         if (wait.until(ExpectedConditions.and(ExpectedConditions.visibilityOfElementLocated(by),
                 ExpectedConditions.elementToBeClickable(by), webDriver -> isReady(webDriver)))) {
             WebElement elm = driver.findElement(by);
@@ -243,7 +244,7 @@ public class SeleniumTestCase {
     }
 
     public WebElement waitAndSelectByText(By by, String text) {
-        WebDriverWait wait = new WebDriverWait(driver, MAX_WAIT_TIME);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(MAX_WAIT_TIME));
         if (wait.until(ExpectedConditions.and(ExpectedConditions.visibilityOfElementLocated(by),
                 ExpectedConditions.elementToBeClickable(by), webDriver -> isReady(webDriver)))) {
             WebElement elm = driver.findElement(by);
@@ -255,7 +256,7 @@ public class SeleniumTestCase {
     }
 
     public WebElement waitAndSelectByIndex(By by, int index) {
-        WebDriverWait wait = new WebDriverWait(driver, MAX_WAIT_TIME);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(MAX_WAIT_TIME));
         if (wait.until(ExpectedConditions.and(ExpectedConditions.visibilityOfElementLocated(by),
                 ExpectedConditions.elementToBeClickable(by), webDriver -> isReady(webDriver)))) {
             WebElement elm = driver.findElement(by);
@@ -267,7 +268,7 @@ public class SeleniumTestCase {
     }
 
     public WebElement waitForElement(By by) {
-        WebDriverWait wait = new WebDriverWait(driver, MAX_WAIT_TIME);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(MAX_WAIT_TIME));
         if (wait.until(ExpectedConditions.and(ExpectedConditions.visibilityOfElementLocated(by),
                 webDriver -> isReady(webDriver)))) {
             WebElement elm = driver.findElement(by);
@@ -278,7 +279,7 @@ public class SeleniumTestCase {
     }
 
     public List<WebElement> waitForElements(By by) {
-        WebDriverWait wait = new WebDriverWait(driver, MAX_WAIT_TIME);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(MAX_WAIT_TIME));
         if (wait.until(ExpectedConditions.and(ExpectedConditions.visibilityOfElementLocated(by),
                 webDriver -> isReady(webDriver)))) {
             List<WebElement> elm = driver.findElements(by);
@@ -289,7 +290,7 @@ public class SeleniumTestCase {
     }
 
     public WebElement waitForInvisibleElement(By by) {
-        WebDriverWait wait = new WebDriverWait(driver, MAX_WAIT_TIME);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(MAX_WAIT_TIME));
         if (wait.until(ExpectedConditions.and(ExpectedConditions.invisibilityOfElementLocated(by),
                 webDriver -> isReady(webDriver)))) {
             WebElement elm = driver.findElement(by);
@@ -311,7 +312,7 @@ public class SeleniumTestCase {
     }
 
     public WebElement waitForElementContainsText(By by, String text) {
-        WebDriverWait wait = new WebDriverWait(driver, MAX_WAIT_TIME);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(MAX_WAIT_TIME));
         if (wait.until(ExpectedConditions.and(ExpectedConditions.visibilityOfElementLocated(by),
                 webDriver -> isReady(webDriver)))) {
             return driver.findElements(by).stream().filter(e -> e.getText().contains(text)).findFirst().orElse(null);
@@ -325,7 +326,7 @@ public class SeleniumTestCase {
     }
 
     public WebElement reloadRetry(Callable<WebElement> callable, int numRetries) {
-        WebDriverWait wait = new WebDriverWait(driver, MAX_WAIT_TIME);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(MAX_WAIT_TIME));
         WebElement elm = null;
 
         int retry = 0;

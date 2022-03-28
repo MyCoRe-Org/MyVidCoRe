@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -39,18 +40,26 @@ public class EntityUtils {
 
     private static final List<Class<?>> CACHED_ENTITIES = Collections.synchronizedList(new ArrayList<>());
 
+    private static Predicate<Class<?>> classPackageMatches(String pkg) {
+        return cls -> {
+            String cn = cls.getName();
+            return cn.substring(0, cn.lastIndexOf(".")).equals(pkg);
+        };
+    }
+
     public static List<Class<?>> populateEntities(String pkg) throws IOException {
         return populateEntities(Arrays.asList(pkg));
     }
 
     public static List<Class<?>> populateEntities(List<String> pkgs) throws IOException {
         synchronized (CACHED_ENTITIES) {
-            if (CACHED_ENTITIES.isEmpty()) {
+            if (CACHED_ENTITIES.isEmpty() || pkgs.stream().anyMatch(
+                    p -> CACHED_ENTITIES.stream().filter(classPackageMatches(p)).count() == 0)) {
                 CACHED_ENTITIES.addAll(
                         pkgs.stream()
                                 .map(pkg -> new Reflections(pkg, new TypeAnnotationsScanner())
                                         .getTypesAnnotatedWith(XmlRootElement.class, true))
-                                .flatMap(ts -> ts.stream()).collect(Collectors.toList()));
+                                .flatMap(ts -> ts.stream()).distinct().collect(Collectors.toList()));
             }
             return CACHED_ENTITIES;
         }
