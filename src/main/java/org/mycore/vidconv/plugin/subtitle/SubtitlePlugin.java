@@ -137,6 +137,14 @@ public class SubtitlePlugin extends ListenerPlugin {
             final ConverterJob job = (ConverterJob) event.getObject();
 
             if (job.exitValue() == 0) {
+                VoskExtractor extractor = new VoskExtractor(SAMPLE_RATE);
+
+                if (extractor.getModelPath() == null) {
+                    LOGGER.warn("no model path provided, disable plugin");
+                    disable();
+                    return;
+                }
+
                 Path audioFilePath = Paths
                         .get(formatFileName(job.inputPath().getParent(), job.inputPath(), ".wav"));
 
@@ -146,8 +154,6 @@ public class SubtitlePlugin extends ListenerPlugin {
                 int ret = runCommand(cmd);
 
                 if (ret == 0) {
-                    VoskExtractor extractor = new VoskExtractor(SAMPLE_RATE);
-
                     try {
                         LOGGER.info("extract text from {}...", audioFilePath);
                         List<VoskResult> results = extractor.extract(audioFilePath);

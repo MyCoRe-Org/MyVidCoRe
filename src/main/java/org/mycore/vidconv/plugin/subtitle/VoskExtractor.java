@@ -63,11 +63,22 @@ public class VoskExtractor {
 
     public VoskExtractor(String modelPath, float sampleRate) {
         this.modelPath = Optional.ofNullable(modelPath)
-                .orElseGet(() -> Configuration.instance().getString("VoskExtractor.modelPath"));
+                .orElseGet(() -> Configuration.instance().getString("VoskExtractor.modelPath", null));
         this.sampleRate = sampleRate;
     }
 
+    /**
+     * @return the modelPath
+     */
+    public String getModelPath() {
+        return modelPath;
+    }
+
     public List<VoskResult> extract(Path input) throws IOException, UnsupportedAudioFileException {
+        if (this.modelPath == null) {
+            return null;
+        }
+
         LibVosk.setLogLevel(LogLevel.WARNINGS);
 
         List<VoskResult> results = new ArrayList<>();
