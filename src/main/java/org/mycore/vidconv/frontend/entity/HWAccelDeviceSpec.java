@@ -19,8 +19,8 @@
  */
 package org.mycore.vidconv.frontend.entity;
 
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlSeeAlso;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlSeeAlso;
 
 /**
  * @author Ren\u00E9 Adler (eagle)

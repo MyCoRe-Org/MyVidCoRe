@@ -21,15 +21,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.annotation.Priority;
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.Priorities;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerResponseContext;
-import javax.ws.rs.container.ContainerResponseFilter;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.Provider;
+import jakarta.annotation.Priority;
+import jakarta.ws.rs.HttpMethod;
+import jakarta.ws.rs.Priorities;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerResponseContext;
+import jakarta.ws.rs.container.ContainerResponseFilter;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.ext.Provider;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -62,9 +62,9 @@ public class CORSFilter implements ContainerResponseFilter {
     /*
      * (non-Javadoc)
      * 
-     * @see javax.ws.rs.container.ContainerResponseFilter#filter(javax.ws.rs.
+     * @see jakarta.ws.rs.container.ContainerResponseFilter#filter(jakarta.ws.rs.
      * container.ContainerRequestContext,
-     * javax.ws.rs.container.ContainerResponseContext)
+     * jakarta.ws.rs.container.ContainerResponseContext)
      */
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)

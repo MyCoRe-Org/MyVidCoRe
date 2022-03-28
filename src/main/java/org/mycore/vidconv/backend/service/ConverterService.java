@@ -50,7 +50,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -192,8 +192,8 @@ public class ConverterService extends Widget implements Listener {
                 return new ConverterWrapper(converterId, converter);
             }
         } else {
-            final Integer page = new Integer(params.get(0));
-            final Integer limit = new Integer(params.get(1));
+            final Integer page = Integer.valueOf(params.get(0));
+            final Integer limit = Integer.valueOf(params.get(1));
 
             int start = (page - 1) * limit;
 

@@ -37,16 +37,16 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import javax.inject.Singleton;
-import javax.ws.rs.GET;
-import javax.ws.rs.HEAD;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HEAD;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.StreamingOutput;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -239,7 +239,7 @@ public class WidgetResource {
                 .map(rm -> {
                     try {
                         final File assetFile = asset.toFile();
-                        final long from = new Long(rm.group(2));
+                        final long from = Long.valueOf(rm.group(2));
                         final long to = Optional.ofNullable(rm.group(3)).map(Long::parseLong)
                                 .orElse(assetFile.length() - 1);
 

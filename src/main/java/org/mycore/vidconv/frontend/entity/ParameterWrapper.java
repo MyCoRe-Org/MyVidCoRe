@@ -24,7 +24,7 @@ package org.mycore.vidconv.frontend.entity;
 
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
@@ -147,20 +147,20 @@ public class ParameterWrapper {
 
     private String parseValueConstant(String value) {
         switch (value) {
-            case "I64_MIN":
-            case "INT_MIN":
-                return new Integer(Integer.MIN_VALUE).toString();
-            case "I64_MAX":
-            case "INT_MAX":
-                return new Integer(Integer.MAX_VALUE).toString();
-            case "FLT_MIN":
-                return new Float(Float.MIN_VALUE).toString();
-            case "-FLT_MAX":
-                return new Float(Float.MAX_VALUE * -1).toString();
-            case "FLT_MAX":
-                return new Float(Float.MAX_VALUE).toString();
-            default:
-                break;
+        case "I64_MIN":
+        case "INT_MIN":
+            return Integer.valueOf(Integer.MIN_VALUE).toString();
+        case "I64_MAX":
+        case "INT_MAX":
+            return Integer.valueOf(Integer.MAX_VALUE).toString();
+        case "FLT_MIN":
+            return Float.valueOf(Float.MIN_VALUE).toString();
+        case "-FLT_MAX":
+            return Float.valueOf(Float.MAX_VALUE * -1).toString();
+        case "FLT_MAX":
+            return Float.valueOf(Float.MAX_VALUE).toString();
+        default:
+            break;
         }
 
         return value;

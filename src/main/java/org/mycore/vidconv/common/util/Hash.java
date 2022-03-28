@@ -29,7 +29,7 @@ import java.text.Normalizer;
 import java.text.Normalizer.Form;
 import java.util.Locale;
 
-import javax.xml.bind.DatatypeConverter;
+import jakarta.xml.bind.DatatypeConverter;
 
 /**
  * @author Ren\u00E9 Adler (eagle)

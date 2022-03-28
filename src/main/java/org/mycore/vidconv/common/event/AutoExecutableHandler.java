@@ -37,7 +37,7 @@ import org.mycore.vidconv.common.event.annotation.AutoExecutable;
 import org.mycore.vidconv.common.event.annotation.Shutdown;
 import org.mycore.vidconv.common.event.annotation.Startup;
 import org.reflections.Reflections;
-import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.scanners.Scanners;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
@@ -53,7 +53,7 @@ public class AutoExecutableHandler {
 
     static {
         final Reflections reflections = new Reflections(Application.class.getPackage().getName(),
-                new TypeAnnotationsScanner());
+                Scanners.TypesAnnotated);
         executables = reflections.getTypesAnnotatedWith(AutoExecutable.class, true);
     }
 

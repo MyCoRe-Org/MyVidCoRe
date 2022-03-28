@@ -33,8 +33,8 @@ import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.StreamingOutput;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.StreamingOutput;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
@@ -60,7 +60,7 @@ public class ZipStreamingOutput implements StreamingOutput {
     }
 
     /* (non-Javadoc)
-     * @see javax.ws.rs.core.StreamingOutput#write(java.io.OutputStream)
+     * @see jakarta.ws.rs.core.StreamingOutput#write(java.io.OutputStream)
      */
     @Override
     public void write(OutputStream output) throws IOException, WebApplicationException {

@@ -41,9 +41,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.logging.log4j.LogManager;
@@ -476,7 +476,7 @@ public class FFMpegImpl {
                                                 .flatMap(ma -> splitString(ma.group(1))).collect(Collectors.toList()));
 
                                         encoder.setSampleRates(MatcherStream.findMatches(PATTERN_SMP_RATES, mr.group(3))
-                                                .flatMap(ma -> splitString(ma.group(1))).map(s -> new Integer(s))
+                                                .flatMap(ma -> splitString(ma.group(1))).map(s -> Integer.valueOf(s))
                                                 .collect(Collectors.toList()));
 
                                         encoder.setChannelLayouts(MatcherStream
@@ -700,7 +700,7 @@ public class FFMpegImpl {
     public static boolean isUpscaling(final Path inputFile, final String scale)
             throws InterruptedException, JAXBException, ExecutionException {
         final ProbeWrapper probe = probe(inputFile);
-        final Integer[] sc = Arrays.stream(scale.split(":")).map(Integer::new).toArray(Integer[]::new);
+        final Integer[] sc = Arrays.stream(scale.split(":")).map(Integer::valueOf).toArray(Integer[]::new);
 
         if (probe != null && probe.getStreams() != null) {
             return probe.getStreams().stream().filter(s -> s.getCodecType().equalsIgnoreCase("video")).map(s -> {

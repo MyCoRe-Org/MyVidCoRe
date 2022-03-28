@@ -34,7 +34,7 @@ import org.mycore.vidconv.frontend.entity.SettingsWrapper;
 import org.mycore.vidconv.plugin.GenericPlugin;
 import org.mycore.vidconv.plugin.annotation.Plugin;
 import org.reflections.Reflections;
-import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.scanners.Scanners;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
@@ -52,7 +52,7 @@ public class PluginService {
     private static Map<String, GenericPlugin> plugins;
 
     static {
-        final Reflections reflections = new Reflections("org.mycore.vidconv.plugin", new TypeAnnotationsScanner());
+        final Reflections reflections = new Reflections("org.mycore.vidconv.plugin", Scanners.TypesAnnotated);
         PLUGIN_CACHE = reflections.getTypesAnnotatedWith(Plugin.class, true);
     }
 

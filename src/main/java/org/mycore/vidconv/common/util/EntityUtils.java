@@ -27,10 +27,10 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
 import org.reflections.Reflections;
-import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.scanners.Scanners;
+
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
@@ -57,7 +57,7 @@ public class EntityUtils {
                     p -> CACHED_ENTITIES.stream().filter(classPackageMatches(p)).count() == 0)) {
                 CACHED_ENTITIES.addAll(
                         pkgs.stream()
-                                .map(pkg -> new Reflections(pkg, new TypeAnnotationsScanner())
+                                .map(pkg -> new Reflections(pkg, Scanners.TypesAnnotated)
                                         .getTypesAnnotatedWith(XmlRootElement.class, true))
                                 .flatMap(ts -> ts.stream()).distinct().collect(Collectors.toList()));
             }

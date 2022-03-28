@@ -21,11 +21,11 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.MessageBodyWriter;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.ext.MessageBodyWriter;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 import org.mycore.vidconv.common.config.Configuration;
 import org.mycore.vidconv.common.util.EntityFactory;
@@ -40,9 +40,9 @@ public class EntityMessageBodyWriter<T> implements MessageBodyWriter<T> {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see javax.ws.rs.ext.MessageBodyWriter#isWriteable(java.lang.Class,
+	 * @see jakarta.ws.rs.ext.MessageBodyWriter#isWriteable(java.lang.Class,
 	 * java.lang.reflect.Type, java.lang.annotation.Annotation[],
-	 * javax.ws.rs.core.MediaType)
+	 * jakarta.ws.rs.core.MediaType)
 	 */
 	@Override
 	public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
@@ -54,9 +54,9 @@ public class EntityMessageBodyWriter<T> implements MessageBodyWriter<T> {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see javax.ws.rs.ext.MessageBodyWriter#getSize(java.lang.Object,
+	 * @see jakarta.ws.rs.ext.MessageBodyWriter#getSize(java.lang.Object,
 	 * java.lang.Class, java.lang.reflect.Type,
-	 * java.lang.annotation.Annotation[], javax.ws.rs.core.MediaType)
+	 * java.lang.annotation.Annotation[], jakarta.ws.rs.core.MediaType)
 	 */
 	@Override
 	public long getSize(T t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
@@ -66,10 +66,10 @@ public class EntityMessageBodyWriter<T> implements MessageBodyWriter<T> {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see javax.ws.rs.ext.MessageBodyWriter#writeTo(java.lang.Object,
+	 * @see jakarta.ws.rs.ext.MessageBodyWriter#writeTo(java.lang.Object,
 	 * java.lang.Class, java.lang.reflect.Type,
-	 * java.lang.annotation.Annotation[], javax.ws.rs.core.MediaType,
-	 * javax.ws.rs.core.MultivaluedMap, java.io.OutputStream)
+	 * java.lang.annotation.Annotation[], jakarta.ws.rs.core.MediaType,
+	 * jakarta.ws.rs.core.MultivaluedMap, java.io.OutputStream)
 	 */
 	@Override
 	public void writeTo(T t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType,

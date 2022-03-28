@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 @Retention(RUNTIME)
 @Target(METHOD)
 /**
- * Used to define the {@link javax.ws.rs.core.HttpHeaders#CACHE_CONTROL} header
+ * Used to define the {@link jakarta.ws.rs.core.HttpHeaders#CACHE_CONTROL} header
  * via annotation
  * 
  * @author Ren\u00E9 Adler (eagle)

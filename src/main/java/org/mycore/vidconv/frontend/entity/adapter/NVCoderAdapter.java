@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
-import javax.xml.bind.annotation.XmlAnyElement;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.XmlAnyElement;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 

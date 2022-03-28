@@ -16,9 +16,9 @@
  */
 package org.mycore.vidconv.frontend.provider;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.ExceptionMapper;
+import jakarta.ws.rs.ext.Provider;
 
 import org.apache.logging.log4j.LogManager;
 import org.mycore.vidconv.frontend.entity.ExceptionWrapper;
@@ -33,7 +33,7 @@ public class GenericExceptionMapper implements ExceptionMapper<Exception> {
     /*
      * (non-Javadoc)
      * 
-     * @see javax.ws.rs.ext.ExceptionMapper#toResponse(java.lang.Exception)
+     * @see jakarta.ws.rs.ext.ExceptionMapper#toResponse(java.lang.Exception)
      */
     @Override
     public Response toResponse(Exception exception) {

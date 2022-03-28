@@ -19,12 +19,12 @@ package org.mycore.vidconv.frontend.filter;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import javax.annotation.Priority;
-import javax.ws.rs.Priorities;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.ext.Provider;
-import javax.ws.rs.ext.WriterInterceptor;
-import javax.ws.rs.ext.WriterInterceptorContext;
+import jakarta.annotation.Priority;
+import jakarta.ws.rs.Priorities;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.ext.Provider;
+import jakarta.ws.rs.ext.WriterInterceptor;
+import jakarta.ws.rs.ext.WriterInterceptorContext;
 
 import org.apache.commons.io.output.ProxyOutputStream;
 import org.apache.logging.log4j.LogManager;
@@ -43,7 +43,7 @@ public class IgnoreClientAbortInterceptor implements WriterInterceptor {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see javax.ws.rs.ext.WriterInterceptor#aroundWriteTo(javax.ws.rs.ext.
+	 * @see jakarta.ws.rs.ext.WriterInterceptor#aroundWriteTo(jakarta.ws.rs.ext.
 	 * WriterInterceptorContext)
 	 */
 	@Override

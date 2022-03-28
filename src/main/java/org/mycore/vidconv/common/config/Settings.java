@@ -28,7 +28,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -45,9 +45,9 @@ public class Settings {
     public static Comparator<Output> sortOutputs = (o1, o2) -> {
         if (o1.getFormat().equals(o2.getFormat())) {
             if (o1.getVideo().getScale() != null && o2.getVideo().getScale() != null) {
-                final Integer[] sc1 = Arrays.stream(o1.getVideo().getScale().split(":")).map(Integer::new)
+                final Integer[] sc1 = Arrays.stream(o1.getVideo().getScale().split(":")).map(Integer::valueOf)
                         .toArray(Integer[]::new);
-                final Integer[] sc2 = Arrays.stream(o2.getVideo().getScale().split(":")).map(Integer::new)
+                final Integer[] sc2 = Arrays.stream(o2.getVideo().getScale().split(":")).map(Integer::valueOf)
                         .toArray(Integer[]::new);
                 return sc1[0] < 0 && sc1[0] < 0 ? Integer.compare(sc2[1], sc1[1]) : Integer.compare(sc2[1], sc1[1]);
             }

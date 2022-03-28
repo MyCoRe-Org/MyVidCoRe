@@ -29,8 +29,8 @@ import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.Locale;
 
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriBuilderException;
+import jakarta.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.core.UriBuilderException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
