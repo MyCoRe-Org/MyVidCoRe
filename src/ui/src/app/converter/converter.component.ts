@@ -3,7 +3,7 @@ import { Component, OnInit, OnDestroy } from "@angular/core";
 import { timer, Subscription, Observable } from "rxjs";
 
 import videojs from "video.js";
-import videojsPluginQualitySelector from "@silvermine/videojs-quality-selector";
+//import videojsPluginQualitySelector from "@silvermine/videojs-quality-selector";
 
 import { environment } from "../../environments/environment";
 
@@ -96,8 +96,8 @@ export class ConverterComponent implements OnInit, OnDestroy {
                         ],
                     },
                 }, () => {
-                    videojsPluginQualitySelector(videojs);
-                    player.controlBar.addChild("QualitySelector");
+                    // videojsPluginQualitySelector(videojs);
+                    // player.controlBar.addChild("QualitySelector");
                 });
             }
 
