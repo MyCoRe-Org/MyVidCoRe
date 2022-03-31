@@ -21,19 +21,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
-import jakarta.xml.bind.annotation.XmlType;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.vidconv.common.config.Configuration;
 import org.mycore.vidconv.common.util.JsonUtils;
 import org.vosk.LibVosk;
@@ -41,29 +44,62 @@ import org.vosk.LogLevel;
 import org.vosk.Model;
 import org.vosk.Recognizer;
 
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlType;
+
 /**
  * @author Ren\u00E9 Adler (eagle)
  *
  */
 public class VoskExtractor {
 
+    public static final String CONFIG_PREFIX = "VoskExtractor.";
+
+    public static final String DE = "de";
+
+    public static final String EN = "en";
+
+    private static final Logger LOGGER = LogManager.getLogger();
+
     private static final float DEFAULT_SAMPLE_RATE = 16000;
+
+    private static final int DEFAULT_GUESS_MAX_WORDS = 100;
+
+    private static final Map<String, List<String>> DEFAULT_GUESS_MAP;
 
     private final String modelPath;
 
     private final float sampleRate;
 
+    private String modelLang;
+
+    static {
+        DEFAULT_GUESS_MAP = new HashMap<>();
+
+        DEFAULT_GUESS_MAP.put("de",
+                Arrays.asList("der", "die", "das", "wir", "uns", "ihr", "sie", "zu", "zum", "und", "oder", "für",
+                        "mit"));
+        DEFAULT_GUESS_MAP.put("en",
+                Arrays.asList("the", "there", "this", "his", "her", "he", "she", "with", "of", "are", "and", "or",
+                        "for"));
+    }
+
     public VoskExtractor() {
-        this(null, DEFAULT_SAMPLE_RATE);
+        this(null, null, DEFAULT_SAMPLE_RATE);
     }
 
     public VoskExtractor(float sampleRate) {
-        this(null, sampleRate);
+        this(null, null, sampleRate);
     }
 
-    public VoskExtractor(String modelPath, float sampleRate) {
+    public VoskExtractor(String modelPath, String modelLang, float sampleRate) {
         this.modelPath = Optional.ofNullable(modelPath)
-                .orElseGet(() -> Configuration.instance().getString("VoskExtractor.modelPath", null));
+                .orElseGet(() -> Configuration.instance().getString(CONFIG_PREFIX + "modelPath", null));
+        this.modelLang = Optional.ofNullable(modelLang).orElse(DE);
         this.sampleRate = sampleRate;
     }
 
@@ -71,9 +107,32 @@ public class VoskExtractor {
      * @return the modelPath
      */
     public String getModelPath() {
-        return modelPath;
+        return Optional.ofNullable(Configuration.instance().getString(CONFIG_PREFIX + "model." + modelLang, null))
+                .map(mlp -> Paths.get(modelPath).resolve(mlp).toAbsolutePath().toString()).orElse(modelPath);
     }
 
+    /**
+     * @return the modelLang
+     */
+    public String getModelLang() {
+        return modelLang;
+    }
+
+    /**
+     * @param modelLang the modelLang to set
+     */
+    public void setModelLang(String modelLang) {
+        this.modelLang = modelLang;
+    }
+
+    /**
+     * Extract text from given audio file.
+     * 
+     * @param input the audio file
+     * @return a {@link List} of {@link VoskResult}s 
+     * @throws IOException
+     * @throws UnsupportedAudioFileException
+     */
     public List<VoskResult> extract(Path input) throws IOException, UnsupportedAudioFileException {
         if (this.modelPath == null) {
             return null;
@@ -83,7 +142,7 @@ public class VoskExtractor {
 
         List<VoskResult> results = new ArrayList<>();
 
-        try (Model model = new Model(modelPath);
+        try (Model model = new Model(getModelPath());
                 InputStream is = Files.newInputStream(input);
                 InputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(is));
                 Recognizer recognizer = new Recognizer(model, sampleRate)) {
@@ -103,6 +162,84 @@ public class VoskExtractor {
         }
 
         return results;
+    }
+
+    /**
+     * Guess language of given audio file.
+     * <p>
+     * Currently only german and english language supported.
+     * </p>
+     * <p>
+     * <i>For best result use the german model for guessing.</i>
+     * </p>
+     * 
+     * @param input the audio file
+     * @return the langauage
+     * @throws IOException
+     * @throws UnsupportedAudioFileException
+     */
+    public String guessLanguage(Path input) throws IOException, UnsupportedAudioFileException {
+        if (this.modelPath == null) {
+            return null;
+        }
+
+        if (modelLang == EN) {
+            LOGGER.warn("Model language for guessing should not the english one.");
+        }
+
+        Map<String, Integer> guessResult = new HashMap<>();
+
+        LibVosk.setLogLevel(LogLevel.WARNINGS);
+
+        try (Model model = new Model(getModelPath());
+                InputStream is = Files.newInputStream(input);
+                InputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(is));
+                Recognizer recognizer = new Recognizer(model, sampleRate)) {
+            recognizer.setWords(true);
+
+            int wordCount = 0;
+            int nbytes;
+            byte[] b = new byte[(int) (sampleRate / 2)];
+            while ((nbytes = ais.read(b)) >= 0) {
+                if (recognizer.acceptWaveForm(b, nbytes)) {
+                    VoskResult result = unmarshall(recognizer.getResult());
+                    if (result.getResult() != null && !result.getResult().isEmpty()) {
+                        List<String> words = result.getResult().stream().map(w -> w.getWord().toLowerCase(Locale.ROOT))
+                                .collect(Collectors.toList());
+
+                        Map<String, Integer> gres = DEFAULT_GUESS_MAP.entrySet().stream()
+                                .collect(Collectors.toMap(e -> (String) e.getKey(),
+                                        e -> Long.valueOf(e.getValue().stream().filter(words::contains).count())
+                                                .intValue()));
+
+                        gres.entrySet().stream().forEach(e -> {
+                            if (guessResult.containsKey(e.getKey())) {
+                                guessResult.compute(e.getKey(), (k, i) -> i + e.getValue());
+                            } else {
+                                guessResult.put(e.getKey(), e.getValue());
+                            }
+                        });
+
+                        wordCount += words.size();
+                    }
+                }
+
+                if (wordCount > DEFAULT_GUESS_MAX_WORDS) {
+                    break;
+                }
+            }
+        } catch (JAXBException e) {
+            return null;
+        }
+
+        return guessResult.entrySet()
+                .stream()
+                .sorted((e1, e2) -> {
+                    int i = e1.getValue().compareTo(e2.getValue());
+                    return (i != 0) ? -i : 0;
+                }).findFirst()
+                .map(Entry::getKey)
+                .orElse(null);
     }
 
     /**

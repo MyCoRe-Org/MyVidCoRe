@@ -155,6 +155,14 @@ public class SubtitlePlugin extends ListenerPlugin {
 
                 if (ret == 0) {
                     try {
+                        LOGGER.info("guess language of {}...", audioFilePath);
+                        String lang = extractor.guessLanguage(audioFilePath);
+
+                        if (lang != null) {
+                            LOGGER.info("...set language to \"{}\" for {}", lang, audioFilePath);
+                            extractor.setModelLang(lang);
+                        }
+
                         LOGGER.info("extract text from {}...", audioFilePath);
                         List<VoskResult> results = extractor.extract(audioFilePath);
 
