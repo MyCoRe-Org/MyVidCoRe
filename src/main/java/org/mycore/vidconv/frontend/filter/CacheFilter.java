@@ -27,6 +27,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.glassfish.grizzly.http.util.HttpStatus;
+import org.mycore.vidconv.frontend.annotation.CacheControl;
+import org.mycore.vidconv.frontend.annotation.LastModified;
+import org.mycore.vidconv.frontend.annotation.LastModified.LastModifiedProvider;
+
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.HttpMethod;
 import jakarta.ws.rs.Priorities;
@@ -39,13 +46,6 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.ext.Provider;
 import jakarta.ws.rs.ext.RuntimeDelegate;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.glassfish.grizzly.http.util.HttpStatus;
-import org.mycore.vidconv.frontend.annotation.CacheControl;
-import org.mycore.vidconv.frontend.annotation.LastModified;
-import org.mycore.vidconv.frontend.annotation.LastModified.LastModifiedProvider;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
@@ -81,7 +81,7 @@ public class CacheFilter implements ContainerResponseFilter {
             if (responseContext.getHeaderString(HttpHeaders.AUTHORIZATION) == null) {
                 return;
             }
-            cc = jakarta.ws.rs.core.CacheControl.valueOf(currentCacheControl);
+            cc = HEADER_DELEGATE.fromString(currentCacheControl);
         } else {
             // from https://developer.mozilla.org/en-US/docs/Glossary/cacheable
             if (!requestContext.getMethod().equals(HttpMethod.GET)
