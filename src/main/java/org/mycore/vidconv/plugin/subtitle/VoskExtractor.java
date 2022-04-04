@@ -52,6 +52,12 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
 
 /**
+ * Extracts Text from Audio file.
+ * 
+ * <p>
+ * Linux needes <i>libatomic.so.1</i> to be installed.
+ * </p>
+ * 
  * @author Ren\u00E9 Adler (eagle)
  *
  */
@@ -157,7 +163,8 @@ public class VoskExtractor {
             }
 
             results.add(unmarshall(recognizer.getFinalResult()));
-        } catch (JAXBException e) {
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
             return null;
         }
 
@@ -228,7 +235,8 @@ public class VoskExtractor {
                     break;
                 }
             }
-        } catch (JAXBException e) {
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
             return null;
         }
 
