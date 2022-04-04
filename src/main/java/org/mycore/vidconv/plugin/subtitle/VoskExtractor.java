@@ -24,6 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -87,11 +88,12 @@ public class VoskExtractor {
         DEFAULT_GUESS_MAP = new HashMap<>();
 
         DEFAULT_GUESS_MAP.put("de",
-                Arrays.asList("der", "die", "das", "wir", "uns", "ihr", "sie", "zu", "zum", "und", "oder", "für",
-                        "mit"));
+                Arrays.asList("der", "die", "das", "ich", "wir", "uns", "ihr", "ihn", "ihnen", "sie", "es", "zu", "zum",
+                        "und", "oder", "für", "mit", "im", "am", "dem", "den", "denn", "von", "vom", "ist", "bis",
+                        "wie"));
         DEFAULT_GUESS_MAP.put("en",
-                Arrays.asList("the", "there", "this", "his", "her", "he", "she", "with", "of", "are", "and", "or",
-                        "for"));
+                Arrays.asList("the", "there", "this", "that", "his", "her", "you", "he", "she", "with", "of", "are",
+                        "and", "or", "for", "at", "to", "by", "is", "it", "how", "be"));
     }
 
     public VoskExtractor() {
@@ -113,6 +115,10 @@ public class VoskExtractor {
      * @return the modelPath
      */
     public String getModelPath() {
+        return getModelPath(modelLang);
+    }
+
+    private String getModelPath(String modelLang) {
         return Optional.ofNullable(Configuration.instance().getString(CONFIG_PREFIX + "model." + modelLang, null))
                 .map(mlp -> Paths.get(modelPath).resolve(mlp).toAbsolutePath().toString()).orElse(modelPath);
     }
@@ -173,12 +179,6 @@ public class VoskExtractor {
 
     /**
      * Guess language of given audio file.
-     * <p>
-     * Currently only german and english language supported.
-     * </p>
-     * <p>
-     * <i>For best result use the german model for guessing.</i>
-     * </p>
      * 
      * @param input the audio file
      * @return the langauage
@@ -190,65 +190,74 @@ public class VoskExtractor {
             return null;
         }
 
-        if (modelLang == EN) {
-            LOGGER.warn("Model language for guessing should not the english one.");
-        }
+        LibVosk.setLogLevel(LogLevel.WARNINGS);
 
         Map<String, Integer> guessResult = new HashMap<>();
 
-        LibVosk.setLogLevel(LogLevel.WARNINGS);
+        for (String lang : Arrays.asList(DE, EN)) {
+            Map<String, Integer> gr = new HashMap<>();
 
-        try (Model model = new Model(getModelPath());
-                InputStream is = Files.newInputStream(input);
-                InputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(is));
-                Recognizer recognizer = new Recognizer(model, sampleRate)) {
-            recognizer.setWords(true);
+            try (Model model = new Model(getModelPath(lang));
+                    InputStream is = Files.newInputStream(input);
+                    InputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(is));
+                    Recognizer recognizer = new Recognizer(model, sampleRate)) {
+                recognizer.setWords(true);
 
-            int wordCount = 0;
-            int nbytes;
-            byte[] b = new byte[(int) (sampleRate / 2)];
-            while ((nbytes = ais.read(b)) >= 0) {
-                if (recognizer.acceptWaveForm(b, nbytes)) {
-                    VoskResult result = unmarshall(recognizer.getResult());
-                    if (result.getResult() != null && !result.getResult().isEmpty()) {
-                        List<String> words = result.getResult().stream().map(w -> w.getWord().toLowerCase(Locale.ROOT))
-                                .collect(Collectors.toList());
+                int wordCount = 0;
+                int nbytes;
+                byte[] b = new byte[(int) (sampleRate / 2)];
+                while ((nbytes = ais.read(b)) >= 0) {
+                    if (recognizer.acceptWaveForm(b, nbytes)) {
+                        VoskResult result = unmarshall(recognizer.getResult());
+                        if (result.getResult() != null && !result.getResult().isEmpty()) {
+                            List<String> words = result.getResult().stream()
+                                    .map(w -> w.getWord().toLowerCase(Locale.ROOT))
+                                    .collect(Collectors.toList());
 
-                        Map<String, Integer> gres = DEFAULT_GUESS_MAP.entrySet().stream()
-                                .collect(Collectors.toMap(e -> (String) e.getKey(),
-                                        e -> Long.valueOf(e.getValue().stream().filter(words::contains).count())
-                                                .intValue()));
+                            Map<String, Integer> gres = DEFAULT_GUESS_MAP.entrySet().stream()
+                                    .collect(Collectors.toMap(e -> (String) e.getKey(),
+                                            e -> Long.valueOf(e.getValue().stream().filter(words::contains).count())
+                                                    .intValue()));
 
-                        gres.entrySet().stream().forEach(e -> {
-                            if (guessResult.containsKey(e.getKey())) {
-                                guessResult.compute(e.getKey(), (k, i) -> i + e.getValue());
-                            } else {
-                                guessResult.put(e.getKey(), e.getValue());
-                            }
-                        });
+                            gres.entrySet().stream().forEach(e -> {
+                                if (gr.containsKey(e.getKey())) {
+                                    gr.compute(e.getKey(), (k, i) -> i + e.getValue());
+                                } else {
+                                    gr.put(e.getKey(), e.getValue());
+                                }
+                            });
 
-                        wordCount += words.size();
+                            wordCount += words.size();
+                        }
+                    }
+
+                    if (wordCount > DEFAULT_GUESS_MAX_WORDS) {
+                        break;
                     }
                 }
 
-                if (wordCount > DEFAULT_GUESS_MAX_WORDS) {
-                    break;
-                }
+                gr.entrySet()
+                        .stream()
+                        .sorted(sortGuess)
+                        .findFirst().ifPresent(e -> guessResult.put(e.getKey(), e.getValue()));
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+                return null;
             }
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            return null;
         }
 
         return guessResult.entrySet()
                 .stream()
-                .sorted((e1, e2) -> {
-                    int i = e1.getValue().compareTo(e2.getValue());
-                    return (i != 0) ? -i : 0;
-                }).findFirst()
+                .sorted(sortGuess)
+                .findFirst()
                 .map(Entry::getKey)
                 .orElse(null);
     }
+
+    private Comparator<Entry<String, Integer>> sortGuess = (e1, e2) -> {
+        int i = e1.getValue().compareTo(e2.getValue());
+        return (i != 0) ? -i : 0;
+    };
 
     /**
      * Fixes JSON with wrong double values
