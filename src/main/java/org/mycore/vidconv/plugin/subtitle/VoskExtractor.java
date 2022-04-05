@@ -74,7 +74,7 @@ public class VoskExtractor {
 
     private static final float DEFAULT_SAMPLE_RATE = 16000;
 
-    private static final int DEFAULT_GUESS_MAX_WORDS = 100;
+    private static final int DEFAULT_GUESS_MAX_WORDS = 200;
 
     private static final Map<String, List<String>> DEFAULT_GUESS_MAP;
 
@@ -87,13 +87,17 @@ public class VoskExtractor {
     static {
         DEFAULT_GUESS_MAP = new HashMap<>();
 
-        DEFAULT_GUESS_MAP.put("de",
-                Arrays.asList("der", "die", "das", "ich", "wir", "uns", "ihr", "ihn", "ihnen", "sie", "es", "zu", "zum",
-                        "und", "oder", "für", "mit", "im", "am", "dem", "den", "denn", "von", "vom", "ist", "bis",
-                        "wie"));
-        DEFAULT_GUESS_MAP.put("en",
-                Arrays.asList("the", "there", "this", "that", "his", "her", "you", "he", "she", "with", "of", "are",
-                        "and", "or", "for", "at", "to", "by", "is", "it", "how", "be"));
+        DEFAULT_GUESS_MAP.put(DE,
+                Arrays.asList("der", "die", "das", "ich", "du", "wir", "uns", "ihr", "ihn", "ihnen", "sie", "es", "zu",
+                        "zum", "und", "oder", "für", "mit", "im", "am", "dem", "den", "denn", "dann", "von", "vom",
+                        "vor", "ist", "bis", "wie", "aber", "ja", "nein", "wird", "werden", "haben", "aus", "ein",
+                        "mehr", "sein", "nun", "auch", "eins", "zwei", "drei", "vier", "fünf", "sechs", "sieben",
+                        "acht", "neun", "null"));
+        DEFAULT_GUESS_MAP.put(EN,
+                Arrays.asList("the", "there", "this", "that", "his", "her", "me", "you", "he", "she", "us", "with",
+                        "of", "are", "and", "or", "for", "at", "to", "by", "is", "it", "how", "be", "before", "after",
+                        "but", "yes", "no", "will", "shall", "have", "on", "off", "now", "one", "two", "three", "four",
+                        "five", "six", "seven", "eight", "nine", "zero"));
     }
 
     public VoskExtractor() {
