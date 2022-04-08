@@ -161,24 +161,26 @@ public class SubtitlePlugin extends ListenerPlugin {
                         if (lang != null) {
                             LOGGER.info("...set language to \"{}\" for {}", lang, audioFilePath);
                             extractor.setModelLang(lang);
-                        }
 
-                        LOGGER.info("extract text from {}...", audioFilePath);
-                        List<VoskResult> results = extractor.extract(audioFilePath);
+                            LOGGER.info("extract text from {}...", audioFilePath);
+                            List<VoskResult> results = extractor.extract(audioFilePath);
 
-                        if (results != null && !results.isEmpty()) {
-                            Path vttFilePath = Paths
-                                    .get(formatFileName(job.outputPath(), job.inputPath(), ".vtt"));
-                            VttObject vtt = buildSubtitle(results);
+                            if (results != null && !results.isEmpty()) {
+                                Path vttFilePath = Paths
+                                        .get(formatFileName(job.outputPath(), job.inputPath(), ".vtt"));
+                                VttObject vtt = buildSubtitle(results);
 
-                            LOGGER.info("write WebVTT to {}...", vttFilePath);
-                            try (OutputStream os = Files.newOutputStream(vttFilePath)) {
-                                VttWriter vttWriter = new VttWriter(StandardCharsets.UTF_8.name());
-                                vttWriter.write(vtt, os);
+                                LOGGER.info("write WebVTT to {}...", vttFilePath);
+                                try (OutputStream os = Files.newOutputStream(vttFilePath)) {
+                                    VttWriter vttWriter = new VttWriter(StandardCharsets.UTF_8.name());
+                                    vttWriter.write(vtt, os);
+                                }
+                                LOGGER.info("...done.");
+                            } else {
+                                LOGGER.warn("...no text extracted.");
                             }
-                            LOGGER.info("...done.");
                         } else {
-                            LOGGER.warn("...no text extracted.");
+                            LOGGER.warn("...couldn't detect language.");
                         }
                     } finally {
                         Files.deleteIfExists(audioFilePath);

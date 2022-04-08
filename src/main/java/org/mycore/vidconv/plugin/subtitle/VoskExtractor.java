@@ -31,7 +31,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -66,9 +69,13 @@ public class VoskExtractor {
 
     public static final String CONFIG_PREFIX = "VoskExtractor.";
 
+    public static final String CONFIG_PREFIX_MODEL = CONFIG_PREFIX + "model.";
+
     public static final String DE = "de";
 
     public static final String EN = "en";
+
+    public static final String RU = "ru";
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -78,9 +85,15 @@ public class VoskExtractor {
 
     private static final Map<String, List<String>> DEFAULT_GUESS_MAP;
 
+    private final Configuration config;
+
     private final String modelPath;
 
     private final float sampleRate;
+
+    private final Map<String, Path> modelPaths;
+
+    private final Map<String, List<String>> guessMap;
 
     private String modelLang;
 
@@ -88,16 +101,21 @@ public class VoskExtractor {
         DEFAULT_GUESS_MAP = new HashMap<>();
 
         DEFAULT_GUESS_MAP.put(DE,
-                Arrays.asList("der", "die", "das", "ich", "du", "wir", "uns", "ihr", "ihn", "ihnen", "sie", "es", "zu",
-                        "zum", "und", "oder", "für", "mit", "im", "am", "dem", "den", "denn", "dann", "von", "vom",
-                        "vor", "ist", "bis", "wie", "aber", "ja", "nein", "wird", "werden", "haben", "aus", "ein",
-                        "mehr", "sein", "nun", "auch", "eins", "zwei", "drei", "vier", "fünf", "sechs", "sieben",
-                        "acht", "neun", "null"));
+                Arrays.asList("aber", "acht", "alle", "am", "auch", "aus", "bei", "bis", "dann", "das", "dem", "den",
+                        "denn", "der", "die", "drei", "du", "ein", "eins", "es", "fünf", "für", "haben", "ich", "ihn",
+                        "ihnen", "ihr", "im", "ist", "ja", "jetzt", "kann", "mehr", "mit", "nein", "neun", "null",
+                        "nun", "oder", "sechs", "sein", "sie", "sieben", "und", "uns", "vier", "vom", "von", "vor",
+                        "werden", "wie", "wir", "wird", "zu", "zum", "zwei"));
         DEFAULT_GUESS_MAP.put(EN,
-                Arrays.asList("the", "there", "this", "that", "his", "her", "me", "you", "he", "she", "us", "with",
-                        "of", "are", "and", "or", "for", "at", "to", "by", "is", "it", "how", "be", "before", "after",
-                        "but", "yes", "no", "will", "shall", "have", "on", "off", "now", "one", "two", "three", "four",
-                        "five", "six", "seven", "eight", "nine", "zero"));
+                Arrays.asList("after", "all", "and", "are", "as", "at", "be", "before", "but", "by", "can", "eight",
+                        "five", "for", "four", "have", "he", "her", "his", "how", "is", "it", "me", "nine", "no", "now",
+                        "of", "off", "on", "one", "or", "seven", "shall", "she", "six", "that", "the", "there", "this",
+                        "three", "to", "two", "us", "will", "with", "yes", "you", "your", "zero"));
+        DEFAULT_GUESS_MAP.put(RU,
+                Arrays.asList("а также", "более", "буду", "в", "вам", "вас", "восемь", "вот", "все", "вы", "да", "два",
+                        "девять", "для", "ее", "ему", "и", "или", "иметь", "к", "как", "который", "нас", "не", "нет",
+                        "но", "нуль", "один", "он", "она", "от", "очень", "погода", "пять", "с", "с участием", "сейчас",
+                        "семь", "так", "три", "ты", "у", "четыре", "что", "чтобы", "шесть", "это", "я"));
     }
 
     public VoskExtractor() {
@@ -109,10 +127,26 @@ public class VoskExtractor {
     }
 
     public VoskExtractor(String modelPath, String modelLang, float sampleRate) {
+        this.config = Configuration.instance();
         this.modelPath = Optional.ofNullable(modelPath)
-                .orElseGet(() -> Configuration.instance().getString(CONFIG_PREFIX + "modelPath", null));
+                .orElseGet(() -> config.getString(CONFIG_PREFIX + "modelPath", null));
         this.modelLang = Optional.ofNullable(modelLang).orElse(DE);
         this.sampleRate = sampleRate;
+        this.modelPaths = getConfiguredModels();
+        this.guessMap = getConfiguredGuessMap();
+    }
+
+    private Map<String, Path> getConfiguredModels() {
+        return config.getPropertiesMap(VoskExtractor.CONFIG_PREFIX_MODEL).entrySet().stream()
+                .filter(p -> Files.exists(Paths.get(modelPath).resolve(p.getValue())))
+                .collect(Collectors.toMap(p -> p.getKey().substring(VoskExtractor.CONFIG_PREFIX_MODEL.length()),
+                        p -> Paths.get(modelPath).resolve(p.getValue())));
+    }
+
+    private Map<String, List<String>> getConfiguredGuessMap() {
+        return getConfiguredModels().keySet().stream()
+                .collect(Collectors.toMap(lng -> lng,
+                        lng -> config.getStrings(CONFIG_PREFIX_MODEL + lng + ".guessMap", DEFAULT_GUESS_MAP.get(lng))));
     }
 
     /**
@@ -123,8 +157,8 @@ public class VoskExtractor {
     }
 
     private String getModelPath(String modelLang) {
-        return Optional.ofNullable(Configuration.instance().getString(CONFIG_PREFIX + "model." + modelLang, null))
-                .map(mlp -> Paths.get(modelPath).resolve(mlp).toAbsolutePath().toString()).orElse(modelPath);
+        return Optional.ofNullable(modelPaths.get(modelLang))
+                .map(mlp -> mlp.toAbsolutePath().toString()).orElse(modelPath);
     }
 
     /**
@@ -196,9 +230,13 @@ public class VoskExtractor {
 
         LibVosk.setLogLevel(LogLevel.WARNINGS);
 
-        Map<String, Integer> guessResult = new HashMap<>();
+        int guessMaxWords = config.getInt(CONFIG_PREFIX + "guessMaxWords", DEFAULT_GUESS_MAX_WORDS);
+        boolean guessConcurrent = config.getBoolean(CONFIG_PREFIX + "guessConcurrent", true);
 
-        for (String lang : Arrays.asList(DE, EN)) {
+        Set<String> langs = guessMap.keySet();
+        Stream<String> stream = guessConcurrent ? langs.parallelStream() : langs.stream();
+
+        return stream.map(lang -> {
             Map<String, Integer> gr = new HashMap<>();
 
             try (Model model = new Model(getModelPath(lang));
@@ -210,6 +248,7 @@ public class VoskExtractor {
                 int wordCount = 0;
                 int nbytes;
                 byte[] b = new byte[(int) (sampleRate / 2)];
+                List<String> allWords = new ArrayList<>();
                 while ((nbytes = ais.read(b)) >= 0) {
                     if (recognizer.acceptWaveForm(b, nbytes)) {
                         VoskResult result = unmarshall(recognizer.getResult());
@@ -218,9 +257,15 @@ public class VoskExtractor {
                                     .map(w -> w.getWord().toLowerCase(Locale.ROOT))
                                     .collect(Collectors.toList());
 
-                            Map<String, Integer> gres = DEFAULT_GUESS_MAP.entrySet().stream()
+                            allWords.addAll(words);
+
+                            Map<String, Integer> gres = guessMap.entrySet().stream()
+                                    .filter(e -> e.getValue() != null)
                                     .collect(Collectors.toMap(e -> (String) e.getKey(),
-                                            e -> Long.valueOf(e.getValue().stream().filter(words::contains).count())
+                                            e -> Long.valueOf(
+                                                    e.getValue().stream()
+                                                            .map(gw -> gw.toLowerCase(Locale.ROOT))
+                                                            .filter(words::contains).count())
                                                     .intValue()));
 
                             gres.entrySet().stream().forEach(e -> {
@@ -235,33 +280,41 @@ public class VoskExtractor {
                         }
                     }
 
-                    if (wordCount > DEFAULT_GUESS_MAX_WORDS) {
+                    if (wordCount > guessMaxWords) {
                         break;
                     }
                 }
 
-                gr.entrySet()
-                        .stream()
-                        .sorted(sortGuess)
-                        .findFirst().ifPresent(e -> guessResult.put(e.getKey(), e.getValue()));
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("{}\n{}", String.join(" ", allWords), countOccurrences(allWords, 3));
+                }
+
+                return gr;
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
                 return null;
             }
-        }
-
-        return guessResult.entrySet()
-                .stream()
-                .sorted(sortGuess)
-                .findFirst()
-                .map(Entry::getKey)
+        }).filter(m -> m != null)
+                .map(gr -> gr.entrySet()
+                        .stream()
+                        .max(sortGuess)
+                        .orElse(null))
+                .filter(e -> e != null)
+                .max(sortGuess)
+                .map(e -> e.getValue() == 0 ? null : e.getKey())
                 .orElse(null);
     }
 
     private Comparator<Entry<String, Integer>> sortGuess = (e1, e2) -> {
-        int i = e1.getValue().compareTo(e2.getValue());
-        return (i != 0) ? -i : 0;
+        return e1.getValue().compareTo(e2.getValue());
     };
+
+    private Map<String, Long> countOccurrences(List<String> sentence, int minOccurrence) {
+        return sentence.stream()
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting())).entrySet().stream()
+                .filter(e -> e.getValue() > 3)
+                .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+    }
 
     /**
      * Fixes JSON with wrong double values
