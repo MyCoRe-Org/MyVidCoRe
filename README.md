@@ -4,7 +4,7 @@ Converts Videos from hotfolder to output directory with given settings.
 
 ## Getting Started
 
-This Project requires at least Java 8 and Maven 3 to build.
+This Project requires at least Java 11 and Maven 3 to build.
 
 Build Project with this command:
 
@@ -75,4 +75,25 @@ For a help and/or overview about default settings run:
 
   Set configuration dir
 
+## Configure Subtitle Plugin
+
+ To enable Subtitle Plugin you must do some basic settings in your config.properties like below.
+ 
+    # Vosk Model(s) root path
+    VoskExtractor.modelPath=/usr/local/vosk/
+    # Model for each language
+    VoskExtractor.model.de=vosk-model-de
+    VoskExtractor.model.en=vosk-model-en-us
+ 
+ Advanced basic options:
   
+    # the count of words to guess the audio language
+    VoskExtractor.guessMaxWords=200 
+    # language guessing concurrent (default is true)
+    VoskExtractor.guessConcurrent=false
+  
+ Advanced guessing options:
+
+    # set guess words for language
+    VoskExtractor.model.de.guessMap=ich,du,er,sie,es,wir,ihr,...
+ 
