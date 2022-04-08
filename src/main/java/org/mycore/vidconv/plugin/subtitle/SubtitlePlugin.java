@@ -21,11 +21,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
@@ -61,22 +62,7 @@ public class SubtitlePlugin extends ListenerPlugin {
 
     private static final float SAMPLE_RATE = 16000;
 
-    private static final int SUBTITLE_LINE_WORDS = 7;
-
-    private static <T> Stream<List<T>> batches(List<T> source, int length) {
-        if (length <= 0) {
-            throw new IllegalArgumentException("length = " + length);
-        }
-
-        int size = source.size();
-        if (size <= 0) {
-            return Stream.empty();
-        }
-
-        int fullChunks = (size - 1) / length;
-        return IntStream.range(0, fullChunks + 1).mapToObj(
-                n -> source.subList(n * length, n == fullChunks ? size : (n + 1) * length));
-    }
+    private static final int SUBTITLE_LINE_LENGTH = 70;
 
     private static String formatFileName(Path outputPath, Path inputFile, String ext) {
         String fName = inputFile.getFileName().toString();
@@ -86,27 +72,59 @@ public class SubtitlePlugin extends ListenerPlugin {
                 .toString();
     }
 
+    private static Stream<List<Word>> buildLine(List<Word> words, int maxLength) {
+        if (words.size() <= 0) {
+            return Stream.empty();
+        }
+
+        List<List<Word>> lines = new ArrayList<>();
+
+        int lineSize = 0;
+        List<Word> line = null;
+
+        for (Word word : words) {
+            if (lineSize + word.getWord().length() < maxLength) {
+                if (line == null) {
+                    line = new ArrayList<>();
+                }
+                lineSize += word.getWord().length();
+                line.add(word);
+            } else {
+                lines.add(line);
+                line = new ArrayList<>(Arrays.asList(word));
+                lineSize = word.getWord().length();
+            }
+        }
+
+        if (line != null) {
+            lines.add(line);
+        }
+
+        return lines.stream();
+    }
+
     private static VttObject buildSubtitle(List<VoskResult> results) {
         VttObject subtitle = new VttObject();
 
         results.stream()
                 .filter(r -> r != null && r.getText() != null && !r.getText().isEmpty() && r.getResult() != null)
-                .forEach(r -> {
-                    batches(r.getResult(), SUBTITLE_LINE_WORDS).forEach(ws -> {
-                        VttLine line = new VttLine();
-                        line.addText(
-                                new SubtitlePlainText(ws.stream().map(Word::getWord).collect(Collectors.joining(" "))));
+                .map(r -> r.getResult())
+                .map(wl -> buildLine(wl, SUBTITLE_LINE_LENGTH).map(ws -> {
+                    VttLine line = new VttLine();
+                    line.addText(
+                            new SubtitlePlainText(ws.stream().map(Word::getWord).collect(Collectors.joining(" "))));
 
-                        VttCue cue = new VttCue();
+                    VttCue cue = new VttCue();
 
-                        cue.addLine(line);
-                        cue.setStartTime(new SubtitleTimeCode((long) (ws.get(0).getStart() * 1000)));
-                        cue.setEndTime(
-                                new SubtitleTimeCode((long) (ws.get(ws.size() - 1).getEnd() * 1000)));
+                    cue.addLine(line);
+                    cue.setStartTime(new SubtitleTimeCode((long) (ws.get(0).getStart() * 1000)));
+                    cue.setEndTime(
+                            new SubtitleTimeCode((long) (ws.get(ws.size() - 1).getEnd() * 1000)));
 
-                        subtitle.addCue(cue);
-                    });
-                });
+                    return cue;
+                }))
+                .flatMap(s -> s)
+                .forEach(subtitle::addCue);
 
         return subtitle;
     }
