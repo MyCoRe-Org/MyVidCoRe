@@ -83,6 +83,8 @@ public class VoskExtractor {
 
     private static final int DEFAULT_GUESS_MAX_WORDS = 200;
 
+    private static final double DEFAULT_GUESS_MIN_WORD_CONF = 0.9;
+
     private static final Map<String, List<String>> DEFAULT_GUESS_MAP;
 
     private final Configuration config;
@@ -102,19 +104,19 @@ public class VoskExtractor {
 
         DEFAULT_GUESS_MAP.put(DE,
                 Arrays.asList("aber", "acht", "alle", "am", "auch", "aus", "bei", "bis", "dann", "das", "dem", "den",
-                        "denn", "der", "die", "drei", "du", "ein", "eins", "es", "fünf", "für", "haben", "ich", "ihn",
-                        "ihnen", "ihr", "im", "ist", "ja", "jetzt", "kann", "mehr", "mit", "nein", "neun", "null",
-                        "nun", "oder", "sechs", "sein", "sie", "sieben", "und", "uns", "vier", "vom", "von", "vor",
-                        "werden", "wie", "wir", "wird", "zu", "zum", "zwei"));
+                        "denn", "der", "die", "drei", "du", "ein", "eine", "eins", "fünf", "für", "haben", "ich", "ihn",
+                        "ihnen", "ihr", "im", "ist", "ja", "jetzt", "kann", "können", "mehr", "mit", "nein", "neun",
+                        "null", "nun", "oder", "sechs", "sein", "sie", "sieben", "sind", "und", "uns", "vier", "vom",
+                        "von", "vor", "werden", "wie", "wir", "wird", "zu", "zum", "zwei"));
         DEFAULT_GUESS_MAP.put(EN,
-                Arrays.asList("after", "all", "and", "are", "as", "at", "be", "before", "but", "by", "can", "eight",
-                        "five", "for", "four", "have", "he", "her", "his", "how", "is", "it", "me", "nine", "no", "now",
-                        "of", "off", "on", "one", "or", "seven", "shall", "she", "six", "that", "the", "there", "this",
+                Arrays.asList("after", "all", "and", "are", "at", "be", "before", "but", "by", "can", "eight", "five",
+                        "for", "four", "have", "he", "her", "his", "how", "is", "it", "me", "nine", "no", "now", "of",
+                        "off", "on", "one", "or", "seven", "shall", "she", "six", "that", "the", "there", "this",
                         "three", "to", "two", "us", "will", "with", "yes", "you", "your", "zero"));
         DEFAULT_GUESS_MAP.put(RU,
-                Arrays.asList("а также", "более", "буду", "в", "вам", "вас", "восемь", "вот", "все", "вы", "да", "два",
-                        "девять", "для", "ее", "ему", "и", "или", "иметь", "к", "как", "который", "нас", "не", "нет",
-                        "но", "нуль", "один", "он", "она", "от", "очень", "погода", "пять", "с", "с участием", "сейчас",
+                Arrays.asList("более", "буду", "в", "вам", "вас", "восемь", "вот", "все", "вы", "да", "два", "девять",
+                        "для", "ее", "ему", "и", "или", "иметь", "к", "как", "который", "нас", "не", "нет", "но",
+                        "нуль", "один", "он", "она", "от", "очень", "погода", "пять", "с", "с участием", "сейчас",
                         "семь", "так", "три", "ты", "у", "четыре", "что", "чтобы", "шесть", "это", "я"));
     }
 
@@ -231,6 +233,7 @@ public class VoskExtractor {
         LibVosk.setLogLevel(LogLevel.WARNINGS);
 
         int guessMaxWords = config.getInt(CONFIG_PREFIX + "guessMaxWords", DEFAULT_GUESS_MAX_WORDS);
+        double guessMinWordConf = config.getDouble(CONFIG_PREFIX + "guessMinWordConf", DEFAULT_GUESS_MIN_WORD_CONF);
         boolean guessConcurrent = config.getBoolean(CONFIG_PREFIX + "guessConcurrent", true);
 
         Set<String> langs = guessMap.keySet();
@@ -254,6 +257,7 @@ public class VoskExtractor {
                         VoskResult result = unmarshall(recognizer.getResult());
                         if (result.getResult() != null && !result.getResult().isEmpty()) {
                             List<String> words = result.getResult().stream()
+                                    .filter(w -> w.getConf() > guessMinWordConf)
                                     .map(w -> w.getWord().toLowerCase(Locale.ROOT))
                                     .collect(Collectors.toList());
 
