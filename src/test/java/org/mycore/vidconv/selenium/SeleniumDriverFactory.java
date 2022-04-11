@@ -26,7 +26,6 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.opera.OperaDriver;
 import org.openqa.selenium.safari.SafariDriver;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
@@ -44,8 +43,6 @@ public class SeleniumDriverFactory {
     public final static String FIREFOX_DRIVER = "firefox";
 
     public final static String IE_DRIVER = "ie";
-
-    public final static String OPERA_DRIVER = "opera";
 
     public final static String SAFARI_DRIVER = "safari";
 
@@ -79,8 +76,6 @@ public class SeleniumDriverFactory {
             WebDriverManager.edgedriver().setup();
         } else if (IE_DRIVER.equalsIgnoreCase(driverName)) {
             WebDriverManager.iedriver().setup();
-        } else if (OPERA_DRIVER.equalsIgnoreCase(driverName)) {
-            WebDriverManager.operadriver().setup();
         } else if (SAFARI_DRIVER.equalsIgnoreCase(driverName)) {
             WebDriverManager.safaridriver().setup();
         } else {
@@ -97,8 +92,6 @@ public class SeleniumDriverFactory {
             return new EdgeDriver();
         } else if (IE_DRIVER.equalsIgnoreCase(driverName)) {
             return new EdgeDriver();
-        } else if (OPERA_DRIVER.equalsIgnoreCase(driverName)) {
-            return new OperaDriver();
         } else if (SAFARI_DRIVER.equalsIgnoreCase(driverName)) {
             return new SafariDriver();
         }
