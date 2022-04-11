@@ -85,7 +85,7 @@ public class VoskExtractor {
 
     private static final int DEFAULT_GUESS_MAX_WORDS = 200;
 
-    private static final double DEFAULT_GUESS_MIN_WORD_CONF = 0.9;
+    private static final double DEFAULT_GUESS_MIN_WORD_CONF = 0.85;
 
     private static final Map<String, List<String>> DEFAULT_GUESS_MAP;
 
@@ -121,11 +121,12 @@ public class VoskExtractor {
                         "нуль", "один", "он", "она", "от", "очень", "погода", "пять", "с", "с участием", "сейчас",
                         "семь", "так", "три", "ты", "у", "четыре", "что", "чтобы", "шесть", "это", "я"));
         DEFAULT_GUESS_MAP.put(IT,
-                Arrays.asList("adesso", "al", "alcune", "anche", "anche", "avere", "avete", "bene", "che", "cinque",
-                        "cioè", "come", "con", "cui", "dal", "davanti", "dei", "del", "di", "due", "e", "il", "io",
-                        "la", "loro", "lui", "ma", "no", "noi", "non", "nove", "o", "otto", "per", "poi", "potere",
-                        "potete", "quattro", "quello", "sei", "sette", "si", "sono", "sua", "tre", "tutti", "un", "uno",
-                        "voi", "volere", "zero", "è"));
+                Arrays.asList("adesso", "al", "alcune", "anche", "anche", "avere", "avete", "bambini", "bene",
+                        "buongiorno", "che", "cinque", "cioè", "come", "con", "cui", "dal", "davanti", "dei", "del",
+                        "della", "di", "due", "e", "il", "io", "la", "loro", "lui", "ma", "mi", "no", "noi", "non",
+                        "nove", "o", "otto", "per", "poi", "potere", "potete", "quattro", "quello", "quindi", "sei",
+                        "sette", "si", "sono", "sua", "tre", "tutti", "un", "una", "uno", "voi", "volere", "zero",
+                        "è"));
     }
 
     public VoskExtractor() {
