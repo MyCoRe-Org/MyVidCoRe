@@ -77,6 +77,8 @@ public class VoskExtractor {
 
     public static final String RU = "ru";
 
+    public static final String IT = "it";
+
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final float DEFAULT_SAMPLE_RATE = 16000;
@@ -118,6 +120,12 @@ public class VoskExtractor {
                         "для", "ее", "ему", "и", "или", "иметь", "к", "как", "который", "нас", "не", "нет", "но",
                         "нуль", "один", "он", "она", "от", "очень", "погода", "пять", "с", "с участием", "сейчас",
                         "семь", "так", "три", "ты", "у", "четыре", "что", "чтобы", "шесть", "это", "я"));
+        DEFAULT_GUESS_MAP.put(IT,
+                Arrays.asList("adesso", "al", "alcune", "anche", "anche", "avere", "avete", "bene", "che", "cinque",
+                        "cioè", "come", "con", "cui", "dal", "davanti", "dei", "del", "di", "due", "e", "il", "io",
+                        "la", "loro", "lui", "ma", "no", "noi", "non", "nove", "o", "otto", "per", "poi", "potere",
+                        "potete", "quattro", "quello", "sei", "sette", "si", "sono", "sua", "tre", "tutti", "un", "uno",
+                        "voi", "volere", "zero", "è"));
     }
 
     public VoskExtractor() {
