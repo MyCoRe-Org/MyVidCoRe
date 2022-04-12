@@ -85,7 +85,7 @@ public class VoskExtractor {
 
     private static final int DEFAULT_GUESS_MAX_WORDS = 200;
 
-    private static final double DEFAULT_GUESS_MIN_WORD_CONF = 0.85;
+    private static final double DEFAULT_GUESS_MIN_WORD_CONF = 0.9;
 
     private static final Map<String, List<String>> DEFAULT_GUESS_MAP;
 
@@ -106,27 +106,28 @@ public class VoskExtractor {
 
         DEFAULT_GUESS_MAP.put(DE,
                 Arrays.asList("aber", "acht", "alle", "am", "auch", "aus", "bei", "bis", "dann", "das", "dem", "den",
-                        "denn", "der", "die", "drei", "du", "ein", "eine", "eins", "fünf", "für", "haben", "ich", "ihn",
-                        "ihnen", "ihr", "im", "ist", "ja", "jetzt", "kann", "können", "mehr", "mit", "nein", "neun",
-                        "null", "nun", "oder", "sechs", "sein", "sie", "sieben", "sind", "und", "uns", "vier", "vom",
-                        "von", "vor", "werden", "wie", "wir", "wird", "zu", "zum", "zwei"));
+                        "denn", "der", "die", "drei", "du", "ein", "eine", "eins", "elf", "fünf", "für", "gut", "haben",
+                        "heute", "ich", "ihn", "ihnen", "ihr", "im", "ist", "ja", "jetzt", "kann", "können", "mehr",
+                        "mit", "nein", "neun", "null", "nun", "oder", "sechs", "sein", "sich", "sie", "sieben", "sind",
+                        "und", "uns", "vier", "vom", "von", "vor", "werden", "wie", "wir", "wird", "zu", "zum", "zwei",
+                        "zwölf"));
         DEFAULT_GUESS_MAP.put(EN,
-                Arrays.asList("after", "all", "and", "are", "at", "be", "before", "but", "by", "can", "eight", "five",
-                        "for", "four", "have", "he", "her", "his", "how", "is", "it", "me", "nine", "no", "now", "of",
-                        "off", "on", "one", "or", "seven", "shall", "she", "six", "that", "the", "there", "this",
-                        "three", "to", "two", "us", "will", "with", "yes", "you", "your", "zero"));
+                Arrays.asList("after", "all", "and", "are", "at", "be", "before", "but", "by", "can", "eight", "eleven",
+                        "five", "for", "four", "have", "he", "her", "his", "how", "is", "it", "me", "nine", "no", "now",
+                        "of", "off", "on", "one", "or", "seven", "shall", "she", "six", "that", "the", "there", "this",
+                        "three", "to", "twelve", "two", "us", "will", "with", "yes", "you", "your", "zero"));
         DEFAULT_GUESS_MAP.put(RU,
                 Arrays.asList("более", "буду", "в", "вам", "вас", "восемь", "вот", "все", "вы", "да", "два", "девять",
                         "для", "ее", "ему", "и", "или", "иметь", "к", "как", "который", "нас", "не", "нет", "но",
                         "нуль", "один", "он", "она", "от", "очень", "погода", "пять", "с", "с участием", "сейчас",
                         "семь", "так", "три", "ты", "у", "четыре", "что", "чтобы", "шесть", "это", "я"));
         DEFAULT_GUESS_MAP.put(IT,
-                Arrays.asList("adesso", "al", "alcune", "anche", "anche", "avere", "avete", "bambini", "bene",
-                        "buongiorno", "che", "cinque", "cioè", "come", "con", "cui", "dal", "davanti", "dei", "del",
-                        "della", "di", "due", "e", "il", "io", "la", "loro", "lui", "ma", "mi", "no", "noi", "non",
-                        "nove", "o", "otto", "per", "poi", "potere", "potete", "quattro", "quello", "quindi", "sei",
-                        "sette", "si", "sono", "sua", "tre", "tutti", "un", "una", "uno", "voi", "volere", "zero",
-                        "è"));
+                Arrays.asList("adesso", "al", "alcune", "anche", "avere", "avete", "bambini", "bene", "buongiorno",
+                        "ce", "che", "cinque", "cioè", "come", "con", "cui", "dal", "davanti", "dei", "del", "della",
+                        "di", "dodici", "due", "durante", "il", "io", "la", "lo", "loro", "lui", "ma", "ne", "nella",
+                        "noi", "non", "nove", "o", "otto", "per", "poi", "potere", "potete", "quattro", "quello",
+                        "quindi", "se", "sei", "sette", "si", "sono", "sua", "tre", "tutti", "un", "una", "undici",
+                        "uno", "voi", "volere", "zero"));
     }
 
     public VoskExtractor() {
@@ -266,11 +267,12 @@ public class VoskExtractor {
                         VoskResult result = unmarshall(recognizer.getResult());
                         if (result.getResult() != null && !result.getResult().isEmpty()) {
                             List<String> words = result.getResult().stream()
-                                    .filter(w -> w.getConf() > guessMinWordConf)
+                                    .filter(w -> w.getConf() >= guessMinWordConf &&
+                                            (allWords.isEmpty() || !w.getWord()
+                                                    .equalsIgnoreCase(allWords.get(allWords.size() - 1))))
                                     .map(w -> w.getWord().toLowerCase(Locale.ROOT))
+                                    .peek(allWords::add)
                                     .collect(Collectors.toList());
-
-                            allWords.addAll(words);
 
                             Map<String, Integer> gres = guessMap.entrySet().stream()
                                     .filter(e -> e.getValue() != null)
