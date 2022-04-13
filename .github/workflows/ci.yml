@@ -37,11 +37,6 @@ jobs:
         export TMPDIR=~/tmp
 
         mvn -B clean install
-
-    - name: Push Coverage Report to Codacy
-      if: success()
-      run: |
-        mvn com.gavinmogan:codacy-maven-plugin:coverage -DcodacyApiBaseUrl=https://api.codacy.com -DcoverageReportFile=target/site/jacoco/jacoco.xml -DprojectToken=${CODACY_PROJECT_TOKEN} -DapiToken=${CODACY_API_TOKEN} -DfailOnMissingReportFile=false
       
     - name: Upload logs on build failure
       if: failure()
