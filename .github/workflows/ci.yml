@@ -1,0 +1,53 @@
+name: test
+
+on: [ push, pull_request ]
+
+env:
+  MAVEN_OPTS: -Xmx1024M -Xss128M -XX:+CMSClassUnloadingEnabled
+  SELENIUM_DRIVER: "chrome"
+  SELENIUM_DRIVER_ARGS: "--headless window-size=1280,1024 --no-sandbox"
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Set up JDK
+      uses: actions/setup-java@v2
+      with:
+        java-version: 11
+        distribution: adopt
+
+    - name: Set up test dependencies
+      run: |
+        sudo apt update
+        sudo apt install chromium-browser ffmpeg
+
+    - name: Restore Maven cache
+      uses: skjolber/maven-cache-github-action@v1
+      with:
+        step: restore
+
+    - name: Build
+      run: |
+        mkdir ~/tmp
+        export TMPDIR=~/tmp
+
+        mvn -B clean install
+
+    - name: Upload logs on build failure
+      if: failure()
+      uses: actions/upload-artifact@v2
+      with:
+        name: test-results
+        path: |
+          ./**/surefire-reports
+          ./**/result
+
+    - name: Save Maven cache
+      uses: skjolber/maven-cache-github-action@v1
+      with:
+        step: save
