@@ -46,7 +46,7 @@
     "core-js": "^3.21.1",
     "jquery": "3.6.0",
     "messageformat": "^2.3.0",
-    "ngx-toastr": "^14.2.3",
+    "ngx-toastr": "^14.2.4",
     "ngx-translate-messageformat-compiler": "^5.0.1",
     "npm-font-open-sans": "^1.1.0",
     "popper.js": "^1.16.1",
