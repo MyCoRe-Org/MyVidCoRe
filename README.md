@@ -1,4 +1,4 @@
-# MyVidCoRe - My Video Converter ![Build Status](https://github.com/MyCoRe-Org/MyVidCoRe/actions/workflows/ci.yml/badge.svg) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/0743cca157aa49df87db3f5b9b71459c)](https://www.codacy.com/gh/MyCoRe-Org/MyVidCoRe/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=MyCoRe-Org/MyVidCoRe&amp;utm_campaign=Badge_Grade)
+# MyVidCoRe - My Video Converter [![Build](https://github.com/MyCoRe-Org/MyVidCoRe/actions/workflows/ci.yml/badge.svg)](https://github.com/MyCoRe-Org/MyVidCoRe/actions/workflows/ci.yml) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/0743cca157aa49df87db3f5b9b71459c)](https://www.codacy.com/gh/MyCoRe-Org/MyVidCoRe/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=MyCoRe-Org/MyVidCoRe&amp;utm_campaign=Badge_Grade)
 
 Converts Videos from hotfolder to output directory with given settings. 
 
