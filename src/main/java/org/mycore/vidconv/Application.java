@@ -147,7 +147,7 @@ public class Application {
 						.orElse(embeddedHttpServer.getURI().toString()));
 
 		int availableProcessors = Runtime.getRuntime().availableProcessors();
-		converterThreads = converterThreads == null ? Math.floorDiv(availableProcessors, 4) : converterThreads;
+		converterThreads = converterThreads == null ? Math.floorDiv(availableProcessors, 2) : converterThreads;
 		LOGGER.info("Use {} converter threads for available {} processors.", converterThreads, availableProcessors);
 		new ConverterService(outputDir, tempDir, converterThreads);
 
