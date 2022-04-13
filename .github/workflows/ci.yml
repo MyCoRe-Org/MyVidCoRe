@@ -38,6 +38,11 @@ jobs:
 
         mvn -B clean install
 
+    - name: Push Coverage Report to Codacy
+      if: success()
+      run: |
+        mvn com.gavinmogan:codacy-maven-plugin:coverage -DcoverageReportFile=target/site/jacoco/jacoco.xml -DprojectToken=${CODACY_PROJECT_TOKEN} -DapiToken=${CODACY_API_TOKEN}
+      
     - name: Upload logs on build failure
       if: failure()
       uses: actions/upload-artifact@v2
@@ -46,7 +51,7 @@ jobs:
         path: |
           ./**/surefire-reports
           ./**/result
-
+    
     - name: Save Maven cache
       uses: skjolber/maven-cache-github-action@v1
       with:
