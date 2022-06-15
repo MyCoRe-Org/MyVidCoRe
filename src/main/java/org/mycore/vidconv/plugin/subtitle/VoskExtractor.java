@@ -33,6 +33,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -83,9 +84,9 @@ public class VoskExtractor {
 
     private static final float DEFAULT_SAMPLE_RATE = 16000;
 
-    private static final int DEFAULT_GUESS_MAX_WORDS = 200;
+    private static final int DEFAULT_GUESS_MAX_WORDS = 300;
 
-    private static final double DEFAULT_GUESS_MIN_WORD_CONF = 0.9;
+    private static final double DEFAULT_GUESS_MIN_WORD_CONF = 0.91;
 
     private static final Map<String, List<String>> DEFAULT_GUESS_MAP;
 
@@ -106,28 +107,30 @@ public class VoskExtractor {
 
         DEFAULT_GUESS_MAP.put(DE,
                 Arrays.asList("aber", "acht", "alle", "am", "auch", "aus", "bei", "bis", "dann", "das", "dem", "den",
-                        "denn", "der", "die", "drei", "du", "ein", "eine", "eins", "elf", "fünf", "für", "gut", "haben",
-                        "heute", "ich", "ihn", "ihnen", "ihr", "im", "ist", "ja", "jetzt", "kann", "können", "mehr",
-                        "mit", "nein", "neun", "null", "nun", "oder", "sechs", "sein", "sich", "sie", "sieben", "sind",
-                        "und", "uns", "vier", "vom", "von", "vor", "werden", "wie", "wir", "wird", "zu", "zum", "zwei",
-                        "zwölf"));
+                        "denn", "der", "die", "diesem", "dieses", "drei", "du", "ein", "eine", "eins", "elf", "es",
+                        "fünf", "für", "gut", "haben", "heute", "hier", "ich", "ihn", "ihnen", "ihr", "im", "ist", "ja",
+                        "jetzt", "kann", "können", "mehr", "mit", "nein", "neun", "null", "nun", "oder", "sechs",
+                        "sein", "sich", "sie", "sieben", "sind", "und", "uns", "vier", "vom", "von", "vor", "werden",
+                        "wie", "willkommen", "wir", "wird", "zu", "zum", "zwei", "zwölf"));
         DEFAULT_GUESS_MAP.put(EN,
-                Arrays.asList("after", "all", "and", "are", "at", "be", "before", "but", "by", "can", "eight", "eleven",
-                        "five", "for", "four", "have", "he", "her", "his", "how", "is", "it", "me", "nine", "no", "now",
-                        "of", "off", "on", "one", "or", "seven", "shall", "she", "six", "that", "the", "there", "this",
-                        "three", "to", "twelve", "two", "us", "will", "with", "yes", "you", "your", "zero"));
+                Arrays.asList("after", "all", "and", "are", "at", "be", "before", "but", "by", "can", "could", "do",
+                        "eight", "eleven", "five", "for", "four", "have", "he", "her", "his", "how", "is", "it", "me",
+                        "nine", "no", "now", "of", "off", "on", "one", "or", "seven", "shall", "she", "six", "that",
+                        "the", "there", "this", "three", "to", "twelve", "two", "us", "we", "welcome", "will", "with",
+                        "yes", "you", "your", "zero"));
         DEFAULT_GUESS_MAP.put(RU,
                 Arrays.asList("более", "буду", "в", "вам", "вас", "восемь", "вот", "все", "вы", "да", "два", "девять",
                         "для", "ее", "ему", "и", "или", "иметь", "к", "как", "который", "нас", "не", "нет", "но",
-                        "нуль", "один", "он", "она", "от", "очень", "погода", "пять", "с", "с участием", "сейчас",
-                        "семь", "так", "три", "ты", "у", "четыре", "что", "чтобы", "шесть", "это", "я"));
+                        "нуль", "один", "он", "она", "от", "очень", "погода", "пять", "с", "участием", "сейчас",
+                        "русского", "языка", "семь", "так", "три", "ты", "у", "четыре", "что", "чтобы", "шесть", "это",
+                        "я"));
         DEFAULT_GUESS_MAP.put(IT,
-                Arrays.asList("adesso", "al", "alcune", "anche", "avere", "avete", "bambini", "bene", "buongiorno",
-                        "ce", "che", "cinque", "cioè", "come", "con", "cui", "dal", "davanti", "dei", "del", "della",
-                        "di", "dodici", "due", "durante", "il", "io", "la", "lo", "loro", "lui", "ma", "ne", "nella",
-                        "noi", "non", "nove", "o", "otto", "per", "poi", "potere", "potete", "quattro", "quello",
-                        "quindi", "se", "sei", "sette", "si", "sono", "sua", "tre", "tutti", "un", "una", "undici",
-                        "uno", "voi", "volere", "zero"));
+                Arrays.asList("adesso", "al", "alcune", "anche", "avere", "avete", "bambini", "bene", "benvenuto",
+                        "buongiorno", "ce", "che", "cinque", "cioè", "come", "con", "cui", "dal", "davanti", "dei",
+                        "del", "della", "di", "dodici", "due", "durante", "il", "io", "la", "lo", "loro", "lui", "ma",
+                        "ne", "nella", "noi", "non", "nove", "o", "otto", "per", "poi", "potere", "potete", "quattro",
+                        "quello", "quindi", "se", "sei", "sette", "si", "sono", "sua", "tra", "tre", "tutti", "un",
+                        "una", "undici", "uno", "vedremo", "voi", "volere", "zero"));
     }
 
     public VoskExtractor() {
@@ -271,6 +274,7 @@ public class VoskExtractor {
                                             (allWords.isEmpty() || !w.getWord()
                                                     .equalsIgnoreCase(allWords.get(allWords.size() - 1))))
                                     .map(w -> w.getWord().toLowerCase(Locale.ROOT))
+                                    .filter(filterOtherLanguageWords(lang).negate())
                                     .peek(allWords::add)
                                     .collect(Collectors.toList());
 
@@ -323,6 +327,11 @@ public class VoskExtractor {
     private Comparator<Entry<String, Integer>> sortGuess = (e1, e2) -> {
         return e1.getValue().compareTo(e2.getValue());
     };
+
+    private Predicate<String> filterOtherLanguageWords(String lang) {
+        return (w) -> getConfiguredGuessMap().entrySet().stream()
+                .anyMatch(e -> !lang.equals(e.getKey()) && e.getValue().contains(w));
+    }
 
     private Map<String, Long> countOccurrences(List<String> sentence, int minOccurrence) {
         return sentence.stream()
