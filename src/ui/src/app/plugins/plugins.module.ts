@@ -16,8 +16,6 @@ import { SystemMonitorComponent, SystemMonitorContentDirective } from "./sysmoni
         GaugeModule.forRoot(),
         TranslateModule
     ],
-    entryComponents: [
-    ],
     declarations: [
         GaugeComponent,
         NVMonitorComponent,

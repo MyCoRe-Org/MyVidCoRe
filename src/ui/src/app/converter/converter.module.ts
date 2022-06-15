@@ -35,8 +35,6 @@ import { FileUploadComponent, FileDropZoneDirective } from "./fileUpload.compone
             ],
         })
     ],
-    entryComponents: [
-    ],
     declarations: [
         ConverterComponent,
         FileUploadComponent,

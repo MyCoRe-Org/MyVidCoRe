@@ -2,7 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { ToastrService } from "ngx-toastr";
 import { TranslateService } from "@ngx-translate/core";
 import { TargetState, StateService, UIRouterGlobals } from "@uirouter/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 
 import { AuthService } from "../_services/auth.service";
 import { SpinnerService } from "../spinner/spinner.service";
@@ -12,11 +12,11 @@ import { SpinnerService } from "../spinner/spinner.service";
     templateUrl: "./login.component.html"
 })
 class LoginComponent implements OnInit {
-    form: FormGroup;
+    form: UntypedFormGroup;
     returnTo: TargetState;
     invalidCredentials = false;
 
-    constructor(public $fb: FormBuilder, private $state: StateService, private $spinner: SpinnerService,
+    constructor(public $fb: UntypedFormBuilder, private $state: StateService, private $spinner: SpinnerService,
         private $auth: AuthService, private toastr: ToastrService, private translate: TranslateService,
         private globals: UIRouterGlobals) { }
 

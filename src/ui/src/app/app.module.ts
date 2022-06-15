@@ -63,9 +63,6 @@ export class InjectableTranslateMessageFormatCompiler extends TranslateMessageFo
         DashboardComponent,
         ConfirmComponent
     ],
-    entryComponents: [
-        ConfirmComponent
-    ],
     imports: [
         BreadcrumbModule,
         BrowserModule,

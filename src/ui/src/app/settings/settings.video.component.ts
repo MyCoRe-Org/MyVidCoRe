@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, OnChanges, SimpleChanges } from "@angular/core";
-import { FormBuilder, FormGroup, Validators, ControlContainer, FormGroupDirective } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, Validators, ControlContainer, FormGroupDirective } from "@angular/forms";
 
 import { Settings, Video, AllowedFormat } from "./definitions";
 import {
@@ -43,9 +43,9 @@ export class SettingsVideoComponent implements OnInit, OnChanges {
 
     tunes = DEFAULT_TUNES;
 
-    output: FormGroup;
+    output: UntypedFormGroup;
 
-    static createVideo($fb: FormBuilder, video: Video = null): FormGroup {
+    static createVideo($fb: UntypedFormBuilder, video: Video = null): UntypedFormGroup {
         const fg = $fb.group({
             codec: [null, [Validators.required]],
             forceKeyFrames: [],
@@ -73,7 +73,7 @@ export class SettingsVideoComponent implements OnInit, OnChanges {
         return fg;
     }
 
-    constructor(private parent: FormGroupDirective, public $fb: FormBuilder) {
+    constructor(private parent: FormGroupDirective, public $fb: UntypedFormBuilder) {
     }
 
     ngOnInit() {
@@ -83,7 +83,7 @@ export class SettingsVideoComponent implements OnInit, OnChanges {
         if (changes.selectedFormat.previousValue !== changes.selectedFormat.currentValue) {
             this.selectedFormat = changes.selectedFormat.currentValue;
 
-            const form = <FormGroup>this.parent.form.get("output." + this.index);
+            const form = <UntypedFormGroup>this.parent.form.get("output." + this.index);
 
             if (form.contains(this.type)) {
                 const output = this.settings && this.settings.output[this.index] && this.settings.output[this.index][this.type];
@@ -94,7 +94,7 @@ export class SettingsVideoComponent implements OnInit, OnChanges {
                 );
             }
 
-            this.output = <FormGroup>this.parent.form.get("output." + this.index + "." + this.type);
+            this.output = <UntypedFormGroup>this.parent.form.get("output." + this.index + "." + this.type);
             this.onCodecChange();
             this.onQualityTypeChange();
         }
@@ -105,7 +105,7 @@ export class SettingsVideoComponent implements OnInit, OnChanges {
     }
 
     createParameters() {
-        const params = <FormGroup>this.output.get("parameter");
+        const params = <UntypedFormGroup>this.output.get("parameter");
         if (params && Object.keys(params.controls).length !== 0) {
             const ctrKeys = Object.keys(params.controls);
             ctrKeys.forEach(n => {
@@ -125,7 +125,7 @@ export class SettingsVideoComponent implements OnInit, OnChanges {
             );
 
             SettingsExtendedComponent.patchValues(
-                <FormGroup>this.output.get("parameter"),
+                <UntypedFormGroup>this.output.get("parameter"),
                 this.selectedEncoder.parameters,
                 this.settings && this.settings.output[this.index] && this.settings.output[this.index][this.type].parameter
             );

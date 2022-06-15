@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, OnChanges, SimpleChanges } from "@angular/core";
-import { FormBuilder, FormGroup, Validators, ControlContainer, FormGroupDirective } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, Validators, ControlContainer, FormGroupDirective } from "@angular/forms";
 
 import { Settings, Audio, AllowedFormat } from "./definitions";
 import {
@@ -31,9 +31,9 @@ export class SettingsAudioComponent implements OnInit, OnChanges {
 
     audioBitrates = DEFAULT_BITRATES;
 
-    output: FormGroup;
+    output: UntypedFormGroup;
 
-    static createAudio($fb: FormBuilder, audio: Audio = null): FormGroup {
+    static createAudio($fb: UntypedFormBuilder, audio: Audio = null): UntypedFormGroup {
         const fg = $fb.group({
             codec: [null, [Validators.required]],
             bitrate: [],
@@ -48,7 +48,7 @@ export class SettingsAudioComponent implements OnInit, OnChanges {
         return fg;
     }
 
-    constructor(private parent: FormGroupDirective, public $fb: FormBuilder) {
+    constructor(private parent: FormGroupDirective, public $fb: UntypedFormBuilder) {
     }
 
     ngOnInit() {
@@ -58,7 +58,7 @@ export class SettingsAudioComponent implements OnInit, OnChanges {
         if (changes.selectedFormat.previousValue !== changes.selectedFormat.currentValue) {
             this.selectedFormat = changes.selectedFormat.currentValue;
 
-            const form = <FormGroup>this.parent.form.get("output." + this.index);
+            const form = <UntypedFormGroup>this.parent.form.get("output." + this.index);
 
             if (form.contains(this.type)) {
                 const output = this.settings && this.settings.output[this.index] && this.settings.output[this.index][this.type];
@@ -69,7 +69,7 @@ export class SettingsAudioComponent implements OnInit, OnChanges {
                 );
             }
 
-            this.output = <FormGroup>this.parent.form.get("output." + this.index + "." + this.type);
+            this.output = <UntypedFormGroup>this.parent.form.get("output." + this.index + "." + this.type);
             this.onCodecChange();
         }
     }

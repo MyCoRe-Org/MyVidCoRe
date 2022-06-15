@@ -36,8 +36,6 @@ import { SettingsVideoComponent } from "./settings.video.component";
             ],
         })
     ],
-    entryComponents: [
-    ],
     declarations: [
         SettingsComponent,
         SettingsExtendedComponent,

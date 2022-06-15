@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from "@angular/core";
-import { FormBuilder, FormArray, FormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormArray, UntypedFormGroup, Validators } from "@angular/forms";
 
 import { of, forkJoin } from "rxjs";
 import { mergeMap, map, mergeAll, take, delay, retryWhen } from "rxjs/operators";
@@ -44,14 +44,14 @@ export class SettingsComponent implements OnInit {
 
     activeTab: string;
 
-    form: FormGroup;
+    form: UntypedFormGroup;
 
-    hwAccelsForm: FormArray;
+    hwAccelsForm: UntypedFormArray;
 
-    output: FormArray;
+    output: UntypedFormArray;
 
     constructor(private $api: SettingsApiService, private $capi: ConverterApiService,
-        private $error: ErrorService, private $spinner: SpinnerService, public $fb: FormBuilder) {
+        private $error: ErrorService, private $spinner: SpinnerService, public $fb: UntypedFormBuilder) {
     }
 
     ngOnInit() {
@@ -209,7 +209,7 @@ export class SettingsComponent implements OnInit {
         return params.find(p => p.name === name);
     }
 
-    createOutput(output: Output = null): FormGroup {
+    createOutput(output: Output = null): UntypedFormGroup {
         const fg = this.$fb.group({
             format: ["", [Validators.required]],
             filenameAppendix: [""],

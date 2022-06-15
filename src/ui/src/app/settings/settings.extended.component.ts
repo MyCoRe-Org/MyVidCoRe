@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, OnChanges, SimpleChanges } from "@angular/core";
-import { FormBuilder, FormGroup, ControlContainer, FormGroupDirective, Validators } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, ControlContainer, FormGroupDirective, Validators } from "@angular/forms";
 
 import { Settings } from "./definitions";
 
@@ -24,9 +24,9 @@ export class SettingsExtendedComponent implements OnInit, OnChanges {
     @Input()
     selectedEncoder: any;
 
-    parameter: FormGroup;
+    parameter: UntypedFormGroup;
 
-    static createParameter($fb: FormBuilder, param: any) {
+    static createParameter($fb: UntypedFormBuilder, param: any) {
         if (param.type === "int") {
             const vals = [];
 
@@ -84,7 +84,7 @@ export class SettingsExtendedComponent implements OnInit, OnChanges {
         return value;
     }
 
-    static patchValues(fg: FormGroup, encParams: Array<(key: string) => any>, params: (key: string) => string) {
+    static patchValues(fg: UntypedFormGroup, encParams: Array<(key: string) => any>, params: (key: string) => string) {
         encParams.forEach((p: any) => {
             if (params && params[p.name] && fg.contains(p.name)) {
                 fg.get(p.name).patchValue(
@@ -119,7 +119,7 @@ export class SettingsExtendedComponent implements OnInit, OnChanges {
         return res;
     }
 
-    constructor(private parent: FormGroupDirective, public $fb: FormBuilder) {
+    constructor(private parent: FormGroupDirective, public $fb: UntypedFormBuilder) {
     }
 
     ngOnInit() {
@@ -133,7 +133,7 @@ export class SettingsExtendedComponent implements OnInit, OnChanges {
     }
 
     createParameters() {
-        const params = <FormGroup>this.parent.form.get("parameter");
+        const params = <UntypedFormGroup>this.parent.form.get("parameter");
         if (params && Object.keys(params.controls).length !== 0) {
             const ctrKeys = Object.keys(params.controls);
             ctrKeys.forEach(n => {
@@ -159,6 +159,6 @@ export class SettingsExtendedComponent implements OnInit, OnChanges {
             );
         }
 
-        this.parameter = <FormGroup>this.parent.form.get("parameter");
+        this.parameter = <UntypedFormGroup>this.parent.form.get("parameter");
     }
 }

@@ -85,7 +85,6 @@
       "projectType": "application"
     }
   },
-  "defaultProject": "myvidcore-ui",
   "schematics": {
     "@schematics/angular:component": {
       "prefix": "app",
