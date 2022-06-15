@@ -185,7 +185,7 @@ public class SubtitlePlugin extends ListenerPlugin {
 
                             if (results != null && !results.isEmpty()) {
                                 Path vttFilePath = Paths
-                                        .get(formatFileName(job.outputPath(), job.inputPath(), ".vtt"));
+                                        .get(formatFileName(job.outputPath(), job.inputPath(), "-" + lang + ".vtt"));
                                 VttObject vtt = buildSubtitle(results);
 
                                 LOGGER.info("write WebVTT to {}...", vttFilePath);
