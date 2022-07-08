@@ -63,14 +63,14 @@
     <properties>
         <eclipselink.version>3.0.2</eclipselink.version>
         <encoding>UTF-8</encoding>
-        <grizzly.version>3.0.1</grizzly.version>
+        <grizzly.version>4.0.0</grizzly.version>
         <java.version>11</java.version>
         <jersey.version>3.0.4</jersey.version>
-        <log4j.version>2.17.2</log4j.version>
+        <log4j.version>2.18.0</log4j.version>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <node.version>v14.17.0</node.version>
         <npm.version>6.14.13</npm.version>
-        <selenium.version>4.1.3</selenium.version>
+        <selenium.version>4.3.0</selenium.version>
     </properties>
 
     <dependencies>
@@ -204,13 +204,13 @@
         <dependency>
             <groupId>com.github.oshi</groupId>
             <artifactId>oshi-core</artifactId>
-            <version>6.1.6</version>
+            <version>6.2.1</version>
         </dependency>
 
         <dependency>
             <groupId>com.alphacephei</groupId>
             <artifactId>vosk</artifactId>
-            <version>0.3.33</version>
+            <version>0.3.38</version>
         </dependency>
 
         <dependency>
@@ -241,7 +241,7 @@
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
-            <version>5.0.0</version>
+            <version>6.0.0</version>
             <scope>runtime</scope>
         </dependency>
 
@@ -348,7 +348,7 @@
         <dependency>
             <groupId>io.github.bonigarcia</groupId>
             <artifactId>webdrivermanager</artifactId>
-            <version>5.1.1</version>
+            <version>5.2.1</version>
             <scope>test</scope>
         </dependency>
 
