@@ -1,13 +1,13 @@
-const { Console } = require("console");
-const os = require("os");
-const fs = require("fs");
-const path = require("path");
-const pLimit = require("p-limit");
-const imagemin = require("imagemin");
-const imageminMozjpeg = require("imagemin-mozjpeg");
-const imageminPngquant = require("imagemin-pngquant");
-const imageminGiflossy = require("imagemin-giflossy");
-const imageminSvgo = require("imagemin-svgo");
+import { Console } from "console";
+import os from "os";
+import fs from "fs";
+import path from "path";
+import pLimit from "p-limit";
+import imagemin from "imagemin";
+import imageminMozjpeg from "imagemin-mozjpeg";
+import imageminPngquant from "imagemin-pngquant";
+import imageminGiflossy from "imagemin-giflossy";
+import imageminSvgo from "imagemin-svgo";
 
 const logger = new Console(process.stdout, process.stderr);
 
@@ -55,7 +55,7 @@ const walk = (dir, done) => {
 
 if (!distDir) {
     logger.error("Need \"dist\" path!");
-    return;
+    process.exit(1);
 }
 
 walk(distDir, (err, files) => {
