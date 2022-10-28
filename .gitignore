@@ -7,3 +7,12 @@
 /.vscode/
 /package-lock.json
 /pom.xml.bak
+/.idea/.gitignore
+/.idea/aws.xml
+/.idea/compiler.xml
+/.idea/jpa-buddy.xml
+/.idea/misc.xml
+/.idea/modules.xml
+/myvidcore.iml
+/.idea/vcs.xml
+/.idea/
