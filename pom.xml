@@ -39,10 +39,6 @@
         </developer>
     </developers>
 
-    <prerequisites>
-        <maven>3.1.0</maven>
-    </prerequisites>
-
     <scm>
         <connection>scm:git:https://github.com/MyCoRe-Org/MyVidCoRe.git</connection>
         <developerConnection>scm:git:https://github.com/MyCoRe-Org/MyVidCoRe.git</developerConnection>
@@ -65,12 +61,12 @@
         <encoding>UTF-8</encoding>
         <grizzly.version>4.0.0</grizzly.version>
         <java.version>11</java.version>
-        <jersey.version>3.0.4</jersey.version>
-        <log4j.version>2.18.0</log4j.version>
+        <jersey.version>3.0.8</jersey.version>
+        <log4j.version>2.19.0</log4j.version>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <node.version>v14.17.0</node.version>
         <npm.version>6.14.13</npm.version>
-        <selenium.version>4.3.0</selenium.version>
+        <selenium.version>4.5.3</selenium.version>
     </properties>
 
     <dependencies>
@@ -323,12 +319,6 @@
         </dependency>
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-opera-driver</artifactId>
-            <version>${selenium.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-safari-driver</artifactId>
             <version>${selenium.version}</version>
             <scope>test</scope>
@@ -348,7 +338,7 @@
         <dependency>
             <groupId>io.github.bonigarcia</groupId>
             <artifactId>webdrivermanager</artifactId>
-            <version>5.2.1</version>
+            <version>5.3.0</version>
             <scope>test</scope>
         </dependency>
 
