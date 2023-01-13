@@ -61,12 +61,12 @@
         <encoding>UTF-8</encoding>
         <grizzly.version>4.0.0</grizzly.version>
         <java.version>11</java.version>
-        <jersey.version>3.0.8</jersey.version>
+        <jersey.version>3.1.0</jersey.version>
         <log4j.version>2.19.0</log4j.version>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <node.version>v18.10.0</node.version>
         <npm.version>8.19.2</npm.version>
-        <selenium.version>4.5.3</selenium.version>
+        <selenium.version>4.7.2</selenium.version>
     </properties>
 
     <dependencies>
@@ -136,7 +136,7 @@
         <dependency>
             <groupId>jakarta.ws.rs</groupId>
             <artifactId>jakarta.ws.rs-api</artifactId>
-            <version>3.0.0</version>
+            <version>3.1.0</version>
         </dependency>
 
         <dependency>
@@ -200,7 +200,7 @@
         <dependency>
             <groupId>com.github.oshi</groupId>
             <artifactId>oshi-core</artifactId>
-            <version>6.2.1</version>
+            <version>6.4.0</version>
         </dependency>
 
         <dependency>
@@ -338,7 +338,7 @@
         <dependency>
             <groupId>io.github.bonigarcia</groupId>
             <artifactId>webdrivermanager</artifactId>
-            <version>5.3.0</version>
+            <version>5.3.1</version>
             <scope>test</scope>
         </dependency>
 
