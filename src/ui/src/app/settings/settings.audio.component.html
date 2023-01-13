@@ -1,9 +1,9 @@
 <div *ngIf="output && type" [formGroup]="output">
     <!-- templates -->
     <ng-template #codecSelect let-index="index" let-type="type">
-        <div class="form-group">
+        <div class="mb-2">
             <label [attr.for]="'output-' + index + '-' + type + '-codec'">{{ 'settings.codec' | translate }}</label>
-            <select class="form-control custom-select" [id]="'output-' + index + '-' + type + '-codec'"
+            <select class="form-select" [id]="'output-' + index + '-' + type + '-codec'"
                 formControlName="codec" (change)="onCodecChange()">
                 <option [value]="''">{{ 'general.pleaseSelect' | translate }}</option>
                 <ng-container *ngFor="let cgrp of selectedFormat.audio">
@@ -28,9 +28,9 @@
         </ng-container>
 
         <ng-container *ngIf="selectedEncoder">
-            <div *ngIf="selectedEncoder.sampleRates" class="form-group">
+            <div *ngIf="selectedEncoder.sampleRates" class="mb-2">
                 <label for="output-{{ index }}-audio-samplerate">{{ 'settings.samplerate' | translate }}</label>
-                <select class="form-control custom-select" [id]="'output-' + index + '-audio-samplerate'"
+                <select class="form-select" [id]="'output-' + index + '-audio-samplerate'"
                     formControlName="samplerate"
                     [ngClass]="{'is-invalid':output.controls.samplerate.errors}">
                     <option [value]="null">{{ 'settings.auto' | translate }}
@@ -40,9 +40,9 @@
                 </select>
             </div>
 
-            <div class="form-group">
+            <div class="mb-2">
                 <label for="output-{{ index }}-audio-bitrate">{{ 'settings.bitrate' | translate }}</label>
-                <select class="form-control custom-select" [id]="'output-' + index + '-audio-bitrate'"
+                <select class="form-select" [id]="'output-' + index + '-audio-bitrate'"
                     formControlName="bitrate"
                     [ngClass]="{'is-invalid':output.controls.bitrate.errors}">
                     <option [value]="null">{{ 'settings.auto' | translate }}

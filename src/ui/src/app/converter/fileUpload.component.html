@@ -10,7 +10,7 @@
     <div *ngFor="let item of queue; trackBy: trackByItem" class="row my-1">
         <div class="col-12 text-truncate">
             <strong>{{ item.file.filepath || item.file.name }}</strong>
-            <a *ngIf="item.error" class="text-dark ml-1" (click)="retry(item)">
+            <a *ngIf="item.error" class="text-dark ms-1" (click)="retry(item)">
                 <i class="fas fa-sync"></i>
             </a>
         </div>
@@ -21,7 +21,7 @@
             </ngb-progressbar>
         </div>
         <div *ngIf="!item.progress && !item.complete" class="col-12">
-            <div class="status-icon queued float-left">
+            <div class="status-icon queued float-start">
                 <div class="is-rotating">
                     <i class="circle"></i> <i class="circle"></i>
                 </div>
