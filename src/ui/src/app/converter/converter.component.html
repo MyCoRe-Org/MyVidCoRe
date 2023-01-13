@@ -5,10 +5,10 @@
                 <div class="d-flex align-items-center justify-content-between">
                     {{ 'converter.runningJobs' | translate }}
                     <div class="btn-group action-group" role="group" aria-label="Actions">
-                        <button type="button" class="btn btn-action" data-toggle="collapse" data-target="#addJob"
+                        <button type="button" class="btn btn-action" data-bs-toggle="collapse" data-bs-target="#addJob"
                             aria-expanded="true" aria-controls="addJob">
                             <i class="fa fa-plus" aria-hidden="true"></i> <span
-                                class="d-none d-sm-inline-block ml-1">{{ 'converter.addJob' | translate }}</span>
+                                class="d-none d-sm-inline-block ms-1">{{ 'converter.addJob' | translate }}</span>
                         </button>
                     </div>
                 </div>
@@ -33,7 +33,7 @@
                                     [animated]="job.running" [value]="job.progress.percent || 0" height="20px">
                                 </ngb-progressbar>
                             </div>
-                            <div class="col-12 col-md-3 text-right my-auto">
+                            <div class="col-12 col-md-3 text-end my-auto">
                                 <i class="fa fa-hourglass-start" aria-hidden="true"></i>
                                 {{ job.progress.estimate || '0:00:00' }}
                                 <span> / </span>
@@ -43,7 +43,7 @@
                         </ng-container>
                         <ng-container *ngIf="!job.running && !job.done">
                             <div class="col-12">
-                                <div class="status-icon queued float-left">
+                                <div class="status-icon queued float-start">
                                     <div class="is-rotating">
                                         <i class="circle"></i> <i class="circle"></i>
                                     </div>
@@ -66,34 +66,34 @@
             <div class="card-body p-2">
                 <div class="row my-1" *ngFor="let job of done; trackBy: trackByJobId; let i = index">
                     <div class="col-7 col-sm-7 text-truncate my-auto">
-                        <span class="fa mr-1"
+                        <span class="fa me-1"
                             [ngClass]="{'fa-check text-success': job.done && job.exitValue === 0, 'fa-times text-danger': job.done && job.exitValue !== 0}"></span>
                         <strong>{{ job.file }}</strong>
                     </div>
-                    <div class="col-sm-3 d-none d-sm-block text-right my-auto">
+                    <div class="col-sm-3 d-none d-sm-block text-end my-auto">
                         <i class="fa fa-hourglass-end" aria-hidden="true"></i> {{ job.progress.elapsed }}
                     </div>
 
                     <div class="col-5 col-sm-2">
-                        <div class="btn-group btn-group-sm float-right" role="group">
-                            <button class="btn btn-outline-secondary" data-toggle="collapse"
+                        <div class="btn-group btn-group-sm float-end" role="group">
+                            <button class="btn btn-outline-secondary" data-bs-toggle="collapse"
                                 [attr.aria-controls]="'details-'+ (job.hashCode || job.id)"
-                                [attr.data-target]="'#details-' + (job.hashCode || job.id)" aria-expanded="false">
+                                [attr.data-bs-target]="'#details-' + (job.hashCode || job.id)" aria-expanded="false">
                                 <i class="fa fa-terminal" aria-hidden="true"></i>
                             </button>
                             <button class="btn btn-outline-secondary" aria-expanded="false"
                                 [attr.aria-controls]="'preview-'+ (job.hashCode || job.id)"
-                                [attr.data-target]="'#preview-' + (job.hashCode || job.id)" data-toggle="collapse"
+                                [attr.data-bs-target]="'#preview-' + (job.hashCode || job.id)" data-bs-toggle="collapse"
                                 [disabled]="job.exitValue !== 0 || !canStream(job)"
                                 (click)="initPreview(job.hashCode || job.id)">
                                 <i class="fa fa-eye" aria-hidden="true"></i>
                             </button>
                             <button class="btn btn-outline-secondary dropdown-toggle"
-                                id="download-menu-{{ (job.hashCode || job.id) }}" data-toggle="dropdown"
+                                id="download-menu-{{ (job.hashCode || job.id) }}" data-bs-toggle="dropdown"
                                 aria-haspopup="true" aria-expanded="false" [disabled]="job.exitValue !== 0">
                                 <i class="fa fa-save"></i>
                             </button>
-                            <div class="dropdown-menu dropdown-menu-right"
+                            <div class="dropdown-menu dropdown-menu-end"
                                 [attr.aria-labelledby]="'download-menu-' + (job.id | hashCode)">
                                 <a *ngFor="let file of job.files" class="dropdown-item"
                                     [href]="baseUrl + '/widget/converter/' + job.id + '/' + file.name + '/download'">{{ file.name }}</a>
@@ -118,7 +118,7 @@
                         </ng-container>
                     </div>
                     <div id="preview-{{ (job.hashCode || job.id) }}" class="col-12 collapse mt-2">
-                        <div class="embed-responsive embed-responsive-16by9">
+                        <div class="ratio ratio-16x9">
                             <video id="video-{{ (job.hashCode || job.id) }}"
                                 class="video-preview video-js vjs-default-skin vjs-big-play-centered embed-responsive-item"
                                 controls preload="none">

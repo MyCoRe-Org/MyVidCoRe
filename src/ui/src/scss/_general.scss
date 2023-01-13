@@ -18,7 +18,7 @@
 
 .sortable {
     cursor: pointer;
-    
+
     > th {
         @include text-truncate;
     }
@@ -34,13 +34,25 @@
     }
 }
 
+.pre-scrollable {
+  max-height: 340px;
+  overflow-y: scroll;
+}
+
 /**
  * Generic Elements
  **/
- 
+
+a:not([class*="btn"]):not([class*="nav-link"]):not([class*="dropdown-item"]) {
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 dl {
      line-height: 1.1em;
-     
+
      > dd {
          color: $text-muted;
     }
@@ -58,7 +70,7 @@ fieldset {
         border-bottom: 1px solid $table-border-color;
 
         > a, > button {
-            &[data-toggle="collapse"], &[aria-expanded="false"], &.collapsed {
+            &[data-bs-toggle="collapse"], &[aria-expanded="false"], &.collapsed {
                 display: flex;
                 flex-direction: row;
                 align-items: center;
@@ -74,7 +86,7 @@ fieldset {
                     margin-left: 0.5rem;
                 }
             }
-        
+
             &[aria-expanded="true"] {
                 &:after {
                     content: "\f077";
@@ -91,7 +103,7 @@ fieldset {
 /**
  * Boostrap Ovewrites (not working with vars)
  **/
- 
+
 .btn, .page-link {
     @include box-shadow(0 -2px rgba(0, 0, 0, 0.05) inset);
 }
@@ -100,7 +112,7 @@ fieldset {
     background-color: #fff;
     color: lighten($body-color, 10%);
     border-color: $input-border-color;
-    
+
     &:active, &:focus, &:hover {
         background-color: darken(#fff, 5%);
     }
@@ -108,10 +120,19 @@ fieldset {
 
 .btn-primary {
     color: #fff;
-    
+
     &.disabled, &:disabled {
         color: darken(#fff, 5%);
     }
+}
+
+/**
+ * Breadcrumb
+ */
+.breadcrumb {
+  background-color: #e9ecef;
+  border-radius: 0.1rem;
+  padding: .75rem 1rem;
 }
 
 /**
@@ -125,7 +146,7 @@ fieldset {
         }
     }
 }
- 
+
 /**
  * Panel
  **/
@@ -134,7 +155,7 @@ fieldset {
     border: $table-border-width solid $table-border-color;
     @include border-radius(2px);
     @include box-shadow(0 1px 1px rgba(0, 0, 0, 0.05));
-    
+
     .panel-heading {
         background-color: #fafafa;
         @include border-top-radius(2px);
@@ -155,7 +176,7 @@ fieldset {
 /**
  * Search Form
  **/
- 
+
 .search-holder {
 	display: -webkit-flex;
 	display: -ms-flexbox;

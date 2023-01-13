@@ -36,7 +36,7 @@ $sidebar-font-size: 1.1rem !default;
         margin-top: 0.25rem;
         float: left;
 
-        @include media-breakpoint-down(sm) {
+        @include media-breakpoint-down(md) {
             display: none;
         }
     }
@@ -45,7 +45,7 @@ $sidebar-font-size: 1.1rem !default;
         &.encoder , &.cpu-load {
             &:nth-child(1) {
                 margin-left: 10px;
-                @include media-breakpoint-only(xs) {
+                @include media-breakpoint-down(sm) {
                     margin-left: 5px;
                 }
             }
@@ -61,11 +61,11 @@ $sidebar-font-size: 1.1rem !default;
     line-height: 1.25em;
 
     .navbar-nav {
-        @include media-breakpoint-only(xs) {
+        @include media-breakpoint-down(sm) {
             float: right;
             margin: 0;
         }
-     
+
         > li {
             -webkit-tap-highlight-color: rgba(128, 128, 128, 0.5);
             a {
@@ -74,12 +74,12 @@ $sidebar-font-size: 1.1rem !default;
                     cursor: pointer;
                 }
             }
-        
+
             &:hover , &:focus {
                 @include gradient-vertical(#222222, #282828);
                 box-shadow: 0 3px 9px rgba(0, 0, 0, 0.25) inset;
             }
-        
+
             .dropdown-menu:before {
                 border-bottom: 8px solid rgba(0, 0, 0, 0.15);
                 border-left: 8px solid rgba(0, 0, 0, 0);
@@ -90,7 +90,7 @@ $sidebar-font-size: 1.1rem !default;
                 right: 16px;
                 top: -9.5px;
             }
-        
+
             .dropdown-menu:after {
                 border-bottom: 8px solid #ffffff;
                 border-left: 8px solid rgba(0, 0, 0, 0);
@@ -101,45 +101,45 @@ $sidebar-font-size: 1.1rem !default;
                 right: 16px;
                 top: -8px;
             }
-        
+
             .dropdown-menu {
                 margin-top: 3px;
                 position: absolute;
 
-                &.dropdown-menu-right {
+                &.dropdown-menu-end {
                     right: -10px;
                     left: auto;
                 }
             }
         }
-    
+
         & > .active > a {
             @include gradient-vertical(#222222, #282828);
             box-shadow: 0 3px 9px rgba(0, 0, 0, 0.25) inset;
         }
-    
+
         & > .dropdown.show > a {
             @include gradient-vertical(#222222, #282828);
             box-shadow: 0 3px 9px rgba(0, 0, 0, 0.25) inset;
         }
-    
+
         #user-info {
             width: 300px;
-            
+
             .controls {
                 background-color: #fafafa;
             }
-            
-            @include media-breakpoint-only(xs) {
+
+            @include media-breakpoint-down(sm) {
                 width: 250px;
             }
         }
-        
+
     }
 }
 
 .navbar-header {
-    @include media-breakpoint-only(xs) {
+    @include media-breakpoint-down(sm) {
         float: left;
     }
 }
@@ -154,8 +154,8 @@ $sidebar-font-size: 1.1rem !default;
     border-radius: 0;
     border: 0;
     -webkit-tap-highlight-color: rgba(128, 128, 128, 0.5);
-  
-    @include media-breakpoint-only(xs) {
+
+    @include media-breakpoint-down(sm) {
         margin-right: 0;
         padding: 0 10px;
     }
@@ -206,7 +206,7 @@ $sidebar-font-size: 1.1rem !default;
         left: -$sidebar-width;
     }
 
-    @include media-breakpoint-down(xs) {
+    @include media-breakpoint-down(md) {
         left: -$sidebar-width;
         overflow-y: scroll;
         -webkit-overflow-scrolling: touch;
@@ -246,7 +246,7 @@ $sidebar-font-size: 1.1rem !default;
                     border-left: 3px solid $primary;
                 }
             
-                &[data-toggle="collapse"] {
+                &[data-bs-toggle="collapse"] {
                     position: relative;
                 }
     
@@ -345,7 +345,7 @@ $sidebar-font-size: 1.1rem !default;
         }
     }
     
-    @include media-breakpoint-down(xs) {
+    @include media-breakpoint-down(md) {
         position: absolute;
         left: 0;
         right: 0;

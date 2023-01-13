@@ -55,9 +55,9 @@ public class TestSharedHelpers extends SeleniumTestCase {
         }
 
         if (menu != null) {
-            String xp = "//header[@id='header']//a[@aria-expanded='false' and @data-toggle='collapse' and @href='#"
+            String xp = "//header[@id='header']//a[@aria-expanded='false' and @data-bs-toggle='collapse' and @href='#"
                     + menu
-                    + "']|//nav[@id='sidebar']//a[@aria-expanded='false' and @data-toggle='collapse' and @href='#"
+                    + "']|//nav[@id='sidebar']//a[@aria-expanded='false' and @data-bs-toggle='collapse' and @href='#"
                     + menu
                     + "']";
             if (hasElement(By.xpath(xp)) != null) {
@@ -81,7 +81,7 @@ public class TestSharedHelpers extends SeleniumTestCase {
         waitForInvisibleElement(By.id("spinner"), 3);
 
         if (menu != null) {
-            String xp = "//*[@aria-expanded='false' and @data-toggle='dropdown' and @id='" + menu + "']";
+            String xp = "//*[@aria-expanded='false' and @data-bs-toggle='dropdown' and @id='" + menu + "']";
             if (hasElement(By.xpath(xp)) != null) {
                 waitAndClick(By.xpath(xp));
             }

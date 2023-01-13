@@ -21,7 +21,7 @@
                                 </a>
                             </li>
                             <li *ngIf="allowed">
-                                <a [href]="'#'+ refId(r)" data-toggle="collapse" aria-expanded="false">
+                                <a [href]="'#'+ refId(r)" data-bs-toggle="collapse" aria-expanded="false">
                                     <i *ngIf="r.icon" [ngClass]="r.icon"></i> {{ r.i18n | translate }}
                                 </a>
                                 <ul class="collapse list-unstyled" [id]="refId(r)" [attr.aria-labelledby]="refId(r)">
