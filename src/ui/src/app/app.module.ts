@@ -7,7 +7,7 @@ import { TranslateCompiler, TranslateModule, TranslateLoader } from "@ngx-transl
 import { TranslateHttpLoader } from "@ngx-translate/http-loader";
 import { MESSAGE_FORMAT_CONFIG, TranslateMessageFormatCompiler } from "ngx-translate-messageformat-compiler";
 
-import { NgPipesModule } from "angular-pipes";
+import { NgPipesModule } from "ngx-pipes";
 import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
 import { NgSelectModule } from "@ng-select/ng-select";
 import { NgOptionHighlightModule } from "@ng-select/ng-option-highlight";
