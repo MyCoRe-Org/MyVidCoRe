@@ -9,7 +9,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Checkout
@@ -37,7 +37,7 @@ jobs:
         export TMPDIR=~/tmp
 
         mvn -B clean install
-      
+
     - name: Upload logs on build failure
       if: failure()
       uses: actions/upload-artifact@v2
@@ -46,7 +46,7 @@ jobs:
         path: |
           ./**/surefire-reports
           ./**/result
-    
+
     - name: Save Maven cache
       uses: skjolber/maven-cache-github-action@v1
       with:
