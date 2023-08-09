@@ -31,6 +31,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Singleton;
+
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -56,7 +57,6 @@ import org.mycore.vidconv.frontend.widget.WidgetManager;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
- *
  */
 @Path("converter")
 @Singleton
@@ -65,7 +65,7 @@ public class ConverterResource {
     @GET
     @CacheControl(maxAge = @CacheControl.Age(time = 1, unit = TimeUnit.HOURS), proxyRevalidate = true)
     @Path("codecs{filter:(/[^/]+?)?}{value:(/([^/]+)?)?}")
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public CodecsWrapper getCodecs(@PathParam("filter") String filter, @PathParam("value") String value)
             throws Exception {
         CodecsWrapper codecs = FFMpegImpl.codecs();
@@ -93,7 +93,7 @@ public class ConverterResource {
     @GET
     @CacheControl(maxAge = @CacheControl.Age(time = 1, unit = TimeUnit.HOURS), proxyRevalidate = true)
     @Path("formats{filter:(/[^/]+?)?}{value:(/([^/]+)?)?}")
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public FormatsWrapper getFormats(@PathParam("filter") String filter, @PathParam("value") String value)
             throws Exception {
         FormatsWrapper formats = FFMpegImpl.formats();
@@ -115,7 +115,7 @@ public class ConverterResource {
     @GET
     @CacheControl(maxAge = @CacheControl.Age(time = 1, unit = TimeUnit.HOURS), proxyRevalidate = true)
     @Path("encoder/{name}")
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public EncodersWrapper getEncoder(@PathParam("name") String name) throws Exception {
         return FFMpegImpl.encoder(name);
     }
@@ -123,7 +123,7 @@ public class ConverterResource {
     @GET
     @CacheControl(maxAge = @CacheControl.Age(time = 1, unit = TimeUnit.HOURS), proxyRevalidate = true)
     @Path("decoder/{name}")
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public DecodersWrapper getDecoder(@PathParam("name") String name) throws Exception {
         return FFMpegImpl.decoder(name);
     }
@@ -131,7 +131,7 @@ public class ConverterResource {
     @GET
     @CacheControl(maxAge = @CacheControl.Age(time = 1, unit = TimeUnit.HOURS), proxyRevalidate = true)
     @Path("hwaccels")
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public HWAccelsWrapper getHWAccels() throws Exception {
         return FFMpegImpl.detectHWAccels();
     }
@@ -139,7 +139,7 @@ public class ConverterResource {
     @POST
     @Path("addjob")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces({ MediaType.TEXT_PLAIN })
+    @Produces({MediaType.TEXT_PLAIN})
     public String addJob(
             @FormDataParam("file") InputStream is,
             @FormDataParam("file") FormDataContentDisposition fileDetail,
@@ -169,7 +169,7 @@ public class ConverterResource {
 
         Files.copy(is, tmpFile, StandardCopyOption.REPLACE_EXISTING);
 
-        return converterService.addJob(tmpFile, jobId, prio, completeCallBack);
+        return converterService.addJob(tmpFile, jobId, prio, completeCallBack, language);
     }
 
     private String decodeFormDataFileName(String fileName) {
