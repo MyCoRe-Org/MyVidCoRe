@@ -16,6 +16,23 @@ package org.mycore.vidconv.plugin.subtitle;
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
+import fr.noop.subtitle.util.SubtitlePlainText;
+import fr.noop.subtitle.util.SubtitleTimeCode;
+import fr.noop.subtitle.vtt.VttCue;
+import fr.noop.subtitle.vtt.VttLine;
+import fr.noop.subtitle.vtt.VttObject;
+import fr.noop.subtitle.vtt.VttWriter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.mycore.vidconv.backend.service.ConverterService;
+import org.mycore.vidconv.backend.service.ConverterService.ConverterJob;
+import org.mycore.vidconv.common.event.Event;
+import org.mycore.vidconv.common.util.Executable;
+import org.mycore.vidconv.plugin.ListenerPlugin;
+import org.mycore.vidconv.plugin.annotation.Plugin;
+import org.mycore.vidconv.plugin.subtitle.VoskExtractor.VoskResult;
+import org.mycore.vidconv.plugin.subtitle.VoskExtractor.VoskResult.Word;
+
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -29,27 +46,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.mycore.vidconv.backend.service.ConverterService;
-import org.mycore.vidconv.backend.service.ConverterService.ConverterJob;
-import org.mycore.vidconv.common.event.Event;
-import org.mycore.vidconv.common.util.Executable;
-import org.mycore.vidconv.plugin.ListenerPlugin;
-import org.mycore.vidconv.plugin.annotation.Plugin;
-import org.mycore.vidconv.plugin.subtitle.VoskExtractor.VoskResult;
-import org.mycore.vidconv.plugin.subtitle.VoskExtractor.VoskResult.Word;
-
-import fr.noop.subtitle.util.SubtitlePlainText;
-import fr.noop.subtitle.util.SubtitleTimeCode;
-import fr.noop.subtitle.vtt.VttCue;
-import fr.noop.subtitle.vtt.VttLine;
-import fr.noop.subtitle.vtt.VttObject;
-import fr.noop.subtitle.vtt.VttWriter;
-
 /**
  * @author Ren\u00E9 Adler (eagle)
- *
  */
 @Plugin(name = "Subtitle Plugin", description = "Generates WebVTT Subtitle from Video.")
 public class SubtitlePlugin extends ListenerPlugin {
@@ -173,8 +171,12 @@ public class SubtitlePlugin extends ListenerPlugin {
 
                 if (ret == 0) {
                     try {
-                        LOGGER.info("guess language of {}...", audioFilePath);
-                        String lang = extractor.guessLanguage(audioFilePath);
+                        String lang = extractor.isModelLangSupported(job.language()) ? job.language() : null;
+
+                        if (lang == null) {
+                            LOGGER.info("guess language of {}...", audioFilePath);
+                            lang = extractor.guessLanguage(audioFilePath);
+                        }
 
                         if (lang != null) {
                             LOGGER.info("...set language to \"{}\" for {}", lang, audioFilePath);

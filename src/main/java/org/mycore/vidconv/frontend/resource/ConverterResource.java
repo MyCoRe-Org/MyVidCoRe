@@ -146,11 +146,14 @@ public class ConverterResource {
             @FormDataParam("filename") FormDataBodyPart fileName,
             @FormDataParam("id") FormDataBodyPart id,
             @FormDataParam("priority") FormDataBodyPart priority,
-            @FormDataParam("callback") FormDataBodyPart callback)
+            @FormDataParam("callback") FormDataBodyPart callback,
+            @FormDataParam("lang") FormDataBodyPart lang)
             throws IOException, InterruptedException, JAXBException, ExecutionException {
         final String jobId = Optional.ofNullable(id).map(i -> i.getValueAs(String.class)).orElse(null);
         final int prio = Optional.ofNullable(priority).map(i -> i.getValueAs(Integer.class)).orElse(0);
         final String completeCallBack = Optional.ofNullable(callback).map(cb -> cb.getValueAs(String.class))
+                .orElse(null);
+        final String language = Optional.ofNullable(lang).map(cb -> cb.getValueAs(String.class))
                 .orElse(null);
         final String fn = Optional.ofNullable(fileName).map(f -> f.getValueAs(String.class)).filter(f -> !f.isEmpty())
                 .orElseGet(() -> decodeFormDataFileName(fileDetail.getFileName()));

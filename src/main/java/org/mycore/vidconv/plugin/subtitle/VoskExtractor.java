@@ -58,13 +58,12 @@ import jakarta.xml.bind.annotation.XmlType;
 
 /**
  * Extracts Text from Audio file.
- * 
+ *
  * <p>
  * Linux needes <i>libatomic.so.1</i> to be installed.
  * </p>
- * 
- * @author Ren\u00E9 Adler (eagle)
  *
+ * @author Ren\u00E9 Adler (eagle)
  */
 public class VoskExtractor {
 
@@ -190,11 +189,15 @@ public class VoskExtractor {
         this.modelLang = modelLang;
     }
 
+    public boolean isModelLangSupported(String modelLang) {
+        return getConfiguredModels().containsKey(modelLang);
+    }
+
     /**
      * Extract text from given audio file.
-     * 
+     *
      * @param input the audio file
-     * @return a {@link List} of {@link VoskResult}s 
+     * @return a {@link List} of {@link VoskResult}s
      * @throws IOException
      * @throws UnsupportedAudioFileException
      */
@@ -208,9 +211,9 @@ public class VoskExtractor {
         List<VoskResult> results = new ArrayList<>();
 
         try (Model model = new Model(getModelPath());
-                InputStream is = Files.newInputStream(input);
-                InputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(is));
-                Recognizer recognizer = new Recognizer(model, sampleRate)) {
+             InputStream is = Files.newInputStream(input);
+             InputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(is));
+             Recognizer recognizer = new Recognizer(model, sampleRate)) {
             recognizer.setWords(true);
 
             int nbytes;
@@ -232,7 +235,7 @@ public class VoskExtractor {
 
     /**
      * Guess language of given audio file.
-     * 
+     *
      * @param input the audio file
      * @return the langauage
      * @throws IOException
@@ -253,67 +256,67 @@ public class VoskExtractor {
         Stream<String> stream = guessConcurrent ? langs.parallelStream() : langs.stream();
 
         return stream.map(lang -> {
-            Map<String, Integer> gr = new HashMap<>();
+                    Map<String, Integer> gr = new HashMap<>();
 
-            try (Model model = new Model(getModelPath(lang));
-                    InputStream is = Files.newInputStream(input);
-                    InputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(is));
-                    Recognizer recognizer = new Recognizer(model, sampleRate)) {
-                recognizer.setWords(true);
+                    try (Model model = new Model(getModelPath(lang));
+                         InputStream is = Files.newInputStream(input);
+                         InputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(is));
+                         Recognizer recognizer = new Recognizer(model, sampleRate)) {
+                        recognizer.setWords(true);
 
-                int wordCount = 0;
-                int nbytes;
-                byte[] b = new byte[(int) (sampleRate / 2)];
-                List<String> allWords = new ArrayList<>();
-                while ((nbytes = ais.read(b)) >= 0) {
-                    if (recognizer.acceptWaveForm(b, nbytes)) {
-                        VoskResult result = unmarshall(recognizer.getResult());
-                        if (result.getResult() != null && !result.getResult().isEmpty()) {
-                            List<String> words = result.getResult().stream()
-                                    .filter(w -> w.getConf() >= guessMinWordConf &&
-                                            (allWords.isEmpty() || !w.getWord()
-                                                    .equalsIgnoreCase(allWords.get(allWords.size() - 1))))
-                                    .map(w -> w.getWord().toLowerCase(Locale.ROOT))
-                                    .filter(filterOtherLanguageWords(lang).negate())
-                                    .peek(allWords::add)
-                                    .collect(Collectors.toList());
+                        int wordCount = 0;
+                        int nbytes;
+                        byte[] b = new byte[(int) (sampleRate / 2)];
+                        List<String> allWords = new ArrayList<>();
+                        while ((nbytes = ais.read(b)) >= 0) {
+                            if (recognizer.acceptWaveForm(b, nbytes)) {
+                                VoskResult result = unmarshall(recognizer.getResult());
+                                if (result.getResult() != null && !result.getResult().isEmpty()) {
+                                    List<String> words = result.getResult().stream()
+                                            .filter(w -> w.getConf() >= guessMinWordConf &&
+                                                    (allWords.isEmpty() || !w.getWord()
+                                                            .equalsIgnoreCase(allWords.get(allWords.size() - 1))))
+                                            .map(w -> w.getWord().toLowerCase(Locale.ROOT))
+                                            .filter(filterOtherLanguageWords(lang).negate())
+                                            .peek(allWords::add)
+                                            .collect(Collectors.toList());
 
-                            Map<String, Integer> gres = guessMap.entrySet().stream()
-                                    .filter(e -> e.getValue() != null)
-                                    .collect(Collectors.toMap(e -> (String) e.getKey(),
-                                            e -> Long.valueOf(
-                                                    e.getValue().stream()
-                                                            .map(gw -> gw.toLowerCase(Locale.ROOT))
-                                                            .filter(words::contains).count())
-                                                    .intValue()));
+                                    Map<String, Integer> gres = guessMap.entrySet().stream()
+                                            .filter(e -> e.getValue() != null)
+                                            .collect(Collectors.toMap(e -> (String) e.getKey(),
+                                                    e -> Long.valueOf(
+                                                                    e.getValue().stream()
+                                                                            .map(gw -> gw.toLowerCase(Locale.ROOT))
+                                                                            .filter(words::contains).count())
+                                                            .intValue()));
 
-                            gres.entrySet().stream().forEach(e -> {
-                                if (gr.containsKey(e.getKey())) {
-                                    gr.compute(e.getKey(), (k, i) -> i + e.getValue());
-                                } else {
-                                    gr.put(e.getKey(), e.getValue());
+                                    gres.entrySet().stream().forEach(e -> {
+                                        if (gr.containsKey(e.getKey())) {
+                                            gr.compute(e.getKey(), (k, i) -> i + e.getValue());
+                                        } else {
+                                            gr.put(e.getKey(), e.getValue());
+                                        }
+                                    });
+
+                                    wordCount += words.size();
                                 }
-                            });
+                            }
 
-                            wordCount += words.size();
+                            if (wordCount > guessMaxWords) {
+                                break;
+                            }
                         }
+
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("{}\n{}", String.join(" ", allWords), countOccurrences(allWords, 3));
+                        }
+
+                        return gr;
+                    } catch (Exception e) {
+                        LOGGER.error(e.getMessage(), e);
+                        return null;
                     }
-
-                    if (wordCount > guessMaxWords) {
-                        break;
-                    }
-                }
-
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("{}\n{}", String.join(" ", allWords), countOccurrences(allWords, 3));
-                }
-
-                return gr;
-            } catch (Exception e) {
-                LOGGER.error(e.getMessage(), e);
-                return null;
-            }
-        }).filter(m -> m != null)
+                }).filter(m -> m != null)
                 .map(gr -> gr.entrySet()
                         .stream()
                         .max(sortGuess)
@@ -342,7 +345,7 @@ public class VoskExtractor {
 
     /**
      * Fixes JSON with wrong double values
-     * 
+     *
      * @param input
      * @return the fixed json
      */

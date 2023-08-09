@@ -1,5 +1,5 @@
 /*
- * $Id$ 
+ * $Id$
  * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -74,7 +74,6 @@ import org.mycore.vidconv.frontend.widget.Widget;
 
 /**
  * @author Ren\u00E9 Adler (eagle)
- *
  */
 public class ConverterService extends Widget implements Listener {
 
@@ -112,7 +111,7 @@ public class ConverterService extends Widget implements Listener {
     static {
         Optional.ofNullable(FFMpegImpl.detectHWAccels())
                 .ifPresent(dhw -> dhw.getHWAccels().stream().filter(
-                        hw -> SETTINGS.getSettings() != null ? SETTINGS.getSettings().getHwaccels().contains(hw) : true)
+                                hw -> SETTINGS.getSettings() != null ? SETTINGS.getSettings().getHwaccels().contains(hw) : true)
                         .forEach(hw -> hwAccels.add(hw)));
     }
 
@@ -304,6 +303,11 @@ public class ConverterService extends Widget implements Listener {
     }
 
     public String addJob(final Path inputPath, final String jobId, final int priority, final String completeCallBack)
+            throws JAXBException, IOException, ExecutionException, InterruptedException {
+        return addJob(inputPath, jobId, priority, completeCallBack, null);
+    }
+
+    public String addJob(final Path inputPath, final String jobId, final int priority, final String completeCallBack, final String language)
             throws InterruptedException, JAXBException, ExecutionException, IOException {
         final SettingsWrapper settings = SETTINGS.getSettings();
 
@@ -330,7 +334,7 @@ public class ConverterService extends Widget implements Listener {
                             try {
                                 return output.getVideo().getUpscale()
                                         || output.getVideo().getScale() != null
-                                                && !FFMpegImpl.isUpscaling(inputPath, output.getVideo().getScale());
+                                        && !FFMpegImpl.isUpscaling(inputPath, output.getVideo().getScale());
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
                             }
@@ -341,11 +345,11 @@ public class ConverterService extends Widget implements Listener {
                 }
 
                 final ConverterJob converter = new ConverterJob(id, prio, outputs, inputPath, outputPath,
-                        completeCallBack);
+                        completeCallBack, language);
 
                 if (converters.containsKey(id)
                         && Optional.ofNullable(converters.get(id)).filter(cj -> cj.inputPath().equals(inputPath))
-                                .map(ConverterJob::isRunning).orElse(false)) {
+                        .map(ConverterJob::isRunning).orElse(false)) {
                     LOGGER.warn("File \"" + inputPath.toFile().getAbsolutePath() + "\" is already in queue.");
                     return null;
                 }
@@ -430,6 +434,8 @@ public class ConverterService extends Widget implements Listener {
 
         private final String completeCallBack;
 
+        private final String language;
+
         private final List<Output> outputs;
 
         private String command;
@@ -455,13 +461,14 @@ public class ConverterService extends Widget implements Listener {
         private Timer timer;
 
         public ConverterJob(final String id, int priority, final List<Output> outputs, final Path inputPath,
-                final Path outputPath,
-                final String completeCallBack) throws InterruptedException, IOException, JAXBException {
+                            final Path outputPath,
+                            final String completeCallBack, final String language) throws InterruptedException, IOException, JAXBException {
             this.id = id;
             this.outputs = outputs;
             this.inputPath = inputPath;
             this.outputPath = outputPath;
             this.completeCallBack = completeCallBack;
+            this.language = language;
             this.hwAccel = Optional.empty();
             this.addTime = Instant.now();
             this.done = false;
@@ -478,8 +485,8 @@ public class ConverterService extends Widget implements Listener {
                 throws InterruptedException, JAXBException, ExecutionException, IOException {
             hwAccel = !allowHwAccel ? Optional.empty()
                     : hwAccels.stream()
-                            .filter(hw -> FFMpegImpl.canHWAccelerate(outputs, hw)).sorted()
-                            .findFirst();
+                    .filter(hw -> FFMpegImpl.canHWAccelerate(outputs, hw)).sorted()
+                    .findFirst();
 
             command = FFMpegImpl.command(id, inputPath, outputs, hwAccel);
             final Executable exec = new Executable(command);
@@ -546,6 +553,10 @@ public class ConverterService extends Widget implements Listener {
 
         public String completeCallBack() {
             return completeCallBack;
+        }
+
+        public String language() {
+            return language;
         }
 
         public String command() {
