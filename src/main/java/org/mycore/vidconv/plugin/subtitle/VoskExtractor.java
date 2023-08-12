@@ -16,30 +16,8 @@
  */
 package org.mycore.vidconv.plugin.subtitle;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.UnsupportedAudioFileException;
-
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.annotation.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.vidconv.common.config.Configuration;
@@ -49,12 +27,20 @@ import org.vosk.LogLevel;
 import org.vosk.Model;
 import org.vosk.Recognizer;
 
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
-import jakarta.xml.bind.annotation.XmlType;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Extracts Text from Audio file.
@@ -283,22 +269,22 @@ public class VoskExtractor {
 
                                     Map<String, Integer> gres = guessMap.entrySet().stream()
                                             .filter(e -> e.getValue() != null)
-                                            .collect(Collectors.toMap(e -> (String) e.getKey(),
+                                            .collect(Collectors.toMap(Entry::getKey,
                                                     e -> Long.valueOf(
                                                                     e.getValue().stream()
                                                                             .map(gw -> gw.toLowerCase(Locale.ROOT))
                                                                             .filter(words::contains).count())
                                                             .intValue()));
 
-                                    gres.entrySet().stream().forEach(e -> {
-                                        if (gr.containsKey(e.getKey())) {
-                                            gr.compute(e.getKey(), (k, i) -> i + e.getValue());
+                                    gres.forEach((key, value) -> {
+                                        if (gr.containsKey(key)) {
+                                            gr.compute(key, (k, i) -> i + value);
                                         } else {
-                                            gr.put(e.getKey(), e.getValue());
+                                            gr.put(key, value);
                                         }
                                     });
 
-                                    wordCount += words.size();
+                                    wordCount += result.getResult().size();
                                 }
                             }
 
@@ -309,6 +295,7 @@ public class VoskExtractor {
 
                         if (LOGGER.isDebugEnabled()) {
                             LOGGER.debug("{}\n{}", String.join(" ", allWords), countOccurrences(allWords, 3));
+                            LOGGER.debug("{} -> {} {} ({}%)", lang, wordCount, allWords.size(), ((100f / (float) wordCount) * (float) allWords.size()));
                         }
 
                         return gr;
@@ -316,20 +303,18 @@ public class VoskExtractor {
                         LOGGER.error(e.getMessage(), e);
                         return null;
                     }
-                }).filter(m -> m != null)
+                }).filter(Objects::nonNull)
                 .map(gr -> gr.entrySet()
                         .stream()
                         .max(sortGuess)
                         .orElse(null))
-                .filter(e -> e != null)
+                .filter(Objects::nonNull)
                 .max(sortGuess)
                 .map(e -> e.getValue() == 0 ? null : e.getKey())
                 .orElse(null);
     }
 
-    private Comparator<Entry<String, Integer>> sortGuess = (e1, e2) -> {
-        return e1.getValue().compareTo(e2.getValue());
-    };
+    private Comparator<Entry<String, Integer>> sortGuess = Entry.comparingByValue();
 
     private Predicate<String> filterOtherLanguageWords(String lang) {
         return (w) -> getConfiguredGuessMap().entrySet().stream()
@@ -339,8 +324,8 @@ public class VoskExtractor {
     private Map<String, Long> countOccurrences(List<String> sentence, int minOccurrence) {
         return sentence.stream()
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting())).entrySet().stream()
-                .filter(e -> e.getValue() > 3)
-                .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+                .filter(e -> e.getValue() > minOccurrence)
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
     }
 
     /**
