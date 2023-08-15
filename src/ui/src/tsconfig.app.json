@@ -3,7 +3,8 @@
   "compilerOptions": {
     "outDir": "../out-tsc/app",
     "baseUrl": "/",
-    "types": []
+    "types": [],
+    "skipLibCheck": true
   },
   "angularCompilerOptions": {
     "enableIvy": true

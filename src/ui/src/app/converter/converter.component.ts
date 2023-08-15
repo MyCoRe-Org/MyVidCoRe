@@ -3,6 +3,7 @@ import { Component, OnInit, OnDestroy } from "@angular/core";
 import { timer, Subscription, Observable } from "rxjs";
 
 import videojs from "video.js";
+import Player from "video.js/dist/types/player";
 //import videojsPluginQualitySelector from "@silvermine/videojs-quality-selector";
 
 import { environment } from "../../environments/environment";
@@ -49,7 +50,7 @@ export class ConverterComponent implements OnInit, OnDestroy {
 
     jobStatus: Map<string, Observable<Job>> = new Map();
 
-    videoPlayer: Map<string, videojs.Player> = new Map();
+    videoPlayer: Map<string, Player> = new Map();
 
     constructor(private $api: ConverterApiService, private $error: ErrorService, private $state: StateService,
         private $jobsvc: ConverterJobService, private globals: UIRouterGlobals) {
