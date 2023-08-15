@@ -1,15 +1,15 @@
-import { Component, OnInit, OnDestroy } from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 
-import { timer, Subscription, Observable } from "rxjs";
+import { Observable, Subscription, timer } from "rxjs";
 
 import videojs from "video.js";
 import Player from "video.js/dist/types/player";
-//import videojsPluginQualitySelector from "@silvermine/videojs-quality-selector";
+import videojsPluginQualitySelector from "@silvermine/videojs-quality-selector";
 
 import { environment } from "../../environments/environment";
 
 import { ConverterApiService } from "./api.service";
-import { ConverterJobService, AppEventData } from "./converterJob.service";
+import { AppEventData, ConverterJobService } from "./converterJob.service";
 import { ErrorService } from "../_services/error.service";
 
 import { Job } from "./definitions";
@@ -25,6 +25,8 @@ export class ConverterComponent implements OnInit, OnDestroy {
     static REMOVE_TIMEOUT = 30000;
 
     static REFRESH_INTERVAL = 30000;
+
+    protected readonly encodeURIComponent = encodeURIComponent;
 
     baseUrl = environment.apiBaseUrl;
 
@@ -53,7 +55,7 @@ export class ConverterComponent implements OnInit, OnDestroy {
     videoPlayer: Map<string, Player> = new Map();
 
     constructor(private $api: ConverterApiService, private $error: ErrorService, private $state: StateService,
-        private $jobsvc: ConverterJobService, private globals: UIRouterGlobals) {
+                private $jobsvc: ConverterJobService, private globals: UIRouterGlobals) {
         this.page = this.globals.params.page || 1;
         this.limit = this.globals.params.limit || 50;
     }
@@ -97,8 +99,12 @@ export class ConverterComponent implements OnInit, OnDestroy {
                         ],
                     },
                 }, () => {
-                    // videojsPluginQualitySelector(videojs);
-                    // player.controlBar.addChild("QualitySelector");
+                    try {
+                        videojsPluginQualitySelector(videojs);
+                        (<any>player).controlBar.addChild("QualitySelector");
+                    } catch (e) {
+                        console.error(e);
+                    }
                 });
             }
 
@@ -144,15 +150,11 @@ export class ConverterComponent implements OnInit, OnDestroy {
     }
 
     private refreshDone() {
-        this.$api.getDone(this.page || 1, this.limit).toPromise().then((res: any) => this.doneJobs = res).
-            catch(err => this.$error.handleError(err)).
-            then(() => this.buildDone());
+        this.$api.getDone(this.page || 1, this.limit).toPromise().then((res: any) => this.doneJobs = res).catch(err => this.$error.handleError(err)).then(() => this.buildDone());
     }
 
     private refreshRunning() {
-        this.$api.getRunning().toPromise().then((res: any) => this.runningJobs = res).
-            catch(err => this.$error.handleError(err)).
-            then(() => this.buildRunning());
+        this.$api.getRunning().toPromise().then((res: any) => this.runningJobs = res).catch(err => this.$error.handleError(err)).then(() => this.buildRunning());
     }
 
     private filterDone(job: Job) {
@@ -162,7 +164,7 @@ export class ConverterComponent implements OnInit, OnDestroy {
 
         const diff = new Date().getTime() - new Date(job.endTime).getTime();
         return job.running || !job.running && !job.done ?
-            true : job.done && diff < ConverterComponent.REFRESH_INTERVAL ? true : false;
+            true : job.done && diff < ConverterComponent.REFRESH_INTERVAL;
     }
 
     private sortByPercent(a: Job, b: Job) {
@@ -232,7 +234,7 @@ export class ConverterComponent implements OnInit, OnDestroy {
         this.$state.transitionTo(this.globals.$current.name, {
             page: this.page,
             limit: this.limit
-        }, { reload: true });
+        }, {reload: true});
     }
 
 }

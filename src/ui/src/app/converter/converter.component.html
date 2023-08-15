@@ -123,7 +123,7 @@
                                 class="video-preview video-js vjs-default-skin vjs-big-play-centered embed-responsive-item"
                                 controls preload="none">
                                 <source *ngFor="let file of job.files"
-                                    [src]="baseUrl + '/widget/converter/' + job.id + '/' + file.name + '/download'"
+                                    [src]="baseUrl + '/widget/converter/' + encodeURIComponent(job.id) + '/' + encodeURIComponent(file.name) + '/download'"
                                     [attr.label]="formatScale(file.scale)" type="video/{{ file.format }}">
                             </video>
                         </div>
