@@ -62,18 +62,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "myvidcore-ui:build"
+            "buildTarget": "myvidcore-ui:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "myvidcore-ui:build:production"
+              "buildTarget": "myvidcore-ui:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "myvidcore-ui:build"
+            "buildTarget": "myvidcore-ui:build"
           }
         }
       }
