@@ -1,9 +1,9 @@
 import { BrowserModule } from "@angular/platform-browser";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { HttpClientModule, HttpClient, HTTP_INTERCEPTORS } from "@angular/common/http";
-import { NgModule, Injectable } from "@angular/core";
+import { HTTP_INTERCEPTORS, HttpClient, provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
+import { Injectable, NgModule } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { TranslateCompiler, TranslateModule, TranslateLoader } from "@ngx-translate/core";
+import { TranslateCompiler, TranslateLoader, TranslateModule } from "@ngx-translate/core";
 import { TranslateHttpLoader } from "@ngx-translate/http-loader";
 import { MESSAGE_FORMAT_CONFIG, TranslateMessageFormatCompiler } from "ngx-translate-messageformat-compiler";
 
@@ -53,8 +53,9 @@ export const SettingsFutureState = {
 };
 
 // @FIXME workaround for ivy build
-@Injectable({ providedIn: "root" })
-export class InjectableTranslateMessageFormatCompiler extends TranslateMessageFormatCompiler { }
+@Injectable({providedIn: "root"})
+export class InjectableTranslateMessageFormatCompiler extends TranslateMessageFormatCompiler {
+}
 
 @NgModule({
     declarations: [
@@ -63,11 +64,9 @@ export class InjectableTranslateMessageFormatCompiler extends TranslateMessageFo
         DashboardComponent,
         ConfirmComponent
     ],
-    imports: [
-        BreadcrumbModule,
+    bootstrap: [AppComponent], imports: [BreadcrumbModule,
         BrowserModule,
         BrowserAnimationsModule,
-        HttpClientModule,
         FormsModule,
         ReactiveFormsModule,
         SpinnerModule,
@@ -107,10 +106,9 @@ export class InjectableTranslateMessageFormatCompiler extends TranslateMessageFo
             useHash: true,
             config: routerConfigFn,
             otherwise: "/"
-        })
-    ],
-    providers: [
-        { provide: HTTP_INTERCEPTORS, useClass: AuthHttpInterceptor, multi: true },
+        })], providers: [
+        provideHttpClient(withInterceptorsFromDi()),
+        {provide: HTTP_INTERCEPTORS, useClass: AuthHttpInterceptor, multi: true},
         {
             provide: MESSAGE_FORMAT_CONFIG, useValue: {
                 biDiSupport: false,
@@ -122,7 +120,7 @@ export class InjectableTranslateMessageFormatCompiler extends TranslateMessageFo
         ApiService,
         CacheService,
         ErrorService
-    ],
-    bootstrap: [AppComponent]
+    ]
 })
-export class AppModule { }
+export class AppModule {
+}
