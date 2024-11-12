@@ -21,6 +21,7 @@ jobs:
         with:
           java-version: 11
           distribution: adopt
+          cache: 'maven'
 
       - name: Set up nodejs
         uses: actions/setup-node@v4
@@ -37,11 +38,6 @@ jobs:
           sudo apt update
           sudo apt install ffmpeg
 
-      - name: Restore Maven cache
-        uses: skjolber/maven-cache-github-action@v1
-        with:
-          step: restore
-
       - name: Build
         run: |
           mkdir ~/tmp
@@ -57,8 +53,3 @@ jobs:
           path: |
             ./**/surefire-reports
             ./**/result
-
-      - name: Save Maven cache
-        uses: skjolber/maven-cache-github-action@v1
-        with:
-          step: save
