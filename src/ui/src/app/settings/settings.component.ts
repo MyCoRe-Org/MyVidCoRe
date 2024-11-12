@@ -1,8 +1,8 @@
-import { Component, OnInit, Input } from "@angular/core";
-import { UntypedFormBuilder, UntypedFormArray, UntypedFormGroup, Validators } from "@angular/forms";
+import { Component, Input, OnInit } from "@angular/core";
+import { UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 
-import { of, forkJoin } from "rxjs";
-import { mergeMap, map, mergeAll, take, delay, retryWhen } from "rxjs/operators";
+import { forkJoin, of } from "rxjs";
+import { delay, map, mergeAll, mergeMap, retryWhen, take } from "rxjs/operators";
 
 import { Transition } from "@uirouter/core";
 
@@ -12,7 +12,7 @@ import { ErrorService } from "../_services/error.service";
 import { SpinnerService } from "../spinner/spinner.service";
 
 import { Codec, Format } from "../converter/definitions";
-import { Settings, Output, AllowedFormat, HWAccel } from "./definitions";
+import { AllowedFormat, HWAccel, Output, Settings } from "./definitions";
 import { DEFAULT_BITRATES, DEFAULT_FORMATS } from "./defaults";
 import { SettingsVideoComponent } from "./settings.video.component";
 import { SettingsAudioComponent } from "./settings.audio.component";
@@ -51,7 +51,7 @@ export class SettingsComponent implements OnInit {
     output: UntypedFormArray;
 
     constructor(private $api: SettingsApiService, private $capi: ConverterApiService,
-        private $error: ErrorService, private $spinner: SpinnerService, public $fb: UntypedFormBuilder) {
+                private $error: ErrorService, private $spinner: SpinnerService, public $fb: UntypedFormBuilder) {
     }
 
     ngOnInit() {
@@ -128,7 +128,7 @@ export class SettingsComponent implements OnInit {
                         )
                     ).pipe(
                         map(re => {
-                            cc.encoders = { encoder: [re] };
+                            cc.encoders = {encoder: [re]};
                             return cc;
                         })
                     );
@@ -141,7 +141,7 @@ export class SettingsComponent implements OnInit {
         this.allowedFormats = Object.keys(DEFAULT_FORMATS).map(f => {
             return {
                 name: f,
-                description: this.filterFormat(f).description || "",
+                description: this.filterFormat(f)?.description || "",
                 audio: DEFAULT_FORMATS[f].audio.map((n: string) => this.filterCodecs(n)).filter((r: any) => r),
                 video: DEFAULT_FORMATS[f].video.map((n: string) => this.filterCodecs(n)).filter((r: any) => r)
             };
@@ -198,15 +198,15 @@ export class SettingsComponent implements OnInit {
     }
 
     filterFormat(name: string): Format {
-        return this.formats.find(f => f.name === name);
+        return this.formats.find(f => f.name.toLocaleLowerCase() === name.toLocaleLowerCase());
     }
 
     filterCodecs(name: string): Codec {
-        return this.codecs.find(f => f.name === name);
+        return this.codecs.find(f => f.name.toLocaleLowerCase() === name.toLocaleLowerCase());
     }
 
     filterParameter(params: Array<any>, name: string) {
-        return params.find(p => p.name === name);
+        return params.find(p => p.name.toLocaleLowerCase() === name.toLocaleLowerCase());
     }
 
     createOutput(output: Output = null): UntypedFormGroup {
@@ -253,15 +253,14 @@ export class SettingsComponent implements OnInit {
         return name && re.test(name) ? "_" + name : name;
     }
 
-    onSubmit({ value, valid }) {
+    onSubmit({value, valid}) {
         if (valid) {
             value.output.forEach((o: Output) => {
                 ["video", "video-fallback", "audio"].forEach(type => {
                     if (o[type]) {
                         const sel = o[type].codec;
                         const cc = this.allowedFormats.find(f => f.name === o.format);
-                        const sc = cc[type === "audio" ? type : "video"].
-                            find(c => c.name === sel || c.encoders && c.encoders.encoder.find(e => e.name === sel));
+                        const sc = cc[type === "audio" ? type : "video"].find(c => c.name === sel || c.encoders && c.encoders.encoder.find(e => e.name === sel));
                         const se = sc ?
                             sc.encoders.encoder.length === 1 ? sc.encoders.encoder[0] : sc.encoders.encoder.find(e => e.name === sel)
                             : cc.video[0].encoders.encoder[0];
@@ -338,7 +337,7 @@ export function resolveFnHWaccels($api: ConverterApiService, $error: ErrorServic
 }
 
 export function resolveFnSettings($api: SettingsApiService, $error: ErrorService, $spinner: SpinnerService, trans: Transition,
-    _codecs: Array<Codec>, _formats: Array<Format>, _hwAccesls: Array<HWAccel>) {
+                                  _codecs: Array<Codec>, _formats: Array<Format>, _hwAccesls: Array<HWAccel>) {
     $spinner.setLoadingState(trans.options().source !== "url" && trans.from().name !== trans.to().name);
 
     const reload = typeof trans.options().reload === "boolean" ? <boolean>trans.options().reload : false;
