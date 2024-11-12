@@ -5,49 +5,55 @@ on: [ push, pull_request ]
 env:
   MAVEN_OPTS: -Xmx1024M -Xss128M -XX:+CMSClassUnloadingEnabled
   SELENIUM_DRIVER: "chrome"
-  SELENIUM_DRIVER_ARGS: "--headless window-size=1280,1024 --no-sandbox"
+  SELENIUM_DRIVER_ARGS: "no-sandbox ignore-certificate-errors remote-allow-origins=* disable-popup-blocking disable-default-apps disable-extensions-file-access-check disable-infobars disable-dev-shm-usage disable-gpu disable-search-engine
+-choice-screen accept-lang=de-DE headless=new window-size=1280,1024"
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Set up JDK
-      uses: actions/setup-java@v2
-      with:
-        java-version: 11
-        distribution: adopt
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: 11
+          distribution: adopt
 
-    - name: Set up test dependencies
-      run: |
-        sudo apt update
-        sudo apt install chromium-browser ffmpeg
+      - name: Set up chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
 
-    - name: Restore Maven cache
-      uses: skjolber/maven-cache-github-action@v1
-      with:
-        step: restore
+      - name: Set up test dependencies
+        run: |
+          sudo apt update
+          sudo apt install ffmpeg
 
-    - name: Build
-      run: |
-        mkdir ~/tmp
-        export TMPDIR=~/tmp
+      - name: Restore Maven cache
+        uses: skjolber/maven-cache-github-action@v1
+        with:
+          step: restore
 
-        mvn -B clean install
+      - name: Build
+        run: |
+          mkdir ~/tmp
+          export TMPDIR=~/tmp
+          
+          mvn -B clean install
 
-    - name: Upload logs on build failure
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-results
-        path: |
-          ./**/surefire-reports
-          ./**/result
+      - name: Upload logs on build failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            ./**/surefire-reports
+            ./**/result
 
-    - name: Save Maven cache
-      uses: skjolber/maven-cache-github-action@v1
-      with:
-        step: save
+      - name: Save Maven cache
+        uses: skjolber/maven-cache-github-action@v1
+        with:
+          step: save
