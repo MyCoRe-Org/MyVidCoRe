@@ -13,7 +13,8 @@ import { SettingsExtendedComponent } from "./settings.extended.component";
     templateUrl: "./settings.video.component.html",
     viewProviders: [
         { provide: ControlContainer, useExisting: FormGroupDirective }
-    ]
+    ],
+    standalone: false
 })
 export class SettingsVideoComponent implements OnInit, OnChanges {
 

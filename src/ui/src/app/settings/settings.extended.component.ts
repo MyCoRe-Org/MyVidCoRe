@@ -8,7 +8,8 @@ import { Settings } from "./definitions";
     templateUrl: "./settings.extended.component.html",
     viewProviders: [
         { provide: ControlContainer, useExisting: FormGroupDirective }
-    ]
+    ],
+    standalone: false
 })
 export class SettingsExtendedComponent implements OnInit, OnChanges {
 

@@ -20,7 +20,8 @@ import { SettingsExtendedComponent } from "./settings.extended.component";
 
 @Component({
     selector: "ui-settings",
-    templateUrl: "./settings.component.html"
+    templateUrl: "./settings.component.html",
+    standalone: false
 })
 export class SettingsComponent implements OnInit {
 

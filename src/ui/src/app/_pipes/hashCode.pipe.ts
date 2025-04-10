@@ -4,7 +4,8 @@ import { hashCode } from "../definitions";
 
 @Pipe({
     name: "hashCode",
-    pure: false
+    pure: false,
+    standalone: false
 })
 export class HashCodePipe implements PipeTransform {
 

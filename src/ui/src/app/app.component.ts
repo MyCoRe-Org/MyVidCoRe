@@ -11,7 +11,8 @@ import { ROUTES, RouteFlag, RouteItem, RouteMenu } from "./routes";
 
 @Component({
     selector: "ui-root",
-    templateUrl: "./app.component.html"
+    templateUrl: "./app.component.html",
+    standalone: false
 })
 export class AppComponent implements OnInit {
 

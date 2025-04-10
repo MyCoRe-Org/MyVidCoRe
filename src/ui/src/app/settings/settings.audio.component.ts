@@ -11,7 +11,8 @@ import {
     templateUrl: "./settings.audio.component.html",
     viewProviders: [
         { provide: ControlContainer, useExisting: FormGroupDirective }
-    ]
+    ],
+    standalone: false
 })
 export class SettingsAudioComponent implements OnInit, OnChanges {
 

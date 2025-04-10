@@ -27,7 +27,8 @@ export interface ConfirmOptions {
 
 @Component({
     selector: "ui-confirm-modal",
-    templateUrl: "./confirm.component.html"
+    templateUrl: "./confirm.component.html",
+    standalone: false
 })
 export class ConfirmComponent implements OnInit {
 

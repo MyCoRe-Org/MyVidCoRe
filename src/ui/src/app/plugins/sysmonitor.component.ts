@@ -15,7 +15,10 @@ export interface MonitorAttribs {
     [name: string]: Attrib;
 }
 
-@Directive({ selector: "ng-template[sysMonContent]" })
+@Directive({
+    selector: "ng-template[sysMonContent]",
+    standalone: false
+})
 export class SystemMonitorContentDirective {
 
     @Output()
@@ -27,7 +30,8 @@ export class SystemMonitorContentDirective {
 @Component({
     selector: "ui-sysmonitor-plugin",
     templateUrl: "./sysmonitor.component.html",
-    providers: [WebsocketService, SystemMonitorService]
+    providers: [WebsocketService, SystemMonitorService],
+    standalone: false
 })
 export class SystemMonitorComponent implements OnInit, OnDestroy, AfterContentChecked {
 

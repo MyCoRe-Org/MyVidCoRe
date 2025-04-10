@@ -11,7 +11,8 @@ import { GPUEntry } from "../plugins/nvmonitor.component";
 @Component({
     selector: "ui-dashboard",
     templateUrl: "./dashboard.component.html",
-    providers: [ConverterApiService]
+    providers: [ConverterApiService],
+    standalone: false
 })
 export class DashboardComponent implements OnInit {
 

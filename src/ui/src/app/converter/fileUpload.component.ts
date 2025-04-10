@@ -25,7 +25,8 @@ interface FileItem {
 @Component({
     selector: "ui-fileupload",
     templateUrl: "./fileUpload.component.html",
-    styleUrls: ["fileUpload.component.scss"]
+    styleUrls: ["fileUpload.component.scss"],
+    standalone: false
 })
 export class FileUploadComponent implements OnInit {
 
@@ -140,7 +141,10 @@ export class FileUploadComponent implements OnInit {
 
 }
 
-@Directive({ selector: "[fileDropZone]" })
+@Directive({
+    selector: "[fileDropZone]",
+    standalone: false
+})
 export class FileDropZoneDirective {
 
     @Output()

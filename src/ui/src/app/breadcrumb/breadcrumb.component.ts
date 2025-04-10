@@ -6,6 +6,7 @@ import { BreadcrumbService } from "./breadcrumb.service";
 @Component({
     selector: "ui-breadcrumb",
     templateUrl: "./breadcrumb.component.html",
+    standalone: false
 })
 export class BreadcrumbComponent {
 

@@ -5,7 +5,8 @@ import { SpinnerService } from "./spinner.service";
 @Component({
     selector: "ui-spinner",
     templateUrl: "./spinner.component.html",
-    styleUrls: ["./spinner.component.scss"]
+    styleUrls: ["./spinner.component.scss"],
+    standalone: false
 })
 export class SpinnerComponent implements OnInit {
 

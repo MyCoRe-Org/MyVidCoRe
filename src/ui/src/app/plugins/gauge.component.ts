@@ -4,7 +4,8 @@ import { Attrib } from "./definitions";
 
 @Component({
     selector: "ui-gauge",
-    templateUrl: "./gauge.component.html"
+    templateUrl: "./gauge.component.html",
+    standalone: false
 })
 export class GaugeComponent {
 

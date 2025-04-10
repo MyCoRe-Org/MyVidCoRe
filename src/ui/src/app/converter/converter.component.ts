@@ -18,7 +18,8 @@ import { StateService, UIRouterGlobals } from "@uirouter/core";
 
 @Component({
     selector: "ui-converter",
-    templateUrl: "./converter.component.html"
+    templateUrl: "./converter.component.html",
+    standalone: false
 })
 export class ConverterComponent implements OnInit, OnDestroy {
 

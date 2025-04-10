@@ -9,7 +9,8 @@ import { SpinnerService } from "../spinner/spinner.service";
 
 @Component({
     selector: "ui-login",
-    templateUrl: "./login.component.html"
+    templateUrl: "./login.component.html",
+    standalone: false
 })
 class LoginComponent implements OnInit {
     form: UntypedFormGroup;

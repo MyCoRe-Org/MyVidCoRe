@@ -14,7 +14,10 @@ export interface GPUEntry {
     [name: string]: Attrib;
 }
 
-@Directive({ selector: "ng-template[nvMonContent]" })
+@Directive({
+    selector: "ng-template[nvMonContent]",
+    standalone: false
+})
 export class NVMonitorContentDirective {
 
     @Output()
@@ -26,7 +29,8 @@ export class NVMonitorContentDirective {
 @Component({
     selector: "ui-nvmonitor-plugin",
     templateUrl: "./nvmonitor.component.html",
-    providers: [WebsocketService, NVMonitorService]
+    providers: [WebsocketService, NVMonitorService],
+    standalone: false
 })
 export class NVMonitorComponent implements OnInit, OnDestroy, AfterContentChecked {
 
