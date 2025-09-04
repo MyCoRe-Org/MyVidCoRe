@@ -1,84 +1,89 @@
-<div *ngIf="parameter && type">
-    <ng-template #paramBuilder let-i="i" let-type="type" let-param="param">
-        <ng-container formGroupName="parameter">
-            <ng-container *ngIf="param.type === 'boolean'">
-                <div *ngIf="param.defaultValue !== 'auto'" class="form-check form-switch mt-2">
-                    <input type="checkbox" class="form-check-input"
-                           [id]="'output-' + i + '-' + type + '-' + param.name" [formControlName]="param.name">
-                    <label class="form-check-label"
-                           [attr.for]="'output-' + i + '-' + type + '-' + param.name">{{ param.description }}</label>
-                </div>
-                <div class="row" *ngIf="param.defaultValue === 'auto'">
-                    <label class="col-form-label col-12">{{ param.description }}</label>
-                    <div class="col-12">
-                        <div class="form-check custom-control-inline">
-                            <input class="form-check-input" type="radio"
-                                   [id]="'output-' + i + '-' + type + '-' + param.name + '-auto'"
-                                   [formControlName]="param.name" value="auto">
+@if (parameter && type) {
+    <div>
+        <ng-template #paramBuilder let-i="i" let-type="type" let-param="param">
+            <ng-container formGroupName="parameter">
+                @if (param.type === 'boolean') {
+                    @if (param.defaultValue !== 'auto') {
+                        <div class="form-check form-switch mt-2">
+                            <input type="checkbox" class="form-check-input"
+                                   [id]="'output-' + i + '-' + type + '-' + param.name" [formControlName]="param.name">
                             <label class="form-check-label"
-                                   [attr.for]="'output-' + i + '-' + type + '-' + param.name + '-auto'">{{ 'settings.auto' | translate }}</label>
+                                   [attr.for]="'output-' + i + '-' + type + '-' + param.name">{{ param.description }}</label>
                         </div>
-                        <div class="form-check custom-control-inline">
-                            <input class="form-check-input" type="radio"
-                                   [id]="'output-' + i + '-' + type + '-' + param.name + '-true'"
-                                   [formControlName]="param.name" [value]="true">
-                            <label class="form-check-label"
-                                   [attr.for]="'output-' + i + '-' + type + '-' + param.name + '-true'">{{ 'general.boolean.true' | translate }}</label>
+                    } @else {
+                        <div class="row">
+                            <label class="col-form-label col-12">{{ param.description }}</label>
+                            <div class="col-12">
+                                <div class="form-check custom-control-inline">
+                                    <input class="form-check-input" type="radio"
+                                           [id]="'output-' + i + '-' + type + '-' + param.name + '-auto'"
+                                           [formControlName]="param.name" value="auto">
+                                    <label class="form-check-label"
+                                           [attr.for]="'output-' + i + '-' + type + '-' + param.name + '-auto'">{{ 'settings.auto' | translate }}</label>
+                                </div>
+                                <div class="form-check custom-control-inline">
+                                    <input class="form-check-input" type="radio"
+                                           [id]="'output-' + i + '-' + type + '-' + param.name + '-true'"
+                                           [formControlName]="param.name" [value]="true">
+                                    <label class="form-check-label"
+                                           [attr.for]="'output-' + i + '-' + type + '-' + param.name + '-true'">{{ 'general.boolean.true' | translate }}</label>
+                                </div>
+                                <div class="form-check custom-control-inline">
+                                    <input class="form-check-input" type="radio"
+                                           [id]="'output-' + i + '-' + type + '-' + param.name + '-false'"
+                                           [formControlName]="param.name" [value]="false">
+                                    <label class="form-check-label"
+                                           [attr.for]="'output-' + i + '-' + type + '-' + param.name + '-false'">{{ 'general.boolean.false' | translate }}</label>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-check custom-control-inline">
-                            <input class="form-check-input" type="radio"
-                                   [id]="'output-' + i + '-' + type + '-' + param.name + '-false'"
-                                   [formControlName]="param.name" [value]="false">
-                            <label class="form-check-label"
-                                   [attr.for]="'output-' + i + '-' + type + '-' + param.name + '-false'">{{ 'general.boolean.false' | translate }}</label>
-                        </div>
-                    </div>
-                </div>
-            </ng-container>
-
-            <ng-container *ngIf="param.type === 'string'">
-                <label [attr.for]="'output-' + i + '-' + type + '-' + param.name">{{ param.description }}</label>
-                <input type="text" class="form-control" [id]="'output-' + i + '-' + type + '-' + param.name"
-                       [formControlName]="param.name"
-                       [ngClass]="{'is-invalid':parameter.controls[param.name].errors}">
-            </ng-container>
-
-            <ng-container *ngIf="param.type === 'int' || param.type === 'float'">
-                <ng-container *ngIf="!param.values">
+                    }
+                } @else if (param.type === 'string') {
                     <label [attr.for]="'output-' + i + '-' + type + '-' + param.name">{{ param.description }}</label>
-                    <input type="number" class="form-control" [id]="'output-' + i + '-' + type + '-' + param.name"
-                           [formControlName]="param.name" [attr.min]="param.fromValue" [attr.max]="param.toValue"
+                    <input type="text" class="form-control" [id]="'output-' + i + '-' + type + '-' + param.name"
+                           [formControlName]="param.name"
                            [ngClass]="{'is-invalid':parameter.controls[param.name].errors}">
-                </ng-container>
-
-                <ng-container *ngIf="param.values">
-                    <label [attr.for]="'output-' + i + '-' + type + '-' + param.name">{{ param.description }}</label>
-                    <select class="form-select" [id]="'output-' + i + '-' + type + '-' + param.name"
-                            [formControlName]="param.name"
-                            [ngClass]="{'is-invalid':parameter.controls[param.name].errors}">
-                        <option [value]="param.defaultValue">
-                            {{ 'settings.default' | translate }}
-                        </option>
-                        <option *ngFor="let v of param.values" [value]="v.name">
-                            {{ v.description || v.name }}</option>
-                    </select>
-                </ng-container>
+                } @else if (param.type === 'int' || param.type === 'float') {
+                    @if (!param.values) {
+                        <label [attr.for]="'output-' + i + '-' + type + '-' + param.name">{{ param.description }}</label>
+                        <input type="number" class="form-control" [id]="'output-' + i + '-' + type + '-' + param.name"
+                               [formControlName]="param.name" [attr.min]="param.fromValue" [attr.max]="param.toValue"
+                               [ngClass]="{'is-invalid':parameter.controls[param.name].errors}">
+                    } @else {
+                        <label [attr.for]="'output-' + i + '-' + type + '-' + param.name">{{ param.description }}</label>
+                        <select class="form-select" [id]="'output-' + i + '-' + type + '-' + param.name"
+                                [formControlName]="param.name"
+                                [ngClass]="{'is-invalid':parameter.controls[param.name].errors}">
+                            <option [value]="param.defaultValue">
+                                {{ 'settings.default' | translate }}
+                            </option>
+                            @for (v of param.values; track v.name) {
+                                <option [value]="v.name">{{ v.description || v.name }}</option>
+                            }
+                        </select>
+                    }
+                }
             </ng-container>
-        </ng-container>
-    </ng-template>
+        </ng-template>
 
-    <fieldset formGroupName="parameter" *ngIf="selectedEncoder.parameters.length > 0">
-        <legend><a data-bs-toggle="collapse" [href]="'#extendedSettings-' + type + '-' + index" role="button"
-                   aria-expanded="false"
-                   [attr.aria-controls]="'extendedSettings-' + type + '-' + index">{{ 'settings.extended' | translate }}</a>
-        </legend>
-        <div class="collapse" [id]="'extendedSettings-' + type + '-' + index">
-            <ng-container *ngFor="let param of selectedEncoder.parameters">
-                <div *ngIf="['preset', 'tune', 'profile', 'level'].indexOf(param.name) === -1" class="mb-2">
-                    <ng-container *ngTemplateOutlet="paramBuilder,context:{i: index, type: 'video', param: param}">
-                    </ng-container>
+        @if (selectedEncoder.parameters.length > 0) {
+            <fieldset formGroupName="parameter">
+                <legend><a data-bs-toggle="collapse" [href]="'#extendedSettings-' + type + '-' + index" role="button"
+                           aria-expanded="false"
+                           [attr.aria-controls]="'extendedSettings-' + type + '-' + index">{{ 'settings.extended' | translate }}</a>
+                </legend>
+                <div class="collapse" [id]="'extendedSettings-' + type + '-' + index">
+                    @for (param of selectedEncoder.parameters; track param) {
+                        @if (['preset', 'tune', 'profile', 'level'].indexOf(param.name) === -1) {
+                            <div class="mb-2">
+                                <ng-container
+                                        *ngTemplateOutlet="paramBuilder,context:{i: index, type: 'video', param: param}">
+                                </ng-container>
+                            </div>
+                        }
+                    }
                 </div>
-            </ng-container>
-        </div>
-    </fieldset>
-</div>
+            </fieldset>
+        }
+    </div>
+}

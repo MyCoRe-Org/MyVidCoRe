@@ -1,18 +1,21 @@
 <ng-container>
-    <div *ngIf="!contentTpl" class="gauges d-inline-flex flex-row">
-        <ui-gauge [i18nPrefix]="'plugin.sysmonitor.'" [name]="'cpu-load'" [attrib]="entries['cpu-load']">
-        </ui-gauge>
-        <ui-gauge [i18nPrefix]="'plugin.sysmonitor.'" [name]="'cpu-temp'" [attrib]="entries['cpu-temp']" [max]="120">
-        </ui-gauge>
-        <div class="d-inline-flex flex-column">
-            <ui-gauge [i18nPrefix]="'plugin.sysmonitor.'" [name]="'memory'" [attrib]="entries['mem-available']"
-                [max]="entries['mem-total']?.value" [negate]="true" [startAngle]="180" [endAngle]="0">
+    @if (!contentTpl) {
+        <div class="gauges d-inline-flex flex-row">
+            <ui-gauge [i18nPrefix]="'plugin.sysmonitor.'" [name]="'cpu-load'" [attrib]="entries['cpu-load']">
             </ui-gauge>
-            <ui-gauge [i18nPrefix]="'plugin.sysmonitor.'" [name]="'swap'" [attrib]="entries['swap-used']"
-                [max]="entries['swap-total']?.value" [startAngle]="180" [endAngle]="0">
+            <ui-gauge [i18nPrefix]="'plugin.sysmonitor.'" [name]="'cpu-temp'" [attrib]="entries['cpu-temp']"
+                      [max]="120">
             </ui-gauge>
+            <div class="d-inline-flex flex-column">
+                <ui-gauge [i18nPrefix]="'plugin.sysmonitor.'" [name]="'memory'" [attrib]="entries['mem-available']"
+                          [max]="entries['mem-total']?.value" [negate]="true" [startAngle]="180" [endAngle]="0">
+                </ui-gauge>
+                <ui-gauge [i18nPrefix]="'plugin.sysmonitor.'" [name]="'swap'" [attrib]="entries['swap-used']"
+                          [max]="entries['swap-total']?.value" [startAngle]="180" [endAngle]="0">
+                </ui-gauge>
+            </div>
         </div>
-    </div>
+    }
 
     <ng-template [ngTemplateOutlet]="contentTpl?.templateRef" [ngTemplateOutletContext]="{entries: entries}">
     </ng-template>

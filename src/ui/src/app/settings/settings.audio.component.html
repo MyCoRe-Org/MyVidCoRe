@@ -1,60 +1,69 @@
-<div *ngIf="output && type" [formGroup]="output">
-    <!-- templates -->
-    <ng-template #codecSelect let-index="index" let-type="type">
-        <div class="mb-2">
-            <label [attr.for]="'output-' + index + '-' + type + '-codec'">{{ 'settings.codec' | translate }}</label>
-            <select class="form-select" [id]="'output-' + index + '-' + type + '-codec'"
-                formControlName="codec" (change)="onCodecChange()">
-                <option [value]="''">{{ 'general.pleaseSelect' | translate }}</option>
-                <ng-container *ngFor="let cgrp of selectedFormat.audio">
-                    <ng-container *ngIf="cgrp">
-                        <optgroup *ngIf="cgrp.encoders?.encoder.length &gt; 1" [label]="cgrp.description">
-                            <option *ngFor="let enc of cgrp.encoders.encoder" [value]="enc.name">
-                                {{ enc.description }} ({{ enc.name }})
-                            </option>
-                        </optgroup>
-                        <option *ngIf="cgrp.encoders?.encoder.length &lt;= 1" [value]="cgrp.name">
-                            {{ cgrp.description }}
-                        </option>
-                    </ng-container>
-                </ng-container>
-            </select>
-        </div>
-    </ng-template>
-    <!-- templates -->
-
-    <fieldset class="border border-top-0 p-2">
-        <ng-container *ngTemplateOutlet="codecSelect,context:{index: index, type: 'audio'}">
-        </ng-container>
-
-        <ng-container *ngIf="selectedEncoder">
-            <div *ngIf="selectedEncoder.sampleRates" class="mb-2">
-                <label for="output-{{ index }}-audio-samplerate">{{ 'settings.samplerate' | translate }}</label>
-                <select class="form-select" [id]="'output-' + index + '-audio-samplerate'"
-                    formControlName="samplerate"
-                    [ngClass]="{'is-invalid':output.controls.samplerate.errors}">
-                    <option [value]="null">{{ 'settings.auto' | translate }}
-                    </option>
-                    <option *ngFor="let sr of selectedEncoder.sampleRates" [value]="sr">
-                        {{ sr }} Hz</option>
-                </select>
-            </div>
-
+@if (output && type) {
+    <div [formGroup]="output">
+        <!-- templates -->
+        <ng-template #codecSelect let-index="index" let-type="type">
             <div class="mb-2">
-                <label for="output-{{ index }}-audio-bitrate">{{ 'settings.bitrate' | translate }}</label>
-                <select class="form-select" [id]="'output-' + index + '-audio-bitrate'"
-                    formControlName="bitrate"
-                    [ngClass]="{'is-invalid':output.controls.bitrate.errors}">
-                    <option [value]="null">{{ 'settings.auto' | translate }}
-                    </option>
-                    <option *ngFor="let br of audioBitrates" [value]="br">
-                        {{ br }}k</option>
+                <label [attr.for]="'output-' + index + '-' + type + '-codec'">{{ 'settings.codec' | translate }}</label>
+                <select class="form-select" [id]="'output-' + index + '-' + type + '-codec'"
+                        formControlName="codec" (change)="onCodecChange()">
+                    <option [value]="''">{{ 'general.pleaseSelect' | translate }}</option>
+                    @for (cgrp of selectedFormat.audio; track cgrp.name) {
+                        @if (cgrp) {
+                            @if (cgrp.encoders?.encoder.length > 1) {
+                                <optgroup [label]="cgrp.description">
+                                    @for (enc of cgrp.encoders.encoder; track enc.name) {
+                                        <option [value]="enc.name">
+                                            {{ enc.description }} ({{ enc.name }})
+                                        </option>
+                                    }
+                                </optgroup>
+                            } @else {
+                                <option [value]="cgrp.name">{{ cgrp.description }}</option>
+                            }
+                        }
+                    }
                 </select>
             </div>
-        </ng-container>
+        </ng-template>
+        <!-- templates -->
 
-        <ui-settings-extended [settings]="settings" [selectedEncoder]="selectedEncoder" [index]="index"
-            [type]="'audio'">
-        </ui-settings-extended>
-    </fieldset>
-</div>
+        <fieldset class="border border-top-0 p-2">
+            <ng-container *ngTemplateOutlet="codecSelect,context:{index: index, type: 'audio'}">
+            </ng-container>
+
+            @if (selectedEncoder) {
+                @if (selectedEncoder.sampleRates) {
+                    <div class="mb-2">
+                        <label for="output-{{ index }}-audio-samplerate">{{ 'settings.samplerate' | translate }}</label>
+                        <select class="form-select" [id]="'output-' + index + '-audio-samplerate'"
+                                formControlName="samplerate"
+                                [ngClass]="{'is-invalid':output.controls.samplerate.errors}">
+                            <option [value]="null">{{ 'settings.auto' | translate }}
+                            </option>
+                            @for (sr of selectedEncoder.sampleRates; track sr) {
+                                <option [value]="sr">{{ sr }} Hz</option>
+                            }
+                        </select>
+                    </div>
+                }
+
+                <div class="mb-2">
+                    <label for="output-{{ index }}-audio-bitrate">{{ 'settings.bitrate' | translate }}</label>
+                    <select class="form-select" [id]="'output-' + index + '-audio-bitrate'"
+                            formControlName="bitrate"
+                            [ngClass]="{'is-invalid':output.controls.bitrate.errors}">
+                        <option [value]="null">{{ 'settings.auto' | translate }}
+                        </option>
+                        @for (br of audioBitrates; track br) {
+                            <option [value]="br">{{ br }}k</option>
+                        }
+                    </select>
+                </div>
+            }
+
+            <ui-settings-extended [settings]="settings" [selectedEncoder]="selectedEncoder" [index]="index"
+                                  [type]="'audio'">
+            </ui-settings-extended>
+        </fieldset>
+    </div>
+}

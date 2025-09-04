@@ -1,13 +1,21 @@
 <div class="modal-content">
-	<div class="modal-header" *ngIf="options.i18n.headline">
-		<h4 class="modal-title">{{options.i18n.headline | translate}}</h4>
-	</div>
-	<div class="modal-body">
-		<p [innerHTML]="options.i18n.content | translate:options.object"></p>
-	</div>
-	<div class="modal-footer">
-		<button type="button" (click)="confirm()" class="btn {{ options.dangerConfirm ? 'btn-danger' : 'btn-primary' }}">{{(options.i18n.confirmBtn || 'button.ok') |
-			translate}}</button>
-		<button type="button" (click)="cancel()" class="btn btn-default">{{(options.i18n.cancelBtn || 'button.cancel') | translate}}</button>
-	</div>
+    @if (options.i18n.headline) {
+        <div class="modal-header">
+            <h4 class="modal-title">{{ options.i18n.headline | translate }}</h4>
+        </div>
+    }
+    <div class="modal-body">
+        <p [innerHTML]="options.i18n.content | translate:options.object"></p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" (click)="confirm()"
+                class="btn {{ options.dangerConfirm ? 'btn-danger' : 'btn-primary' }}">{{
+                (options.i18n.confirmBtn || 'button.ok') |
+                    translate
+            }}
+        </button>
+        <button type="button" (click)="cancel()"
+                class="btn btn-default">{{ (options.i18n.cancelBtn || 'button.cancel') | translate }}
+        </button>
+    </div>
 </div>

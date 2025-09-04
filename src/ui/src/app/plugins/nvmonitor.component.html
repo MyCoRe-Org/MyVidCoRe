@@ -1,21 +1,23 @@
-<ng-container *ngIf="socket">
-    <ng-container *ngIf="!contentTpl">
-        <div class="gauges d-inline-flex flex-row" *ngFor="let e of entries; let i = index; trackBy: trackByGPU"
-            [id]="'gpu-' + i">
-            <ui-gauge [i18nPrefix]="'plugin.nvmonitor.'" [index]="i" [name]="'encoder'" [attrib]="e['enc']">
-            </ui-gauge>
-            <ui-gauge [i18nPrefix]="'plugin.nvmonitor.'" [index]="i" [name]="'decoder'" [attrib]="e['dec']">
-            </ui-gauge>
-            <div class="d-inline-flex flex-column">
-                <ui-gauge [i18nPrefix]="'plugin.nvmonitor.'" [index]="i" [name]="'memory'" [attrib]="e['mem']"
-                    [startAngle]="180" [endAngle]="0" [class]="'align-self-start mb-1'">
+@if (socket) {
+    @if (!contentTpl) {
+        @for (e of entries; track trackByGPU; let i = $index) {
+            <div class="gauges d-inline-flex flex-row" [id]="'gpu-' + i">
+                <ui-gauge [i18nPrefix]="'plugin.nvmonitor.'" [index]="i" [name]="'encoder'" [attrib]="e['enc']">
                 </ui-gauge>
-                <ui-gauge [i18nPrefix]="'plugin.nvmonitor.'" [index]="i" [name]="'temperature'" [attrib]="e['temp'] || e['gtemp']"
-                    [max]="120" [startAngle]="180" [endAngle]="0" [class]="'align-self-end'">
+                <ui-gauge [i18nPrefix]="'plugin.nvmonitor.'" [index]="i" [name]="'decoder'" [attrib]="e['dec']">
                 </ui-gauge>
+                <div class="d-inline-flex flex-column">
+                    <ui-gauge [i18nPrefix]="'plugin.nvmonitor.'" [index]="i" [name]="'memory'" [attrib]="e['mem']"
+                              [startAngle]="180" [endAngle]="0" [class]="'align-self-start mb-1'">
+                    </ui-gauge>
+                    <ui-gauge [i18nPrefix]="'plugin.nvmonitor.'" [index]="i" [name]="'temperature'"
+                              [attrib]="e['temp'] || e['gtemp']"
+                              [max]="120" [startAngle]="180" [endAngle]="0" [class]="'align-self-end'">
+                    </ui-gauge>
+                </div>
             </div>
-        </div>
-    </ng-container>
+        }
+    }
 
     <ng-template [ngTemplateOutlet]="contentTpl?.templateRef"></ng-template>
-</ng-container>
+}

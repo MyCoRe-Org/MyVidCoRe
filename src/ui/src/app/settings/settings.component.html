@@ -1,99 +1,110 @@
 <div id="settings">
     <ui-view>
         <form novalidate [formGroup]="form" (ngSubmit)="onSubmit(form)">
-            <fieldset *ngIf="hwaccels && hwaccels.length !== 0">
-                <legend>{{ 'settings.legend.hwAccels' | translate }}</legend>
-                <label>{{ 'settings.autoBalancing' | translate }}</label>
-                <div *ngFor="let hw of hwaccels; let i = index">
-                    <div class="form-check form-switch">
-                        <input [id]="'hwaccel-' + hw.index" type="checkbox" class="form-check-input"
-                               [checked]="isHwAccelsChecked(i)" (change)="onHWAccelChange(i)">
-                        <label [attr.for]="'hwaccel-' + hw.index" class="form-check-label">#{{ hw.index }} -
-                            {{ hw.name }}</label>
-                    </div>
-                </div>
-            </fieldset>
+            @if (hwaccels && hwaccels.length !== 0) {
+                <fieldset>
+                    <legend>{{ 'settings.legend.hwAccels' | translate }}</legend>
+                    <label>{{ 'settings.autoBalancing' | translate }}</label>
+                    @for (hw of hwaccels; track hw.index; let i = $index) {
+                        <div>
+                            <div class="form-check form-switch">
+                                <input [id]="'hwaccel-' + hw.index" type="checkbox" class="form-check-input"
+                                       [checked]="isHwAccelsChecked(i)" (change)="onHWAccelChange(i)">
+                                <label [attr.for]="'hwaccel-' + hw.index" class="form-check-label">#{{ hw.index }} -
+                                    {{ hw.name }}</label>
+                            </div>
+                        </div>
+                    }
+                </fieldset>
+            }
 
             <fieldset>
-                <legend *ngIf="hwaccels && hwaccels.length !== 0">{{ 'settings.legend.converter' | translate }}</legend>
+                @if (hwaccels && hwaccels.length !== 0) {
+                    <legend>{{ 'settings.legend.converter' | translate }}</legend>
+                }
                 <ul ngbNav #navOutput="ngbNav" class="nav-tabs" [destroyOnHide]="false" [(activeId)]="activeTab">
-                    <li formArrayName="output"
-                        *ngFor="let o of output.controls; let i = index; let isFirst = first; let isLast = last"
-                        [ngbNavItem]="'tab-output-' + i" [domId]="'tab-output-' + i">
-                        <a ngbNavLink>
-                            {{ 'settings.outputLabel' | translate:{index: i + 1} }}
-                            <span *ngIf="isFirst !== isLast || !isFirst && !isLast"
-                                  class="close position-relative ps-2 font-weight-light"
-                                  (click)="removeOutput($event, i)">
-                                <i class="fas fa-minus text-danger"></i>
-                            </span>
-                        </a>
-                        <ng-template ngbNavContent>
-                            <fieldset [formGroupName]="i" class="border border-top-0 p-2">
-                                <div class="mb-2">
-                                    <label for="output-format-{{ i }}">{{ 'settings.format' | translate }}</label>
-                                    <select class="form-select" [id]="'output-format-' + i"
-                                            formControlName="format" (change)="onFormatChange(i)"
-                                            [ngClass]="{'is-invalid':output.controls[i].controls.format.errors}">
-                                        <option [value]="''">{{ 'general.pleaseSelect' | translate }}</option>
-                                        <option *ngFor="let format of allowedFormats" [value]="format.name">
-                                            {{ format.description }}
-                                        </option>
-                                    </select>
-                                </div>
+                    @for (o of output.controls; track o; let i = $index; let isFirst = $first; let isLast = $last) {
+                        <li formArrayName="output"
+                            [ngbNavItem]="'tab-output-' + i" [domId]="'tab-output-' + i">
+                            <a ngbNavLink>
+                                {{ 'settings.outputLabel' | translate:{index: i + 1} }}
+                                @if (isFirst !== isLast || !isFirst && !isLast) {
+                                    <span class="close position-relative ps-2 font-weight-light"
+                                          (click)="removeOutput($event, i)">
+                                        <i class="fas fa-minus text-danger"></i>
+                                    </span>
+                                }
+                            </a>
+                            <ng-template ngbNavContent>
+                                <fieldset [formGroupName]="i" class="border border-top-0 p-2">
+                                    <div class="mb-2">
+                                        <label for="output-format-{{ i }}">{{ 'settings.format' | translate }}</label>
+                                        <select class="form-select" [id]="'output-format-' + i"
+                                                formControlName="format" (change)="onFormatChange(i)"
+                                                [ngClass]="{'is-invalid':output.controls[i].controls.format.errors}">
+                                            <option [value]="''">{{ 'general.pleaseSelect' | translate }}</option>
+                                            @for (format of allowedFormats; track format.name) {
+                                                <option [value]="format.name">{{ format.description }}</option>
+                                            }
+                                        </select>
+                                    </div>
 
-                                <div class="mb-2">
-                                    <label
-                                            for="output-fileappendix-{{ i }}">{{ 'settings.filenameAppendix' | translate }}</label>
-                                    <input type="text" class="form-control" [id]="'output-fileappendix-' + i"
-                                           formControlName="filenameAppendix"
-                                           placeholder="{{ 'settings.filenameAppendix' | translate }}"
-                                           [ngClass]="{'is-invalid':output.controls[i].controls.filenameAppendix.errors}">
-                                </div>
+                                    <div class="mb-2">
+                                        <label
+                                                for="output-fileappendix-{{ i }}">{{ 'settings.filenameAppendix' | translate }}</label>
+                                        <input type="text" class="form-control" [id]="'output-fileappendix-' + i"
+                                               formControlName="filenameAppendix"
+                                               placeholder="{{ 'settings.filenameAppendix' | translate }}"
+                                               [ngClass]="{'is-invalid':output.controls[i].controls.filenameAppendix.errors}">
+                                    </div>
 
-                                <ng-container *ngIf="selectedFormat[i]">
-                                    <ul ngbNav #navOutputType="ngbNav" class="nav-tabs" [destroyOnHide]="false">
-                                        <li [ngbNavItem]="'tab-output-' + i + '-video'"
-                                            [domId]="'tab-output-' + i + '-video'" formArrayName="video">
-                                            <a ngbNavLink>{{ 'settings.video' | translate }}</a>
-                                            <ng-template ngbNavContent>
-                                                <ui-settings-video [settings]="settings"
-                                                                   [selectedFormat]="selectedFormat[i]" [index]="i"
-                                                                   [type]="'video'">
-                                                </ui-settings-video>
-                                            </ng-template>
-                                        </li>
+                                    @if (selectedFormat[i]) {
+                                        <ul ngbNav #navOutputType="ngbNav" class="nav-tabs" [destroyOnHide]="false">
+                                            <li [ngbNavItem]="'tab-output-' + i + '-video'"
+                                                [domId]="'tab-output-' + i + '-video'" formArrayName="video">
+                                                <a ngbNavLink>{{ 'settings.video' | translate }}</a>
+                                                <ng-template ngbNavContent>
+                                                    <ui-settings-video [settings]="settings"
+                                                                       [selectedFormat]="selectedFormat[i]" [index]="i"
+                                                                       [type]="'video'">
+                                                    </ui-settings-video>
+                                                </ng-template>
+                                            </li>
 
-                                        <li [ngbNavItem]="'tab-output-' + i + '-video-fallback'"
-                                            [domId]="'tab-output-' + i + '-video-fallback'" *ngIf="hwaccels?.length > 0"
-                                            formArrayName="video-fallback">
-                                            <a ngbNavLink>{{ 'settings.videoFallback' | translate }}</a>
-                                            <ng-template ngbNavContent>
-                                                <ui-settings-video [settings]="settings"
-                                                                   [selectedFormat]="selectedFormat[i]" [index]="i"
-                                                                   [type]="'video-fallback'">
-                                                </ui-settings-video>
-                                            </ng-template>
-                                        </li>
+                                            @if (hwaccels?.length > 0) {
+                                                <li [ngbNavItem]="'tab-output-' + i + '-video-fallback'"
+                                                    [domId]="'tab-output-' + i + '-video-fallback'"
+                                                    formArrayName="video-fallback">
+                                                    <a ngbNavLink>{{ 'settings.videoFallback' | translate }}</a>
+                                                    <ng-template ngbNavContent>
+                                                        <ui-settings-video [settings]="settings"
+                                                                           [selectedFormat]="selectedFormat[i]"
+                                                                           [index]="i"
+                                                                           [type]="'video-fallback'">
+                                                        </ui-settings-video>
+                                                    </ng-template>
+                                                </li>
+                                            }
 
-                                        <li [ngbNavItem]="'tab-output-' + i + '-audio'"
-                                            [domId]="'tab-output-' + i + '-audio'" formArrayName="audio">
-                                            <a ngbNavLink>{{ 'settings.audio' | translate }}</a>
-                                            <ng-template ngbNavContent>
-                                                <ui-settings-audio [settings]="settings"
-                                                                   [selectedFormat]="selectedFormat[i]" [index]="i"
-                                                                   [type]="'audio'">
-                                                </ui-settings-audio>
-                                            </ng-template>
-                                        </li>
-                                    </ul>
+                                            <li [ngbNavItem]="'tab-output-' + i + '-audio'"
+                                                [domId]="'tab-output-' + i + '-audio'" formArrayName="audio">
+                                                <a ngbNavLink>{{ 'settings.audio' | translate }}</a>
+                                                <ng-template ngbNavContent>
+                                                    <ui-settings-audio [settings]="settings"
+                                                                       [selectedFormat]="selectedFormat[i]" [index]="i"
+                                                                       [type]="'audio'">
+                                                    </ui-settings-audio>
+                                                </ng-template>
+                                            </li>
+                                        </ul>
 
-                                    <div [ngbNavOutlet]="navOutputType"></div>
-                                </ng-container>
+                                        <div [ngbNavOutlet]="navOutputType"></div>
+                                    }
 
-                            </fieldset>
-                        </ng-template>
-                    </li>
+                                </fieldset>
+                            </ng-template>
+                        </li>
+                    }
 
                     <li id="tab-output-add" class="nav-item">
                         <a class="nav-link" href (click)="addOutput($event)"><i class="fas fa-plus"></i></a>
@@ -105,7 +116,8 @@
 
             <div class="d-flex justify-content-end mt-2">
                 <button type="submit" class="btn btn-primary me-1"
-                        [disabled]="form.invalid">{{ 'button.save' | translate }}</button>
+                        [disabled]="form.invalid">{{ 'button.save' | translate }}
+                </button>
             </div>
         </form>
     </ui-view>

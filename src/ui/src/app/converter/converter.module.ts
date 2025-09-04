@@ -1,11 +1,11 @@
-import { NgModule, Injectable } from "@angular/core";
+import { Injectable, NgModule } from "@angular/core";
 
 import { CommonModule } from "@angular/common";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
 import { NgPipesModule } from "ngx-pipes";
 import { NgSelectModule } from "@ng-select/ng-select";
-import { NgOptionHighlightModule } from "@ng-select/ng-option-highlight";
+import { NgOptionHighlightDirective } from "@ng-select/ng-option-highlight";
 import { PipesModule } from "../_pipes/pipes.module";
 import { TranslateModule } from "@ngx-translate/core";
 
@@ -15,8 +15,8 @@ import { ConverterApiService } from "./api.service";
 import { ConverterJobService } from "./converterJob.service";
 import { WebsocketService } from "../_services/websocket.service";
 
-import { ConverterStates, ConverterComponent } from "./converter.component";
-import { FileUploadComponent, FileDropZoneDirective } from "./fileUpload.component";
+import { ConverterComponent, ConverterStates } from "./converter.component";
+import { FileDropZoneDirective, FileUploadComponent } from "./fileUpload.component";
 
 @NgModule({
     imports: [
@@ -26,7 +26,7 @@ import { FileUploadComponent, FileDropZoneDirective } from "./fileUpload.compone
         NgbModule,
         NgPipesModule,
         NgSelectModule,
-        NgOptionHighlightModule,
+        NgOptionHighlightDirective,
         PipesModule,
         TranslateModule,
         UIRouterModule.forChild({
@@ -52,4 +52,5 @@ import { FileUploadComponent, FileDropZoneDirective } from "./fileUpload.compone
     ]
 })
 @Injectable()
-export class ConverterModule { }
+export class ConverterModule {
+}

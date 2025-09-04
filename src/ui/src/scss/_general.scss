@@ -80,7 +80,7 @@ fieldset {
                 &:after {
                     content: "\f078";
                     display: flex;
-                    font-family: "Font Awesome 6 Free";
+                    font-family: "Font Awesome 7 Free";
                     font-weight: 900;
                     font-size: 1rem;
                     margin-left: 0.5rem;
@@ -90,7 +90,7 @@ fieldset {
             &[aria-expanded="true"] {
                 &:after {
                     content: "\f077";
-                    font-family: "Font Awesome 6 Free";
+                    font-family: "Font Awesome 7 Free";
                     font-weight: 900;
                     font-size: 1rem;
                     margin-left: 0.5rem;

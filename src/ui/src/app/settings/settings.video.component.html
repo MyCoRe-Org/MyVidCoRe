@@ -1,199 +1,260 @@
-<div *ngIf="output && type" [formGroup]="output">
-    <!-- templates -->
-    <ng-template #codecSelect let-index="index" let-type="type">
-        <div class="mb-2">
-            <label [attr.for]="'output-' + index + '-' + type + '-codec'">{{ 'settings.codec' | translate }}</label>
-            <select class="form-select" [id]="'output-' + index + '-' + type + '-codec'"
-                formControlName="codec" (change)="onCodecChange()">
-                <option [value]="''">{{ 'general.pleaseSelect' | translate }}</option>
-                <ng-container *ngFor="let cgrp of selectedFormat.video">
-                    <ng-container *ngIf="cgrp">
-                        <optgroup *ngIf="cgrp.encoders?.encoder.length &gt; 1" [label]="cgrp.description">
-                            <option *ngFor="let enc of cgrp.encoders.encoder" [value]="enc.name">
-                                {{ enc.description }} ({{ enc.name }})
-                            </option>
-                        </optgroup>
-                        <option *ngIf="cgrp.encoders?.encoder.length &lt;= 1" [value]="cgrp.name">
-                            {{ cgrp.description }}
-                        </option>
-                    </ng-container>
-                </ng-container>
-            </select>
-        </div>
-    </ng-template>
-    <!-- templates -->
-
-    <fieldset class="border border-top-0 p-2">
-        <ng-container *ngTemplateOutlet="codecSelect,context:{index: index, type: type}">
-        </ng-container>
-
-        <ng-container *ngIf="selectedEncoder">
-            <!-- templates - video -->
-            <ng-template #videoParameterSelect let-index="index" let-ptype="ptype" let-defaults="defaults">
-                <ng-container formGroupName="parameter">
-                    <label for="output-{{ index }}-{{ type }}-{{ ptype }}">{{ 'settings.' + ptype | translate }}</label>
-                    <select class="form-select" [id]="'output-' + index + '-' + type + '-' + ptype"
-                        [formControlName]="ptype"
-                        [ngClass]="{'is-invalid':output.controls.parameter.controls[ptype].errors}">
-                        <option [value]="null">{{ 'settings.auto' | translate }}
-                        </option>
-                        <ng-container
-                            *ngFor="let p of filterParameter(selectedEncoder.parameters, ptype)?.values || defaults || []">
-                            <option *ngIf="['auto', 'default'].indexOf(p.name) === -1" [value]="p.name">
-                                {{ p.description || p.name }}</option>
-                        </ng-container>
-                    </select>
-                </ng-container>
-            </ng-template>
-            <!-- templates - video -->
-
-            <div class="row mb-2" formGroupName="parameter"
-                *ngIf="filterParameter(selectedEncoder.parameters, 'profile') && filterParameter(selectedEncoder.parameters, 'level')">
-                <div class="col-12 col-md-6">
-                    <ng-container
-                        *ngTemplateOutlet="videoParameterSelect,context:{index: index, ptype: 'profile', defaults: profiles}">
-                    </ng-container>
-                </div>
-
-                <div class="col-12 col-md-6">
-                    <ng-container
-                        *ngTemplateOutlet="videoParameterSelect,context:{index: index, ptype: 'level', defaults: levels}">
-                    </ng-container>
-                </div>
-            </div>
-
-            <div *ngIf="filterParameter(selectedEncoder.parameters, 'preset')">
-                <ng-container
-                    *ngTemplateOutlet="videoParameterSelect,context:{index: index, ptype: 'preset', defaults: presets[selectedEncoder.name]}">
-                </ng-container>
-            </div>
-
-            <div formGroupName="parameter"
-                *ngIf="filterParameter(selectedEncoder.parameters, 'tune')">
-                <ng-container
-                    *ngTemplateOutlet="videoParameterSelect,context:{index: index, ptype: 'tune', defaults: tunes[selectedEncoder.name]}">
-                </ng-container>
-            </div>
-
-            <div *ngIf="selectedEncoder.pixelFormats" class="mb-2">
-                <label for="output-{{ index }}-video-pixelformat">{{ 'settings.pixelFormat' | translate }}</label>
-                <select class="form-select" [id]="'output-' + index + '-' + type + '-pixelformat'"
-                    formControlName="pixelFormat"
-                    [ngClass]="{'is-invalid':output.controls.pixelFormat.errors}">
-                    <option [value]="null">{{ 'settings.auto' | translate }}
-                    </option>
-                    <option *ngFor="let pf of selectedEncoder.pixelFormats" [value]="pf">
-                        {{ pf }}</option>
-                </select>
-            </div>
-
+@if (output && type) {
+    <div [formGroup]="output">
+        <!-- templates -->
+        <ng-template #codecSelect let-index="index" let-type="type">
             <div class="mb-2">
-                <label for="output-{{ index }}-video-scale">{{ 'settings.scale' | translate }}</label>
-                <select class="form-select" [id]="'output-' + index + '-' + type + '-scale'"
-                    formControlName="scale"
-                    [ngClass]="{'is-invalid':output.controls.scale.errors && output.controls.scale.dirty}">
-                    <option [value]="null">{{ 'settings.auto' | translate }}
-                    </option>
-                    <option *ngFor="let s of scales" [value]="s.value">
-                        {{ s.name }}</option>
+                <label [attr.for]="'output-' + index + '-' + type + '-codec'">{{ 'settings.codec' | translate }}</label>
+                <select class="form-select" [id]="'output-' + index + '-' + type + '-codec'"
+                        formControlName="codec" (change)="onCodecChange()">
+                    <option [value]="''">{{ 'general.pleaseSelect' | translate }}</option>
+                    @for (cgrp of selectedFormat.video; track cgrp.name) {
+                        @if (cgrp) {
+                            @if (cgrp.encoders?.encoder.length > 1) {
+                                <optgroup [label]="cgrp.description">
+                                    @for (enc of cgrp.encoders.encoder; track enc.name) {
+                                        <option [value]="enc.name">
+                                            {{ enc.description }} ({{ enc.name }})
+                                        </option>
+                                    }
+                                </optgroup>
+                            } @else {
+                                <option [value]="cgrp.name">{{ cgrp.description }}</option>
+                            }
+                        }
+                    }
                 </select>
-
-                <div class="form-check form-switch mt-2">
-                    <input type="checkbox" class="form-check-input"
-                        [id]="'output-' + index + '-' + type + '-upcale'" formControlName="upscale">
-                    <label class="form-check-label"
-                        [attr.for]="'output-' + index + '-' + type + '-upcale'">{{ 'settings.allowUpscale' | translate }}</label>
-                </div>
             </div>
-        </ng-container>
+        </ng-template>
+        <!-- templates -->
 
-        <div class="row">
-            <div class="col-sm-4">
-                <div class="mb-2">
-                    <label for="output-{{ index }}-video-framerate">{{ 'settings.framerate' | translate }}</label>
-                    <select class="form-select" [id]="'output-' + index + '-' + type + '-framerate'"
-                        formControlName="framerate"
-                        [ngClass]="{'is-invalid':output.controls.framerate.errors}">
-                        <option [value]="null">
-                            {{ 'settings.asSource' | translate }}
-                        </option>
-                        <option *ngFor="let fps of framerates" [value]="fps">
-                            {{ fps }}</option>
-                    </select>
-                </div>
+        <fieldset class="border border-top-0 p-2">
+            <ng-container *ngTemplateOutlet="codecSelect,context:{index: index, type: type}">
+            </ng-container>
 
-                <div class="mb-2">
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio"
-                            [id]="'output-' + index + '-' + type + '-framerateType-vfr'" formControlName="framerateType"
-                            value="VFR">
-                        <label class="form-check-label"
-                            [attr.for]="'output-' + index + '-' + type + '-framerateType-vfr'">{{ 'settings.framerateType.VFR' | translate }}</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio"
-                            [id]="'output-' + index + '-' + type + '-framerateType-cfr'" formControlName="framerateType"
-                            value="CFR">
-                        <label class="form-check-label"
-                            [attr.for]="'output-' + index + '-' + type + '-framerateType-cfr'">{{ 'settings.framerateType.CFR' | translate }}</label>
-                    </div>
-                </div>
+            @if (selectedEncoder) {
+                <!-- templates - video -->
+                <ng-template #videoParameterSelect let-index="index" let-ptype="ptype" let-defaults="defaults">
+                    <ng-container formGroupName="parameter">
+                        <label for="output-{{ index }}-{{ type }}-{{ ptype }}">{{ 'settings.' + ptype | translate }}</label>
+                        <select class="form-select" [id]="'output-' + index + '-' + type + '-' + ptype"
+                                [formControlName]="ptype"
+                                [ngClass]="{'is-invalid':output.controls.parameter.controls[ptype].errors}">
+                            <option [value]="null">{{ 'settings.auto' | translate }}
+                            </option>
+                            @for (
+                                p of filterParameter(selectedEncoder.parameters, ptype)?.values || defaults || []; track p.name) {
+                                @if (['auto', 'default'].indexOf(p.name) === -1) {
+                                    <option [value]="p.name">
+                                        {{ p.description || p.name }}
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </ng-container>
+                </ng-template>
+                <!-- templates - video -->
 
-                <div class="mb-2">
-                    <label
-                        [attr.for]="'output-' + index + '-' + type + '-forceKeyFrames'">{{ 'settings.forceKeyFrames' | translate }}</label>
-                    <div class="input-group">
-                        <input [id]="'output-' + index + '-' + type + '-forceKeyFrames'" type="number"
-                            class="form-control" formControlName="forceKeyFrames">
-                        <div class="input-group-append">
-                            <span class="input-group-text">{{ 'settings.secondsAbbr' | translate }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-4" formGroupName="quality">
-                <label>{{ 'settings.quality.label' | translate }}</label>
-                <div class="mb-2">
-                    <div *ngIf="filterParameter(selectedEncoder.parameters, 'crf')" class="form-check">
-                        <input class="form-check-input" type="radio"
-                            [id]="'output-' + index + '-' + type + '-qType-crf'" formControlName="type" value="CRF"
-                            (change)="onQualityTypeChange()">
-                        <label class="form-check-label"
-                            [attr.for]="'output-' + index + '-' + type + '-qType-crf'">{{ 'settings.quality.type.CRF' | translate }}</label>
-                        <div class="input-group">
-                            <ng-template #rateFactorRange let-param="param">
-                                <input type="range" class="custom-range" [min]="param.fromValue" [max]="param.toValue"
-                                    [step]="param.type === 'float' ? 0.25 : 1" formControlName="rateFactor">
-                            </ng-template>
-
+                @if (filterParameter(selectedEncoder.parameters, 'profile') && filterParameter(selectedEncoder.parameters, 'level')) {
+                    <div class="row mb-2" formGroupName="parameter">
+                        <div class="col-12 col-md-6">
                             <ng-container
-                                *ngTemplateOutlet="rateFactorRange;context:{param: filterParameter(selectedEncoder.parameters, 'crf')}">
+                                    *ngTemplateOutlet="videoParameterSelect,context:{index: index, ptype: 'profile', defaults: profiles}">
+                            </ng-container>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <ng-container
+                                    *ngTemplateOutlet="videoParameterSelect,context:{index: index, ptype: 'level', defaults: levels}">
                             </ng-container>
                         </div>
                     </div>
+                }
+                @if (filterParameter(selectedEncoder.parameters, 'preset')) {
+                    <div>
+                        <ng-container
+                                *ngTemplateOutlet="videoParameterSelect,context:{index: index, ptype: 'preset', defaults: presets[selectedEncoder.name]}">
+                        </ng-container>
+                    </div>
+                }
+                @if (filterParameter(selectedEncoder.parameters, 'tune')) {
+                    <div formGroupName="parameter">
+                        <ng-container
+                                *ngTemplateOutlet="videoParameterSelect,context:{index: index, ptype: 'tune', defaults: tunes[selectedEncoder.name]}">
+                        </ng-container>
+                    </div>
+                }
+                @if (selectedEncoder.pixelFormats) {
+                    <div class="mb-2">
+                        <label for="output-{{ index }}-video-pixelformat">{{ 'settings.pixelFormat' | translate }}</label>
+                        <select class="form-select" [id]="'output-' + index + '-' + type + '-pixelformat'"
+                                formControlName="pixelFormat"
+                                [ngClass]="{'is-invalid':output.controls.pixelFormat.errors}">
+                            <option [value]="null">{{ 'settings.auto' | translate }}
+                            </option>
+                            @for (pf of selectedEncoder.pixelFormats; track pf) {
+                                <option [value]="pf">{{ pf }}</option>
+                            }
+                        </select>
+                    </div>
+                }
 
-                    <div *ngIf="!filterParameter(selectedEncoder.parameters, 'crf')"
-                        class="form-check">
-                        <input class="form-check-input" type="radio"
-                            [id]="'output-' + index + '-' + type + '-qType-cq'" formControlName="type" value="CQ"
-                            (change)="onQualityTypeChange()">
+                <div class="mb-2">
+                    <label for="output-{{ index }}-video-scale">{{ 'settings.scale' | translate }}</label>
+                    <select class="form-select" [id]="'output-' + index + '-' + type + '-scale'"
+                            formControlName="scale"
+                            [ngClass]="{'is-invalid':output.controls.scale.errors && output.controls.scale.dirty}">
+                        <option [value]="null">{{ 'settings.auto' | translate }}
+                        </option>
+                        @for (s of scales; track s.name) {
+                            <option [value]="s.value">
+                                {{ s.name }}
+                            </option>
+                        }
+                    </select>
+
+                    <div class="form-check form-switch mt-2">
+                        <input type="checkbox" class="form-check-input"
+                               [id]="'output-' + index + '-' + type + '-upcale'" formControlName="upscale">
                         <label class="form-check-label"
-                            [attr.for]="'output-' + index + '-' + type + '-qType-cq'">{{ 'settings.quality.type.CQ' | translate }}</label>
-                        <div class="input-group">
-                            <input type="range" class="custom-range" min="0" max="51" step="0.25"
-                                formControlName="scale">
+                               [attr.for]="'output-' + index + '-' + type + '-upcale'">{{ 'settings.allowUpscale' | translate }}</label>
+                    </div>
+                </div>
+            }
+
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="mb-2">
+                        <label for="output-{{ index }}-video-framerate">{{ 'settings.framerate' | translate }}</label>
+                        <select class="form-select" [id]="'output-' + index + '-' + type + '-framerate'"
+                                formControlName="framerate"
+                                [ngClass]="{'is-invalid':output.controls.framerate.errors}">
+                            <option [value]="null">
+                                {{ 'settings.asSource' | translate }}
+                            </option>
+                            @for (fps of framerates; track fps) {
+                                <option [value]="fps">{{ fps }}</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-2">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio"
+                                   [id]="'output-' + index + '-' + type + '-framerateType-vfr'"
+                                   formControlName="framerateType"
+                                   value="VFR">
+                            <label class="form-check-label"
+                                   [attr.for]="'output-' + index + '-' + type + '-framerateType-vfr'">{{ 'settings.framerateType.VFR' | translate }}</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio"
+                                   [id]="'output-' + index + '-' + type + '-framerateType-cfr'"
+                                   formControlName="framerateType"
+                                   value="CFR">
+                            <label class="form-check-label"
+                                   [attr.for]="'output-' + index + '-' + type + '-framerateType-cfr'">{{ 'settings.framerateType.CFR' | translate }}</label>
                         </div>
                     </div>
 
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio"
-                            [id]="'output-' + index + '-' + type + '-qType-abr'" formControlName="type" value="ABR"
-                            (change)="onQualityTypeChange()">
-                        <label class="form-check-label"
-                            [attr.for]="'output-' + index + '-' + type + '-qType-abr'">{{ 'settings.quality.type.ABR' | translate }}</label>
+                    <div class="mb-2">
+                        <label
+                                [attr.for]="'output-' + index + '-' + type + '-forceKeyFrames'">{{ 'settings.forceKeyFrames' | translate }}</label>
                         <div class="input-group">
-                            <input [id]="'output-' + index + '-' + type + '-bitrate'" type="number" class="form-control"
-                                formControlName="bitrate">
+                            <input [id]="'output-' + index + '-' + type + '-forceKeyFrames'" type="number"
+                                   class="form-control" formControlName="forceKeyFrames">
+                            <div class="input-group-append">
+                                <span class="input-group-text">{{ 'settings.secondsAbbr' | translate }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4" formGroupName="quality">
+                    <label>{{ 'settings.quality.label' | translate }}</label>
+                    <div class="mb-2">
+                        @if (filterParameter(selectedEncoder.parameters, 'crf')) {
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio"
+                                       [id]="'output-' + index + '-' + type + '-qType-crf'" formControlName="type"
+                                       value="CRF"
+                                       (change)="onQualityTypeChange()">
+                                <label class="form-check-label"
+                                       [attr.for]="'output-' + index + '-' + type + '-qType-crf'">{{ 'settings.quality.type.CRF' | translate }}</label>
+                                <div class="input-group">
+                                    <ng-template #rateFactorRange let-param="param">
+                                        <input type="range" class="custom-range" [min]="param.fromValue"
+                                               [max]="param.toValue"
+                                               [step]="param.type === 'float' ? 0.25 : 1" formControlName="rateFactor">
+                                    </ng-template>
+
+                                    <ng-container
+                                            *ngTemplateOutlet="rateFactorRange;context:{param: filterParameter(selectedEncoder.parameters, 'crf')}">
+                                    </ng-container>
+                                </div>
+                            </div>
+                        } @else {
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio"
+                                       [id]="'output-' + index + '-' + type + '-qType-cq'" formControlName="type"
+                                       value="CQ"
+                                       (change)="onQualityTypeChange()">
+                                <label class="form-check-label"
+                                       [attr.for]="'output-' + index + '-' + type + '-qType-cq'">{{ 'settings.quality.type.CQ' | translate }}</label>
+                                <div class="input-group">
+                                    <input type="range" class="custom-range" min="0" max="51" step="0.25"
+                                           formControlName="scale">
+                                </div>
+                            </div>
+                        }
+
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio"
+                                   [id]="'output-' + index + '-' + type + '-qType-abr'" formControlName="type"
+                                   value="ABR"
+                                   (change)="onQualityTypeChange()">
+                            <label class="form-check-label"
+                                   [attr.for]="'output-' + index + '-' + type + '-qType-abr'">{{ 'settings.quality.type.ABR' | translate }}</label>
+                            <div class="input-group">
+                                <input [id]="'output-' + index + '-' + type + '-bitrate'" type="number"
+                                       class="form-control"
+                                       formControlName="bitrate">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">kbps</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4" formGroupName="quality">
+                    <div class="mb-2">
+                        <label
+                                [attr.for]="'output-' + index + '-' + type + '-minrate'">{{ 'settings.quality.minrate' | translate }}</label>
+                        <div class="input-group">
+                            <input [id]="'output-' + index + '-' + type + '-minrate'" type="number" class="form-control"
+                                   formControlName="minrate">
+                            <div class="input-group-append">
+                                <span class="input-group-text">kbps</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <label
+                                [attr.for]="'output-' + index + '-' + type + '-maxrate'">{{ 'settings.quality.maxrate' | translate }}</label>
+                        <div class="input-group">
+                            <input [id]="'output-' + index + '-' + type + '-maxrate'" type="number" class="form-control"
+                                   formControlName="maxrate">
+                            <div class="input-group-append">
+                                <span class="input-group-text">kbps</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-2">
+                        <label
+                                [attr.for]="'output-' + index + '-' + type + '-bufsize'">{{ 'settings.quality.bufsize' | translate }}</label>
+                        <div class="input-group">
+                            <input [id]="'output-' + index + '-' + type + '-bufsize'" type="number" class="form-control"
+                                   formControlName="bufsize">
                             <div class="input-group-append">
                                 <span class="input-group-text">kbps</span>
                             </div>
@@ -201,46 +262,10 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-4" formGroupName="quality">
-                <div class="mb-2">
-                    <label
-                        [attr.for]="'output-' + index + '-' + type + '-minrate'">{{ 'settings.quality.minrate' | translate }}</label>
-                    <div class="input-group">
-                        <input [id]="'output-' + index + '-' + type + '-minrate'" type="number" class="form-control"
-                            formControlName="minrate">
-                        <div class="input-group-append">
-                            <span class="input-group-text">kbps</span>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="mb-2">
-                    <label
-                        [attr.for]="'output-' + index + '-' + type + '-maxrate'">{{ 'settings.quality.maxrate' | translate }}</label>
-                    <div class="input-group">
-                        <input [id]="'output-' + index + '-' + type + '-maxrate'" type="number" class="form-control"
-                            formControlName="maxrate">
-                        <div class="input-group-append">
-                            <span class="input-group-text">kbps</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mb-2">
-                    <label
-                        [attr.for]="'output-' + index + '-' + type + '-bufsize'">{{ 'settings.quality.bufsize' | translate }}</label>
-                    <div class="input-group">
-                        <input [id]="'output-' + index + '-' + type + '-bufsize'" type="number" class="form-control"
-                            formControlName="bufsize">
-                        <div class="input-group-append">
-                            <span class="input-group-text">kbps</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <ui-settings-extended [settings]="settings" [selectedEncoder]="selectedEncoder" [index]="index" [type]="type">
-        </ui-settings-extended>
-    </fieldset>
-</div>
+            <ui-settings-extended [settings]="settings" [selectedEncoder]="selectedEncoder" [index]="index"
+                                  [type]="type">
+            </ui-settings-extended>
+        </fieldset>
+    </div>
+}

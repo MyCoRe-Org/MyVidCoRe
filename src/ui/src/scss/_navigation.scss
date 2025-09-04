@@ -5,7 +5,7 @@ $sidebar-font-size: 1.1rem !default;
 
 .navbar {
     padding: 0;
-  
+
     .container-fluid {
         padding-left: 5px;
         padding-right: 5px;
@@ -18,7 +18,7 @@ $sidebar-font-size: 1.1rem !default;
             margin: 0px 10px;
             text-indent: 5px;
             line-height: 2.5em;
-         
+
             &:hover, &:focus {
                     text-decoration: none;
             }
@@ -198,10 +198,10 @@ $sidebar-font-size: 1.1rem !default;
     @include gradient-horizontal(#f3f3f3, #dfdfdf, 93%, 100%);
     color: #fff;
     @include transition (left 0.5s ease-in-out 0s);
-    
+
     overflow: auto;
     overflow-x: hidden;
-    
+
     &.active {
         left: -$sidebar-width;
     }
@@ -210,7 +210,7 @@ $sidebar-font-size: 1.1rem !default;
         left: -$sidebar-width;
         overflow-y: scroll;
         -webkit-overflow-scrolling: touch;
-        
+
         &.active {
             left: 0;
         }
@@ -225,62 +225,62 @@ $sidebar-font-size: 1.1rem !default;
             color: #fff;
             padding: 10px;
         }
-        
+
         li {
              overflow: hidden;
             -webkit-tap-highlight-color: rgba($primary, 0.5);
-            
+
             a {
                 padding: 10px;
                 font-size: $sidebar-font-size;
                 display: block;
                 color: #666666;
                 text-decoration: none !important;
-                
+
                 border-left: 3px solid transparent;
                 @include transition (color 0.5s ease 0s);
                 @include transition (border 0.5s ease 0s);
-                
+
                 &:hover {
                     color: #000000;
                     border-left: 3px solid $primary;
                 }
-            
+
                 &[data-bs-toggle="collapse"] {
                     position: relative;
                 }
-    
+
                 &[aria-expanded="false"]::before, &[aria-expanded="true"]::before {
                     content: '\f078';
                     display: inline-block;
                     position: absolute;
                     right: 20px;
-                    font-family: "Font Awesome 6 Free";
+                    font-family: "Font Awesome 7 Free";
                     font-size: 0.6em;
                     font-weight: 900;
                     line-height: 1.75rem;
                     vertical-align: middle;
                     @include transition (all 0.5s ease 0s);
                 }
-    
+
                 &[aria-expanded="true"]::before {
                     transform: rotate(-180deg);
                 }
-            
+
                 &[aria-expanded="true"] {
                     background: #e0e0e0;
                     @include gradient-horizontal(#e0e0e0, #d0d0d0, 93%, 100%);
                 }
             }
-        
+
             &.active > a {
                 color: #000;
-                
+
                 &:before {
                     color: #ffffff;
                     content: "\f0d9";
                     display: block;
-                    font-family: "Font Awesome 6 Free";
+                    font-family: "Font Awesome 7 Free";
                     font-size: 20px;
                     font-weight: 900;
                     height: 27px;
@@ -291,22 +291,22 @@ $sidebar-font-size: 1.1rem !default;
                 }
             }
         }
-    
+
         ul a {
             font-size: $sidebar-font-size * 0.95;
             padding-left: 30px !important;
             background: #e0e0e0;
             @include gradient-horizontal(#e0e0e0, #d0d0d0, 93%, 100%);
-            
+
             &.active {
                 color: #000;
             }
-            
+
             &.active:before {
                 color: #ffffff;
                 content: "\f0d9";
                 display: block;
-                font-family: "Font Awesome 6 Free";
+                font-family: "Font Awesome 7 Free";
                 font-size: 20px;
                 font-weight: 900;
                 height: 27px;
@@ -328,47 +328,47 @@ $sidebar-font-size: 1.1rem !default;
     padding-left: 15px;
     padding-right: 15px;
     padding-bottom: 1em;
-    
+
     @include transition(all 0.5s ease-in-out 0s);
-    
+
     .spinner-container {
         top: $navbar-height;
-        left: $sidebar-width;       
-        @include transition(all 0.5s ease-in-out 0s); 
+        left: $sidebar-width;
+        @include transition(all 0.5s ease-in-out 0s);
     }
-    
+
     &.active {
         margin-left: 0;
-        
+
         .spinner-container {
-            left: 0;        
+            left: 0;
         }
     }
-    
+
     @include media-breakpoint-down(md) {
         position: absolute;
         left: 0;
         right: 0;
         margin-left: 0px;
-        
+
         .spinner-container {
-            left: 0;        
+            left: 0;
         }
-        
+
         &.active {
             margin-left: 0px;
             left: $sidebar-width + 5px;
             right: ($sidebar-width + 5px) * -1;
-            
+
             .spinner-container {
-                left: $sidebar-width;        
+                left: $sidebar-width;
             }
         }
     }
 }
 
 #breadcrumb {
-    
+
     > .container {
         padding-right: 0;
         padding-left: 0;

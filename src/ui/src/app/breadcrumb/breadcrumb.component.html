@@ -1,22 +1,23 @@
-<nav id="breadcrumb" aria-label="breadcrumb" *ngIf="$breadcrumb.breadcrumbs.length > 1">
-	<ol class="breadcrumb">
-		<ng-template #labelTemplate let-label="label"> {{ textEllipsis(label) }} </ng-template>
+@if ($breadcrumb.breadcrumbs.length > 1) {
+    <nav id="breadcrumb" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <ng-template #labelTemplate let-label="label"> {{ textEllipsis(label) }}</ng-template>
 
-        <ng-container *ngFor="let b of $breadcrumb.breadcrumbs; let i = index">
-            <li class="breadcrumb-item" uiSrefActive="active">
-                <ng-container *ngIf="i < $breadcrumb.breadcrumbs.length - 1">
-                    <a [uiSref]="b.name" [uiParams]="b.params" [uiOptions]="{reload: false}"> 
+            @for (b of $breadcrumb.breadcrumbs; track b.name; let i = $index) {
+                <li class="breadcrumb-item" uiSrefActive="active">
+                    @if (i < $breadcrumb.breadcrumbs.length - 1) {
+                        <a [uiSref]="b.name" [uiParams]="b.params" [uiOptions]="{reload: false}">
+                            <ng-container
+                                    *ngTemplateOutlet="labelTemplate;context:{label: (b.labelResolver | async) || (($state.get(b.name).data?.breadcrumb || b.name) | translate:b.params)}"
+                            ></ng-container>
+                        </a>
+                    } @else {
                         <ng-container
-                            *ngTemplateOutlet="labelTemplate;context:{label: (b.labelResolver | async) || (($state.get(b.name).data?.breadcrumb || b.name) | translate:b.params)}"
+                                *ngTemplateOutlet="labelTemplate;context:{label: (b.labelResolver | async) || (($state.get(b.name).data?.breadcrumb || b.name) | translate:b.params)}"
                         ></ng-container>
-                    </a>
-                </ng-container>
-                <ng-container *ngIf="i == $breadcrumb.breadcrumbs.length - 1">
-                    <ng-container 
-                        *ngTemplateOutlet="labelTemplate;context:{label: (b.labelResolver | async) || (($state.get(b.name).data?.breadcrumb || b.name) | translate:b.params)}"
-                    ></ng-container>
-                </ng-container>
-            </li>
-        </ng-container>
-	</ol>
-</nav>
+                    }
+                </li>
+            }
+        </ol>
+    </nav>
+}

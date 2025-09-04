@@ -1,64 +1,75 @@
 <div class="wrapper">
     <nav id="sidebar" #sidebar>
         <ul class="list-unstyled components">
-            <ng-container *ngFor="let r of routes">
-                <ng-container *ngIf="(r.roles && ($auth.isAllowed(r.roles) | async) || false) || !r.roles">
-                    <ng-container *ngIf="!r.items">
+            @for (r of routes; track r) {
+                @if ((r.roles && ($auth.isAllowed(r.roles) | async) || false) || !r.roles) {
+                    @if (!r.items) {
                         <li uiSrefActive="active">
                             <a [id]="refId(r)" [uiSref]="r.ref">
-                                <i *ngIf="r.icon" [ngClass]="r.icon"></i> {{ r.i18n | translate }}
+                                @if (r.icon) {
+                                    <i [ngClass]="r.icon"></i>
+                                } {{ r.i18n | translate }}
                             </a>
                         </li>
-                    </ng-container>
-                    <ng-container *ngIf="r.items">
+                    } @else {
                         <ng-container
-                            *ngTemplateOutlet="routeMenuTemplate;context:{allowed: (anyAllowed(r.items) | async) || false}">
+                                *ngTemplateOutlet="routeMenuTemplate;context:{allowed: (anyAllowed(r.items) | async) || false}">
                         </ng-container>
                         <ng-template #routeMenuTemplate let-allowed="allowed">
-                            <li *ngIf="!allowed && r.ref" uiSrefActive="active">
-                                <a [id]="refId(r)" [uiSref]="r.ref">
-                                    <i *ngIf="r.icon" [ngClass]="r.icon"></i> {{ r.i18n | translate }}
-                                </a>
-                            </li>
-                            <li *ngIf="allowed">
-                                <a [href]="'#'+ refId(r)" data-bs-toggle="collapse" aria-expanded="false">
-                                    <i *ngIf="r.icon" [ngClass]="r.icon"></i> {{ r.i18n | translate }}
-                                </a>
-                                <ul class="collapse list-unstyled" [id]="refId(r)" [attr.aria-labelledby]="refId(r)">
-                                    <ng-container *ngFor="let i of r.items">
-                                        <ng-container *ngTemplateOutlet="routeItemTemplate;context:{item: i}">
-                                        </ng-container>
-                                    </ng-container>
-                                </ul>
+                            @if (!allowed && r.ref) {
+                                <li uiSrefActive="active">
+                                    <a [id]="refId(r)" [uiSref]="r.ref">
+                                        @if (r.icon) {
+                                            <i [ngClass]="r.icon"></i>
+                                        } {{ r.i18n | translate }}
+                                    </a>
+                                </li>
+                            }
 
-                                <ng-template #routeItemTemplate let-item="item">
-                                    <ng-container
-                                        *ngIf="(item.roles && ($auth.isAllowed(item.roles) | async) || false) || !item.roles">
-                                        <ng-container
-                                            *ngIf="(item.flag && Flags.DIVIDER) == Flags.DIVIDER; else routeItem">
-                                        </ng-container>
-                                        <ng-template #routeItem>
-                            <li>
-                                <ng-container
-                                    *ngIf="(item.flag && Flags.ACTIVE_EQ) == Flags.ACTIVE_EQ; else routeItemDefault">
-                                    <a uiSrefActiveEq="active" [id]="refId(item)" [uiSref]="item.ref">
-                                        <i *ngIf="item.icon" [ngClass]="item.icon"></i> {{ item.i18n | translate }}
+                            @if (allowed) {
+                                <li>
+                                    <a [href]="'#'+ refId(r)" data-bs-toggle="collapse" aria-expanded="false">
+                                        @if (r.icon) {
+                                            <i [ngClass]="r.icon"></i>
+                                        } {{ r.i18n | translate }}
                                     </a>
-                                </ng-container>
-                                <ng-template #routeItemDefault>
-                                    <a uiSrefActive="active" [id]="refId(item)" [uiSref]="item.ref">
-                                        <i *ngIf="item.icon" [ngClass]="item.icon"></i> {{ item.i18n | translate }}
-                                    </a>
-                                </ng-template>
-                            </li>
+                                    <ul class="collapse list-unstyled" [id]="refId(r)"
+                                        [attr.aria-labelledby]="refId(r)">
+                                        @for (i of r.items; track i) {
+                                            <ng-container
+                                                    *ngTemplateOutlet="routeItemTemplate;context:{item: i}"></ng-container>
+                                        }
+                                    </ul>
+
+                                    <ng-template #routeItemTemplate let-item="item">
+                                        @if ((item.roles && ($auth.isAllowed(item.roles) | async) || false) || !item.roles) {
+                                            @if ((item.flag && Flags.DIVIDER) == Flags.DIVIDER) {
+                                            } @else {
+                                                <li>
+                                                    @if ((item.flag && Flags.ACTIVE_EQ) == Flags.ACTIVE_EQ) {
+                                                        <a uiSrefActiveEq="active" [id]="refId(item)"
+                                                           [uiSref]="item.ref">
+                                                            @if (r.icon) {
+                                                                <i [ngClass]="r.icon"></i>
+                                                            } {{ item.i18n | translate }}
+                                                        </a>
+                                                    } @else {
+                                                        <a uiSrefActive="active" [id]="refId(item)" [uiSref]="item.ref">
+                                                            @if (r.icon) {
+                                                                <i [ngClass]="r.icon"></i>
+                                                            } {{ item.i18n | translate }}
+                                                        </a>
+                                                    }
+                                                </li>
+                                            }
+                                        }
+                                    </ng-template>
+                                </li>
+                            }
                         </ng-template>
-                    </ng-container>
-                    </ng-template>
-                    </li>
-                    </ng-template>
-                </ng-container>
-            </ng-container>
-            </ng-container>
+                    }
+                }
+            }
         </ul>
     </nav>
 
@@ -70,7 +81,7 @@
                 </div>
                 <div class="navbar-right">
                     <button type="button" class="navbar-toggler" (click)="toggleSidebar()" aria-controls="sidebar"
-                        aria-expanded="true" aria-label="Toggle navigation">
+                            aria-expanded="true" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                     </button>
                     <ui-nvmonitor-plugin></ui-nvmonitor-plugin>

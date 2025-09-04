@@ -26,6 +26,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.vidconv.backend.service.ConverterService;
 import org.mycore.vidconv.backend.service.ConverterService.ConverterJob;
+import org.mycore.vidconv.common.config.Configuration;
 import org.mycore.vidconv.common.event.Event;
 import org.mycore.vidconv.common.util.Executable;
 import org.mycore.vidconv.plugin.ListenerPlugin;
@@ -33,14 +34,14 @@ import org.mycore.vidconv.plugin.annotation.Plugin;
 import org.mycore.vidconv.plugin.subtitle.VoskExtractor.VoskResult;
 import org.mycore.vidconv.plugin.subtitle.VoskExtractor.VoskResult.Word;
 
+import javax.sound.sampled.UnsupportedAudioFileException;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -212,4 +213,67 @@ public class SubtitlePlugin extends ListenerPlugin {
         }
     }
 
+    public static void main(String[] args) throws IOException, UnsupportedAudioFileException {
+        Configuration config = Configuration.instance();
+
+        config.set("APP.Jersey.DynamicEntities",
+                "org.mycore.vidconv.frontend.entity,org.mycore.vidconv.frontend.entity.probe,org.mycore.vidconv.plugin.wowza,org.mycore.vidconv.plugin.subtitle");
+
+        config.set("VoskExtractor.modelPath", "/Users/adlerre/Downloads/");
+        config.set("VoskExtractor.model.de", "vosk-model-de-0.21");
+        config.set("VoskExtractor.model.en", "vosk-model-en-us-0.22");
+        config.set("VoskExtractor.model.ru", "vosk-model-ru-0.22");
+        config.set("VoskExtractor.model.it", "vosk-model-small-it-0.4");
+
+        VoskExtractor extractor = new VoskExtractor(SAMPLE_RATE);
+
+        String fileBase = "/Users/adlerre/Downloads/test.mp4/";
+
+        Map<String, String> filesWithLng = new HashMap<>();
+        filesWithLng.put("test.wav", VoskExtractor.DE);
+//        filesWithLng.put("test2.wav", VoskExtractor.DE);
+//        filesWithLng.put("test3.wav", VoskExtractor.DE);
+//        filesWithLng.put("test4.wav", VoskExtractor.EN);
+//        filesWithLng.put("test5.wav", VoskExtractor.EN);
+//        filesWithLng.put("test7.wav", VoskExtractor.RU);
+//        filesWithLng.put("test8.wav", VoskExtractor.RU);
+//        filesWithLng.put("test9.wav", VoskExtractor.IT);
+//        filesWithLng.put("test10.wav", VoskExtractor.IT);
+//        filesWithLng.put("test11.wav", VoskExtractor.IT);
+//        filesWithLng.put("test12.wav", VoskExtractor.DE);
+        //filesWithLng.put("test13.wav", VoskExtractor.DE);
+
+        for (Map.Entry<String, String> fe : filesWithLng.entrySet()) {
+            LOGGER.info("===========================================================");
+            String lng = extractor.guessLanguage(Paths.get(fileBase).resolve(fe.getKey()));
+            if (lng.equals(fe.getValue())) {
+                LOGGER.info("{} matches {}", fe.getKey(), lng);
+            } else {
+                LOGGER.info("{} is {} expected {}", fe.getKey(), lng, fe.getValue());
+            }
+            LOGGER.info("===========================================================");
+        }
+
+//        String file = "/Users/adlerre/Downloads/jvalley.wav";
+//        Path filePath = Paths.get(file);
+//        long start = System.currentTimeMillis();
+//
+//        String lang = "en"; // extractor.guessLanguage(filePath);
+//        LOGGER.info("language: {} {}ms", lang, System.currentTimeMillis() - start);
+//
+//        extractor.setModelLang(lang);
+//        List<VoskResult> result = extractor.extract(filePath);
+//
+//        if (result != null) {
+//            result.forEach(r -> LOGGER.info(r.getText()));
+//            VttObject vtt = buildSubtitle(result);
+//
+//            VttWriter vttWriter = new VttWriter(StandardCharsets.UTF_8.name());
+//            String vttFile = formatFileName(filePath.getParent(), filePath.getFileName(), ".vtt");
+//            LOGGER.info("write WebVTT to {}", vttFile);
+//            try (OutputStream out = Files.newOutputStream(Paths.get(vttFile))) {
+//                vttWriter.write(vtt, out);
+//            }
+//        }
+    }
 }

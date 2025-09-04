@@ -5,7 +5,7 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
 import { NgPipesModule } from "ngx-pipes";
 import { NgSelectModule } from "@ng-select/ng-select";
-import { NgOptionHighlightModule } from "@ng-select/ng-option-highlight";
+import { NgOptionHighlightDirective } from "@ng-select/ng-option-highlight";
 import { PipesModule } from "../_pipes/pipes.module";
 import { TranslateModule } from "@ngx-translate/core";
 
@@ -27,7 +27,7 @@ import { SettingsVideoComponent } from "./settings.video.component";
         NgbModule,
         NgPipesModule,
         NgSelectModule,
-        NgOptionHighlightModule,
+        NgOptionHighlightDirective,
         PipesModule,
         TranslateModule,
         UIRouterModule.forChild({

@@ -1,16 +1,15 @@
 import { BrowserModule } from "@angular/platform-browser";
-import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { HTTP_INTERCEPTORS, HttpClient, provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
-import { Injectable, NgModule } from "@angular/core";
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
+import { NgModule } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { TranslateCompiler, TranslateLoader, TranslateModule } from "@ngx-translate/core";
-import { TranslateHttpLoader } from "@ngx-translate/http-loader";
+import { provideTranslateCompiler, provideTranslateService, TranslateModule } from "@ngx-translate/core";
+import { provideTranslateHttpLoader } from "@ngx-translate/http-loader";
 import { MESSAGE_FORMAT_CONFIG, TranslateMessageFormatCompiler } from "ngx-translate-messageformat-compiler";
 
 import { NgPipesModule } from "ngx-pipes";
 import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
 import { NgSelectModule } from "@ng-select/ng-select";
-import { NgOptionHighlightModule } from "@ng-select/ng-option-highlight";
+import { NgOptionHighlightDirective } from "@ng-select/ng-option-highlight";
 import { ToastrModule } from "ngx-toastr";
 
 import { UIRouterModule } from "@uirouter/angular";
@@ -34,10 +33,7 @@ import { DashboardComponent, DashboardStates } from "./dashboard/dashboard.compo
 import { LoginComponent, LoginStates } from "./login/login.component";
 
 import { ConfirmComponent } from "./modals/confirm.component";
-
-export function createTranslateLoader(http: HttpClient) {
-    return new TranslateHttpLoader(http, "./assets/i18n/", ".json");
-}
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 
 // Lazy Loading States
 export const ConverterFutureState = {
@@ -51,11 +47,6 @@ export const SettingsFutureState = {
     url: "/settings",
     loadChildren: () => import("./settings/settings.module").then(m => m.SettingsModule)
 };
-
-// @FIXME workaround for ivy build
-@Injectable({providedIn: "root"})
-export class InjectableTranslateMessageFormatCompiler extends TranslateMessageFormatCompiler {
-}
 
 @NgModule({
     declarations: [
@@ -72,7 +63,7 @@ export class InjectableTranslateMessageFormatCompiler extends TranslateMessageFo
         SpinnerModule,
         NgPipesModule,
         NgSelectModule,
-        NgOptionHighlightModule,
+        NgOptionHighlightDirective,
         PipesModule,
         NgbModule,
         PluginsModule,
@@ -83,19 +74,7 @@ export class InjectableTranslateMessageFormatCompiler extends TranslateMessageFo
             preventDuplicates: true,
             maxOpened: 3
         }),
-        TranslateModule.forRoot({
-            loader: {
-                provide: TranslateLoader,
-                useFactory: (createTranslateLoader),
-                deps: [HttpClient]
-            },
-            compiler: {
-                provide: TranslateCompiler,
-                // @FIXME workaround for ivy build
-                // useClass: TranslateMessageFormatCompiler
-                useClass: InjectableTranslateMessageFormatCompiler
-            }
-        }),
+        TranslateModule.forRoot(),
         UIRouterModule.forRoot({
             states: [
                 LoginStates,
@@ -108,9 +87,18 @@ export class InjectableTranslateMessageFormatCompiler extends TranslateMessageFo
             otherwise: "/"
         })], providers: [
         provideHttpClient(withInterceptorsFromDi()),
-        {provide: HTTP_INTERCEPTORS, useClass: AuthHttpInterceptor, multi: true},
+        provideTranslateService({
+            compiler: provideTranslateCompiler(TranslateMessageFormatCompiler),
+            loader: provideTranslateHttpLoader({prefix: "./assets/i18n/", suffix: ".json"}),
+        }),
         {
-            provide: MESSAGE_FORMAT_CONFIG, useValue: {
+            provide: HTTP_INTERCEPTORS,
+            useClass: AuthHttpInterceptor,
+            multi: true
+        },
+        {
+            provide: MESSAGE_FORMAT_CONFIG,
+            useValue: {
                 biDiSupport: false,
                 intlSupport: false,
                 strictNumberSign: false
